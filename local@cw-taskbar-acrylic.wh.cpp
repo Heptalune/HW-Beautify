@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.2.10
+// @version         4.2.11
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -66,6 +66,8 @@
 
 
 
+
+- **4.2.11**：托盘悬停/选中背景小框恢复相称尺寸：快捷设置与通知按钮的圆角背景加高，不再显得过小（CW 汉化版调整）。
 - **4.2.10**：按反馈调整托盘缩放：仅放大托盘软件图标与输入法图标，系统图标（WiFi、音量、电池、铃铛等）与时钟日期恢复系统原样；保留托盘垂直居中（CW 汉化版调整）。
 - **4.2.9**：托盘区等比缩放：托盘图标、系统图标、时钟日期与间距跟随任务栏高度等比放大并垂直居中，不再底部留空（CW 汉化版新增；静态值对应「等比缩放=125%」）。
 - **4.2.8**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
@@ -940,6 +942,10 @@ const Theme g_themeTranslucentTaskbar = {{
         L"Padding=5,0"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
         L"MinWidth=40"}},
+    ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
+        L"MinHeight=52"}},
+    ThemeTargetStyles{L"SystemTray.OmniButton#NotificationCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
+        L"MinHeight=52"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Fill:=$CommonBgBrush"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#HoverFlyoutBackgroundControl > Grid > Rectangle#BackgroundFill", {
@@ -1037,6 +1043,10 @@ const Theme g_themeSimplyTransparent = {{
         L"Padding=5,0"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
         L"MinWidth=40"}},
+    ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
+        L"MinHeight=52"}},
+    ThemeTargetStyles{L"SystemTray.OmniButton#NotificationCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
+        L"MinHeight=52"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Fill=Transparent"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
