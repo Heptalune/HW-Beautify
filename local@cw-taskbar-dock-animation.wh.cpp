@@ -1,4 +1,4 @@
-// ==WindhawkMod==
+﻿// ==WindhawkMod==
 // @id              cw-taskbar-dock-animation
 // @name              CW-任务栏 Dock 动画
 // @name:zh-CN        CW-任务栏 Dock 动画
@@ -13,7 +13,7 @@
 // @description:ko-KR macOS처럼 마우스를 올리면 작업 표시줄 아이콘이 애니메이션됩니다
 // @description:pt-BR Anima os ícones da barra de tarefas ao passar o mouse, como no macOS
 // @description:it-IT Anima le icone della barra delle applicazioni al passaggio del mouse, come su macOS
-// @version           1.9.3
+// @version           1.9.4
 // @author            Ph0en1x-dev
 // @github            https://github.com/Ph0en1x-dev
 // @include           explorer.exe
@@ -49,7 +49,7 @@
 
 ## 已知问题
 
-- 图标偶尔会被任务栏裁切。
+- 图标偶尔会被任务栏裁切（CW 1.9.4 已加入「防裁剪保护」自动收住弹跳，可大幅缓解；配合加高任务栏效果更好）。
 - 放大后的图标可能略显模糊。
 - 配合 CW-任务栏高度与图标大小做窄任务栏时，请把「最大缩放」保持在 130% 或以下，减少裁切（原作者建议）。
 - 不支持 StartAllBack（原作者说明，支持需要重写整个代码库）。
@@ -67,10 +67,14 @@
 - **任务栏标签兼容模式**：任务栏显示窗口标题（矩形按钮）时开启，修正动画居中。
 - **排除系统按钮**：0=全部动画，1=排除开始，2=排除开始/搜索/任务视图/小组件，3=仅应用图标。
 - **平滑度（Lerp 速度）**：越高越灵敏，越低越平滑，0 为禁用。
+- **弹跳抬升幅度（%）**：空闲「呼吸」弹跳高度的倍率（50-300，默认 100）。
+- **禁用防裁剪保护**：默认开启保护，自动把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切。
 - **禁用弹跳效果**：完全关闭空闲「呼吸」。
 
 ## 更新日志
 
+
+- **1.9.4**：新增「弹跳抬升幅度」与「防裁剪保护」：弹跳高度可调（50%-300%），并自动避免图标被任务栏上边缘平口裁切（CW 汉化版新增功能）。
 - **1.9.3**：中文汉化与整合（仅元数据、说明与设置文案，代码与原版 1.9.2 一致）；修正「弹跳开始延迟」的默认值描述（实际默认 500 毫秒）。
 
 ## 致谢与许可
@@ -138,6 +142,16 @@ You can experiment with the **radius** value to achieve the best result for your
   $description:ko-KR: "아이콘이 커질 수 있는 최대 크기 (예: 160 = +60%)"
   $description:pt-BR: "Até quanto o ícone pode aumentar (ex.: 160 = +60%)"
   $description:it-IT: "Quanto può ingrandirsi un’icona (es.: 160 = +60%)"
+- BounceAmplitude: 100
+  $name: Bounce amplitude (%)
+  $name:zh-CN: 弹跳抬升幅度（%）
+  $description: Multiplier for the idle breathing bounce height (100 = default, 200 = twice as high).
+  $description:zh-CN: 空闲“呼吸”弹跳高度的倍率（100=默认，200=两倍高度）。防裁剪保护开启时，超出任务栏上边缘的部分会被自动收住。
+- DisableAntiClipGuard: false
+  $name: Disable anti-clip guard
+  $name:zh-CN: 禁用防裁剪保护
+  $description: Automatically limits the bounce so icons are not flat-cut by the taskbar top edge.
+  $description:zh-CN: 自动把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切。默认开启；关闭后按原始幅度弹跳。
 - EffectRadius: 100
   $name: Effect radius (px)
   $name:uk-UA: Радіус ефекту (пкс)
@@ -330,6 +344,8 @@ struct {
     bool disableVerticalBounce;
     bool taskbarLabelsMode;
     int excludeSystemButtonsMode;
+    double bounceAmplitude;
+    bool antiClipDisabled;
     double lerpSpeed;
     bool disableBounce;
 } g_settings;
@@ -496,8 +512,12 @@ void ApplyAnimation(double mouseX, DockAnimationContext& ctx, double intensity, 
                             .count();
         double t = std::fmod(elapsed_ms, BOUNCE_PERIOD_MS) / BOUNCE_PERIOD_MS;
         double normalizedWave = std::sin(t * 3.14159);
-        bounceScaleFactor = 1.0 + (normalizedWave * BOUNCE_SCALE_AMOUNT);
-        bounceTranslateY = normalizedWave * BOUNCE_TRANSLATE_Y;       
+        bounceScaleFactor =
+            1.0 + (normalizedWave * BOUNCE_SCALE_AMOUNT *
+            g_settings.bounceAmplitude);
+        bounceTranslateY =
+            normalizedWave * BOUNCE_TRANSLATE_Y *
+            g_settings.bounceAmplitude;       
         if (g_settings.mirrorAnimation) {
             bounceTranslateY *= -1.0;
         }
@@ -543,6 +563,55 @@ void ApplyAnimation(double mouseX, DockAnimationContext& ctx, double intensity, 
         waveTranslate.X(ctx.icons[i].state.waveTranslateX);
 
         if (i == closestIconIndex && g_isBouncing) {
+            // CW: 防裁剪保护——把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切。
+            if (!g_settings.antiClipDisabled) {
+                double elHeight = element.ActualHeight();
+                auto frameElem = ctx.taskbarFrame.get();
+                if (frameElem && elHeight > 1.0) {
+                    try {
+                        auto pt = element.TransformToVisual(frameElem)
+                                      .TransformPoint({0, 0});
+                        double topGap = pt.Y;
+                        double frameH = frameElem.ActualHeight();
+                        if (g_settings.mirrorAnimation && frameH > 0) {
+                            topGap = frameH - (pt.Y + elHeight);
+                        }
+                        double headroom = topGap - 1.0;
+                        if (headroom < 0.0) {
+                            headroom = 0.0;
+                        }
+                        double combined =
+                            ctx.icons[i].state.waveScale * bounceScaleFactor;
+                        double rise = (combined - 1.0) * elHeight;
+                        if (rise > headroom) {
+                            double maxCombined = 1.0 + headroom / elHeight;
+                            double maxBounce =
+                                maxCombined / ctx.icons[i].state.waveScale;
+                            if (maxBounce < 1.0) {
+                                maxBounce = 1.0;
+                            }
+                            bounceScaleFactor = maxBounce;
+                            combined = ctx.icons[i].state.waveScale *
+                                       bounceScaleFactor;
+                            rise = (combined - 1.0) * elHeight;
+                        }
+                        double allowedUp = headroom - rise;
+                        if (allowedUp < 0.0) {
+                            allowedUp = 0.0;
+                        }
+                        if (g_settings.mirrorAnimation) {
+                            if (bounceTranslateY > allowedUp) {
+                                bounceTranslateY = allowedUp;
+                            }
+                        } else {
+                            if (bounceTranslateY < -allowedUp) {
+                                bounceTranslateY = -allowedUp;
+                            }
+                        }
+                    } catch (...) {
+                    }
+                }
+            }
             bounceScale.ScaleX(bounceScaleFactor);
             bounceScale.ScaleY(bounceScaleFactor);
 
@@ -1338,6 +1407,16 @@ void LoadSettings() {
     if (g_settings.lerpSpeed > 60) g_settings.lerpSpeed = 60;
 
     g_settings.disableBounce = (bool)Wh_GetIntSetting(L"DisableBounce");
+
+    double bounceAmp = (double)Wh_GetIntSetting(L"BounceAmplitude");
+    if (bounceAmp < 50.0) {
+        bounceAmp = 50.0;
+    } else if (bounceAmp > 300.0) {
+        bounceAmp = 300.0;
+    }
+    g_settings.bounceAmplitude = bounceAmp / 100.0;
+    g_settings.antiClipDisabled =
+        (bool)Wh_GetIntSetting(L"DisableAntiClipGuard");
 
     Wh_Log(L"DockAnimation: Settings loaded.");
 }
