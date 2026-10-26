@@ -1,7 +1,7 @@
 // ==WindhawkMod==
-// @id              windows-animations
-// @name            ZenDesktop: 窗口动画
-// @name:zh-CN      ZenDesktop: 窗口动画
+// @id              cw-windows-animations
+// @name            CW-窗口动画
+// @name:zh-CN      CW-窗口动画
 // @description     Close, minimize, restore, launch and Alt+Tab animations for windows, including the macOS genie effect.
 // @description:zh-CN 为窗口的关闭、最小化、还原、启动和 Alt+Tab 切换加入动画，包含 macOS 神奇效果。
 // @version         1.5.2
@@ -66,11 +66,12 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
 > 原作者：**ReDrag**（Window Animations，MIT）。本版由 Lanbo 维护与扩展，原作者的捐助链接保留在 `@donateUrl`。
 
-# ZenDesktop: 窗口动画
+# CW-窗口动画
 
 为窗口的关闭、最小化、还原、启动和 Alt+Tab 切换加入动画，包含从「macOS 最小化动画」合并来的 macOS 神奇效果。基于 ReDrag 的 Windows Animations v1.3.7。
 
@@ -116,7 +117,7 @@
 - macOS 神奇效果移植自 [macOS Minimize Animation](https://windhawk.net/mods/macos-minimize-animation)（MIT），作者 [Abdullah Masood](https://github.com/Abdullah-Masood-05)；其 Direct2D 网格变形引擎、圆角遮罩、网格密度设置和演示动图由 [Potassiumuncher](https://github.com/Potassiumuncher)（[MacOS-Animation-for-windows](https://github.com/Potassiumuncher/MacOS-Animation-for-windows)）编写。「排除的程序」设置也来自该 mod。
 - 经典神奇效果动画来自 Abdullah Masood 的 macOS Minimize Animation。
 - 各部分版权归各自作者所有。
-- ZenDesktop 修改（Lanbo）：中文界面、游戏与反作弊进程排除名单、覆盖范围扩展、合并 macOS 神奇效果、新增关闭与最小化样式。
+- Lanbo 的修改：中文界面、游戏与反作弊进程排除名单、覆盖范围扩展、合并 macOS 神奇效果、新增关闭与最小化样式。
 - 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 
 ## 附录：原版说明（英文）
@@ -217,7 +218,7 @@ Lower frame cost is better. Values in parentheses are speedups over version
 ### Credits
 Special thanks to [@Abdullah Masood](https://github.com/Abdullah-Masood-05) for the Classic Genie animation from his [macOS Minimize Animation](https://windhawk.net/mods/macos-minimize-animation) mod.
 
-**ZenDesktop 1.4.0 merge** — the **macOS Genie** style is ported from the
+**1.4.0 merge (CW)** — the **macOS Genie** style is ported from the
 [macOS Minimize Animation](https://windhawk.net/mods/macos-minimize-animation)
 mod (MIT) by **Abdullah Masood** (https://github.com/Abdullah-Masood-05). Its
 Direct2D genie engine — the mesh warp driven by the macOS "lamp" curve, the
@@ -882,14 +883,14 @@ std::atomic<bool> g_nativeShowDesktopAnimations{false};
 std::atomic<bool> g_gpuAcceleration{true};
 std::atomic<bool> g_closeGpuAcceleration{true};
 std::atomic<bool> g_performanceTelemetry{false};
-// ZenDesktop (macOS genie merge): mesh resolution of the macOS genie and the
+// CW (macOS genie merge): mesh resolution of the macOS genie and the
 // "Excluded programs" list, both from the macOS Minimize Animation mod.
 std::atomic<int> g_genieTileCount{35};
 std::mutex g_ExcludedProgramsMutex;
 std::vector<std::wstring> g_ExcludedPrograms;  // normalized, see below
 std::atomic<bool> g_hasExcludedPrograms{false};
 
-// ZenDesktop: effect registry. The numeric indices are stable: shuffle bags,
+// CW: effect registry. The numeric indices are stable: shuffle bags,
 // the GPU pipeline map (RequiredGpuPipelines), the minimize/restore pair token
 // (4 bits, so at most 15 minimize/restore effects) and the shaders all use
 // them. To add an effect: give it the next free index here, add a row to the
@@ -2706,7 +2707,7 @@ static bool EnsureSharedStateMapped() {
     g_pSharedState = view;
     return true;
 }
-// ZenDesktop: normalizes an "Excluded programs" entry the same way as
+// CW: normalizes an "Excluded programs" entry the same way as
 // GetProcessNameCached: file name only, lowercased, cut at the first dot.
 static std::wstring NormalizeExcludedProgramName(PCWSTR value) {
     std::wstring name = value ? value : L"";
@@ -2744,7 +2745,7 @@ void LoadAnimSettings() {
         WindhawkUtils::StringSetting::make(L"minimize_restore.effect_style");
     const PCWSTR closeStyleValue = closeStyle;
     const PCWSTR minRestoreStyleValue = minRestoreStyle;
-    // ZenDesktop: every effect_style option is non-empty, so both being empty
+    // CW: every effect_style option is non-empty, so both being empty
     // means the settings were never written (the file was only copied, or an
     // installer seeded a few keys). Windhawk reads a missing value as 0 / "",
     // so then use the settings-block defaults instead of "everything off".
@@ -3473,7 +3474,7 @@ std::wstring GetProcessNameCached(HWND hWnd) {
     }
     return procNameLower;
 }
-// ZenDesktop: true if the process that owns hWnd is on the "Excluded
+// CW: true if the process that owns hWnd is on the "Excluded
 // programs" list. Checked at each animation entry point (not inside the
 // generic window filters, which also drive GPU and lifetime bookkeeping).
 static bool IsUserExcludedWindow(HWND hWnd) {
@@ -3530,7 +3531,7 @@ static bool IsAppMainWindow(HWND hWnd, bool forSwitch = false) {
     if (!hWnd || !IsWindow(hWnd) || !IsWindowVisible(hWnd) || IsIconic(hWnd) || GetAncestor(hWnd, GA_ROOT) != hWnd) return false;
     const LONG_PTR style = GetWindowLongPtrW(hWnd, GWL_STYLE);
     const LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
-    // ZenDesktop: owned windows that ask for a taskbar button
+    // CW: owned windows that ask for a taskbar button
     // (WS_EX_APPWINDOW), e.g. the main window of apps that parent it to a
     // hidden owner, are app windows too.
     const bool appWindow = (exStyle & WS_EX_APPWINDOW) != 0;
@@ -3548,7 +3549,7 @@ static bool IsAppMainWindow(HWND hWnd, bool forSwitch = false) {
         return false;
     }
     RECT r{};
-    // ZenDesktop: 200px (was 300px) so that small app windows are included.
+    // CW: 200px (was 300px) so that small app windows are included.
     bool isMain = GetWindowRect(hWnd, &r) && r.right - r.left >= 200 && r.bottom - r.top >= 200;
     return isMain;
 }
@@ -3864,7 +3865,7 @@ static bool ShouldAnimateWindow(HWND hWnd) {
     } else if (!GetWindowRect(hWnd, &r)) return false;
     return r.right - r.left >= 40 && r.bottom - r.top >= 40;
 }
-// ZenDesktop: frameless Chromium/Electron app windows (VS Code, Discord...)
+// CW: frameless Chromium/Electron app windows (VS Code, Discord...)
 // have no WS_CAPTION. Their menus, tooltips and popups share the class, so
 // only unowned (or WS_EX_APPWINDOW), resizable or taskbar windows count.
 static bool IsChromiumFramelessAppWindow(HWND hWnd, LONG_PTR style,
@@ -7962,7 +7963,7 @@ static void ScheduleFinalWindowGpuRelease(HWND closingWindow) {
 }
 
 // -------------------------------------------------------------------------
-// ZenDesktop: macOS genie (kMinRestoreMacGenie). Ported from the macOS
+// CW: macOS genie (kMinRestoreMacGenie). Ported from the macOS
 // Minimize Animation mod (MIT) by Abdullah Masood; the Direct2D genie engine
 // (lamp curve, mesh warp, outline mask, tile count) is Potassiumuncher's
 // (https://github.com/Potassiumuncher). The original only knew a bottom
@@ -8841,7 +8842,7 @@ private:
                         frame.height, 1.0f);
     }
 
-    // --- ZenDesktop 1.5.0 close / min-restore styles ---
+    // --- CW 1.5.0 close / min-restore styles ---
     static float EaseOutCubic(float t) {
         const float u = 1.0f - t;
         return 1.0f - u * u * u;

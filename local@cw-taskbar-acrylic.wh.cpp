@@ -1,10 +1,10 @@
 // ==WindhawkMod==
-// @id              zen-taskbar-acrylic
-// @name            ZenDesktop: 任务栏美化
-// @name:zh-CN      ZenDesktop: 任务栏美化
+// @id              cw-taskbar-acrylic
+// @name            CW-任务栏美化
+// @name:zh-CN      CW-任务栏美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.2.7
+// @version         4.2.8
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -25,11 +25,12 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
-> 原作者：**m417z**（[Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。本版由 Lanbo 修改与维护，问题请到 [ZenDesktop](https://github.com/Liset999/ZenDesktop/issues) 反馈。
+> 原作者：**m417z**（[Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
 
-# ZenDesktop: 任务栏美化
+# CW-任务栏美化
 
 为 Windows 11 任务栏提供亚克力、模糊和透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Taskbar Styler v1.10。
 
@@ -38,7 +39,7 @@
 - 背景颜色、模糊、不透明度、亮度预设，可与任意内置主题搭配。
 - 设置按区分组；「统一设置」开启时，托盘溢出面板和音量/亮度浮窗跟随任务栏背景，关闭后可单独调节。
 - 可选「最大化时加深背景」：某个显示器上有最大化窗口时，该显示器的任务栏改用更实的背景。
-- 文字颜色与其他 ZenDesktop mod 共用同一套选项。
+- 文字颜色与其他 CW 模组共用同一套选项。
 - 可选任务栏空白处点击穿透，适合 Dock 风格主题。
 
 ## 设置说明
@@ -62,7 +63,9 @@
 
 ## 更新日志
 
-- **4.2.7**：默认主题改回「自定义玻璃」，已选的主题不变；问题反馈改到 ZenDesktop 仓库，说明开头补上原作者说明，微信赞赏链接改为指向 `main` 分支。
+
+- **4.2.8**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
+- **4.2.7**：默认主题改回「自定义玻璃」，已选的主题不变；问题反馈渠道调整，说明开头补上原作者说明，微信赞赏链接改为指向 `main` 分支。
 - **4.2.6**：设置按区分组（主题与文字、任务栏背景、托盘溢出面板、音量/亮度浮窗、最大化时、高级），新增「统一设置」让弹窗跟随任务栏背景；旧版保存的设置继续生效。
 - **4.2.5**：Win+X 菜单和托盘溢出面板去掉额外描边，圆角跟 Windows 自带一致（自定义玻璃和液态玻璃主题都适用）；默认主题改为「液态玻璃」，已选的主题不变。
 - **4.2.4**：液态玻璃主题去掉额外描边，圆角恢复为 Windows 自带的大小（面板 8、元素 4）；保留玻璃模糊和底色。
@@ -71,7 +74,7 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Taskbar Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- ZenDesktop 修改（Lanbo）：背景颜色/模糊/不透明度预设、溢出面板与音量浮窗独立玻璃、最大化状态层、文字颜色与中文设置。
+- Lanbo 的修改：背景颜色/模糊/不透明度预设、溢出面板与音量浮窗独立玻璃、最大化状态层、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
@@ -671,45 +674,45 @@ from the **TranslucentTB** project.
   $description: "Overall theme, background tint and text color."
   $description:zh-CN: "整体主题、背景色调和文字颜色。"
 - taskbar:
-    - blurPreset: 30
+    - blurPreset: "30"
       $name: "Blur"
       $name:zh-CN: "模糊"
       $description: "Background blur strength, 0–60. Larger is blurrier."
       $description:zh-CN: "背景模糊强度，范围 0–60，数值越大越模糊。"
       $options:
-        - 0: "0：不模糊"
-        - 10: "10：轻微"
-        - 20: "20：中等"
-        - 30: "30：较强"
-        - 45: "45：强"
-        - 60: "60：最强"
-    - opacityPreset: 50
+        - "0": "0：不模糊"
+        - "10": "10：轻微"
+        - "20": "20：中等"
+        - "30": "30：较强"
+        - "45": "45：强"
+        - "60": "60：最强"
+    - opacityPreset: "50"
       $name: "Opacity"
       $name:zh-CN: "不透明度"
       $description: "Fill strength of the background color, 0–100%. 0% is fully transparent, 100% is opaque."
       $description:zh-CN: "背景颜色的填充浓度，范围 0–100%。0% 为完全透明，100% 为完全不透明。"
       $options:
-        - 0: "0%：完全透明"
-        - 10: "10%：很薄"
-        - 25: "25%：较薄"
-        - 50: "50%：适中"
-        - 75: "75%：较厚"
-        - 90: "90%：很厚"
-        - 100: "100%：完全不透明"
-    - luminosityPreset: 20
+        - "0": "0%：完全透明"
+        - "10": "10%：很薄"
+        - "25": "25%：较薄"
+        - "50": "50%：适中"
+        - "75": "75%：较厚"
+        - "90": "90%：很厚"
+        - "100": "100%：完全不透明"
+    - luminosityPreset: "20"
       $name: "Luminosity"
       $name:zh-CN: "亮度"
       $description: "Luminosity layer strength of the background, 0–150."
       $description:zh-CN: "背景亮度层的强度，范围 0–150。"
       $options:
-        - 0: "0：最低"
-        - 20: "20：低"
-        - 25: "25：较低"
-        - 50: "50：中"
-        - 75: "75：较高"
-        - 100: "100：标准"
-        - 125: "125：高"
-        - 150: "150：最高"
+        - "0": "0：最低"
+        - "20": "20：低"
+        - "25": "25：较低"
+        - "50": "50：中"
+        - "75": "75：较高"
+        - "100": "100：标准"
+        - "125": "125：高"
+        - "150": "150：最高"
   $name: "Taskbar background"
   $name:zh-CN: "任务栏背景"
   $description: "Blur, opacity and luminosity of the taskbar background. Mainly for Custom Glass and other themes that use the shared background; Liquid Glass uses its own fixed values."
@@ -720,89 +723,89 @@ from the **TranslucentTB** project.
   $description: "The overflow panel and the volume/brightness OSD use the taskbar background's blur, opacity and luminosity; their own groups below are ignored. Default: on."
   $description:zh-CN: "托盘溢出面板和音量/亮度浮窗跟随「任务栏背景」的模糊、不透明度和亮度，下方两组各自的设置被忽略。默认开启。"
 - tray:
-    - blurPreset: 30
+    - blurPreset: "30"
       $name: "Blur"
       $name:zh-CN: "模糊"
       $description: "Blur strength of the overflow icon panel, independent of the taskbar, 0–60. Default: 30."
       $description:zh-CN: "溢出图标面板的模糊强度，独立于任务栏本身，范围 0–60。默认 30。"
       $options:
-        - 0: "0：不模糊"
-        - 10: "10：轻微"
-        - 20: "20：中等"
-        - 30: "30：较强"
-        - 45: "45：强"
-        - 60: "60：最强"
-    - opacityPreset: 50
+        - "0": "0：不模糊"
+        - "10": "10：轻微"
+        - "20": "20：中等"
+        - "30": "30：较强"
+        - "45": "45：强"
+        - "60": "60：最强"
+    - opacityPreset: "50"
       $name: "Opacity"
       $name:zh-CN: "不透明度"
       $description: "Fill strength of the overflow icon panel (the flyout shown when tray icons do not fit, not the clock), 0–100%. Default: 50%."
       $description:zh-CN: "溢出图标面板（托盘图标放不下时弹出的面板，不是时钟）的颜色浓度，范围 0–100%。默认 50%。"
       $options:
-        - 0: "0%：完全透明"
-        - 10: "10%：很薄"
-        - 25: "25%：较薄"
-        - 50: "50%：适中"
-        - 75: "75%：较厚"
-        - 90: "90%：很厚"
-        - 100: "100%：完全不透明"
-    - luminosityPreset: 20
+        - "0": "0%：完全透明"
+        - "10": "10%：很薄"
+        - "25": "25%：较薄"
+        - "50": "50%：适中"
+        - "75": "75%：较厚"
+        - "90": "90%：很厚"
+        - "100": "100%：完全不透明"
+    - luminosityPreset: "20"
       $name: "Luminosity"
       $name:zh-CN: "亮度"
       $description: "Luminosity layer strength of the overflow icon panel, 0–150. Default: 20."
       $description:zh-CN: "溢出图标面板亮度层的强度，范围 0–150。默认 20。"
       $options:
-        - 0: "0：最低"
-        - 20: "20：低"
-        - 25: "25：较低"
-        - 50: "50：中"
-        - 75: "75：较高"
-        - 100: "100：标准"
-        - 125: "125：高"
-        - 150: "150：最高"
+        - "0": "0：最低"
+        - "20": "20：低"
+        - "25": "25：较低"
+        - "50": "50：中"
+        - "75": "75：较高"
+        - "100": "100：标准"
+        - "125": "125：高"
+        - "150": "150：最高"
   $name: "Overflow panel"
   $name:zh-CN: "托盘溢出面板"
   $description: "The panel shown when tray icons do not fit (not the clock). Ignored while \"Unify flyouts\" is on."
   $description:zh-CN: "托盘图标放不下时弹出的面板（不是时钟）。开启「统一设置」时忽略此组。"
 - volume:
-    - blurPreset: 30
+    - blurPreset: "30"
       $name: "Blur"
       $name:zh-CN: "模糊"
       $description: "Blur strength of the volume/brightness slider, 0–60. Default: 30."
       $description:zh-CN: "音量/亮度滑条的模糊强度，范围 0–60。默认 30。"
       $options:
-        - 0: "0：不模糊"
-        - 10: "10：轻微"
-        - 20: "20：中等"
-        - 30: "30：较强"
-        - 45: "45：强"
-        - 60: "60：最强"
-    - opacityPreset: 50
+        - "0": "0：不模糊"
+        - "10": "10：轻微"
+        - "20": "20：中等"
+        - "30": "30：较强"
+        - "45": "45：强"
+        - "60": "60：最强"
+    - opacityPreset: "50"
       $name: "Opacity"
       $name:zh-CN: "不透明度"
       $description: "Fill strength of the slider shown when changing volume or brightness (not the Win+A panel), 0–100%. Default: 50%."
       $description:zh-CN: "调节音量或亮度时弹出的滑条（不是 Win+A 面板）的颜色浓度，范围 0–100%。默认 50%。"
       $options:
-        - 0: "0%：完全透明"
-        - 10: "10%：很薄"
-        - 25: "25%：较薄"
-        - 50: "50%：适中"
-        - 75: "75%：较厚"
-        - 90: "90%：很厚"
-        - 100: "100%：完全不透明"
-    - luminosityPreset: 20
+        - "0": "0%：完全透明"
+        - "10": "10%：很薄"
+        - "25": "25%：较薄"
+        - "50": "50%：适中"
+        - "75": "75%：较厚"
+        - "90": "90%：很厚"
+        - "100": "100%：完全不透明"
+    - luminosityPreset: "20"
       $name: "Luminosity"
       $name:zh-CN: "亮度"
       $description: "Luminosity layer strength of the volume/brightness slider, 0–150. Default: 20."
       $description:zh-CN: "音量/亮度滑条亮度层的强度，范围 0–150。默认 20。"
       $options:
-        - 0: "0：最低"
-        - 20: "20：低"
-        - 25: "25：较低"
-        - 50: "50：中"
-        - 75: "75：较高"
-        - 100: "100：标准"
-        - 125: "125：高"
-        - 150: "150：最高"
+        - "0": "0：最低"
+        - "20": "20：低"
+        - "25": "25：较低"
+        - "50": "50：中"
+        - "75": "75：较高"
+        - "100": "100：标准"
+        - "125": "125：高"
+        - "150": "150：最高"
   $name: "Volume/brightness OSD"
   $name:zh-CN: "音量/亮度浮窗"
   $description: "The slider shown when changing volume or brightness (not the Win+A panel). Ignored while \"Unify flyouts\" is on."
@@ -813,47 +816,47 @@ from the **TranslucentTB** project.
       $name:zh-CN: "最大化时加深背景"
       $description: "When a monitor has a maximized window, its taskbar switches to the denser background defined by the three settings below. Default: off."
       $description:zh-CN: "某个显示器上有最大化窗口时，该显示器的任务栏改用下方三项定义的更实的背景。默认关闭。"
-    - blur: 24
+    - blur: "24"
       $name: "Blur"
       $name:zh-CN: "模糊"
       $description: "Used only when the maximized window layer is on, 0–60. Default: 24."
       $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–60。默认 24。"
       $options:
-        - 0: "0：不模糊"
-        - 10: "10：轻微"
-        - 20: "20：中等"
-        - 24: "24：中等偏强"
-        - 30: "30：较强"
-        - 45: "45：强"
-        - 60: "60：最强"
-    - opacity: 72
+        - "0": "0：不模糊"
+        - "10": "10：轻微"
+        - "20": "20：中等"
+        - "24": "24：中等偏强"
+        - "30": "30：较强"
+        - "45": "45：强"
+        - "60": "60：最强"
+    - opacity: "72"
       $name: "Opacity"
       $name:zh-CN: "不透明度"
       $description: "Used only when the maximized window layer is on, 0–100%. Default: 72%."
       $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–100%。默认 72%。"
       $options:
-        - 0: "0%：完全透明"
-        - 10: "10%：很薄"
-        - 25: "25%：较薄"
-        - 50: "50%：适中"
-        - 72: "72%：较厚"
-        - 85: "85%：厚"
-        - 90: "90%：很厚"
-        - 100: "100%：完全不透明"
-    - luminosity: 20
+        - "0": "0%：完全透明"
+        - "10": "10%：很薄"
+        - "25": "25%：较薄"
+        - "50": "50%：适中"
+        - "72": "72%：较厚"
+        - "85": "85%：厚"
+        - "90": "90%：很厚"
+        - "100": "100%：完全不透明"
+    - luminosity: "20"
       $name: "Luminosity"
       $name:zh-CN: "亮度"
       $description: "Used only when the maximized window layer is on, 0–150. Default: 20."
       $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–150。默认 20。"
       $options:
-        - 0: "0：最低"
-        - 20: "20：低"
-        - 25: "25：较低"
-        - 50: "50：中"
-        - 75: "75：较高"
-        - 100: "100：标准"
-        - 125: "125：高"
-        - 150: "150：最高"
+        - "0": "0：最低"
+        - "20": "20：低"
+        - "25": "25：较低"
+        - "50": "50：中"
+        - "75": "75：较高"
+        - "100": "100：标准"
+        - "125": "125：高"
+        - "150": "150：最高"
   $name: "Maximized window"
   $name:zh-CN: "最大化时"
   $description: "Denser taskbar background on monitors with a maximized window. Mainly for Custom Glass and other themes that use the shared background."
@@ -6399,7 +6402,7 @@ const Theme g_themeLiquidGlass_variant_Alternate = {{
     L"ElementCornerRadius=8",
 }};
 
-// ZenDesktop themes: Liquid Glass (Apple style) and its variants.
+// CW themes: Liquid Glass (Apple style) and its variants.
 const Theme g_themeAppleLiquidGlass = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"BorderThickness=0",
@@ -12563,7 +12566,7 @@ struct {
     XamlDiagnosticsHandling xamlDiagnosticsHandling;
 } g_settings;
 
-// ZenDesktop: the maximizedTaskbarLayer setting, read by the UI threads.
+// CW: the maximizedTaskbarLayer setting, read by the UI threads.
 std::atomic<bool> g_zenMaxLayerEnabled;
 
 // https://stackoverflow.com/a/51274008
@@ -19215,7 +19218,7 @@ void HandleClickThroughElement(FrameworkElement element) {
 // UWPSpy handles system XAML islands.
 void HandleClickThroughIslandRoot(
     winrt::Windows::Foundation::IInspectable const& inspectable) {
-    // ZenDesktop: the maximized layer also maps XamlRoots to their windows.
+    // CW: the maximized layer also maps XamlRoots to their windows.
     if (!g_settings.clickThroughTaskbar && !g_zenMaxLayerEnabled) {
         return;
     }
@@ -19563,7 +19566,7 @@ void HandleVirtualizingRepeater(ElementId elementId, FrameworkElement element) {
 
 void MergeResourceVariables();
 
-// ZenDesktop: maximized window layer (maximizedTaskbarLayer).
+// CW: maximized window layer (maximizedTaskbarLayer).
 //
 // While a maximized window is on a monitor, the taskbar on that monitor uses a
 // denser background brush (maximizedLayer* settings). ProcessAllStylesFromSettings
@@ -21282,7 +21285,7 @@ std::optional<bool> IsOsFeatureEnabled(UINT32 featureId) {
     return std::nullopt;
 }
 
-// ZenDesktop: background color / blur / opacity / luminosity presets.
+// CW: background color / blur / opacity / luminosity presets.
 //
 // The theme's main background constant (the first of kZenBgConstantNames that
 // the theme defines) is rebuilt from the presets. Its tint color is kept unless
@@ -21622,9 +21625,9 @@ void ZenAddExtraStyles() {
 void ProcessAllStylesFromSettings() {
     PCWSTR themeName = ZenGetStringSetting(L"look.theme", L"theme");
     const Theme* theme = nullptr;
-    // ZenDesktop: legacy TranslucentTaskbar_* presets from earlier versions.
+    // CW: legacy TranslucentTaskbar_* presets from earlier versions.
     std::vector<PCWSTR> overrideStyleConstants;
-    // ZenDesktop: an empty theme means "None", unless the settings are
+    // CW: an empty theme means "None", unless the settings are
     // missing altogether, in which case use the default theme.
     if (wcscmp(themeName, L"TranslucentTaskbar") == 0 ||
         (!*themeName && ZenSettingsUnseeded())) {
@@ -21889,7 +21892,7 @@ void UninitializeResourceVariables() {
 }
 
 void UninitializeForCurrentThread() {
-    // ZenDesktop: no more maximized layer refreshes for this thread.
+    // CW: no more maximized layer refreshes for this thread.
     ZenMaxLayerUnregisterCurrentThread();
 
     // Drop the click-through subclasses before restoring the windows below.
@@ -22010,7 +22013,7 @@ void InitializeForCurrentThread() {
     g_initializedForThread = true;
 }
 
-// ZenDesktop: serializes Wh_ModAfterInit, Wh_ModSettingsChanged,
+// CW: serializes Wh_ModAfterInit, Wh_ModSettingsChanged,
 // Wh_ModUninit and the TAP retry below. Never taken on a UI thread: the holders
 // SendMessage into the UI threads (RunFromWindowThread), so a UI thread waiting
 // for it would deadlock.
@@ -22018,7 +22021,7 @@ std::mutex g_zenLifecycleMutex;
 // Set at the start of Wh_ModUninit, under g_zenTapRetryMutex.
 std::atomic<bool> g_zenUnloading;
 
-// ZenDesktop: if injecting the TAP fails (seen right after boot), try once more
+// CW: if injecting the TAP fails (seen right after boot), try once more
 // a few seconds later, in case no other XAML host window gets created to
 // trigger a new attempt. Armed at most once per load / settings change.
 std::mutex g_zenTapRetryMutex;
@@ -22066,7 +22069,7 @@ void InitializeSettingsAndTap() {
     HRESULT hr = InjectWindhawkTAP();
     if (FAILED(hr)) {
         Wh_Log(L"Error %08X", hr);
-        // ZenDesktop: allow a later attempt instead of staying uninjected.
+        // CW: allow a later attempt instead of staying uninjected.
         g_initialized = false;
         ZenScheduleTapRetry();
     }
@@ -22124,7 +22127,7 @@ bool RunFromWindowThread(HWND hWnd,
     return true;
 }
 
-// ZenDesktop: besides the taskbar, also style the XAML islands of the tray
+// CW: besides the taskbar, also style the XAML islands of the tray
 // overflow, the notification icon overflow and the thumbnail windows.
 bool ZenIsExtraXamlHostClass(PCWSTR className) {
     return _wcsicmp(className, L"TopLevelWindowForOverflowXamlIsland") == 0 ||
@@ -22660,7 +22663,7 @@ void LoadSettings() {
 
     PCWSTR xamlDiagnosticsHandling =
         Wh_GetStringSetting(L"xamlDiagnosticsHandling");
-    // ZenDesktop: allow other consumers unless configured otherwise, so that
+    // CW: allow other consumers unless configured otherwise, so that
     // no prompt can block an Explorer thread at startup.
     g_settings.xamlDiagnosticsHandling = XamlDiagnosticsHandling::kAllow;
     if (wcscmp(xamlDiagnosticsHandling, L"block") == 0) {
@@ -22773,7 +22776,7 @@ void Wh_ModAfterInit() {
 void Wh_ModUninit() {
     Wh_Log(L">");
 
-    // ZenDesktop: stop the TAP retry first, without the lifecycle lock, which
+    // CW: stop the TAP retry first, without the lifecycle lock, which
     // its callback takes.
     {
         std::lock_guard<std::mutex> lock(g_zenTapRetryMutex);

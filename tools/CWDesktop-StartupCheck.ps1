@@ -1,8 +1,8 @@
-# ============================================================
-#  ZenDesktop startup self-check (optional, off by default)
+﻿# ============================================================
+#  CWDesktop startup self-check (optional, off by default)
 #  PowerShell 5.1 compatible. Installed by: deploy.ps1 -StartupCheck check|restart
 #  Remove with:  deploy.ps1 -StartupCheck remove
-#            or: schtasks /Delete /TN "ZenDesktop\StartupCheck" /F
+#            or: schtasks /Delete /TN "CWDesktop\StartupCheck" /F
 #
 #  Runs once per logon (scheduled task, ~15s after logon). It restarts
 #  explorer.exe AT MOST ONCE PER BOOT, and only when:
@@ -10,7 +10,7 @@
 #                    or explorer.exe crashed since boot (Application log, ID 1000).
 #    -Mode restart : always (automates the manual "restart explorer once after
 #                    boot" workaround; use only if 'check' does not catch it).
-#  Log: %LOCALAPPDATA%\ZenDesktop\startup-check.log (last ~200 lines kept)
+#  Log: %LOCALAPPDATA%\CWDesktop\startup-check.log (last ~200 lines kept)
 # ============================================================
 param(
     [ValidateSet("check", "restart")]
@@ -19,7 +19,7 @@ param(
 )
 $ErrorActionPreference = 'Continue'
 
-$dir = Join-Path $env:LOCALAPPDATA "ZenDesktop"
+$dir = Join-Path $env:LOCALAPPDATA "CWDesktop"
 if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 $log = Join-Path $dir "startup-check.log"
 $marker = Join-Path $dir "startup-check.lastboot"
@@ -39,7 +39,7 @@ try {
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
-public static class ZenWin {
+public static class CWWin {
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern IntPtr FindWindow(string cls, string title);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -68,15 +68,15 @@ $reasons = @()
 $explorer = Get-Process -Name explorer -ErrorAction SilentlyContinue
 if (-not $explorer) { $reasons += "explorer.exe not running" }
 
-$tray = [ZenWin]::FindWindow("Shell_TrayWnd", $null)
+$tray = [CWWin]::FindWindow("Shell_TrayWnd", $null)
 if ($tray -eq [IntPtr]::Zero) {
     $reasons += "Shell_TrayWnd missing"
 } else {
     $res = [IntPtr]::Zero
     # SMTO_ABORTIFHUNG = 0x2, WM_NULL = 0
-    $ok = [ZenWin]::SendMessageTimeout($tray, 0, [IntPtr]::Zero, [IntPtr]::Zero, 2, 3000, [ref]$res)
-    if ($ok -eq [IntPtr]::Zero -or [ZenWin]::IsHungAppWindow($tray)) { $reasons += "taskbar not responding" }
-    $notify = [ZenWin]::FindWindowEx($tray, [IntPtr]::Zero, "TrayNotifyWnd", $null)
+    $ok = [CWWin]::SendMessageTimeout($tray, 0, [IntPtr]::Zero, [IntPtr]::Zero, 2, 3000, [ref]$res)
+    if ($ok -eq [IntPtr]::Zero -or [CWWin]::IsHungAppWindow($tray)) { $reasons += "taskbar not responding" }
+    $notify = [CWWin]::FindWindowEx($tray, [IntPtr]::Zero, "TrayNotifyWnd", $null)
     Write-Log ("Shell_TrayWnd=0x{0:X} TrayNotifyWnd=0x{1:X}" -f $tray.ToInt64(), $notify.ToInt64())
 }
 

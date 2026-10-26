@@ -1,6 +1,6 @@
 @echo off
 echo ===================================================
-echo   ZenDesktop: Instantly Restart Explorer.exe
+echo   CW Desktop: Instantly Restart Explorer.exe
 echo ===================================================
 echo Killing explorer.exe...
 taskkill /f /im explorer.exe

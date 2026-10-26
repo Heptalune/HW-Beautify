@@ -1,5 +1,5 @@
 @echo off
-title ZenDesktop Uninstaller
+title CW Desktop Uninstaller
 setlocal
 
 :: privilege detection and elevation (same as deploy.bat)
@@ -18,7 +18,7 @@ cd /d "%~dp0"
 color 0B
 
 echo ============================================================
-echo   ZenDesktop Uninstall (PowerShell Bootstrapper)
+echo   CW Desktop Uninstall (PowerShell Bootstrapper)
 echo ============================================================
 echo.
 

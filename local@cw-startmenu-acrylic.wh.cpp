@@ -1,10 +1,10 @@
 // ==WindhawkMod==
-// @id              zen-startmenu-acrylic
-// @name            ZenDesktop: 开始菜单美化
-// @name:zh-CN      ZenDesktop: 开始菜单美化
+// @id              cw-startmenu-acrylic
+// @name            CW-开始菜单美化
+// @name:zh-CN      CW-开始菜单美化
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.1.10
+// @version         4.1.11
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -27,11 +27,12 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
-> 原作者：**m417z**（[Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler)，GPL-3.0）。本版由 Lanbo 修改与维护，问题请到 [ZenDesktop](https://github.com/Liset999/ZenDesktop/issues) 反馈。
+> 原作者：**m417z**（[Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
 
-# ZenDesktop: 开始菜单美化
+# CW-开始菜单美化
 
 为 Windows 11 开始菜单和搜索面板提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Start Menu Styler。
 
@@ -41,7 +42,7 @@
 - 展开的文件夹面板可单独设置颜色、模糊、不透明度和亮度。
 - 可自定义开始菜单宽度和高度。
 - 应用名称可显示、隐藏或悬停时显示。
-- 文字颜色与其他 ZenDesktop mod 共用同一套选项。
+- 文字颜色与其他 CW 模组共用同一套选项。
 - 搜索页（在开始菜单里打字后出现的页面）与开始菜单使用同一套玻璃、描边和文字颜色。
 
 ## 设置说明
@@ -63,8 +64,10 @@
 
 ## 更新日志
 
+
+- **4.1.11**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
 - **4.1.10**：修复从任务栏打开的搜索页不透明、还是 Windows 自带深色亚克力的问题：搜索页进程（SearchHost.exe）开机就在后台待命，mod 过早挂上时没接到真正显示的界面，之后也不会再试；现在搜索页打开时会自动重新挂接，直到外框被美化为止。自定义玻璃和液态玻璃下搜索页外框保持 Windows 自带的圆角和细描边，不再加彩色描边和大圆角；「最近」列表区域背景同样透明。一键部署会顺便重启 SearchHost.exe。
-- **4.1.9**：问题反馈改到 ZenDesktop 仓库，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
+- **4.1.9**：问题反馈渠道调整，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
 - **4.1.8**：真正修复液态玻璃主题下固定应用名称只在鼠标悬停时才显示的问题（4.1.6 没修好）：名称没有自己的文字颜色，在液态玻璃下继承到的颜色看不见；现在默认给应用名称加上系统文字颜色，深色、浅色模式都一直显示。「文字颜色」和「应用名称显示」设置照常生效。
 - **4.1.7**：修复浅色模式下液态玻璃主题中间的应用区域蒙着一层白雾的问题：应用区域不再额外叠一层玻璃，跟四周边缘一样通透；液态玻璃 - 原版同样去掉系统的浅色底；搜索页浅色模式下的卡片和预览也调得更通透。
 - **4.1.6**：修复液态玻璃主题下固定应用、推荐项的名称不显示（只在鼠标悬停时出现）的问题，名称现在像系统一样一直显示，文字颜色跟随系统深浅色或「文字颜色」设置。
@@ -72,7 +75,7 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Start Menu Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- ZenDesktop 修改（Lanbo）：重构 HostBackdrop 渲染与卡片模糊层、文件夹面板独立参数、尺寸调整、文字颜色与中文设置。
+- Lanbo 的修改：重构 HostBackdrop 渲染与卡片模糊层、文件夹面板独立参数、尺寸调整、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
@@ -485,45 +488,45 @@ from the **TranslucentTB** project.
     - SunsetOrange: "落日橙"
     - ChampagneGold: "香槟金"
     - MorandiSage: "莫兰迪绿"
-- blurPreset: 30
+- blurPreset: "30"
   $name: "Blur"
   $name:zh-CN: "模糊"
   $description: "Background blur strength, 0–60. Larger is blurrier."
   $description:zh-CN: "背景模糊强度，范围 0–60，数值越大越模糊。"
   $options:
-    - 0: "0：不模糊"
-    - 10: "10：轻微"
-    - 20: "20：中等"
-    - 30: "30：较强"
-    - 45: "45：强"
-    - 60: "60：最强"
-- opacityPreset: 50
+    - "0": "0：不模糊"
+    - "10": "10：轻微"
+    - "20": "20：中等"
+    - "30": "30：较强"
+    - "45": "45：强"
+    - "60": "60：最强"
+- opacityPreset: "50"
   $name: "Opacity"
   $name:zh-CN: "不透明度"
   $description: "Fill strength of the background color, 0–100%. 0% is fully transparent, 100% is opaque."
   $description:zh-CN: "背景颜色的填充浓度，范围 0–100%。0% 为完全透明，100% 为完全不透明。"
   $options:
-    - 0: "0%：完全透明"
-    - 10: "10%：很薄"
-    - 25: "25%：较薄"
-    - 50: "50%：适中"
-    - 75: "75%：较厚"
-    - 90: "90%：很厚"
-    - 100: "100%：完全不透明"
-- luminosityPreset: 20
+    - "0": "0%：完全透明"
+    - "10": "10%：很薄"
+    - "25": "25%：较薄"
+    - "50": "50%：适中"
+    - "75": "75%：较厚"
+    - "90": "90%：很厚"
+    - "100": "100%：完全不透明"
+- luminosityPreset: "20"
   $name: "Luminosity"
   $name:zh-CN: "亮度"
   $description: "Luminosity layer strength of the background, 0–150."
   $description:zh-CN: "背景亮度层的强度，范围 0–150。"
   $options:
-    - 0: "0：最低"
-    - 20: "20：低"
-    - 25: "25：较低"
-    - 50: "50：中"
-    - 75: "75：较高"
-    - 100: "100：标准"
-    - 125: "125：高"
-    - 150: "150：最高"
+    - "0": "0：最低"
+    - "20": "20：低"
+    - "25": "25：较低"
+    - "50": "50：中"
+    - "75": "75：较高"
+    - "100": "100：标准"
+    - "125": "125：高"
+    - "150": "150：最高"
 - textColorMode: "default"
   $name: "Text color"
   $name:zh-CN: "文字颜色"
@@ -595,44 +598,44 @@ from the **TranslucentTB** project.
     - SunsetOrange: "落日橙"
     - ChampagneGold: "香槟金"
     - MorandiSage: "莫兰迪绿"
-- folderBlurPreset: 20
+- folderBlurPreset: "20"
   $name: "Folder: blur"
   $name:zh-CN: "文件夹：模糊"
   $description: "Blur strength of the folder panel, 0–60. Default: 20."
   $description:zh-CN: "文件夹面板的模糊强度，范围 0–60。默认 20。"
   $options:
-    - 0: "0：不模糊"
-    - 10: "10：轻微"
-    - 20: "20：中等"
-    - 30: "30：较强"
-    - 45: "45：强"
-    - 60: "60：最强"
-- folderOpacityPreset: 40
+    - "0": "0：不模糊"
+    - "10": "10：轻微"
+    - "20": "20：中等"
+    - "30": "30：较强"
+    - "45": "45：强"
+    - "60": "60：最强"
+- folderOpacityPreset: "40"
   $name: "Folder: opacity"
   $name:zh-CN: "文件夹：不透明度"
   $description: "Fill strength of the folder panel color, 0–100%. Default: 40%."
   $description:zh-CN: "文件夹面板颜色的填充浓度，范围 0–100%。默认 40%。"
   $options:
-    - 0: "0%：完全透明"
-    - 10: "10%：很薄"
-    - 25: "25%：较薄"
-    - 40: "40%：适中"
-    - 75: "75%：较厚"
-    - 90: "90%：很厚"
-    - 100: "100%：完全不透明"
-- folderLuminosityPreset: 100
+    - "0": "0%：完全透明"
+    - "10": "10%：很薄"
+    - "25": "25%：较薄"
+    - "40": "40%：适中"
+    - "75": "75%：较厚"
+    - "90": "90%：很厚"
+    - "100": "100%：完全不透明"
+- folderLuminosityPreset: "100"
   $name: "Folder: luminosity"
   $name:zh-CN: "文件夹：亮度"
   $description: "Luminosity layer strength of the folder panel, 0–150. Default: 100."
   $description:zh-CN: "文件夹面板亮度层的强度，范围 0–150。默认 100。"
   $options:
-    - 0: "0：最低"
-    - 25: "25：较低"
-    - 50: "50：中"
-    - 75: "75：较高"
-    - 100: "100：标准"
-    - 125: "125：高"
-    - 150: "150：最高"
+    - "0": "0：最低"
+    - "25": "25：较低"
+    - "50": "50：中"
+    - "75": "75：较高"
+    - "100": "100：标准"
+    - "125": "125：高"
+    - "150": "150：最高"
 - styleConstants: [""]
   $name: "Advanced: style constants"
   $name:zh-CN: "高级：样式常量"
@@ -7578,7 +7581,7 @@ const Theme g_themeCommand_Center = {{
 
 std::atomic<DWORD> g_targetThreadId = 0;
 
-// ZenDesktop: set once the search page frame (Border#AppBorder in
+// CW: set once the search page frame (Border#AppBorder in
 // SearchHost.exe) has gone through ApplyCustomizations, i.e. the TAP is
 // attached to the XAML tree that's actually shown. See
 // ZenScheduleSearchAttachRetry.
@@ -8252,7 +8255,7 @@ std::unordered_map<std::wstring, std::vector<StyleVariableConsumer>>
 
 std::wstring g_webContentCss;
 std::wstring g_webContentJs;
-// ZenDesktop: search page material unification, generated per settings.
+// CW: search page material unification, generated per settings.
 std::wstring g_zenWebContentCss;
 std::wstring g_zenWebContentJs;
 
@@ -12692,7 +12695,7 @@ void ApplyCustomizations(InstanceHandle handle,
         try {
             if (element.Name() == L"AppBorder") {
                 g_zenSearchFrameSeen = true;
-                Wh_Log(L"[ZenDesktop] Search frame found (Border#AppBorder)");
+                Wh_Log(L"[CW] Search frame found (Border#AppBorder)");
             }
         } catch (...) {
         }
@@ -13255,7 +13258,7 @@ void ProcessWebStylesFromSettings(
         webContentCss += L"}\n";
     }
 
-    // ZenDesktop rules go between the theme's own web styles (above) and the
+    // CW rules go between the theme's own web styles (above) and the
     // user's custom web styles, so the user can still override them.
     if (!g_zenWebContentCss.empty()) {
         webContentCss.insert(themeCssLength, g_zenWebContentCss);
@@ -13557,7 +13560,7 @@ void MergeResourceVariables() {
     }
 }
 
-// ZenDesktop: search page material unification.
+// CW: search page material unification.
 //
 // When typing in the Start menu, the results are shown by a different process
 // (SearchHost.exe) in a different XAML tree (Cortana.UI.Views.TaskbarSearchPage),
@@ -13825,10 +13828,10 @@ void ZenAddSearchMaterialRules(const Theme* theme,
             }
             AddElementCustomizationRules(target, std::move(styles));
         } catch (winrt::hresult_error const& ex) {
-            Wh_Log(L"[ZenDesktop] Search rule error %08X: %s", ex.code(),
+            Wh_Log(L"[CW] Search rule error %08X: %s", ex.code(),
                    target);
         } catch (std::exception const& ex) {
-            Wh_Log(L"[ZenDesktop] Search rule error %S: %s", ex.what(),
+            Wh_Log(L"[CW] Search rule error %S: %s", ex.what(),
                    target);
         }
     };
@@ -14281,7 +14284,7 @@ void ProcessAllStylesFromSettings() {
 
     Wh_FreeStringSetting(bgColorMode);
 
-    // ZenDesktop: on the search page, the glass themes keep the native frame
+    // CW: on the search page, the glass themes keep the native frame
     // shape: Windows' own corner radius and thin stroke, no added gradient
     // border, margin or larger corners on the frame and its shadow. Only the
     // material (Background) comes from the theme, as on the Start menu.
@@ -14420,7 +14423,7 @@ void ProcessAllStylesFromSettings() {
                 };
                 AddElementCustomizationRules(L"StartMenu.FolderModal > Grid > Border", folderStyles);
                 AddElementCustomizationRules(L"StartMenu.ExpandedFolderList > Grid > Border", std::move(folderStyles));
-                Wh_Log(L"[ZenDesktop] Folder panel custom brush applied");
+                Wh_Log(L"[CW] Folder panel custom brush applied");
             } catch (winrt::hresult_error const& ex) {
                 Wh_Log(L"Folder brush error %08X", ex.code());
             } catch (std::exception const& ex) {
@@ -14520,7 +14523,7 @@ void ProcessAllStylesFromSettings() {
     }
     Wh_FreeStringSetting(labelVisibility);
 
-    // ZenDesktop: Liquid Glass app names. The pinned tile name
+    // CW: Liquid Glass app names. The pinned tile name
     // (PinnedListTile > Grid#Root > Grid#DisplayNameAndDownloadIconContainer >
     // TextBlock#DisplayName, style WrappingLabelTextBlockStyle) has no
     // Foreground of its own; it inherits it from the GridViewItem's
@@ -14558,7 +14561,7 @@ void ProcessAllStylesFromSettings() {
         AddElementCustomizationRules(L"ContentPresenter", fgStyles);
     }
 
-    // ZenDesktop: light mode white haze fix. The glass themes only replace the
+    // CW: light mode white haze fix. The glass themes only replace the
     // main backgrounds; the remaining Start menu layers (cards, buttons, list
     // items, the user/power footer...) keep their system theme brushes, such
     // as CardBackgroundFillColorDefault, ControlFillColorDefault and
@@ -14587,14 +14590,14 @@ void ProcessAllStylesFromSettings() {
         Wh_FreeStringSetting(controlTheme);
 
         if (forceDark) {
-            Wh_Log(L"[ZenDesktop] Forcing the dark element theme");
+            Wh_Log(L"[CW] Forcing the dark element theme");
             // ElementTheme::Dark.
             std::vector<std::wstring> themeStyles = {L"RequestedTheme=2"};
             AddElementCustomizationRules(L"Grid", std::move(themeStyles));
         }
     }
 
-    // ZenDesktop: give the search page the same material as the Start menu.
+    // CW: give the search page the same material as the Start menu.
     {
         ZenSearchFamily searchFamily = ZenSearchFamily::None;
         if (theme == &g_themeTranslucentStartMenu ||
@@ -16171,7 +16174,7 @@ static void WINAPI TriggerFullReinitFromWindowThread(PVOID) {
     Wh_Log(L"Reinit: complete");
 }
 
-// ZenDesktop: SearchHost.exe is started (prelaunched) at sign-in and then
+// CW: SearchHost.exe is started (prelaunched) at sign-in and then
 // suspended until the search page is first opened. Attaching the TAP that
 // early can fail or attach to a XAML tree that isn't the one shown later, and
 // the single boot retry above runs once, so the search page could stay
@@ -16190,7 +16193,7 @@ static void WINAPI ZenSearchAttachFromWindowThread(PVOID) {
     }
 
     if (g_targetThreadId.load() == 0) {
-        Wh_Log(L"[ZenDesktop] Search attach retry: injecting TAP");
+        Wh_Log(L"[CW] Search attach retry: injecting TAP");
         InitializeSettingsAndTap();
         return;
     }
@@ -16200,7 +16203,7 @@ static void WINAPI ZenSearchAttachFromWindowThread(PVOID) {
     }
 
     // Attached, but the search page tree hasn't shown up: attach again.
-    Wh_Log(L"[ZenDesktop] Search attach retry: search frame not seen, "
+    Wh_Log(L"[CW] Search attach retry: search frame not seen, "
            L"reattaching");
     TriggerFullReinitFromWindowThread(nullptr);
 }
@@ -16255,7 +16258,7 @@ static void CALLBACK ZenSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
 
     int tick = ++g_zenSearchAttachRetryTicks;
     if (tick > kZenSearchAttachRetryMaxTicks) {
-        Wh_Log(L"[ZenDesktop] Search attach retry: giving up, search frame "
+        Wh_Log(L"[CW] Search attach retry: giving up, search frame "
                L"never seen");
         SetThreadpoolTimer(timer, nullptr, 0, 0);
         return;

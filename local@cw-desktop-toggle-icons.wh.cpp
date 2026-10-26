@@ -1,7 +1,7 @@
 // ==WindhawkMod==
-// @id              zen-desktop-toggle-icons
-// @name            ZenDesktop: 桌面双击隐藏图标
-// @name:zh-CN      ZenDesktop: 桌面双击隐藏图标
+// @id              cw-desktop-toggle-icons
+// @name            CW-桌面双击隐藏图标
+// @name:zh-CN      CW-桌面双击隐藏图标
 // @description     Double-click empty desktop space to show or hide icons, with optional auto-hide when the system is idle.
 // @description:zh-CN 双击桌面空白处显示或隐藏图标，可在系统闲置时自动隐藏。
 // @version         4.1.5
@@ -16,9 +16,10 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
-# ZenDesktop: 桌面双击隐藏图标
+# CW-桌面双击隐藏图标
 
 双击桌面空白处即可显示或隐藏桌面图标，也可以在系统闲置一段时间后自动隐藏。直接运行在 `explorer.exe` 中，不需要额外的后台程序。如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」。
 
@@ -52,7 +53,7 @@
 
 ## 致谢与许可
 
-- ZenDesktop 原创 mod。
+- Lanbo 的原创 mod。
 - 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 */
 // ==/WindhawkModReadme==
@@ -122,7 +123,7 @@ static void LoadSettings()
     if (g_settings.autoHideDelay > 60) g_settings.autoHideDelay = 60;
     g_settings.showIconsOnAnyInput = Wh_GetIntSetting(L"showIconsOnAnyInput") != 0;
 
-    Wh_Log(L"[ZenDesktop] Settings loaded: enableAutoHide=%d, autoHideDelay=%d, showIconsOnAnyInput=%d",
+    Wh_Log(L"[CW] Settings loaded: enableAutoHide=%d, autoHideDelay=%d, showIconsOnAnyInput=%d",
            (int)g_settings.enableAutoHide, g_settings.autoHideDelay, (int)g_settings.showIconsOnAnyInput);
 }
 
@@ -243,7 +244,7 @@ static bool GetPersistedHideState()
     HKEY hKey;
     DWORD value = 0;
     DWORD size = sizeof(DWORD);
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\ZenDesktop", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\CW", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
         RegQueryValueExW(hKey, L"HideDesktopIcons", nullptr, nullptr, (LPBYTE)&value, &size);
         RegCloseKey(hKey);
     }
@@ -253,7 +254,7 @@ static bool GetPersistedHideState()
 static void SetPersistedHideState(bool hide)
 {
     HKEY hKey;
-    if (RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\ZenDesktop", 0, nullptr, 0, KEY_WRITE, nullptr, &hKey, nullptr) == ERROR_SUCCESS) {
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\CW", 0, nullptr, 0, KEY_WRITE, nullptr, &hKey, nullptr) == ERROR_SUCCESS) {
         DWORD value = hide ? 1 : 0;
         RegSetValueExW(hKey, L"HideDesktopIcons", 0, REG_DWORD, (const BYTE*)&value, sizeof(DWORD));
         RegCloseKey(hKey);
@@ -268,11 +269,11 @@ static void ManualToggleIcons(HWND hwndShellView)
         bool newVisible = !isVisible;
         ShowWindow(hwndListView, newVisible ? SW_SHOW : SW_HIDE);
         SetPersistedHideState(!newVisible);
-        Wh_Log(L"[ZenDesktop] ManualToggle: %s", newVisible ? L"SHOW" : L"HIDE");
+        Wh_Log(L"[CW] ManualToggle: %s", newVisible ? L"SHOW" : L"HIDE");
     } else {
         // Fallback: use the native shell toggle if ListView handle is missing
         PostMessageW(hwndShellView, WM_COMMAND, 0x7402, 0);
-        Wh_Log(L"[ZenDesktop] ManualToggle: fallback WM_COMMAND 0x7402");
+        Wh_Log(L"[CW] ManualToggle: fallback WM_COMMAND 0x7402");
     }
     // Clear auto-hide marker — this was a deliberate user action
     RemovePropW(hwndShellView, L"ZenAutoHiddenAt");
@@ -297,7 +298,7 @@ static void AutoHideIcons(HWND hwndShellView)
         SetPropW(hwndShellView, L"ZenMouseX", UlongToHandle((DWORD)pt.x));
         SetPropW(hwndShellView, L"ZenMouseY", UlongToHandle((DWORD)pt.y));
 
-        Wh_Log(L"[ZenDesktop] AutoHide: icons hidden at tick=%u, mouse=(%d,%d)", now, pt.x, pt.y);
+        Wh_Log(L"[CW] AutoHide: icons hidden at tick=%u, mouse=(%d,%d)", now, pt.x, pt.y);
     }
     ScheduleAutoHideTimer(hwndShellView);
 }
@@ -307,7 +308,7 @@ static void AutoRestoreIcons(HWND hwndShellView)
     HWND hwndListView = FindWindowExW(hwndShellView, NULL, L"SysListView32", NULL);
     if (hwndListView && !IsWindowVisible(hwndListView)) {
         ShowWindow(hwndListView, SW_SHOW);
-        Wh_Log(L"[ZenDesktop] AutoRestore: icons restored");
+        Wh_Log(L"[CW] AutoRestore: icons restored");
     }
     RemovePropW(hwndShellView, L"ZenAutoHiddenAt");
     RemovePropW(hwndShellView, L"ZenMouseX");
@@ -326,17 +327,17 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM)
     if (wcscmp(className, L"WorkerW") == 0 || wcscmp(className, L"Progman") == 0) {
         HWND hwndShell = FindWindowExW(hWnd, NULL, L"SHELLDLL_DefView", NULL);
         if (hwndShell) {
-            Wh_Log(L"[ZenDesktop] Subclassing ShellView=%p (parent=%s)", hwndShell, className);
+            Wh_Log(L"[CW] Subclassing ShellView=%p (parent=%s)", hwndShell, className);
             WindhawkUtils::SetWindowSubclassFromAnyThread(hwndShell, DesktopShellViewSubclassProc, 0);
             UpdateTimerState(hwndShell);
 
             HWND hwndListView = FindWindowExW(hwndShell, NULL, L"SysListView32", NULL);
             if (hwndListView) {
-                Wh_Log(L"[ZenDesktop] Subclassing ListView=%p", hwndListView);
+                Wh_Log(L"[CW] Subclassing ListView=%p", hwndListView);
                 WindhawkUtils::SetWindowSubclassFromAnyThread(hwndListView, DesktopListViewSubclassProc, 0);
                 if (GetPersistedHideState()) {
                     ShowWindow(hwndListView, SW_HIDE);
-                    Wh_Log(L"[ZenDesktop] Initialized desktop icons to HIDE based on persisted registry state.");
+                    Wh_Log(L"[CW] Initialized desktop icons to HIDE based on persisted registry state.");
                 }
             }
         }
@@ -363,7 +364,7 @@ static void UnsubclassWindows()
             if (IsWindow(lv) && GetWindowThreadProcessId(lv, &pid) && pid == GetCurrentProcessId()) {
                 if (!IsWindowVisible(lv)) {
                     ShowWindow(lv, SW_SHOW);
-                    Wh_Log(L"[ZenDesktop] Cleanup: restored SysListView32 visibility");
+                    Wh_Log(L"[CW] Cleanup: restored SysListView32 visibility");
                 }
             }
             WindhawkUtils::RemoveWindowSubclassFromAnyThread(lv, DesktopListViewSubclassProc);
@@ -393,7 +394,7 @@ HWND WINAPI Hook_CreateWindowExW(
 
     if (hWnd && lpClassName && !IS_INTRESOURCE(lpClassName)) {
         if (wcscmp(lpClassName, L"SHELLDLL_DefView") == 0) {
-            Wh_Log(L"[ZenDesktop] Hook: new SHELLDLL_DefView=%p created", hWnd);
+            Wh_Log(L"[CW] Hook: new SHELLDLL_DefView=%p created", hWnd);
             WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DesktopShellViewSubclassProc, 0);
             UpdateTimerState(hWnd);
         }
@@ -403,11 +404,11 @@ HWND WINAPI Hook_CreateWindowExW(
                 GetClassNameW(hWndParent, parentClass, 256) &&
                 wcscmp(parentClass, L"SHELLDLL_DefView") == 0)
             {
-                Wh_Log(L"[ZenDesktop] Hook: new desktop ListView=%p created", hWnd);
+                Wh_Log(L"[CW] Hook: new desktop ListView=%p created", hWnd);
                 WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DesktopListViewSubclassProc, 0);
                 if (GetPersistedHideState()) {
                     ShowWindow(hWnd, SW_HIDE);
-                    Wh_Log(L"[ZenDesktop] Hook initialized desktop icons to HIDE based on persisted registry state.");
+                    Wh_Log(L"[CW] Hook initialized desktop icons to HIDE based on persisted registry state.");
                 }
             }
         }
@@ -492,7 +493,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
     // ── Cross-thread timer refresh (settings change / new window subclassed) ──
     if (uMsg == g_msgRefreshTimer) {
         ScheduleAutoHideTimer(hWnd);
-        Wh_Log(L"[ZenDesktop] Timer refreshed for ShellView=%p", hWnd);
+        Wh_Log(L"[CW] Timer refreshed for ShellView=%p", hWnd);
         return 0;
     }
 
@@ -542,7 +543,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
             }
             DWORD idleMs = now - lii.dwTime;
             if (idleMs >= (DWORD)g_settings.autoHideDelay * 1000) {
-                Wh_Log(L"[ZenDesktop] Timer: idle %ums >= %us threshold -> AutoHide",
+                Wh_Log(L"[CW] Timer: idle %ums >= %us threshold -> AutoHide",
                        idleMs, g_settings.autoHideDelay);
                 PostMessageW(hWnd, g_msgAutoHide, 0, 0);
                 return 0;
@@ -551,7 +552,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
         else if (autoHiddenAt != 0 && g_settings.showIconsOnAnyInput) {
             // Check system-wide physical input
             if (lii.dwTime > autoHiddenAt) {
-                Wh_Log(L"[ZenDesktop] Timer: new system-wide input detected -> AutoRestore");
+                Wh_Log(L"[CW] Timer: new system-wide input detected -> AutoRestore");
                 PostMessageW(hWnd, g_msgAutoRestore, 0, 0);
                 return 0;
             }
@@ -567,7 +568,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
         DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"ZenAutoHiddenAt"));
         if (autoHiddenAt != 0 && g_settings.showIconsOnAnyInput) {
             if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN) {
-                Wh_Log(L"[ZenDesktop] Immediate click restore on DefView (uMsg=%u)", uMsg);
+                Wh_Log(L"[CW] Immediate click restore on DefView (uMsg=%u)", uMsg);
                 PostMessageW(hWnd, g_msgAutoRestore, 0, 0);
             }
             else if (uMsg == WM_MOUSEMOVE) {
@@ -577,7 +578,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
                 DWORD savedY = HandleToUlong(GetPropW(hWnd, L"ZenMouseY"));
 
                 if (ptCurrent.x != (int)savedX || ptCurrent.y != (int)savedY) {
-                    Wh_Log(L"[ZenDesktop] Physical mouse move detected: (%d,%d) vs (%d,%d) -> AutoRestore",
+                    Wh_Log(L"[CW] Physical mouse move detected: (%d,%d) vs (%d,%d) -> AutoRestore",
                            ptCurrent.x, ptCurrent.y, (int)savedX, (int)savedY);
                     PostMessageW(hWnd, g_msgAutoRestore, 0, 0);
                 }
@@ -628,13 +629,13 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
 // ─────────────────────────────────────────────────────────────────────────────
 BOOL Wh_ModInit()
 {
-    Wh_Log(L"[ZenDesktop] === Wh_ModInit v4.1.5 ===");
-    g_msgRefreshTimer = RegisterWindowMessageW(L"Windhawk.ZenDesktop.DesktopIconToggle.RefreshTimer");
-    g_msgManualToggle = RegisterWindowMessageW(L"Windhawk.ZenDesktop.DesktopIconToggle.ManualToggle");
-    g_msgAutoHide = RegisterWindowMessageW(L"Windhawk.ZenDesktop.DesktopIconToggle.AutoHide");
-    g_msgAutoRestore = RegisterWindowMessageW(L"Windhawk.ZenDesktop.DesktopIconToggle.AutoRestore");
+    Wh_Log(L"[CW] === Wh_ModInit v4.1.5 ===");
+    g_msgRefreshTimer = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.RefreshTimer");
+    g_msgManualToggle = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.ManualToggle");
+    g_msgAutoHide = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.AutoHide");
+    g_msgAutoRestore = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.AutoRestore");
     if (!g_msgRefreshTimer || !g_msgManualToggle || !g_msgAutoHide || !g_msgAutoRestore) {
-        Wh_Log(L"[ZenDesktop] FAILED to register private window messages");
+        Wh_Log(L"[CW] FAILED to register private window messages");
         return FALSE;
     }
 
@@ -644,24 +645,24 @@ BOOL Wh_ModInit()
             (void*)CreateWindowExW,
             (void*)Hook_CreateWindowExW,
             (void**)&Real_CreateWindowExW)) {
-        Wh_Log(L"[ZenDesktop] FAILED to hook CreateWindowExW");
+        Wh_Log(L"[CW] FAILED to hook CreateWindowExW");
         return FALSE;
     }
 
     SubclassExistingWindows();
-    Wh_Log(L"[ZenDesktop] Init complete");
+    Wh_Log(L"[CW] Init complete");
     return TRUE;
 }
 
 void Wh_ModUninit()
 {
-    Wh_Log(L"[ZenDesktop] === Wh_ModUninit ===");
+    Wh_Log(L"[CW] === Wh_ModUninit ===");
     UnsubclassWindows();
 }
 
 void Wh_ModSettingsChanged()
 {
-    Wh_Log(L"[ZenDesktop] === Settings changed ===");
+    Wh_Log(L"[CW] === Settings changed ===");
     LoadSettings();
     UpdateAllTimers();
 }

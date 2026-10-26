@@ -2,38 +2,37 @@ import zipfile
 import os
 
 common_files = [
-    'local@zen-taskbar-acrylic.wh.cpp',
-    'local@zen-notificationcenter-acrylic.wh.cpp',
-    'local@zen-startmenu-acrylic.wh.cpp',
-    'local@zen-desktop-toggle-icons.wh.cpp',
-    'local@zen-explorer-styler.wh.cpp',
-    'local@zen-taskbar-lyrics.wh.cpp',
-    'local@windows-11-settings-styler-fork.wh.cpp',
+    'local@cw-taskbar-acrylic.wh.cpp',
+    'local@cw-startmenu-acrylic.wh.cpp',
+    'local@cw-notificationcenter-acrylic.wh.cpp',
+    'local@cw-desktop-toggle-icons.wh.cpp',
+    'local@cw-explorer-styler.wh.cpp',
+    'local@cw-taskbar-icon-size.wh.cpp',
+    'local@cw-taskbar-volume-control.wh.cpp',
+    'local@cw-taskbar-dock-animation.wh.cpp',
     'deploy.bat',
     'deploy.ps1',
     'uninstall.bat',
     'uninstall.ps1',
     'LICENSE',
     'Readme.txt',
+    'CHANGELOG_CW_v1.0.0.md',
     'CHANGELOG_v5.0.0.md',
     'README.md',
     'docs/donate-wechat.png',
     'docs/screenshots',  # README.md preview images
     'restart_explorer.bat',
-    'THIRD_PARTY_NOTICES-taskbar-lyrics.md',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
-    'tools/ZenDesktop-StartupCheck.ps1',  # optional, installed only with -StartupCheck
-    'tools/ai-status',
-    # v4.2: optional mods (installed only on opt-in by deploy.ps1)
-    'optional/local@wobbly-windows.wh.cpp',
-    'optional/local@windows-animations.wh.cpp',
+    'tools/CWDesktop-StartupCheck.ps1',  # optional, installed only with -StartupCheck
+    # v1.0: optional mod (installed only on opt-in by deploy.ps1)
+    'optional/local@cw-windows-animations.wh.cpp',
     'optional/THIRD_PARTY_NOTICES.md',
 ]
 
 releases = {
-    'ZenDesktop_OneKeyDeploy_v5.0.0.zip': common_files + ['windhawk_setup.exe'],
-    'ZenDesktop_OneKeyDeploy_v5.0.0_Offline.zip': common_files + ['windhawk_setup_offline.exe'],
-    'ZenDesktop_OneKeyDeploy_v5.0.0_Online.zip': common_files
+    'CWDesktop_OneKeyDeploy_v1.0.0.zip': common_files + ['windhawk_setup.exe'],
+    'CWDesktop_OneKeyDeploy_v1.0.0_Offline.zip': common_files + ['windhawk_setup_offline.exe'],
+    'CWDesktop_OneKeyDeploy_v1.0.0_Online.zip': common_files
 }
 
 for zip_name, file_list in releases.items():

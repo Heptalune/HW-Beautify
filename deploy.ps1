@@ -1,6 +1,7 @@
 ﻿# ============================================================
-#  ZenDesktop Direct Injection Deploy Engine
-#  Refined v5.0.0 - Full Chinese Localization & Dynamic Engine
+#  CW桌面美化 Direct Injection Deploy Engine v1.0.0
+#  基于 CW v5.0.0 更名整合（GPL-3.0）
+#  职责不变：只把 Mod 源码和元数据装到 Windhawk，不编译、不开启
 # ============================================================
 # v4.2-draft: optional mods can be preselected for unattended runs, e.g.
 #   deploy.ps1 -Optional "wobbly-windows,windows-animations"
@@ -17,13 +18,13 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # Helper function to print colorful status
-# Every status line is also written with a timestamp to %TEMP%\ZenDeploy.log,
+# Every status line is also written with a timestamp to %TEMP%\CWDeploy.log,
 # so a slow step can be found afterwards.
-$script:ZenLogPath = Join-Path $env:TEMP "ZenDeploy.log"
-try { Set-Content -LiteralPath $script:ZenLogPath -Value "ZenDeploy $(Get-Date -Format s)" -Encoding UTF8 } catch {}
+$script:CWLogPath = Join-Path $env:TEMP "CWDeploy.log"
+try { Set-Content -LiteralPath $script:CWLogPath -Value "CWDeploy $(Get-Date -Format s)" -Encoding UTF8 } catch {}
 function Write-Status ($text, $color = "Cyan") {
-    Write-Host "[ZenDeploy] $text" -ForegroundColor $color
-    try { Add-Content -LiteralPath $script:ZenLogPath -Value "$(Get-Date -Format 'HH:mm:ss.fff') $text" -Encoding UTF8 } catch {}
+    Write-Host "[CWDeploy] $text" -ForegroundColor $color
+    try { Add-Content -LiteralPath $script:CWLogPath -Value "$(Get-Date -Format 'HH:mm:ss.fff') $text" -Encoding UTF8 } catch {}
 }
 
 # Settings rule: deploy only seeds a value that does not exist yet (fresh
@@ -38,6 +39,14 @@ function Open-HklmKey ($path) {
 }
 
 function Set-RegValueIfMissing ($path, $name, $value, $type, $label = "") {
+    # 便携版：种子写入 <id>.ini 的 [Settings]；标准版写注册表
+    if ($script:IniStoreMode) {
+        Set-IniValueIfMissing $script:IniStorePath "Settings" $name $value
+        if ($label) {
+            Write-Status "         [Settings] Seeding $label $name -> $value" "Yellow"
+        }
+        return
+    }
     $key = Open-HklmKey $path
     try {
         if ($key.GetValueNames() -notcontains $name) {
@@ -52,6 +61,56 @@ function Set-RegValueIfMissing ($path, $name, $value, $type, $label = "") {
         $key.Close()
     }
 }
+
+# ---- ini 读写助手（便携版 Windhawk 把模组状态存 <Data>\Engine\Mods\<id>.ini）----
+function Get-IniValue ($path, $section, $key) {
+    if ([string]::IsNullOrEmpty($path)) { return $null }
+    if (-not (Test-Path -LiteralPath $path)) { return $null }
+    $current = ""
+    foreach ($line in (Get-Content -LiteralPath $path)) {
+        if ($line -match '^\s*\[(.+)\]\s*$') { $current = $Matches[1]; continue }
+        if ($current -eq $section -and $line -match '^\s*([^=]+?)\s*=\s*(.*)$') {
+            if ($Matches[1] -eq $key) { return $Matches[2] }
+        }
+    }
+    return $null
+}
+
+function Set-IniValue ($path, $section, $key, $value) {
+    if ([string]::IsNullOrEmpty($path)) { throw "Set-IniValue: ini path is empty (internal error)" }
+    $map = [ordered]@{}
+    if (Test-Path -LiteralPath $path) {
+        $cur = ""
+        foreach ($line in (Get-Content -LiteralPath $path)) {
+            if ($line -match '^\s*\[(.+)\]\s*$') {
+                $cur = $Matches[1]
+                if (-not $map.Contains($cur)) { $map[$cur] = [ordered]@{} }
+            } elseif ($line -match '^\s*([^=]+?)\s*=\s*(.*)$' -and $cur) {
+                if (-not $map.Contains($cur)) { $map[$cur] = [ordered]@{} }
+                $map[$cur][$Matches[1]] = $Matches[2]
+            }
+        }
+    }
+    if (-not $map.Contains($section)) { $map[$section] = [ordered]@{} }
+    $map[$section][$key] = "$value"
+    $out = New-Object System.Collections.Generic.List[string]
+    foreach ($s in $map.Keys) {
+        $out.Add("[$s]")
+        foreach ($k in $map[$s].Keys) { $out.Add("$k=$($map[$s][$k])") }
+        $out.Add("")
+    }
+    $dir = Split-Path -Parent $path
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    [IO.File]::WriteAllLines($path, $out)
+}
+
+function Set-IniValueIfMissing ($path, $section, $key, $value) {
+    $existing = Get-IniValue $path $section $key
+    if ($null -eq $existing) { Set-IniValue $path $section $key $value }
+}
+
+$script:IniStoreMode = $false
+$script:IniStorePath = ""
 
 # Adds entries to a "|"-separated Windhawk process list, keeping the user's
 # entries and their order.
@@ -70,7 +129,7 @@ function Merge-ProcessList ($current, [string[]]$entries) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   ZenDesktop Direct Injection Engine v5.0.0" "Green"
+Write-Status "   CW桌面美化 Direct Injection Engine v1.0.0" "Green"
 Write-Status "================================================" "Green"
 
 # 1. Enforce Administrator Privileges
@@ -98,6 +157,8 @@ function Find-WindhawkDir {
     if ($proc -and $proc.Path) { return (Split-Path $proc.Path) }
     # Standard paths fallbacks
     $fallbacks = @()
+    # 用户本机便携版安装位置（优先于标准路径）
+    if (Test-Path "D:\Beautify\Windhawk\windhawk.exe") { $fallbacks += "D:\Beautify\Windhawk" }
     if ($env:ProgramFiles) { $fallbacks += (Join-Path $env:ProgramFiles "Windhawk") }
     $fallbacks += @("C:\Program Files\Windhawk", (Join-Path $PSScriptRoot "Windhawk"), $PSScriptRoot)
     foreach ($fallback in $fallbacks) {
@@ -169,6 +230,22 @@ if (Test-Path $iniPath) {
 
 Write-Status "Windhawk Data Folder: $windhawkData" "DarkGreen"
 
+# 便携版检测：Portable=1 时模组状态存 <Data>\Engine\Mods\<id>.ini（标准版存 HKLM 注册表）
+$script:IniStoreMode = $false
+$script:IniStorePath = ""
+$isPortable = $false
+if (Test-Path -LiteralPath $iniPath) {
+    foreach ($line in (Get-Content -LiteralPath $iniPath)) {
+        if ($line -match '^\s*Portable\s*=\s*1') { $isPortable = $true }
+    }
+}
+$engineModsDir = Join-Path $windhawkData "Engine\Mods"
+$engineWritableDir = Join-Path $windhawkData "Engine\ModsWritable"
+if ($isPortable) {
+    Write-Status "Portable Windhawk detected: mod state -> $engineModsDir\<id>.ini" "Yellow"
+    # 注意：IniStoreMode 只在下面的逐模组部署循环内开启；引擎级设置（InjectIntoGames 等）始终走注册表
+}
+
 # 3. Stop Windhawk Service and UI
 # Global Process Exclusion for Games & Anti-Cheat (ACE, Vanguard, EAC, etc.)
 $globalExcludeList = @(
@@ -184,11 +261,9 @@ $globalExcludeList = @(
 
 # Engine process lists (HKLM\SOFTWARE\Windhawk\Engine\Settings, the same values
 # as Windhawk > Settings > Advanced). Our entries are merged into the user's
-# lists instead of replacing them. A process matching Include is injected even
-# if it matches Exclude or the built-in critical process list, which is how
-# dwm.exe is made available to Wobbly Windows (the mod itself still has to be
-# enabled by the user).
-$globalIncludeList = @("dwm.exe")
+# lists instead of replacing them. CW v1.0 不再包含需要注入 dwm.exe 的模组
+# （果冻窗口已移除），因此不再改写包含列表；排除列表照旧并入游戏/反作弊名单。
+$globalIncludeList = @()
 
 $engineSettingsPath = "HKLM:\SOFTWARE\Windhawk\Engine\Settings"
 if (-not (Test-Path $engineSettingsPath)) {
@@ -197,7 +272,9 @@ if (-not (Test-Path $engineSettingsPath)) {
 $currentExclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Exclude" -ErrorAction SilentlyContinue).Exclude
 Set-ItemProperty -Path $engineSettingsPath -Name "Exclude" -Value (Merge-ProcessList $currentExclude $globalExcludeList) -Type String
 $currentInclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Include" -ErrorAction SilentlyContinue).Include
-Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value (Merge-ProcessList $currentInclude $globalIncludeList) -Type String
+# CW v1.0 清理：旧 CW 部署曾把 dwm.exe 加入包含列表（果冻窗口已移除），这里移除
+$cleanInclude = ($currentInclude -split '\|' | Where-Object { $_ -and $_.Trim() -ne 'dwm.exe' }) -join '|'
+Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value (Merge-ProcessList $cleanInclude $globalIncludeList) -Type String
 # Windhawk's own default is 0 (don't inject into games); only seeded.
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
 
@@ -215,12 +292,30 @@ if (-not (Test-Path $modsSource)) {
 }
 
 # Clean retired legacy mods from Windhawk to prevent conflicts
-$retiredMods = @("local@taskbar-background-helper", "local@start-menu-size")
+# （CW v1.0 移除：设置美化、任务栏音乐与歌词、果冻窗口，及更早的退役模组；
+#   无 local@ 前缀的社区原版是用户手动放入 ModsSource 的，已被 CW- 汉化版取代）
+$retiredMods = @(
+    "local@taskbar-background-helper", "local@start-menu-size",
+    "local@windows-11-settings-styler-fork", "local@zen-taskbar-lyrics",
+    "local@wobbly-windows", "local@macos-minimize-animation",
+    "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
+)
 foreach ($rMod in $retiredMods) {
     $legacyFile = Join-Path $modsSource "$rMod.wh.cpp"
     if (Test-Path $legacyFile) {
         Write-Status "Removing retired mod source: $rMod" "Yellow"
         Remove-Item -Path $legacyFile -Force -ErrorAction SilentlyContinue
+    }
+    # 便携版：状态在 ini，编译产物在 Engine\Mods 下
+    foreach ($iniFile in @((Join-Path $engineModsDir "$rMod.ini"), (Join-Path $engineWritableDir "$rMod.ini"))) {
+        if (Test-Path -LiteralPath $iniFile) {
+            Write-Status "Removing retired mod state: $(Split-Path -Leaf $iniFile)" "Yellow"
+            Remove-Item -LiteralPath $iniFile -Force -ErrorAction SilentlyContinue
+        }
+    }
+    if (Test-Path -LiteralPath $engineModsDir) {
+        Get-ChildItem -LiteralPath $engineModsDir -Recurse -File -Filter "$($rMod)_*.dll" -ErrorAction SilentlyContinue |
+            Remove-Item -Force -ErrorAction SilentlyContinue
     }
     $legacyReg = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$rMod"
     if (Test-Path $legacyReg) {
@@ -236,6 +331,86 @@ if ($windhawkData -ne "$windhawkDir\AppData" -and (Test-Path "$windhawkDir\AppDa
     Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@windows-11-settings-*" -Force -ErrorAction SilentlyContinue
 }
 
+# CW v1.0：CW → CW 更名迁移。旧 mod 状态存在且新 id 缺少对应值时，
+# 把开关状态（Disabled）与全部设置迁到新 id；然后清掉旧状态、旧源码与旧编译 DLL。
+# 新 id 已有同名值（用户已在 CW 版调过）的一律不覆盖；LibraryFileName 不迁移，
+# 新 id 必须由 Windhawk 平台重新编译。迁移前把旧文件备份到 Backup-CWMigration。
+$renameMap = [ordered]@{
+    "local@zen-taskbar-acrylic"            = "local@cw-taskbar-acrylic"
+    "local@zen-startmenu-acrylic"          = "local@cw-startmenu-acrylic"
+    "local@zen-notificationcenter-acrylic" = "local@cw-notificationcenter-acrylic"
+    "local@zen-explorer-styler"            = "local@cw-explorer-styler"
+    "local@zen-desktop-toggle-icons"       = "local@cw-desktop-toggle-icons"
+    "local@windows-animations"             = "local@cw-windows-animations"
+}
+$backupDir = Join-Path $windhawkData "Backup-CWMigration"
+foreach ($oldId in $renameMap.Keys) {
+    $newId = $renameMap[$oldId]
+    if ($isPortable) {
+        $oldIni = Join-Path $engineModsDir "$oldId.ini"
+        if (-not (Test-Path -LiteralPath $oldIni)) { continue }
+        Write-Status "Migrating (portable) $oldId -> $newId (settings and toggle state)" "Yellow"
+        New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+        Copy-Item -LiteralPath $oldIni -Destination (Join-Path $backupDir "$oldId.ini.bak") -Force
+        $newIni = Join-Path $engineModsDir "$newId.ini"
+        foreach ($key in @("Disabled", "Include", "Exclude", "Architecture", "Version")) {
+            $v = Get-IniValue $oldIni "Mod" $key
+            if ($null -ne $v -and $null -eq (Get-IniValue $newIni "Mod" $key)) { Set-IniValue $newIni "Mod" $key $v }
+        }
+        $inSettings = $false
+        foreach ($line in (Get-Content -LiteralPath $oldIni)) {
+            if ($line -match '^\s*\[(.+)\]\s*$') { $inSettings = ($Matches[1] -eq "Settings"); continue }
+            if ($inSettings -and $line -match '^\s*([^=]+?)\s*=\s*(.*)$') {
+                $k = $Matches[1]; $v = $Matches[2]
+                if ($null -eq (Get-IniValue $newIni "Settings" $k)) { Set-IniValue $newIni "Settings" $k $v }
+            }
+        }
+        # 迁移成功（新 ini 已生成）才清理旧文件
+        if (Test-Path -LiteralPath $newIni) {
+            Remove-Item -LiteralPath $oldIni -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath (Join-Path $engineWritableDir "$oldId.ini") -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath (Join-Path $modsSource "$oldId.wh.cpp") -Force -ErrorAction SilentlyContinue
+            if (Test-Path -LiteralPath $engineModsDir) {
+                Get-ChildItem -LiteralPath $engineModsDir -Recurse -File -Filter "$($oldId)_*.dll" -ErrorAction SilentlyContinue |
+                    Remove-Item -Force -ErrorAction SilentlyContinue
+            }
+        }
+        continue
+    }
+    $oldKeyPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$oldId"
+    $newKeyPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$newId"
+    if (-not (Test-Path $oldKeyPath)) { continue }
+    Write-Status "Migrating $oldId -> $newId (settings and toggle state)" "Yellow"
+    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+    $oldReg = Get-Item $oldKeyPath
+    New-Item -Path $newKeyPath -Force | Out-Null
+    foreach ($name in $oldReg.GetValueNames()) {
+        if ($name -eq "LibraryFileName") { continue }
+        $existing = Get-ItemProperty -Path $newKeyPath -Name $name -ErrorAction SilentlyContinue
+        if ($null -ne $existing) { continue }
+        New-ItemProperty -Path $newKeyPath -Name $name -Value ($oldReg.GetValue($name)) -PropertyType ($oldReg.GetValueKind($name)) -Force | Out-Null
+    }
+    $oldSettingsPath = Join-Path $oldKeyPath "Settings"
+    if (Test-Path $oldSettingsPath) {
+        $newSettingsPath = Join-Path $newKeyPath "Settings"
+        New-Item -Path $newSettingsPath -Force | Out-Null
+        $oldSettings = Get-Item $oldSettingsPath
+        foreach ($name in $oldSettings.GetValueNames()) {
+            $existing = Get-ItemProperty -Path $newSettingsPath -Name $name -ErrorAction SilentlyContinue
+            if ($null -ne $existing) { continue }
+            New-ItemProperty -Path $newSettingsPath -Name $name -Value ($oldSettings.GetValue($name)) -PropertyType ($oldSettings.GetValueKind($name)) -Force | Out-Null
+        }
+    }
+    Remove-Item -Path $oldKeyPath -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "HKLM:\SOFTWARE\Windhawk\Engine\ModsWritable\$oldId" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath (Join-Path $modsSource "$oldId.wh.cpp") -Force -ErrorAction SilentlyContinue
+    $compiledRoot = Join-Path $windhawkData "Engine\Mods"
+    if (Test-Path -LiteralPath $compiledRoot) {
+        Get-ChildItem -LiteralPath $compiledRoot -Recurse -File -Filter "$($oldId)_*.dll" -ErrorAction SilentlyContinue |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+}
+
 $files = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter "local@*.wh.cpp")
 if ($files.Count -eq 0) {
     Write-Error "部署目录里没有找到 local@*.wh.cpp：请先把压缩包完整解压，再运行解压目录里的 deploy.bat。 (No local@*.wh.cpp mod files found in: $PSScriptRoot. Extract the whole zip first.)"
@@ -248,14 +423,13 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@wobbly-windows", "local@windows-animations")
+$optionalModIds = @("local@cw-windows-animations")
 $preselected = @()
 if ($Optional) {
     $preselected = $Optional.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne "none" } | ForEach-Object {
-        if ($_ -like "local@*") { $_ } else { "local@$_" }
+        if ($_ -like "local@*") { $_ } else { "local@cw-$_" }
     }
 }
-$dwmModSelected = $false
 if (Test-Path -LiteralPath $optionalDir) {
     $optFiles = @(Get-ChildItem -LiteralPath $optionalDir -Filter "local@*.wh.cpp")
     foreach ($optFile in $optFiles) {
@@ -265,7 +439,7 @@ if (Test-Path -LiteralPath $optionalDir) {
 
 foreach ($file in $files) {
     # Dynamically derive Mod ID from filename
-    # Example: 'local@zen-taskbar-acrylic.wh.cpp' -> 'local@zen-taskbar-acrylic'
+    # Example: 'local@cw-taskbar-acrylic.wh.cpp' -> 'local@cw-taskbar-acrylic'
     $id = $file.BaseName -replace '\.wh$', ''
     Write-Status "Deploying Mod: $id ($($file.Name))..." "Cyan"
     $modTimer = [System.Diagnostics.Stopwatch]::StartNew()
@@ -309,10 +483,12 @@ foreach ($file in $files) {
     
     Write-Status "         [Metadata] Version=$version | Arch=$arch | Include=$includeStr" "Gray"
     
-    Write-Status "         [Registry] Writing mod entry and default settings..." "Gray"
-    # Registry path under Windhawk Engine
+    Write-Status "         [State] Writing mod entry and default settings..." "Gray"
+    # Registry path under Windhawk Engine（标准版）；便携版写 <Data>\Engine\Mods\<id>.ini
     $regPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$id"
-    $modKey = Open-HklmKey $regPath
+    $modIniPath = Join-Path $engineModsDir "$id.ini"
+    $script:IniStorePath = $modIniPath
+    $script:IniStoreMode = $isPortable
 
     # Determine Disabled state:
     # 核心原则：deploy 不负责编译，也不负责开启！只负责把 mod 装到 Windhawk 里面。
@@ -320,8 +496,15 @@ foreach ($file in $files) {
     # 用户在 Windhawk UI 中自行按需开启开关并在提示时编译。
     # 若用户此前已在 Windhawk 中手动调整过开关状态，则予以保留。
     $currentDisabled = $null
-    if ($modKey.GetValueNames() -contains "Disabled") {
-        $currentDisabled = $modKey.GetValue("Disabled")
+    if ($isPortable) {
+        $v = Get-IniValue $modIniPath "Mod" "Disabled"
+        if ($null -ne $v -and "$v".Trim() -ne "") { $currentDisabled = $v }
+    } else {
+        $modKey = Open-HklmKey $regPath
+        if ($modKey.GetValueNames() -contains "Disabled") {
+            $currentDisabled = $modKey.GetValue("Disabled")
+        }
+        $modKey.Close()
     }
 
     # -Optional only turns ON the listed mods; every other mod keeps the
@@ -334,21 +517,28 @@ foreach ($file in $files) {
     } else {
         $targetDisabled = 1  # 默认关闭：所有 Mod 仅装入 Windhawk，不主动开启、不主动编译
     }
-    if ($id -eq "local@wobbly-windows" -and $targetDisabled -eq 0) {
-        $dwmModSelected = $true
-    }
 
     
-    # Populate the registry with metadata
-    $str = [Microsoft.Win32.RegistryValueKind]::String
-    $modKey.SetValue("Disabled", [int]$targetDisabled, [Microsoft.Win32.RegistryValueKind]::DWord)
-    $modKey.SetValue("Include", [string]$includeStr, $str)
-    $modKey.SetValue("Exclude", [string]$excludeStr, $str)
-    $modKey.SetValue("Architecture", [string]$arch, $str)
-    $modKey.SetValue("Version", [string]$version, $str)
-    $modKey.SetValue("LibraryFileName", "", $str)
-    $modKey.Close()
-    Set-RegValueIfMissing $regPath "LoggingEnabled" 0 DWord
+    # Populate the mod metadata（标准版写注册表，便携版写 ini）
+    if ($isPortable) {
+        Set-IniValue $modIniPath "Mod" "Disabled" $targetDisabled
+        Set-IniValue $modIniPath "Mod" "Include" $includeStr
+        Set-IniValue $modIniPath "Mod" "Exclude" $excludeStr
+        Set-IniValue $modIniPath "Mod" "Architecture" $arch
+        Set-IniValue $modIniPath "Mod" "Version" $version
+        Set-IniValue $modIniPath "Mod" "LibraryFileName" ""
+    } else {
+        $str = [Microsoft.Win32.RegistryValueKind]::String
+        $modKey = Open-HklmKey $regPath
+        $modKey.SetValue("Disabled", [int]$targetDisabled, [Microsoft.Win32.RegistryValueKind]::DWord)
+        $modKey.SetValue("Include", [string]$includeStr, $str)
+        $modKey.SetValue("Exclude", [string]$excludeStr, $str)
+        $modKey.SetValue("Architecture", [string]$arch, $str)
+        $modKey.SetValue("Version", [string]$version, $str)
+        $modKey.SetValue("LibraryFileName", "", $str)
+        $modKey.Close()
+        Set-RegValueIfMissing $regPath "LoggingEnabled" 0 DWord
+    }
 
     # Default settings for a fresh install: only seeded when missing, never
     # overwriting the user's settings. Registry-deployed mods get no defaults
@@ -356,7 +546,7 @@ foreach ($file in $files) {
     # 0 / "" for a missing value).
     $settingsPath = Join-Path $regPath "Settings"
 
-    if ($id -eq "local@zen-explorer-styler") {
+    if ($id -eq "local@cw-explorer-styler") {
         $label = "File Explorer"
         Set-RegValueIfMissing $settingsPath "theme" "ZenTranslucent" String $label
         Set-RegValueIfMissing $settingsPath "tintPreset" "followSystem" String $label
@@ -368,7 +558,7 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "contextMenuBlur" 30 DWord $label
     }
 
-    if ($id -eq "local@zen-taskbar-acrylic") {
+    if ($id -eq "local@cw-taskbar-acrylic") {
         $label = "Taskbar"
         Write-Status "         [Settings] Checking saved taskbar settings..." "Gray"
         # 4.2.6 grouped the settings. Copy values saved under the old flat keys
@@ -403,75 +593,62 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "maximized.enabled" 0 DWord $label
     }
 
-    if ($id -eq "local@macos-minimize-animation") {
-        $label = "macOS Genie"
-        $macDefaults = [ordered]@{
-            "duration_ms" = 450
-            "open_animation" = 1
-            "launch_animation" = 0
-            "multi_monitor" = 0
-            "unhide_taskbar" = 1
-            "unhide_duration_ms" = 450
-            "tile_count" = 35
-        }
-        foreach ($key in $macDefaults.Keys) {
-            Set-RegValueIfMissing $settingsPath $key $macDefaults[$key] DWord $label
-        }
-        Set-RegValueIfMissing $settingsPath "engine" "modern" String $label
+    if ($id -eq "local@cw-taskbar-icon-size") {
+        $label = "Taskbar Icon Size"
+        # 这些值必须存在：mod 直接读注册表值，缺失会被当成 0（任务栏高度会变 0）
+        Set-RegValueIfMissing $settingsPath "TaskbarHeight" 52 DWord $label
+        Set-RegValueIfMissing $settingsPath "IconSize" 32 DWord $label
+        Set-RegValueIfMissing $settingsPath "TaskbarButtonWidth" 44 DWord $label
+        Set-RegValueIfMissing $settingsPath "IconSizeSmall" 16 DWord $label
+        Set-RegValueIfMissing $settingsPath "TaskbarButtonWidthSmall" 32 DWord $label
     }
 
-    if ($id -eq "local@zen-startmenu-acrylic") {
+    if ($id -eq "local@cw-taskbar-volume-control") {
+        $label = "Taskbar Volume Control"
+        Set-RegValueIfMissing $settingsPath "volumeIndicator" "win11" String $label
+        Set-RegValueIfMissing $settingsPath "scrollArea" "taskbar" String $label
+        Set-RegValueIfMissing $settingsPath "additionalScrollRegions" "" String $label
+        Set-RegValueIfMissing $settingsPath "middleClickToMute" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "ctrlScrollVolumeChange" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.shift" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.ctrl" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.alt" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.win" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "fullScreenScrolling" "disabled" String $label
+        Set-RegValueIfMissing $settingsPath "noAutomaticMuteToggle" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "volumeChangeStep" 2 DWord $label
+        Set-RegValueIfMissing $settingsPath "oldTaskbarOnWin11" 0 DWord $label
+    }
+
+    if ($id -eq "local@cw-taskbar-dock-animation") {
+        $label = "Taskbar Dock Animation"
+        Set-RegValueIfMissing $settingsPath "AnimationType" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "MaxScale" 130 DWord $label
+        Set-RegValueIfMissing $settingsPath "EffectRadius" 100 DWord $label
+        Set-RegValueIfMissing $settingsPath "SpacingFactor" 50 DWord $label
+        Set-RegValueIfMissing $settingsPath "BounceDelay" 500 DWord $label
+        Set-RegValueIfMissing $settingsPath "FocusDuration" 150 DWord $label
+        Set-RegValueIfMissing $settingsPath "MirrorForTopTaskbar" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "DisableVerticalBounce" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "TaskbarLabelsMode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "ExcludeSystemButtonsMode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "LerpSpeed" 60 DWord $label
+        Set-RegValueIfMissing $settingsPath "DisableBounce" 0 DWord $label
+    }
+
+    if ($id -eq "local@cw-startmenu-acrylic") {
         $label = "StartMenu Acrylic"
         Set-RegValueIfMissing $settingsPath "width" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "height" 0 DWord $label
     }
 
-    if ($id -eq "local@windows-11-settings-styler-fork") {
-        $label = "Settings Acrylic"
-        Set-RegValueIfMissing $settingsPath "theme" "TranslucentSettings" String $label
-        Set-RegValueIfMissing $settingsPath "bgColorMode" "Default" String $label
-        Set-RegValueIfMissing $settingsPath "textColorMode" "default" String $label
-        Set-RegValueIfMissing $settingsPath "blurPreset" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "opacityPreset" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "luminosityPreset" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "lightModeBase" 20 DWord $label
-    }
 
-    if ($id -eq "local@zen-notificationcenter-acrylic") {
+    if ($id -eq "local@cw-notificationcenter-acrylic") {
         $label = "NotificationCenter Acrylic"
         Set-RegValueIfMissing $settingsPath "lightModeContrast" "standard" String $label
     }
 
-
-    if ($id -eq "local@zen-taskbar-lyrics") {
-        $label = "Taskbar Lyrics"
-        Set-RegValueIfMissing $settingsPath "positionMode" "widgets" String $label
-        Set-RegValueIfMissing $settingsPath "xOffset" 12 DWord $label
-        Set-RegValueIfMissing $settingsPath "sizePreset" "standard" String $label
-        Set-RegValueIfMissing $settingsPath "width" 340 DWord $label
-        Set-RegValueIfMissing $settingsPath "showArt" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "showButtons" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "textMode" "lyrics" String $label
-        Set-RegValueIfMissing $settingsPath "secondLine" "auto" String $label
-        Set-RegValueIfMissing $settingsPath "whenIdle" "show" String $label
-        Set-RegValueIfMissing $settingsPath "clickAction" "open" String $label
-        Set-RegValueIfMissing $settingsPath "textColorMode" "default" String $label
-        Set-RegValueIfMissing $settingsPath "panelBackground" "none" String $label
-        Set-RegValueIfMissing $settingsPath "fontPreset" "msyh" String $label
-        Set-RegValueIfMissing $settingsPath "fontSize" 12 DWord $label
-        Set-RegValueIfMissing $settingsPath "bold" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "offsetMs" 200 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideInFullscreen" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "panelGlass" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "multiMonitor" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableNetease" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableQQ" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableLrclib" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "aiStatus" "compact" String $label
-        Set-RegValueIfMissing $settingsPath "aiDoneSeconds" "120" String $label
-    }
-
-    if ($id -eq "local@windows-animations") {
+    if ($id -eq "local@cw-windows-animations") {
         # Matches the mod's settings block (1.4.0: macOS genie merged in, so
         # minimize/restore default on with the macos_genie style). Nested
         # Windhawk settings are stored as "group.key" values; booleans as
@@ -507,15 +684,18 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "minimize_restore.effect_style" "macos_genie" String $label
     }
 
-    # Initialize ModsWritable runtime key
-    $regWritablePath = "HKLM:\SOFTWARE\Windhawk\Engine\ModsWritable\$id"
-    (Open-HklmKey $regWritablePath).Close()
+    # Initialize ModsWritable runtime key（标准版；便携版由引擎自建 ini）
+    if (-not $isPortable) {
+        $regWritablePath = "HKLM:\SOFTWARE\Windhawk\Engine\ModsWritable\$id"
+        (Open-HklmKey $regWritablePath).Close()
+    }
 
     $modTimer.Stop()
     if ($modTimer.Elapsed.TotalSeconds -ge 3) {
         Write-Status ("         [Done] {0:N1} s (slow step; please report this line if it keeps happening)" -f $modTimer.Elapsed.TotalSeconds) "Yellow"
     }
 }
+$script:IniStoreMode = $false
 Write-Status "Active mods successfully registered into Windhawk Engine." "Green"
 
 # 5. UI Cache Regeneration (Refreshes installed list and Chinese metadata instantly)
@@ -545,50 +725,44 @@ if (Get-Process -Name SearchHost -ErrorAction SilentlyContinue) {
 }
 
 # 7. Optional startup self-check (scheduled task, current user, at logon).
-$zenTaskName = "StartupCheck"
-$zenTaskPath = "\ZenDesktop\"
+$cwTaskName = "StartupCheck"
+$cwTaskPath = "\CWDesktop\"
 if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
-    if (Get-ScheduledTask -TaskName $zenTaskName -TaskPath $zenTaskPath -ErrorAction SilentlyContinue) {
-        Unregister-ScheduledTask -TaskName $zenTaskName -TaskPath $zenTaskPath -Confirm:$false
+    if (Get-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Confirm:$false
         Write-Status "Startup self-check task removed." "Green"
     }
 } elseif ($StartupCheck -eq "check" -or $StartupCheck -eq "restart") {
-    $checkSrc = Join-Path $PSScriptRoot "tools\ZenDesktop-StartupCheck.ps1"
+    $checkSrc = Join-Path $PSScriptRoot "tools\CWDesktop-StartupCheck.ps1"
     if (Test-Path -LiteralPath $checkSrc) {
         try {
-            $checkDir = Join-Path $env:LOCALAPPDATA "ZenDesktop"
+            $checkDir = Join-Path $env:LOCALAPPDATA "CWDesktop"
             if (-not (Test-Path $checkDir)) { New-Item -ItemType Directory -Path $checkDir -Force | Out-Null }
-            $checkDst = Join-Path $checkDir "ZenDesktop-StartupCheck.ps1"
+            $checkDst = Join-Path $checkDir "CWDesktop-StartupCheck.ps1"
             Copy-Item -LiteralPath $checkSrc -Destination $checkDst -Force
             $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
             $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$checkDst`" -Mode $StartupCheck -DelaySec 15"
             $trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
             $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Limited
             $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 2)
-            Register-ScheduledTask -TaskName $zenTaskName -TaskPath $zenTaskPath -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
+            Register-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
             Write-Status "Startup self-check installed (mode=$StartupCheck). Log: $checkDir\startup-check.log" "Green"
-            Write-Status "Remove: deploy.ps1 -StartupCheck remove  (or Task Scheduler > ZenDesktop > StartupCheck)" "Gray"
+            Write-Status "Remove: deploy.ps1 -StartupCheck remove  (or Task Scheduler > CWDesktop > StartupCheck)" "Gray"
         } catch {
             Write-Status "Startup self-check install failed: $($_.Exception.Message)" "Red"
         }
     } else {
-        Write-Status "tools\ZenDesktop-StartupCheck.ps1 not found, skipping startup self-check." "Gray"
+        Write-Status "tools\CWDesktop-StartupCheck.ps1 not found, skipping startup self-check." "Gray"
     }
 }
 
-if ($dwmModSelected) {
-    Write-Status "果冻窗口 (Wobbly Windows) 已启用，需要注入 dwm.exe（Windhawk 默认跳过系统核心进程）。" "Yellow"
-    Write-Status "deploy 已把 dwm.exe 加入 Windhawk「进程包含列表」，请重启整台电脑后生效。" "Yellow"
-}
-
 Write-Status "================================================" "Green"
-Write-Status "   [SUCCESS] ZenDesktop v5.0.0 一键部署完成！" "Green"
+Write-Status "   [SUCCESS] CW桌面美化 v1.0.0 一键部署完成！" "Green"
 Write-Status "================================================" "Green"
 Write-Host ""
 Write-Host "后续说明与使用建议："
 Write-Host "  1. deploy 仅负责将美化模块装入 Windhawk，默认不自动开启任何 Mod，也不在后台执行编译。"
 Write-Host "  2. 请在 Windhawk 界面中按需开启您想要使用的模块开关，在弹出的窗口中确认保存与编译。"
-Write-Host "  3. deploy 已把 dwm.exe 加入 Windhawk「进程包含列表」；若开启「果冻窗口」，请重启整机后生效。"
-Write-Host "     deploy 只会补上缺失的默认设置，不会覆盖您已有的 Mod 设置。"
+Write-Host "  3. deploy 只会补上缺失的默认设置，不会覆盖您已有的 Mod 设置。"
 Write-Host "  4. 建议在配置完成后重启整台电脑，使所有美化与透明效果达到最佳状态。"
 Write-Host ""

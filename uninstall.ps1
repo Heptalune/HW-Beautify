@@ -1,11 +1,12 @@
 ﻿# ============================================================
-#  ZenDesktop Uninstaller
-#  Removes the ZenDesktop mods that deploy.ps1 installed into Windhawk.
+#  CW桌面美化 Uninstaller
+#  Removes the CW桌面美化 mods that deploy.ps1 installed into Windhawk.
+#  Also cleans up mods left by the older packages.
 #  Windhawk itself is never uninstalled.
 #
 #  uninstall.ps1               # asks before removing anything
-#  uninstall.ps1 -Yes          # no prompts; keeps %LOCALAPPDATA%\ZenDesktop
-#  uninstall.ps1 -Yes -RemoveData   # no prompts; also deletes %LOCALAPPDATA%\ZenDesktop
+#  uninstall.ps1 -Yes          # no prompts; keeps %LOCALAPPDATA%\CWDesktop
+#  uninstall.ps1 -Yes -RemoveData   # no prompts; also deletes %LOCALAPPDATA%\CWDesktop
 # ============================================================
 param(
     [switch]$Yes,
@@ -13,7 +14,7 @@ param(
 )
 
 function Write-Status ($text, $color = "Cyan") {
-    Write-Host "[ZenUninstall] $text" -ForegroundColor $color
+    Write-Host "[CWUninstall] $text" -ForegroundColor $color
 }
 
 function Ask-YesNo ($question) {
@@ -31,20 +32,32 @@ if (-not $isAdmin) {
 
 # 2. The mods deploy.ps1 installs: every local@*.wh.cpp in this folder and in
 #    optional\, plus the fixed list below in case uninstall.ps1 is run from
-#    another folder. local@macos-minimize-animation was installed by
-#    ZenDesktop v4.1 and is merged into Windows Animations since v4.2.
+#    another folder. The zen-* ids are from the older packages and
+#    are cleaned up too.
 $modIds = New-Object System.Collections.Generic.List[string]
 foreach ($id in @(
+    "local@cw-taskbar-acrylic",
+    "local@cw-startmenu-acrylic",
+    "local@cw-notificationcenter-acrylic",
+    "local@cw-desktop-toggle-icons",
+    "local@cw-explorer-styler",
+    "local@cw-taskbar-icon-size",
+    "local@cw-taskbar-volume-control",
+    "local@cw-taskbar-dock-animation",
+    "local@cw-windows-animations",
     "local@zen-taskbar-acrylic",
-    "local@zen-notificationcenter-acrylic",
     "local@zen-startmenu-acrylic",
+    "local@zen-notificationcenter-acrylic",
     "local@zen-desktop-toggle-icons",
     "local@zen-explorer-styler",
     "local@zen-taskbar-lyrics",
     "local@windows-11-settings-styler-fork",
     "local@wobbly-windows",
     "local@windows-animations",
-    "local@macos-minimize-animation"
+    "local@macos-minimize-animation",
+    "taskbar-icon-size",
+    "taskbar-volume-control",
+    "taskbar-dock-animation"
 )) { $modIds.Add($id) }
 foreach ($dir in @($PSScriptRoot, (Join-Path $PSScriptRoot "optional"))) {
     if (Test-Path -LiteralPath $dir) {
@@ -70,6 +83,8 @@ function Find-WindhawkDir {
     $proc = Get-Process windhawk -ErrorAction SilentlyContinue | Where-Object { $_.Path } | Select-Object -First 1
     if ($proc -and $proc.Path) { return (Split-Path $proc.Path) }
     $fallbacks = @()
+    # 用户本机便携版安装位置（优先于标准路径）
+    if (Test-Path "D:\Beautify\Windhawk\windhawk.exe") { $fallbacks += "D:\Beautify\Windhawk" }
     if ($env:ProgramFiles) { $fallbacks += (Join-Path $env:ProgramFiles "Windhawk") }
     $fallbacks += @("C:\Program Files\Windhawk", (Join-Path $PSScriptRoot "Windhawk"), $PSScriptRoot)
     foreach ($fallback in $fallbacks) {
@@ -107,27 +122,27 @@ if ($windhawkDir) {
 }
 $modsSource = Join-Path $windhawkData "ModsSource"
 $compiledRoot = Join-Path $windhawkData "Engine\Mods"
-$zenData = Join-Path $env:LOCALAPPDATA "ZenDesktop"
-$zenTaskName = "StartupCheck"
-$zenTaskPath = "\ZenDesktop\"
+$cwData = Join-Path $env:LOCALAPPDATA "CWDesktop"
+$cwTaskName = "StartupCheck"
+$cwTaskPath = "\CWDesktop\"
 
 # 4. Show what will be removed and confirm
 $installed = @($modIds | Where-Object {
     (Test-Path "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$_") -or (Test-Path -LiteralPath (Join-Path $modsSource "$_.wh.cpp"))
 })
-$task = Get-ScheduledTask -TaskName $zenTaskName -TaskPath $zenTaskPath -ErrorAction SilentlyContinue
+$task = Get-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -ErrorAction SilentlyContinue
 
 Write-Status "================================================" "Green"
-Write-Status "   ZenDesktop 卸载 (Uninstall)" "Green"
+Write-Status "   CW桌面美化 卸载 (Uninstall)" "Green"
 Write-Status "================================================" "Green"
 Write-Host "Windhawk 数据目录 (data folder): $windhawkData"
 Write-Host ""
 if ($installed.Count -eq 0 -and -not $task) {
-    Write-Status "Windhawk 里没有找到 ZenDesktop 的 mod，也没有开机自检任务。 (No ZenDesktop mods or startup task found.)" "Yellow"
+    Write-Status "Windhawk 里没有找到 CW桌面美化的 mod，也没有开机自检任务。 (No CW Desktop mods or startup task found.)" "Yellow"
 } else {
     Write-Host "将要移除 (Will remove):"
     foreach ($id in $installed) { Write-Host "  - $id" }
-    if ($task) { Write-Host "  - 开机自检计划任务 (startup self-check task) $zenTaskPath$zenTaskName" }
+    if ($task) { Write-Host "  - 开机自检计划任务 (startup self-check task) $cwTaskPath$cwTaskName" }
     Write-Host ""
     Write-Host "包括 mod 源码、编译好的 DLL、Windhawk 里的 mod 记录和设置。Windhawk 本身不会被卸载。"
     Write-Host "(Mod sources, compiled DLLs, Windhawk mod entries and their settings. Windhawk itself stays installed.)"
@@ -154,6 +169,10 @@ if ($installed.Count -eq 0 -and -not $task) {
                 catch { $locked++; Write-Status "  文件被占用，重启电脑后可手动删除 (in use, delete after a reboot): $($dll.FullName)" "Yellow" }
             }
         }
+        # 便携版：同时清掉 ini 状态文件
+        foreach ($iniFile in @((Join-Path $windhawkData "Engine\Mods\$id.ini"), (Join-Path $windhawkData "Engine\ModsWritable\$id.ini"))) {
+            if (Test-Path -LiteralPath $iniFile) { Remove-Item -LiteralPath $iniFile -Force -ErrorAction SilentlyContinue }
+        }
         foreach ($key in @("HKLM:\SOFTWARE\Windhawk\Engine\Mods\$id", "HKLM:\SOFTWARE\Windhawk\Engine\ModsWritable\$id")) {
             if (Test-Path $key) { Remove-Item -Path $key -Recurse -Force -ErrorAction SilentlyContinue }
         }
@@ -165,7 +184,7 @@ if ($installed.Count -eq 0 -and -not $task) {
 
     # 6. Startup self-check task (deploy.ps1 -StartupCheck check|restart)
     if ($task) {
-        Unregister-ScheduledTask -TaskName $zenTaskName -TaskPath $zenTaskPath -Confirm:$false -ErrorAction SilentlyContinue
+        Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Confirm:$false -ErrorAction SilentlyContinue
         Write-Status "已移除开机自检任务。 (Startup self-check task removed.)" "Green"
     }
 
@@ -176,26 +195,25 @@ if ($installed.Count -eq 0 -and -not $task) {
     }
 }
 
-# 7. Optional: ZenDesktop's own data folder (AI status files and tools, startup-check log)
-if (Test-Path -LiteralPath $zenData) {
-    $removeZenData = $RemoveData
+# 7. Optional: CWDesktop's own data folder (startup-check log)
+if (Test-Path -LiteralPath $cwData) {
+    $removeCWData = $RemoveData
     if (-not $Yes) {
-        $removeZenData = Ask-YesNo "同时删除 $zenData 吗？里面是 AI 状态文件和开机自检日志。 (Also delete $zenData? It holds AI status files and the startup-check log.)"
+        $removeCWData = Ask-YesNo "同时删除 $cwData 吗？里面是开机自检日志。 (Also delete $cwData? It holds the startup-check log.)"
     }
-    if ($removeZenData) {
-        Remove-Item -LiteralPath $zenData -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Status "已删除 (Deleted) $zenData" "Green"
+    if ($removeCWData) {
+        Remove-Item -LiteralPath $cwData -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Status "已删除 (Deleted) $cwData" "Green"
     } else {
-        Write-Status "保留 (Kept) $zenData" "Gray"
+        Write-Status "保留 (Kept) $cwData" "Gray"
     }
 }
 
 Write-Host ""
-Write-Host "说明 (Notes):"
-Write-Host "  1. deploy 往 Windhawk「设置 → 高级设置」的进程包含列表加了 dwm.exe，排除列表加了一些游戏和反作弊进程。"
+Write-Host "  1. 旧版部署包往 Windhawk「设置 → 高级设置」的进程包含列表加过 dwm.exe，排除列表加过游戏和反作弊进程。"
 Write-Host "     这些没有被改动，想还原请在那里手动删除。"
-Write-Host "     (deploy added dwm.exe to Windhawk's process include list and some games / anti-cheat processes to the"
-Write-Host "     exclude list. They were left as they are; remove them in Windhawk > Settings > Advanced if you want.)"
+Write-Host "     (Old CW packages added dwm.exe to Windhawk's process include list and some games / anti-cheat"
+Write-Host "     processes to the exclude list. They were left as they are; remove them in Windhawk > Settings > Advanced if you want.)"
 Write-Host "  2. 接过 AI 状态的，记得把当时粘贴到各 AI 助手配置里的 zen-status 片段删掉。"
 Write-Host "     (If you connected AI status, remove the zen-status snippets you pasted into your assistants' configs.)"
 Write-Host ""
@@ -213,5 +231,5 @@ if (-not $Yes) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   ZenDesktop 卸载完成 (Uninstall finished)" "Green"
+Write-Status "   CW桌面美化 卸载完成 (Uninstall finished)" "Green"
 Write-Status "================================================" "Green"

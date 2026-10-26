@@ -1,10 +1,10 @@
 // ==WindhawkMod==
-// @id              zen-notificationcenter-acrylic
-// @name            ZenDesktop: 通知栏美化
-// @name:zh-CN      ZenDesktop: 通知栏美化
+// @id              cw-notificationcenter-acrylic
+// @name            CW-通知栏美化
+// @name:zh-CN      CW-通知栏美化
 // @description     Acrylic and transparent notification center, quick settings and calendar.
 // @description:zh-CN 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景。
-// @version         4.2.2
+// @version         4.2.4
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          m417z, Lanbo
 // @github          https://github.com/m417z, https://github.com/Liset999
@@ -28,11 +28,12 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
-> 原作者：**m417z**（[Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler)，GPL-3.0）。本版由 Lanbo 修改与维护，问题请到 [ZenDesktop](https://github.com/Liset999/ZenDesktop/issues) 反馈。
+> 原作者：**m417z**（[Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
 
-# ZenDesktop: 通知栏美化
+# CW-通知栏美化
 
 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Notification Center Styler。
 
@@ -40,7 +41,7 @@
 
 - 背景颜色、模糊、不透明度、亮度预设，可与内置主题搭配。
 - 内置自定义玻璃、液态玻璃等主题，保留原版经典主题。
-- 文字颜色与其他 ZenDesktop mod 共用同一套选项。
+- 文字颜色与其他 CW 模组共用同一套选项。
 - 浅色模式下自动垫一层白色底并加深文字，花哨壁纸上也看得清；深色模式不受影响。
 
 ## 设置说明
@@ -57,7 +58,7 @@
   - 不要同时再开上游「Windows 11 Notification Center Styler」，会抢同一条 XAML 诊断通道
 - **版本对照（经验）**
   - 22H2 / 23H2：通知 + 日历 + 快捷设置多在 `ShellExperienceHost`，一般正常
-  - 24H2 / 25H2：快捷设置在 `ShellHost`；若只看到通知变了、快捷设置没变，确认 Windhawk 高级选项包含列表里有 `ShellHost.exe`，或重新跑一次 ZenDesktop deploy
+  - 24H2 / 25H2：快捷设置在 `ShellHost`；若只看到通知变了、快捷设置没变，确认 Windhawk 高级选项包含列表里有 `ShellHost.exe`，或重新跑一次 CW桌面美化 deploy
   - `ShellHost.exe` 空闲一段时间后可能被系统关掉，再打开快捷设置时 Windhawk 会重新注入；若偶发没效果，关掉再开一次快捷设置，或重载本 mod
 - **其他**
   - 同一时间只能有一个程序使用 XAML 诊断（UWPSpy、同类 styler 等），冲突时可能完全无效果
@@ -67,8 +68,12 @@
 
 ## 更新日志
 
+
+
+- **4.2.4**：快捷设置子页（蓝牙等）头部开关固定在右侧，修复开关出现在中间的问题（CW 汉化版修复）。
+- **4.2.3**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
 - **4.2.2**：修复横幅通知（Toast 弹窗）材质未统一的问题，全面补齐所有内置主题的 ToastBackgroundBorder 与 FlexibleToastView 适配，并在浅色对比度模式下加深横幅通知文字。
-- **4.2.1**：问题反馈改到 ZenDesktop 仓库，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
+- **4.2.1**：问题反馈渠道调整，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
 - **4.2.0**：新增「浅色模式：对比度增强」，浅色模式下给面板垫白色底、加深日历与通知文字，非本月日期也能看清；深色模式不变。
 - **4.1.5**：液态玻璃主题去掉额外描边，圆角恢复为 Windows 自带的大小（面板 8、元素 4）；保留玻璃模糊和底色。
 - **4.1.3**：修复液态玻璃主题编译错误；移植上游 DisableCompositionDiag，减少部分 Win11 版本上 XAML 挂接失败；快捷设置窗口创建后补一次延迟重试；补充版本兼容说明。
@@ -77,7 +82,7 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Notification Center Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- ZenDesktop 修改（Lanbo）：重构模糊画刷计算、新增视觉预设、文字颜色与中文设置。
+- Lanbo 的修改：重构模糊画刷计算、新增视觉预设、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
@@ -410,45 +415,45 @@ from the **TranslucentTB** project.
     - SunsetOrange: "落日橙"
     - ChampagneGold: "香槟金"
     - MorandiSage: "莫兰迪绿"
-- blurPreset: 30
+- blurPreset: "30"
   $name: "Blur"
   $name:zh-CN: "模糊"
   $description: "Background blur strength, 0–60. Larger is blurrier."
   $description:zh-CN: "背景模糊强度，范围 0–60，数值越大越模糊。"
   $options:
-    - 0: "0：不模糊"
-    - 10: "10：轻微"
-    - 20: "20：中等"
-    - 30: "30：较强"
-    - 45: "45：强"
-    - 60: "60：最强"
-- opacityPreset: 50
+    - "0": "0：不模糊"
+    - "10": "10：轻微"
+    - "20": "20：中等"
+    - "30": "30：较强"
+    - "45": "45：强"
+    - "60": "60：最强"
+- opacityPreset: "50"
   $name: "Opacity"
   $name:zh-CN: "不透明度"
   $description: "Fill strength of the background color, 0–100%. 0% is fully transparent, 100% is opaque."
   $description:zh-CN: "背景颜色的填充浓度，范围 0–100%。0% 为完全透明，100% 为完全不透明。"
   $options:
-    - 0: "0%：完全透明"
-    - 10: "10%：很薄"
-    - 25: "25%：较薄"
-    - 50: "50%：适中"
-    - 75: "75%：较厚"
-    - 90: "90%：很厚"
-    - 100: "100%：完全不透明"
-- luminosityPreset: 20
+    - "0": "0%：完全透明"
+    - "10": "10%：很薄"
+    - "25": "25%：较薄"
+    - "50": "50%：适中"
+    - "75": "75%：较厚"
+    - "90": "90%：很厚"
+    - "100": "100%：完全不透明"
+- luminosityPreset: "20"
   $name: "Luminosity"
   $name:zh-CN: "亮度"
   $description: "Luminosity layer strength of the background, 0–150."
   $description:zh-CN: "背景亮度层的强度，范围 0–150。"
   $options:
-    - 0: "0：最低"
-    - 20: "20：低"
-    - 25: "25：较低"
-    - 50: "50：中"
-    - 75: "75：较高"
-    - 100: "100：标准"
-    - 125: "125：高"
-    - 150: "150：最高"
+    - "0": "0：最低"
+    - "20": "20：低"
+    - "25": "25：较低"
+    - "50": "50：中"
+    - "75": "75：较高"
+    - "100": "100：标准"
+    - "125": "125：高"
+    - "150": "150：最高"
 - textColorMode: "default"
   $name: "Text color"
   $name:zh-CN: "文字颜色"
@@ -523,6 +528,11 @@ struct Theme {
 // clang-format off
 
 const Theme g_themeTranslucentShell = {{
+    // CW: 快捷设置子页（如蓝牙）头部开关固定在右侧，防止被布局挤到中间。
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"Grid#FullScreenPageRoot > ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$CommonBgBrush",
         L"BorderThickness=0,0,0,0",
@@ -2129,6 +2139,11 @@ const Theme g_themeFluid = {{
 }};
 
 const Theme g_themeLiquidGlass = {{
+    // CW: 快捷设置子页（如蓝牙）头部开关固定在右侧，防止被布局挤到中间。
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"Grid#FullScreenPageRoot > ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$Background",
         L"CornerRadius = $CornerRadius",

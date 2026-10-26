@@ -1,12 +1,12 @@
-# ============================================================
-# ZenDesktop Windhawk Mod Dev Helper
+﻿# ============================================================
+# CW Windhawk Mod Dev Helper
 # Injects one mod source and prints the state needed for manual
 # Windhawk UI compile/save validation. It never compiles DLLs.
 # ============================================================
 
 [CmdletBinding()]
 param(
-    [string]$ModId = "local@zen-taskbar-acrylic",
+    [string]$ModId = "local@cw-taskbar-acrylic",
     [switch]$StatusOnly,
     [switch]$RestartExplorer,
     [switch]$NoElevate
@@ -23,7 +23,7 @@ function Write-DevStatus {
         [ConsoleColor]$Color = "Cyan"
     )
 
-    Write-Host "[ZenDev] $Text" -ForegroundColor $Color
+    Write-Host "[CWDev] $Text" -ForegroundColor $Color
 }
 
 function Test-IsAdministrator {
@@ -78,7 +78,7 @@ function Resolve-WindhawkPaths {
         }
     }
 
-    foreach ($fallback in @("C:\Program Files\Windhawk", "$RepoRoot\Windhawk", $RepoRoot)) {
+    foreach ($fallback in @("D:\Beautify\Windhawk", "C:\Program Files\Windhawk", "$RepoRoot\Windhawk", $RepoRoot)) {
         if (-not $windhawkDir -and (Test-Path (Join-Path $fallback "windhawk.exe"))) {
             $windhawkDir = $fallback
         }
@@ -202,7 +202,7 @@ function Set-ModRegistryForPlatformCompile {
         New-Item -Path $writablePath -Force | Out-Null
     }
 
-    if ($Id -eq "local@zen-taskbar-acrylic") {
+    if ($Id -eq "local@cw-taskbar-acrylic") {
         $settingsPath = Join-Path $regPath "Settings"
         if (-not (Test-Path $settingsPath)) {
             New-Item -Path $settingsPath -Force | Out-Null
@@ -215,54 +215,6 @@ function Set-ModRegistryForPlatformCompile {
         }
     }
 
-    if ($Id -eq "local@zen-fileexplorer-acrylic") {
-        $settingsPath = Join-Path $regPath "Settings"
-        if (-not (Test-Path $settingsPath)) {
-            New-Item -Path $settingsPath -Force | Out-Null
-        }
-
-        $settings = Get-ItemProperty -Path $settingsPath -ErrorAction SilentlyContinue
-        $settingNames = @($settings.PSObject.Properties.Name)
-
-        if (-not ($settingNames -contains "bgColorMode")) {
-            $legacy = if ($settingNames -contains "zenGlassColorMode") { $settings.zenGlassColorMode } else { "Default" }
-            if ([string]::IsNullOrWhiteSpace($legacy)) { $legacy = "Default" }
-            Set-RegistryValue -Path $settingsPath -Name "bgColorMode" -Value $legacy -Type String
-        }
-        if (-not ($settingNames -contains "blurPreset")) {
-            $legacy = if ($settingNames -contains "zenGlassBlur") { $settings.zenGlassBlur } else { 30 }
-            Set-RegistryValue -Path $settingsPath -Name "blurPreset" -Value ([int]$legacy) -Type DWord
-        }
-        if (-not ($settingNames -contains "opacityPreset")) {
-            $legacy = if ($settingNames -contains "zenGlassOpacity") { $settings.zenGlassOpacity } else { 0 }
-            Set-RegistryValue -Path $settingsPath -Name "opacityPreset" -Value ([int]$legacy) -Type DWord
-        }
-        if (-not ($settingNames -contains "luminosityPreset")) {
-            $legacy = if ($settingNames -contains "zenGlassLuminosity") { $settings.zenGlassLuminosity } else { 100 }
-            Set-RegistryValue -Path $settingsPath -Name "luminosityPreset" -Value ([int]$legacy) -Type DWord
-        }
-        if (-not ($settingNames -contains "cornerRadiusPreset")) {
-            $legacy = if ($settingNames -contains "zenGlassCornerRadius") { $settings.zenGlassCornerRadius } else { 20 }
-            Set-RegistryValue -Path $settingsPath -Name "cornerRadiusPreset" -Value ([int]$legacy) -Type DWord
-        }
-
-        $currentTheme = (Get-ItemProperty -Path $settingsPath -Name "theme" -ErrorAction SilentlyContinue).theme
-        if ([string]::IsNullOrWhiteSpace($currentTheme) -or
-            $currentTheme -eq "Translucent Explorer11" -or
-            $currentTheme -eq "Mica" -or
-            $currentTheme -eq "MicaAlt") {
-            Write-DevStatus "Defaulting File Explorer -> CustomLiquidGlass full-window glass" "Yellow"
-            Set-RegistryValue -Path $settingsPath -Name "theme" -Value "CustomLiquidGlass" -Type String
-            Set-RegistryValue -Path $settingsPath -Name "zenGlassCoverage" -Value "auto" -Type String
-            Set-RegistryValue -Path $settingsPath -Name "bgColorMode" -Value "Default" -Type String
-            Set-RegistryValue -Path $settingsPath -Name "blurPreset" -Value 30 -Type DWord
-            Set-RegistryValue -Path $settingsPath -Name "opacityPreset" -Value 0 -Type DWord
-            Set-RegistryValue -Path $settingsPath -Name "luminosityPreset" -Value 100 -Type DWord
-            Set-RegistryValue -Path $settingsPath -Name "cornerRadiusPreset" -Value 20 -Type DWord
-            Set-RegistryValue -Path $settingsPath -Name "backgroundTranslucentEffect" -Value "acrylic" -Type String
-            Set-RegistryValue -Path $settingsPath -Name "backgroundTranslucentEffectRegion" -Value "entireWindow" -Type String
-        }
-    }
 }
 
 function Show-ModStatus {
@@ -353,7 +305,7 @@ function Restart-WindowsExplorer {
     Start-Sleep -Seconds 2
 }
 
-Write-DevStatus "ZenDesktop Windhawk Mod Dev Helper"
+Write-DevStatus "CW桌面美化 Windhawk Mod Dev Helper"
 Write-DevStatus "Mode: $(if ($StatusOnly) { 'status only' } else { 'inject source, platform compile' })"
 
 if (-not $StatusOnly -and -not $NoElevate -and -not (Test-IsAdministrator)) {

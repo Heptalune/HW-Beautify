@@ -1,7 +1,7 @@
 // ==WindhawkMod==
-// @id              zen-explorer-styler
-// @name            ZenDesktop: 文件管理器美化
-// @name:zh-CN      ZenDesktop: 文件管理器美化
+// @id              cw-explorer-styler
+// @name            CW-文件管理器美化
+// @name:zh-CN      CW-文件管理器美化
 // @description     Translucent File Explorer with adjustable tint, transparent chrome, and glass desktop context menus.
 // @description:zh-CN 让 Windows 11 文件管理器整窗半透明模糊，色调可调，命令栏、地址栏、标签栏透明，并美化桌面与资源管理器的右键菜单。
 // @version         1.6.9
@@ -20,14 +20,14 @@
 // https://windhawk.net/mods/windows-11-file-explorer-styler
 // https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-11-file-explorer-styler.wh.cpp
 //
-// ZenDesktop modifications (Lanbo): Chinese localization of the readme and
+// CW modifications (Lanbo): Chinese localization of the readme and
 // settings; new integrated "ZenTranslucent" (default) and "ZenTransparent"
 // themes; adjustable tint color/opacity (tintPreset, tintColor, tintOpacity) for
 // the AccentBlurBehind effect, which upstream hardcodes, with a default
 // "followSystem" preset that tints dark in dark mode and light in light mode;
 // address bar and search box fills in the Zen themes with an adjustable opacity
 // (fieldOpacity, default 0), theme-aware selected tab fill; a text color setting
-// (textColorMode) shared with the other ZenDesktop mods; optional glass on the
+// (textColorMode) shared with the other CW mods; optional glass on the
 // Win11 desktop/Explorer context menu (contextMenuEnable / contextMenuBlur),
 // which replaces each menu's SystemBackdrop in code with an adjustable acrylic
 // controller (ZenAcrylicBackdrop; `<WindhawkAcrylicBackdrop .../>` for style
@@ -44,31 +44,32 @@
 // ==WindhawkModReadme==
 /*
 > **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> 本 mod 属于「CW桌面美化」整合包。
 
-> 原作者：**m417z**（[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，GPL-3.0）。本版由 Lanbo 修改与维护，问题请到 [ZenDesktop](https://github.com/Liset999/ZenDesktop/issues) 反馈。
+> 原作者：**m417z**（[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
 
-# ZenDesktop: 文件管理器美化
+# CW-文件管理器美化
 
-自定义 Windows 11 文件管理器的外观。默认的「ZenDesktop 半透明」主题让整个窗口半透明模糊，色调颜色和不透明度可调，命令栏、地址栏、标签栏等 WinUI 区域背景透明；并可给桌面与资源管理器的现代右键菜单加上玻璃效果。基于 m417z 的 Windows 11 File Explorer Styler v1.7。
+自定义 Windows 11 文件管理器的外观。默认的「CW 半透明」主题让整个窗口半透明模糊，色调颜色和不透明度可调，命令栏、地址栏、标签栏等 WinUI 区域背景透明；并可给桌面与资源管理器的现代右键菜单加上玻璃效果。基于 m417z 的 Windows 11 File Explorer Styler v1.7。
 
 ## 功能
 
-- 「ZenDesktop 半透明」主题：样式与原版「半透明 Explorer11」一致，窗口背景改用可调色的「模糊」效果。
-- 「ZenDesktop 仅透明」主题：只清除 WinUI 区域背景，需要另选窗口背景效果。
+- 「CW 半透明」主题：样式与原版「半透明 Explorer11」一致，窗口背景改用可调色的「模糊」效果。
+- 「CW 仅透明」主题：只清除 WinUI 区域背景，需要另选窗口背景效果。
 - 色调颜色可从 11 种预设中选择，也可以自定义颜色代码。
 - 地址栏与搜索框底色可调，适配浅色模式。
-- 文字颜色与其他 ZenDesktop mod 共用同一套选项。
+- 文字颜色与其他 CW 模组共用同一套选项。
 - 桌面与文件管理器的现代右键菜单可开玻璃效果：替换菜单自带的系统亚克力，色调沿用上方设置，通透程度可调。
 - 改完设置后，已打开的文件管理器窗口立即刷新。
 
 ## 设置说明
 
-- **主题**：默认「ZenDesktop 半透明」。其余为原版内置的社区主题，括号内为原名。
+- **主题**：默认「CW 半透明」。其余为原版内置的社区主题，括号内为原名。
 - **窗口背景效果**：只有「模糊」会使用色调颜色和色调不透明度。其他主题想调色时，把这一项选成「模糊」即可；「亚克力」「云母」的颜色由系统决定，无法调整。
 - **色调颜色**：默认「跟随系统」，深色模式下用深灰、浅色模式下用浅白。选「自定义」后，在「高级：自定义颜色代码」中填写 `#RRGGBB`。
 - **色调不透明度**：范围 0–100，0 为只有模糊没有颜色，默认 23（与原版相同）。
-- **地址栏与搜索框不透明度**：范围 0–100，默认 0（完全透明），鼠标悬停时会稍亮一些。只对两款 ZenDesktop 主题生效。
+- **地址栏与搜索框不透明度**：范围 0–100，默认 0（完全透明），鼠标悬停时会稍亮一些。只对两款 CW 主题生效。
 - **文字颜色**：WinUI 区域在任何主题下都生效；文件列表、列标题、导航栏、状态栏等传统区域只在背景效果覆盖整个窗口时生效，选「跟随系统」时保持系统颜色。
 - **浅色模式**：浅色模式下文件列表和导航栏的文字是深色的，色调建议使用「跟随系统」，避免深色色调配深色文字。
 - **右键菜单：玻璃效果**：默认开启。作用在 Windows 11 桌面和文件管理器里的现代（XAML）右键菜单（顶部图标行和下面的菜单项）。「新建」「查看」「排序方式」等展开的子菜单保持系统原样：它们的材质会被系统转交给弹出层、mod 无法安全收回，强改可能在关闭或更新 mod 后让资源管理器崩溃。菜单的毛玻璃是系统背景材质（SystemBackdrop），不是普通画刷，在上面叠画刷看不出区别，所以本项直接替换这层材质，色调颜色和不透明度沿用上方的「色调颜色」「色调不透明度」，边框保持系统原样。开启或修改后需要重新打开菜单才生效。Shift+右键或「显示更多选项」打开的经典 Win32 菜单不在范围内。
@@ -88,12 +89,12 @@
 - **1.6.8**：加固内容底色清理：深色模式覆盖到系统三级底 #282828，浅色模式一并清掉靠近白的灰底（如 #F3F3F3）；补上 `Rectangle` 绘制路径。单显示器上发灰发亮的色块与跨屏材质不统一是同一类问题。
 - **1.6.7**：修复深色模式下内容底色未清成透明，跨显示器时材质不统一；单显示器上也会叠出灰块。
 - **1.6.6**：修复开机后顶部标签栏／地址栏／命令栏不透明的问题：XAML 诊断只会挂到第一个连接，开机时常常先挂到桌面侧，文件管理器顶部那片晚出现的岛就漏了。现在会挂上所有已有连接，并在窗口创建后延迟再扫几次，接上晚出现的岛。
-- **1.6.5**：问题反馈改到 ZenDesktop 仓库，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
+- **1.6.5**：问题反馈渠道调整，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
 
 ## 致谢与许可
 
 - 原版 mod：[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，作者 [m417z](https://github.com/m417z)，GPL-3.0。原版源码：[windhawk-mods](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-11-file-explorer-styler.wh.cpp)、[m417z/my-windhawk-mods](https://github.com/m417z/my-windhawk-mods)。
-- ZenDesktop 修改（Lanbo）：新增两款 ZenDesktop 主题、可调色调颜色与不透明度（原版固定为 #232323、约 23%）、地址栏与搜索框底色、文字颜色和中文界面，其余代码与原版一致。
+- Lanbo 的修改：新增两款 CW 主题、可调色调颜色与不透明度（原版固定为 #232323、约 23%）、地址栏与搜索框底色、文字颜色和中文界面，其余代码与原版一致。
 - 内置主题由社区贡献，详见 [Windows 11 文件管理器美化指南](https://github.com/ramensoftware/windows-11-file-explorer-styling-guide)。
 - 控件树监听基于 TranslucentTB 项目的 [ExplorerTAP](https://github.com/TranslucentTB/TranslucentTB/tree/develop/ExplorerTAP)，`WindhawkBlur` 画刷基于 TranslucentTB 的 [XamlBlurBrush](https://github.com/TranslucentTB/TranslucentTB/blob/release/ExplorerTAP/XamlBlurBrush.cpp)，整窗半透明的 GDI alpha 渲染和 accent blur behind 设置基于 [Translucent Windows](https://windhawk.net/mods/translucent-windows) mod，右键菜单的可调系统材质参照 [microsoft-ui-xaml](https://github.com/microsoft/microsoft-ui-xaml) 的 DesktopAcrylicBackdrop（MIT）。
 - 本修改版同样以 GPL-3.0 发布。
@@ -101,11 +102,11 @@
 
 ## 附录：内置主题
 
-主题就是一组样式。以下主题已内置在 mod 中，可以在设置里直接选择。除两款 ZenDesktop 主题外，其余主题均来自原版，由社区贡献：
+主题就是一组样式。以下主题已内置在 mod 中，可以在设置里直接选择。除两款 CW 主题外，其余主题均来自原版，由社区贡献：
 
-**ZenDesktop 半透明（推荐，默认）**：原版「半透明 Explorer11」的样式 + 可调色调的模糊背景。
+**CW 半透明（推荐，默认）**：原版「半透明 Explorer11」的样式 + 可调色调的模糊背景。
 
-**ZenDesktop 仅透明**：只把命令栏、地址栏、标签页、主页/图库/详细信息窗格的背景改成透明，不改窗口背景效果。单独使用时下面是黑的，需要在「窗口背景效果」里选一个效果（例如「模糊」）提供背景。
+**CW 仅透明**：只把命令栏、地址栏、标签页、主页/图库/详细信息窗格的背景改成透明，不改窗口背景效果。单独使用时下面是黑的，需要在「窗口背景效果」里选一个效果（例如「模糊」）提供背景。
 
 [![Translucent
 Explorer11](https://raw.githubusercontent.com/ramensoftware/windows-11-file-explorer-styling-guide/main/Themes/Translucent%20Explorer11/screenshot-small.png)
@@ -205,7 +206,7 @@ Float](https://github.com/ramensoftware/windows-11-file-explorer-styling-guide/b
 
 在 XAML 语法中，除了系统自带的对象，mod 还提供了内置的模糊画刷 `WindhawkBlur`，支持 `BlurAmount`、`TintColor`、`TintOpacity`、`TintLuminosityOpacity`、`TintSaturation`、`NoiseOpacity`、`NoiseDensity` 和 `FallbackColor` 属性。例如：`Fill:=<WindhawkBlur BlurAmount="10" TintColor="#80FF00FF"/>`。`TintColor` 和 `FallbackColor` 也支持主题资源，例如：`Fill:=<WindhawkBlur BlurAmount="18" TintColor="{ThemeResource SystemAccentColorDark1}" TintOpacity="0.5"/>`。开启省电模式或在系统设置中关闭透明效果时，会用 `FallbackColor` 代替模糊效果。
 
-ZenDesktop 另外提供了 `WindhawkAcrylicBackdrop`，用于 `SystemBackdrop` 属性（右键菜单这类自带系统材质的弹出层；不建议用在 `MenuFlyoutPresenter` 上，原因见「右键菜单：玻璃效果」），支持 `TintColor`（透明度即色调不透明度）、`LuminosityOpacity`（0–1，磨砂程度）和 `FallbackColor`。例如：目标 `Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar`，样式 `SystemBackdrop:=<WindhawkAcrylicBackdrop TintColor="#40202020" LuminosityOpacity="0.3"/>`。这类弹出层的 `Background` 叠在系统材质上面，`WindhawkBlur` 采不到后面的内容，所以对它们无效。
+CW 另外提供了 `WindhawkAcrylicBackdrop`，用于 `SystemBackdrop` 属性（右键菜单这类自带系统材质的弹出层；不建议用在 `MenuFlyoutPresenter` 上，原因见「右键菜单：玻璃效果」），支持 `TintColor`（透明度即色调不透明度）、`LuminosityOpacity`（0–1，磨砂程度）和 `FallbackColor`。例如：目标 `Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar`，样式 `SystemBackdrop:=<WindhawkAcrylicBackdrop TintColor="#40202020" LuminosityOpacity="0.3"/>`。这类弹出层的 `Background` 叠在系统材质上面，`WindhawkBlur` 采不到后面的内容，所以对它们无效。
 
 以两个斜杠（`//`）开头的目标和样式会被忽略，可以用来临时禁用某个目标或样式。
 
@@ -305,12 +306,12 @@ Background:=<AcrylicBrush TintColor="$mainColor" TintOpacity="0.3" />
 - theme: "ZenTranslucent"
   $name: "Theme"
   $name:zh-CN: "主题"
-  $description: "A theme is a set of styles. \"ZenDesktop Translucent\" blurs the whole window with an adjustable tint; \"ZenDesktop Transparent\" only clears WinUI backgrounds. Other themes come from the original mod. Default: ZenDesktop Translucent."
-  $description:zh-CN: "主题是一组样式。「ZenDesktop 半透明」整窗模糊，色调可调；「ZenDesktop 仅透明」只清除 WinUI 区域背景，不带模糊底。其余主题来自原版。默认为 ZenDesktop 半透明。"
+  $description: "A theme is a set of styles. \"CW Translucent\" blurs the whole window with an adjustable tint; \"CW Transparent\" only clears WinUI backgrounds. Other themes come from the original mod. Default: CW Translucent."
+  $description:zh-CN: "主题是一组样式。「CW 半透明」整窗模糊，色调可调；「CW 仅透明」只清除 WinUI 区域背景，不带模糊底。其余主题来自原版。默认为 CW 半透明。"
   $options:
   - "": "无"
-  - ZenTranslucent: "ZenDesktop 半透明（推荐）"
-  - ZenTransparent: "ZenDesktop 仅透明"
+  - ZenTranslucent: "CW 半透明（推荐）"
+  - ZenTransparent: "CW 仅透明"
   - Translucent Explorer11: "半透明 Explorer11（Translucent Explorer11）"
   - MicaBar: "云母命令栏（MicaBar）"
   - NoCommandBar: "隐藏命令栏（NoCommandBar）"
@@ -398,8 +399,8 @@ Background:=<AcrylicBrush TintColor="$mainColor" TintOpacity="0.3" />
 - fieldOpacity: 0
   $name: "Address/search box opacity"
   $name:zh-CN: "地址栏与搜索框不透明度"
-  $description: "Fill strength of the address bar and search box, 0–100, in both dark and light mode. 0 is fully transparent. Only affects the two ZenDesktop themes. Default: 0."
-  $description:zh-CN: "地址栏和搜索框底色的浓度，范围 0–100，深色和浅色模式都生效，0 为完全透明。只对两款 ZenDesktop 主题生效。默认 0。"
+  $description: "Fill strength of the address bar and search box, 0–100, in both dark and light mode. 0 is fully transparent. Only affects the two CW themes. Default: 0."
+  $description:zh-CN: "地址栏和搜索框底色的浓度，范围 0–100，深色和浅色模式都生效，0 为完全透明。只对两款 CW 主题生效。默认 0。"
 - contextMenuEnable: true
   $name: "Context menu glass"
   $name:zh-CN: "右键菜单：玻璃效果"
@@ -483,7 +484,7 @@ struct Theme {
 
 // clang-format off
 
-// ZenDesktop: fills for the address bar and search box. In light mode WinUI
+// CW: fills for the address bar and search box. In light mode WinUI
 // fills them with TextControlBackground/ControlFillColorDefault (#B3FFFFFF, 70%
 // white), which shows as an opaque white block over the translucent window; in
 // dark mode the same resource is #0FFFFFFF. The ZenFieldFill and
@@ -503,7 +504,7 @@ struct Theme {
     L"ZenTabSelectedFill@Dark=#40404040", \
     L"ZenTabSelectedFill@Light=#59FFFFFF"
 
-// ZenDesktop: transparent WinUI backgrounds only (command bar, address bar,
+// CW: transparent WinUI backgrounds only (command bar, address bar,
 // tabs, home/gallery/details panes). Keeps the window backdrop untouched, for
 // use with a background effect chosen in the settings. All targets are taken from the
 // upstream themes above.
@@ -558,7 +559,7 @@ const Theme g_themeTranslucent_Explorer11 = {{
         L"Background=Transparent"}},
 }, {}, {}, /*explorerFrameContainerHeight=*/0, BackgroundTranslucentEffect::kAcrylic};
 
-// ZenDesktop: the same styles as Translucent Explorer11, but with the
+// CW: the same styles as Translucent Explorer11, but with the
 // AccentBlurBehind effect, whose tint color and opacity come from the tintPreset,
 // tintColor and tintOpacity settings (the DWM acrylic backdrop tint isn't
 // adjustable). Upstream's dark-only colors (the selected tab fill #40404040)
@@ -1818,12 +1819,12 @@ struct {
     BackgroundTranslucentEffectRegion backgroundTranslucentEffectRegion;
     int explorerFrameContainerHeight;
     XamlDiagnosticsHandling xamlDiagnosticsHandling;
-    // ZenDesktop: AccentBlurBehind tint, AABBGGRR (as ACCENT_POLICY expects).
+    // CW: AccentBlurBehind tint, AABBGGRR (as ACCENT_POLICY expects).
     // With tintFollowSystem, only the alpha part is used and the color depends
     // on the light/dark theme, see GetAccentGradientColor.
     int accentGradientColor;
     bool tintFollowSystem;
-    // ZenDesktop: textColorMode for the GDI text of the Win32 parts (file list,
+    // CW: textColorMode for the GDI text of the Win32 parts (file list,
     // headers, navigation pane, status bar), only used with the entire window
     // effect. Not set for "default" and "system", which keep the system colors.
     std::optional<COLORREF> win32TextColor;
@@ -2082,7 +2083,7 @@ HRESULT VisualTreeWatcher::OnVisualTreeChange(ParentChildRelation relation, Visu
 
     if (!g_initializedForThread)
     {
-        // ZenDesktop: the desktop context menu can be built on a thread which
+        // CW: the desktop context menu can be built on a thread which
         // never created a window the mod recognizes (the TAP is per process,
         // so its elements are reported anyway). Upstream skips such threads,
         // which left the menu completely unstyled. The thread is initialized
@@ -2185,7 +2186,7 @@ HRESULT VisualTreeWatcher::OnElementStateChanged(InstanceHandle, VisualElementSt
 
 // Read by the UI threads while the thread which injects or uninitializes the TAP
 // replaces it.
-// ZenDesktop: File Explorer hosts multiple WinUI islands (desktop host,
+// CW: File Explorer hosts multiple WinUI islands (desktop host,
 // tabs/address/command bar, …), each with its own WinUIVisualDiagConnection.
 // Upstream kept a single watcher and InjectWindhawkTAP stopped at the first
 // connection, so a reboot often attached to an early desktop island and left
@@ -2251,7 +2252,7 @@ std::vector<winrt::com_ptr<VisualTreeWatcher>> TakeAllVisualTreeWatchers()
 
 HRESULT WindhawkTAP::SetSite(IUnknown *pUnkSite) try
 {
-    // ZenDesktop: one TAP instance per WinUI diagnostics connection. Keep each
+    // CW: one TAP instance per WinUI diagnostics connection. Keep each
     // watcher instead of replacing the previous one.
     if (watcher)
     {
@@ -2402,7 +2403,7 @@ HRESULT InjectWindhawkTAP() noexcept
     // I didn't find a better way than trying many connections until one works.
     // Reference:
     // https://github.com/microsoft/microsoft-ui-xaml/blob/d74a0332cf0d5e58f12eddce1070fa7a79b4c2db/src/dxaml/xcp/dxaml/lib/DXamlCore.cpp#L2782
-    // ZenDesktop: attach to every connection that exists, not just the first.
+    // CW: attach to every connection that exists, not just the first.
     // File Explorer creates separate islands for the desktop host and for the
     // toolbar; stopping at the first left the toolbar unstyled after reboot.
     g_inInjectWindhawkTAP = true;
@@ -5832,7 +5833,7 @@ void TrackIfRemoteImageSource(
     SetupImageTracking(target, sourceProperty, bitmapImage, uri);
 }
 
-// ZenDesktop: CommandBarFlyoutCommandBar disconnects its old SystemBackdrop
+// CW: CommandBarFlyoutCommandBar disconnects its old SystemBackdrop
 // whenever the property changes, without checking that the old one was ever
 // connected (microsoft-ui-xaml CommandBarFlyoutCommandBar::OnPropertyChanged).
 // The default backdrop is only connected once the control has a XamlRoot (in
@@ -5934,7 +5935,7 @@ winrt::Windows::Foundation::IInspectable SetOrClearValue(
     DependencyProperty property,
     const PropertyOverrideValue& overrideValue,
     bool initialApply = false) {
-    // ZenDesktop: any later write or restore supersedes a deferred backdrop.
+    // CW: any later write or restore supersedes a deferred backdrop.
     CancelZenPendingBackdrop(elementDo);
 
     winrt::Windows::Foundation::IInspectable value;
@@ -6116,7 +6117,7 @@ std::vector<std::wstring_view> SplitStringView(std::wstring_view s,
     return res;
 }
 
-// ZenDesktop: a SystemBackdrop with adjustable acrylic parameters.
+// CW: a SystemBackdrop with adjustable acrylic parameters.
 //
 // The Windows 11 modern context menu (CommandBarFlyout) and its submenus
 // (MenuFlyoutPresenter) don't paint their acrylic with a XAML brush. Their
@@ -6219,7 +6220,7 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
     std::vector<Entry> m_entries;
 };
 
-// ZenDesktop: <WindhawkAcrylicBackdrop TintColor="#AARRGGBB"
+// CW: <WindhawkAcrylicBackdrop TintColor="#AARRGGBB"
 // LuminosityOpacity="0.5" FallbackColor="#AARRGGBB"/>, a value for the
 // SystemBackdrop property. The alpha of TintColor is the tint opacity.
 std::optional<winrt::Windows::Foundation::IInspectable>
@@ -6292,7 +6293,7 @@ ParseZenAcrylicBackdropValue(std::wstring_view substr) {
         .as<winrt::Windows::Foundation::IInspectable>();
 }
 
-// ZenDesktop: context menu glass (contextMenuEnable / contextMenuBlur).
+// CW: context menu glass (contextMenuEnable / contextMenuBlur).
 //
 // The menu's acrylic is CommandBarFlyoutCommandBar.SystemBackdrop, so the
 // glass is a ZenAcrylicBackdrop written to that property of each menu. It's
@@ -6731,7 +6732,7 @@ std::optional<PropertyOverrideValue> ParseNonXamlPropertyOverrideValue(
 
     auto substr = TrimStringView(stringValue);
 
-    // ZenDesktop: a SystemBackdrop value, see ZenAcrylicBackdrop.
+    // CW: a SystemBackdrop value, see ZenAcrylicBackdrop.
     if (auto backdrop = ParseZenAcrylicBackdropValue(substr)) {
         Wh_Log(L"%.*s", static_cast<int>(substr.length()), substr.data());
         return PropertyOverrideValue{std::move(*backdrop)};
@@ -9668,7 +9669,7 @@ void FlushDiagnosticsReleases() {
             continue;
         }
 
-        // ZenDesktop: the handle belongs to one of several diagnostics
+        // CW: the handle belongs to one of several diagnostics
         // connections; try each watcher until UnregisterInstance succeeds.
         for (auto const& visualTreeWatcher : visualTreeWatchers) {
             if (visualTreeWatcher->ReleaseDiagnosticsReference(handle)) {
@@ -10619,7 +10620,7 @@ void MergeResourceVariables() {
     }
 }
 
-// ZenDesktop: the textColorMode options, shared with the other ZenDesktop mods.
+// CW: the textColorMode options, shared with the other CW mods.
 // rgb is 0xRRGGBB for the GDI text, or -1 to keep the system color.
 struct TextColorMode {
     PCWSTR id;
@@ -10655,7 +10656,7 @@ const TextColorMode* GetTextColorMode() {
     return result;
 }
 
-// ZenDesktop: applied after theme styles; defined later next to
+// CW: applied after theme styles; defined later next to
 // GetAccentGradientColor so it can reuse the tint helpers.
 void ApplyZenContextMenuStyles();
 
@@ -10733,8 +10734,8 @@ void ProcessAllStylesFromSettings() {
         }
     }
 
-    // ZenDesktop: text color, the same option set and targets as the other
-    // ZenDesktop mods. Added after the theme styles so that it takes
+    // CW: text color, the same option set and targets as the other
+    // CW mods. Added after the theme styles so that it takes
     // precedence, and before the user's control styles, which still override
     // it.
     try {
@@ -10754,7 +10755,7 @@ void ProcessAllStylesFromSettings() {
         Wh_Log(L"Error: %S", ex.what());
     }
 
-    // ZenDesktop: modern Win11 context menu glass (desktop + Explorer).
+    // CW: modern Win11 context menu glass (desktop + Explorer).
     try {
         ApplyZenContextMenuStyles();
     } catch (winrt::hresult_error const& ex) {
@@ -10778,7 +10779,7 @@ void ProcessAllStylesFromSettings() {
     std::vector<PCWSTR> themeResourceVariables =
         theme ? theme->themeResourceVariables : std::vector<PCWSTR>{};
 
-    // ZenDesktop: the field fill resources of the Zen themes, from the
+    // CW: the field fill resources of the Zen themes, from the
     // fieldOpacity setting. They're added after the theme's own variables and
     // before the user's, so user variables still override them. The strings
     // must outlive the ProcessResourceVariablesFromSettings call.
@@ -10910,10 +10911,10 @@ void UninitializeForCurrentThread() {
 
     g_elementsCustomizationRules.clear();
 
-    // ZenDesktop: no Loaded handler may outlive the mod.
+    // CW: no Loaded handler may outlive the mod.
     CancelAllZenPendingBackdrops();
 
-    // ZenDesktop: give every context menu its own backdrop back, so that no
+    // CW: give every context menu its own backdrop back, so that no
     // menu keeps an object of this mod after it's unloaded.
     ZenContextMenuRestoreAll();
 
@@ -10947,7 +10948,7 @@ void InitializeForCurrentThread() {
 }
 
 void InitializeSettingsAndTap() {
-    // ZenDesktop: always try to attach — new File Explorer islands appear
+    // CW: always try to attach — new File Explorer islands appear
     // after the first inject, and already-attached connections are skipped.
     g_initialized.store(true);
 
@@ -10979,7 +10980,7 @@ TargetWindowType GetTargetWindowType(HWND hWnd) {
         return TargetWindowType::FileExplorer;
     }
 
-    // Used by the desktop context menu. ZenDesktop: XamlExplorerHostIslandWindow
+    // Used by the desktop context menu. CW: XamlExplorerHostIslandWindow
     // too, which some builds use for it. (Xaml_WindowedPopupClass, added in
     // 1.6.2, is a Windows.UI.Xaml popup, e.g. of the taskbar, which this
     // WinUI 3 mod can't style; it's no longer matched.)
@@ -11004,7 +11005,7 @@ void SetAccentBlurBehind(HWND hWnd,
                          bool enable,
                          std::optional<bool> darkTheme = std::nullopt);
 
-// ZenDesktop: whether File Explorer paints its content in dark mode. Set when
+// CW: whether File Explorer paints its content in dark mode. Set when
 // the effect is applied and when File Explorer sets the dark mode attribute,
 // so that the paint hooks don't read the registry.
 std::atomic<bool> g_zenDarkContent{false};
@@ -11020,7 +11021,7 @@ HRESULT WINAPI DwmSetWindowAttribute_Hook(HWND hWnd,
                                               cbAttribute);
     };
 
-    // ZenDesktop: File Explorer sets the dark mode attribute when the window is
+    // CW: File Explorer sets the dark mode attribute when the window is
     // created and when the light/dark theme changes. With the "followSystem"
     // tint, the accent tint is updated to match the new theme.
     if (dwAttribute == DWMWA_USE_IMMERSIVE_DARK_MODE) {
@@ -11117,7 +11118,7 @@ thread_local HWND g_entireWindowEffectWndForThread;
 
 bool IsAppsDarkTheme();
 
-// ZenDesktop: the content background isn't always COLOR_WINDOW. In dark mode
+// CW: the content background isn't always COLOR_WINDOW. In dark mode
 // COLOR_WINDOW stays white (system colors don't follow the app theme), and
 // Explorer paints near-black greys instead: about #191919 / #1C1C1C for the
 // items view and navigation pane, #202020 for SolidBackgroundFillColorBase,
@@ -11293,7 +11294,7 @@ BOOL WINAPI PatBlt_Hook(HDC hdc, int x, int y, int w, int h, DWORD rop) {
     return PatBlt_Original(hdc, x, y, w, h, rop);
 }
 
-// ZenDesktop: some shell / comctl32 paths fill with Rectangle instead of
+// CW: some shell / comctl32 paths fill with Rectangle instead of
 // FillRect / PatBlt. Same brush check; the stock black brush has no outline.
 using Rectangle_t = decltype(&Rectangle);
 Rectangle_t Rectangle_Original;
@@ -11733,7 +11734,7 @@ BOOL WINAPI ExtTextOutW_Hook(HDC hdc,
         (options & ETO_OPAQUE) && IsContentBackgroundColor(GetBkColor(hdc));
     COLORREF prevBkColor = windowBk ? SetBkColor(hdc, RGB(0, 0, 0)) : 0;
 
-    // ZenDesktop: the textColorMode setting. Set on the DC, so that both the
+    // CW: the textColorMode setting. Set on the DC, so that both the
     // alpha rendering and the fallback to the original function use it. Text
     // drawn by DrawTextWithGlow also ends up here.
     std::optional<COLORREF> textColor = g_settings.win32TextColor;
@@ -12303,7 +12304,7 @@ HRESULT WINAPI DrawThemeBackgroundEx_Hook(HTHEME hTheme,
                                           pOptions);
 }
 
-// ZenDesktop: whether apps use the dark theme, which File Explorer follows.
+// CW: whether apps use the dark theme, which File Explorer follows.
 bool IsAppsDarkTheme() {
     DWORD value = 1;
     DWORD size = sizeof(value);
@@ -12319,12 +12320,12 @@ bool IsAppsDarkTheme() {
     return value == 0;
 }
 
-// ZenDesktop: the "followSystem" tint colors, as 0x00BBGGRR. Dark matches the
+// CW: the "followSystem" tint colors, as 0x00BBGGRR. Dark matches the
 // upstream #232323, light is the Windows 11 light mica base color #F3F3F3.
 constexpr DWORD kFollowSystemDarkTintBgr = 0x00232323;
 constexpr DWORD kFollowSystemLightTintBgr = 0x00F3F3F3;
 
-// ZenDesktop: the ACCENT_POLICY GradientColor (AABBGGRR) for the tint settings.
+// CW: the ACCENT_POLICY GradientColor (AABBGGRR) for the tint settings.
 // darkTheme is the window's theme if known, otherwise the apps theme is read.
 int GetAccentGradientColor(std::optional<bool> darkTheme = std::nullopt) {
     if (!g_settings.tintFollowSystem) {
@@ -12337,7 +12338,7 @@ int GetAccentGradientColor(std::optional<bool> darkTheme = std::nullopt) {
                  (dark ? kFollowSystemDarkTintBgr : kFollowSystemLightTintBgr));
 }
 
-// ZenDesktop: glass for the Win11 XAML context menu (desktop right-click and
+// CW: glass for the Win11 XAML context menu (desktop right-click and
 // Explorer). The menu's acrylic is its SystemBackdrop, not a XAML brush, so
 // the glass is a ZenAcrylicBackdrop written to each menu in code (see
 // ZenContextMenuOnElementAdded); this only prepares the parameters for the
@@ -12369,7 +12370,7 @@ void ApplyZenContextMenuStyles() {
     params.tintOpacity = a / 255.0f;
     // Frost 0-60 -> luminosity opacity 0.0-0.6. The stock menu is about
     // 0.85-0.96, which is what makes it look milky; the default 30 (0.30) is
-    // clear glass, close to the Start menu of ZenDesktop.
+    // clear glass, close to the Start menu of CW.
     params.luminosityOpacity = frost / 100.0f;
     params.fallback = dark ? winrt::Windows::UI::Color{0xFF, 0x2C, 0x2C, 0x2C}
                            : winrt::Windows::UI::Color{0xFF, 0xF9, 0xF9, 0xF9};
@@ -12430,7 +12431,7 @@ void SetAccentBlurBehind(HWND hWnd, bool enable, std::optional<bool> darkTheme) 
 
     ACCENT_POLICY accentPolicy = {
         .AccentState = ACCENT_ENABLE_ACRYLICBLURBEHIND,
-        // AABBGGRR. ZenDesktop: from the tintPreset, tintColor and
+        // AABBGGRR. CW: from the tintPreset, tintColor and
         // tintOpacity settings, upstream hardcodes 0x3A232323.
         .GradientColor = GetAccentGradientColor(darkTheme),
     };
@@ -12538,7 +12539,7 @@ void OnWindowCreated(HWND hWnd, PCSTR funcName) {
         InitializeForCurrentThread();
         InitializeSettingsAndTap();
 
-        // ZenDesktop: toolbar islands are often created shortly after the
+        // CW: toolbar islands are often created shortly after the
         // CabinetWClass window; keep attaching and periodically reinject.
         if (windowType == TargetWindowType::FileExplorer) {
             ZenScheduleExplorerStyleRetry();
@@ -12824,7 +12825,7 @@ bool RunFromWindowThread(HWND hWnd,
     return true;
 }
 
-// ZenDesktop: threads initialized on their first element.
+// CW: threads initialized on their first element.
 std::mutex g_zenLazyInitThreadsMutex;
 std::unordered_set<DWORD> g_zenLazyInitThreads;
 
@@ -12858,7 +12859,7 @@ std::vector<HWND> GetTargetWnds() {
         },
         (LPARAM)&param);
 
-    // ZenDesktop: one window of each thread initialized on its first element
+    // CW: one window of each thread initialized on its first element
     // (see VisualTreeWatcher::OnVisualTreeChange), unless already listed.
     std::vector<DWORD> lazyThreads;
     {
@@ -13077,7 +13078,7 @@ void StopStatsTimer() {
     }
 }
 
-// ZenDesktop: parses "#RRGGBB" (the "#" is optional; for "#AARRGGBB" the AA
+// CW: parses "#RRGGBB" (the "#" is optional; for "#AARRGGBB" the AA
 // part is ignored, opacity comes from tintOpacity). Returns the color as
 // 0x00BBGGRR, or the upstream default 0x232323 if the value is invalid.
 DWORD ParseTintColorSetting(PCWSTR value) {
@@ -13120,7 +13121,7 @@ DWORD ParseTintColorSetting(PCWSTR value) {
     return (DWORD)r | ((DWORD)g << 8) | ((DWORD)b << 16);
 }
 
-// ZenDesktop: tint color presets for the tintPreset setting, as 0xRRGGBB.
+// CW: tint color presets for the tintPreset setting, as 0xRRGGBB.
 struct TintPreset {
     PCWSTR id;
     DWORD rgb;
@@ -13248,7 +13249,7 @@ void LoadThemeSettings() {
         theme ? theme->explorerFrameContainerHeight : 0;
 }
 
-// ZenDesktop: after reboot the toolbar islands often appear a second or two
+// CW: after reboot the toolbar islands often appear a second or two
 // after the first TAP inject. Keep trying to attach to new connections, and
 // once or twice do a full re-advise so the now-complete tree is dumped again —
 // the same effect as toggling the mod off and on.
