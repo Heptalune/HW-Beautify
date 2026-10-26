@@ -17,7 +17,6 @@ common_files = [
     'LICENSE',
     'Readme.txt',
     'CHANGELOG_CW_v1.0.0.md',
-    'CHANGELOG_v5.0.0.md',
     'README.md',
     'docs/donate-wechat.png',
     'docs/screenshots',  # README.md preview images
