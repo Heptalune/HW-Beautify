@@ -4,7 +4,7 @@
 // @name:zh-CN            CW-灵动岛
 // @description     A living, breathing pill overlay inspired by iPhone's Dynamic Island. Reacts to media, downloads, clipboard, battery, and more.
 // @description:zh-CN     灵动岛风格的悬浮控制胶囊：随媒体、通知等内容灵动展开，60 FPS 流畅渲染。
-// @version         1.4.1
+// @version         1.4.2
 // @author          Himanshu
 // @github          https://github.com/devcode90
 // @include         windhawk.exe
@@ -43,6 +43,8 @@
 
 ## 更新日志
 
+
+- **1.4.2（CW）**：设置描述与选项标签全部中文化。
 - **1.4.1（CW）**：元数据与设置名中文化，纳入 CW 桌面美化整合包。
 - **1.4.0（上游，Himanshu）**：上游版本。
 */
@@ -55,75 +57,86 @@
     $name: Position
     $name:zh-CN: 位置
     $description: Where the island should appear on your screen.
+    $description:zh-CN: 灵动岛在屏幕上的显示位置。
     $options:
-      - top-center: Top Center
-      - top-left: Top Left
-      - top-right: Top Right
-      - bottom-center: Bottom Center
-      - bottom-left: Bottom Left
-      - bottom-right: Bottom Right
+      - top-center: 顶部居中
+      - top-left: 左上
+      - top-right: 右上
+      - bottom-center: 底部居中
+      - bottom-left: 左下
+      - bottom-right: 右下
   - TargetMonitor: primary
     $name: Target Monitor
     $name:zh-CN: 目标显示器
     $description: Select the screen to display the island. If a display isn't found, it safely falls back to the Primary Monitor.(Extra Displays are given even if they don't exist because windhawk settings are static)
+    $description:zh-CN: 选择显示灵动岛的显示器。找不到时安全回退到主显示器。（因 Windhawk 设置为静态，不存在的多余显示器也会列出）
     $options:
-      - 'primary': Primary Monitor
-      - '1': Display 1
-      - '2': Display 2
-      - '3': Display 3
-      - '4': Display 4
-      - '5': Display 5
-      - 'follow': Follow Mouse (Active Monitor)
+      - 'primary': 主显示器
+      - '1': 显示器 1
+      - '2': 显示器 2
+      - '3': 显示器 3
+      - '4': 显示器 4
+      - '5': 显示器 5
+      - 'follow': 跟随鼠标（当前显示器）
   - OffsetX: 0
     $name: Offset X
     $name:zh-CN: 水平偏移
     $description: Adjust the horizontal position (in pixels). Positive values move it right, negative values move it left.
+    $description:zh-CN: 调整水平位置（像素）。正值右移，负值左移。
   - OffsetY: 0
     $name: Offset Y
     $name:zh-CN: 垂直偏移
     $description: Adjust the vertical position (in pixels). Positive values move it down, negative values move it up. Applies to every state unless the separate expanded offset below is turned on, in which case this becomes the collapsed/idle offset.
+    $description:zh-CN: 调整垂直位置（像素）。正值下移，负值上移。适用于所有状态；若开启下方「展开时使用独立垂直偏移」，此项表示收起 / 空闲时的偏移。
   - SeparateExpandedOffsetY: false
     $name: Use a separate Offset Y when expanded
     $name:zh-CN: 展开时使用独立垂直偏移
     $description: Lets the island sit at one height while collapsed and a different one while expanded. Useful for tucking the idle pill up near the screen edge while keeping the expanded dashboard somewhere comfortable to interact with.
+    $description:zh-CN: 收起与展开时使用不同高度。可把空闲胶囊贴在屏幕边缘，而展开面板停在顺手交互的位置。
   - OffsetYExpanded: 0
     $name: Offset Y (expanded)
     $name:zh-CN: 垂直偏移（展开时）
     $description: Vertical position in pixels while the island is expanded. Only used when the separate expanded offset above is on. The island eases between this and Offset Y as it expands and collapses, so the two never snap.
+    $description:zh-CN: 展开时的垂直位置（像素）。仅在上面的独立偏移开启时生效。展开与收起之间平滑过渡，不会跳变。
   - BorderMergedMode: false
     $name: Border-Merged Mode
     $name:zh-CN: 贴边模式（无边距）
     $description: Attach the island flush to the top edge of the monitor without a floating gap.
+    $description:zh-CN: 灵动岛紧贴显示器顶边，无悬浮间隙。
   - ShapeStyle: default
     $name: Island Shape Style
     $name:zh-CN: 岛屿形状
     $description: Change the overall shape of the island (Pill, Windows 11, or macOS Notch).
+    $description:zh-CN: 更换岛屿整体形状（胶囊、Win11 圆角矩形或 macOS 刘海）。
     $options:
-      - default: Default (Apple Pill)
-      - w11: Windows 11 (Rounded Box)
-      - notch: macOS Notch (Top Edge Flush)
+      - default: 默认（苹果胶囊）
+      - w11: Windows 11（圆角矩形）
+      - notch: macOS 刘海（贴合顶边）
   - ProgressStyle: slim
     $name: Progress bar style
     $name:zh-CN: 进度条样式
     $description: Look of the song progress bar in the expanded media player. Wavy and Squiggle animate while music is playing and flatten when paused.
+    $description:zh-CN: 展开播放器中歌曲进度条的样式。Wavy 与 Squiggle 在播放时起伏、暂停时放平。
     $options:
-      - slim: Slim (classic bar)
-      - wavy: Wavy
-      - squiggle: Squiggle (slower, subtler wave)
-      - bar: Bar (thick bar with a line thumb)
+      - slim: 纤细（经典条形）
+      - wavy: 波浪
+      - squiggle: 蜿蜒（更慢更含蓄）
+      - bar: 条形（粗条+线性滑块）
   - SpectrumStyle: bars
     $name: Audio spectrum style
     $name:zh-CN: 音频频谱样式
     $description: Look of the live audio visualizer next to the album art (collapsed pill and expanded player). Pulse Orb, Plasma Thread and Peak Matrix use a real frequency analysis of the system audio, and each plays its own animation when the track changes.
+    $description:zh-CN: 专辑封面旁的实时音频可视化样式（收起胶囊与展开播放器）。Pulse Orb、Plasma Thread 与 Peak Matrix 基于系统音频真实频谱分析，切歌时各有专属动画。
     $options:
-      - bars: Classic Bars
-      - led: Peak Matrix
-      - plasma: Plasma Thread
-      - orb: Pulse Orb
+      - bars: 经典频谱条
+      - led: 峰值矩阵
+      - plasma: 等离子丝
+      - orb: 脉冲光球
   - SizeScale: '1.0'
     $name: Size scale
     $name:zh-CN: 整体缩放
     $description: Makes the entire island and its contents larger or smaller.
+    $description:zh-CN: 整体放大或缩小灵动岛及其内容。
     $options:
       - '0.8': 0.8x
       - '1.0': 1.0x
@@ -136,6 +149,7 @@
     $name: Auto DPI scaling
     $name:zh-CN: 自动 DPI 缩放
     $description: Automatically scales the island to match your monitor's DPI. Recommended for 4K screens.
+    $description:zh-CN: 自动按显示器 DPI 缩放灵动岛。4K 屏幕推荐开启。
   $name: Appearance & Position
   $name:zh-CN: 外观与位置
 - Behavior:
@@ -143,29 +157,34 @@
     $name: Always on top
     $name:zh-CN: 总在最前
     $description: Keeps the island above all other windows. Turn this off if it blocks other apps.
+    $description:zh-CN: 灵动岛始终置顶。若遮挡其他应用可关闭。
   - ExpandOnHover: true
     $name: Expand on hover
     $name:zh-CN: 悬停展开
     $description: Expand the island automatically when hovered. If disabled, click to expand.
+    $description:zh-CN: 悬停自动展开。关闭后需点击展开。
   - AutoHideIdleSeconds: '0'
     $name: Auto-hide island (all states)
     $name:zh-CN: 自动隐藏岛屿（所有状态）
     $description: Hide the island (including idle, media, and other states) after this many seconds of inactivity. 0 to disable.
+    $description:zh-CN: 空闲这么多秒后隐藏灵动岛（含空闲、媒体等所有状态）。0 为不隐藏。
     $options:
-      - '-1': Hide instantly
-      - '0': Never hide (default)
-      - '5': Hide after 5 seconds
-      - '10': Hide after 10 seconds
-      - '30': Hide after 30 seconds
-      - '60': Hide after 60 seconds
+      - '-1': 立即隐藏
+      - '0': 从不隐藏（默认）
+      - '5': 5 秒后隐藏
+      - '10': 10 秒后隐藏
+      - '30': 30 秒后隐藏
+      - '60': 60 秒后隐藏
   - AutoHideFullscreen: true
     $name: Hide on full screen
     $name:zh-CN: 全屏时隐藏
     $description: Automatically hide the island when playing a video or app in full screen mode.
+    $description:zh-CN: 全屏播放视频或应用时自动隐藏。
   - UnhideOnHover: true
     $name: Unhide on hover
     $name:zh-CN: 悬停时恢复显示
     $description: Allow the hidden island to reappear when you hover your mouse over it.
+    $description:zh-CN: 允许鼠标悬停让已隐藏的灵动岛重新出现。
   $name: Behavior & Visibility
   $name:zh-CN: 行为与可见性
 - Animations:
@@ -173,44 +192,49 @@
     $name: Refresh rate / FPS
     $name:zh-CN: 刷新率 / FPS
     $description: Set the animation frame rate. Choose Auto to dynamically match your active monitor's refresh rate (up to 360Hz/500Hz), or select a fixed FPS.
+    $description:zh-CN: 设置动画帧率。Auto 动态匹配显示器刷新率（最高 360Hz/500Hz），或选固定 FPS。
     $options:
-      - auto: Auto (Match Monitor Refresh Rate)
-      - '60': 60 FPS (Eco / Standard)
+      - auto: 自动（匹配显示器刷新率）
+      - '60': 60 FPS（节能 / 标准）
       - '90': 90 FPS
       - '120': 120 FPS
       - '144': 144 FPS
       - '165': 165 FPS
       - '240': 240 FPS
-      - '360': 360 FPS (Ultra Smooth)
-      - '500': 500 FPS (Maximum / Uncapped)
+      - '360': 360 FPS（极致顺滑）
+      - '500': 500 FPS（最大 / 不封顶）
   - AnimationStyle: default
     $name: Animation bounciness / style
     $name:zh-CN: 动画弹性 / 风格
     $description: Control the spring physics and feel of the animation.
+    $description:zh-CN: 控制动画的弹簧物理手感。
     $options:
-      - smooth: Smooth (No bounciness / Critically damped)
-      - default: Default (Balanced Apple-like spring)
-      - bouncy: Bouncy (Dynamic elastic spring)
-      - snappy: Snappy (High stiffness, quick settle)
+      - smooth: 平滑（无弹性 / 临界阻尼）
+      - default: 默认（平衡苹果式弹簧）
+      - bouncy: 弹跳（动态弹性弹簧）
+      - snappy: 利落（高刚度快速回稳）
   - AnimationSpeed: normal
     $name: Animation speed
     $name:zh-CN: 动画速度
     $description: How fast the island expands and collapses.
+    $description:zh-CN: 灵动岛展开与收起的速度。
     $options:
-      - very-slow: Very Slow (0.5x)
-      - slow: Slow (0.75x)
-      - normal: Normal (1.0x)
-      - fast: Fast (1.35x)
-      - very-fast: Very Fast (1.65x)
-      - ultra-fast: Ultra Fast (2.0x)
+      - very-slow: 极慢（0.5x）
+      - slow: 慢（0.75x）
+      - normal: 正常（1.0x）
+      - fast: 快（1.35x）
+      - very-fast: 极快（1.65x）
+      - ultra-fast: 超快（2.0x）
   - ExpandedMediaTransitions: false
     $name: Expanded player transitions
     $name:zh-CN: 展开播放器过渡
     $description: Animate the hover player when the song changes or you press a control - title, artist and album text, the cover flip, and the previous / next / play-pause buttons. Turn off to make them change instantly.
+    $description:zh-CN: 切歌或按下控制键时为播放器做过渡动画（标题、歌手、专辑文字，封面翻转，上一首 / 下一首 / 播放暂停按钮）。关闭则瞬时切换。
   - PillCoverSpin: false
     $name: Pill cover spin
     $name:zh-CN: 胶囊封面旋转
     $description: Spin the album cover in the collapsed pill when the song changes. Turn off to swap the cover instantly.
+    $description:zh-CN: 切歌时收起胶囊中的专辑封面播放旋转动画。关闭则瞬时换图。
   $name: Animations & Performance
   $name:zh-CN: 动画与性能
 - Themes:
@@ -218,107 +242,127 @@
     $name: Theme preset
     $name:zh-CN: 主题预设
     $description: Select a curated color theme, or choose Custom to use your own hex colors below.
+    $description:zh-CN: 选择内置配色主题，或选 Custom 使用下方自定义十六进制颜色。
     $options:
-      - obsidian: Obsidian - true black (Default)
-      - graphite: Graphite - neutral Windows 11 dark
-      - slate: Slate - cool blue-grey
-      - nord: Nord - the Nord palette
-      - evergreen: Evergreen - deep green
-      - espresso: Espresso - warm brown
-      - plum: Plum - muted mauve
-      - porcelain: Porcelain - light theme
-      - custom: Custom Colors (Use Hex Below)
+      - obsidian: Obsidian - 纯黑（默认）
+      - graphite: Graphite - 中性 Win11 深色
+      - slate: Slate - 冷蓝灰
+      - nord: Nord - Nord 配色
+      - evergreen: Evergreen - 深绿
+      - espresso: Espresso - 暖棕
+      - plum: Plum - 灰紫
+      - porcelain: Porcelain - 浅色主题
+      - custom: 自定义颜色（用下方 HEX）
   - PillOpacity: 96
     $name: Pill transparency
     $name:zh-CN: 胶囊透明度
     $description: 35 to 100. Lower values make the island more see-through.
+    $description:zh-CN: 35 到 100。数值越低越通透。
   - TintIntensity: 72
     $name: Background tint intensity
     $name:zh-CN: 背景色调浓度
     $description: 0 to 100. Controls how dark the background tint behind the island is.
+    $description:zh-CN: 0 到 100。控制灵动岛背后背景色调的深浅。
   - BackdropMaterial: none
     $name: Backdrop material (real Windows blur)
     $name:zh-CN: 背景材质（真实 Windows 模糊）
     $description: Paints genuine Windows blur or acrylic behind the island so your desktop and windows show through it, using the same effect the system uses for its own surfaces. Acrylic adds Windows' frosted grain and a tint of your background colour (see Acrylic tint strength). Requires Windows 10 1803 or newer, and Windows' Transparency effects must be turned ON (Settings > Personalization > Colors > Transparency effects, or on Windows 11 also Settings > Accessibility > Visual effects). If it is off, or Battery saver is on, you will only see a flat tint with no blur. When this is on, use Backdrop fill opacity below to control how much of the blur comes through.
+    $description:zh-CN: 在灵动岛背后绘制真实的 Windows 模糊 / 亚克力效果，桌面与窗口可透出（与系统自身表面同款效果）。亚克力带磨砂颗粒与背景色调（见「亚克力色调强度」）。需要 Windows 10 1803+，且系统「透明效果」开启（设置 > 个性化 > 颜色 > 透明效果；Win11 另在 设置 > 辅助功能 > 视觉效果）。若关闭或省电模式开启，只会显示纯色无模糊。开启后用下方「背景填充不透明度」控制模糊透过程度。
     $options:
-      - none: Off (solid background)
-      - blur: Blur
-      - acrylic: Acrylic (frosted)
+      - none: 关闭（纯色背景）
+      - blur: 模糊
+      - acrylic: 亚克力（磨砂）
   - BackdropFillOpacity: 45
     $name: Backdrop fill opacity
     $name:zh-CN: 背景填充不透明度
     $description: 0 to 100. Only used when a Backdrop material is enabled. How opaque the island's own background stays on top of the blur - lower values let more of the blurred desktop through. Has no effect when the backdrop is Off.
+    $description:zh-CN: 0 到 100。仅在启用背景材质时生效。控制模糊之上自身背景的不透明度——越低越透出模糊后的桌面。背景材质关闭时无效。
   - BackdropTint: 55
     $name: Acrylic tint strength
     $name:zh-CN: 亚克力色调强度
     $description: 0 to 100. How strongly your background colour tints the backdrop. Acrylic uses the full strength; Blur uses a lighter wash of the same colour so the desktop stays readable.
+    $description:zh-CN: 0 到 100。背景色给背景材质上色的强度。亚克力用全额强度；模糊用同色浅洗以保证桌面可读。
   - MaterialDepth: true
     $name: Depth shading
     $name:zh-CN: 深度阴影
     $description: Adds soft downward shading and the accent wash so the island has depth instead of looking like one flat fill. No edge highlights or rim lighting are involved. Turn off for a completely flat look.
+    $description:zh-CN: 添加柔和下向阴影与强调色渲染，让岛屿有层次而非一块平板。不含边缘高光或轮廓光。想要完全扁平可关闭。
   - DropShadow: true
     $name: Soft drop shadow
     $name:zh-CN: 柔和投影
     $description: Casts a soft shadow beneath the island to lift it off the desktop.
+    $description:zh-CN: 在灵动岛下方投射柔和阴影，使其脱离桌面悬浮。
   - AccentBloom: 100
     $name: Accent bloom intensity
     $name:zh-CN: 强调色光晕强度
     $description: 0 to 200. Strength of the soft accent-coloured wash bleeding in from the top of the island. Driven by album art when the accent mode is Auto. Set to 0 to remove it.
+    $description:zh-CN: 0 到 200。从岛屿顶部渗入的强调色柔光强度。强调色为 Auto 时由专辑封面驱动。设 0 移除。
   - TextScale: 100
     $name: Text size
     $name:zh-CN: 文字大小
     $description: 70 to 160. Scales all island text independently of the overall Size scale, so you can keep the island compact while making the clock and labels easier to read.
+    $description:zh-CN: 70 到 160。独立于整体缩放的文字缩放，可在保持紧凑的同时放大时钟与标签。
   - AccentColorMode: auto
     $name: Accent color mode
     $name:zh-CN: 强调色模式
     $description: How the glowing accent color is chosen. Auto extracts it from album art.
+    $description:zh-CN: 强调色的获取方式。Auto 从专辑封面提取。
     $options:
-      - auto: Auto, from album art
-      - system: System (Device Accent)
-      - custom: Custom hex
+      - auto: 自动（从专辑封面）
+      - system: 系统（设备强调色）
+      - custom: 自定义十六进制
   - CustomAccentHex: "#4cc9f0"
     $name: Custom accent hex
     $name:zh-CN: 自定义强调色（HEX）
     $description: The hex color to use when the accent mode is set to Custom.
-  - CalendarAccent: red
+    $description:zh-CN: 强调色模式为 Custom 时使用的十六进制颜色。
+  - CalendarAccent: 红色
     $name: Calendar accent color
     $name:zh-CN: 日历强调色
     $description: Accent color for the calendar's month name and today's marker. Default uses the island's accent color mode; System always uses the Windows accent.
+    $description:zh-CN: 日历月份名与今日标记的强调色。Default 跟随岛屿强调色模式；System 始终用 Windows 强调色。
     $options:
-      - red: Default (Island accent)
-      - system: System (Device Accent)
+      - red: 默认（岛屿强调色）
+      - system: 系统（设备强调色）
   - ClockAccentGlow: true
     $name: Show clock background circle/glow
     $name:zh-CN: 显示时钟背景圆环 / 光晕
     $description: Display the soft accent circle/glow behind the time in the expanded clock view. Turn off for a clean, minimal clock without background glow.
+    $description:zh-CN: 在展开的时钟视图里显示时间背后的柔和强调色圆环 / 光晕。关闭则时钟更简洁无背景光。
   - FontFamily: ""
     $name: Font family
     $name:zh-CN: 字体
     $description: Custom font family for island text (e.g. Segoe UI, Arial, Aptos, Consolas). Leave empty for system default.
+    $description:zh-CN: 灵动岛文字的自定义字体（如 Segoe UI、Arial、Aptos、Consolas）。留空用系统默认。
   - ContourBorderMode: default
     $name: Contour border
     $name:zh-CN: 轮廓描边
     $description: Choose the island's border style. Default uses the theme's matching border, Auto extracts the border color from album art, and Borderless removes all outer border outlines.
+    $description:zh-CN: 岛屿描边样式。Default 用主题配套描边；Auto 从专辑封面提取描边色；Borderless 移除所有外框描边。
     $options:
       - default: Default
-      - auto: Auto (From album art)
-      - borderless: Borderless
+      - auto: 自动（来自专辑封面）
+      - borderless: 无描边
   - ContourBorderHex: "#1E1E22"
     $name: Contour border hex color
     $name:zh-CN: 轮廓描边颜色（HEX）
     $description: 'Hex color for the island contour stroke. Changing it from the default overrides the selected Theme preset; restore the default to go back to the preset.'
+    $description:zh-CN: 岛屿轮廓描边的十六进制颜色。修改默认值会覆盖所选主题预设；恢复默认可回到预设。
   - PillBgColor: "#08080A"
     $name: Pill background color
     $name:zh-CN: 胶囊背景颜色
     $description: 'Hex color for the island background. Accepts 3, 4, 6 or 8 hex digits, so use the 8-digit RRGGBBAA form for a translucent background (for example 0D0D0FB0) while keeping the text and icons opaque. Changing it from the default overrides the selected Theme preset; restore the default to go back to the preset.'
+    $description:zh-CN: 岛屿背景的十六进制颜色。支持 3、4、6、8 位十六进制；用 8 位 RRGGBBAA 形式可获得半透明背景（如 0D0D0FB0）而文字图标保持不透明。修改默认值会覆盖主题预设；恢复默认回到预设。
   - TextPrimaryColor: "#FFFFFF"
     $name: Primary text color
     $name:zh-CN: 主要文字颜色
     $description: 'Accessible hex color for titles and main text. Changing it from the default overrides the selected Theme preset; restore the default to go back to the preset.'
+    $description:zh-CN: 标题与主要文字的十六进制颜色（已考量可读性）。修改默认值覆盖主题预设；恢复默认回到预设。
   - TextSecondaryColor: "#9B9BA5"
     $name: Secondary text color
     $name:zh-CN: 次要文字颜色
     $description: 'Accessible hex color for artist names and muted labels. Changing it from the default overrides the selected Theme preset; restore the default to go back to the preset.'
+    $description:zh-CN: 歌手名与弱化标签的十六进制颜色（已考量可读性）。修改默认值覆盖主题预设；恢复默认回到预设。
   $name: Colors & Theming
   $name:zh-CN: 颜色与主题
 - Indicators:
@@ -326,22 +370,27 @@
     $name: Show privacy indicators (Mic & Camera)
     $name:zh-CN: 显示隐私指示（麦克风与摄像头）
     $description: Master toggle to display the iOS-style privacy dots when microphone or camera is in use.
+    $description:zh-CN: 显示 iOS 风格隐私圆点（麦克风 / 摄像头使用中）的总开关。
   - PrivacyDotsMic: true
     $name: Show microphone indicator (Orange dot)
     $name:zh-CN: 显示麦克风指示（橙色圆点）
     $description: Show the orange dot when microphone is in use. Turn off if background apps (like Discord/OBS) keep it permanently active.
+    $description:zh-CN: 麦克风使用中显示橙色圆点。若后台应用（Discord / OBS 等）使其常亮可关闭。
   - PrivacyDotsMicHex: "#FF9500"
     $name: Microphone dot color
     $name:zh-CN: 麦克风圆点颜色
     $description: Custom hex color for microphone privacy indicator.
+    $description:zh-CN: 麦克风隐私指示的自定义十六进制颜色。
   - PrivacyDotsCam: true
     $name: Show camera indicator (Green dot)
     $name:zh-CN: 显示摄像头指示（绿色圆点）
     $description: Show the green dot when webcam is in use.
+    $description:zh-CN: 摄像头使用中显示绿色圆点。
   - PrivacyDotsCamHex: "#34C759"
     $name: Camera dot color
     $name:zh-CN: 摄像头圆点颜色
     $description: Custom hex color for camera privacy indicator.
+    $description:zh-CN: 摄像头隐私指示的自定义十六进制颜色。
   $name: Privacy Indicators
   $name:zh-CN: 隐私指示
 - Modules:
@@ -349,110 +398,137 @@
     $name: Media module
     $name:zh-CN: 媒体模块
     $description: Shows album art, song info, and playback controls when music is playing.
+    $description:zh-CN: 播放音乐时显示专辑封面、歌曲信息与播放控制。
   - MediaAutoExpand: false
     $name: Auto-expand on track change
     $name:zh-CN: 切歌时自动展开
     $description: Automatically expand the island when a new song or video starts playing. If disabled, album art updates smoothly in the collapsed pill without unprompted expansion.
+    $description:zh-CN: 新歌或视频开始播放时自动展开。关闭则专辑封面在收起胶囊中平滑更新，不自动展开。
   - MediaPillClock: false
     $name: Show clock in the collapsed media pill
     $name:zh-CN: 收起的媒体胶囊中显示时钟
     $description: While media is playing, the collapsed pill also shows the current time on the left, separated from the album cover by a thin divider. Hovering still opens the normal player. Uses the same 12h/24h and seconds options as the clock below. Off by default.
+    $description:zh-CN: 播放媒体时，收起胶囊左侧同时显示当前时间，与封面间有细分隔线。悬停仍打开正常播放器。使用下方时钟的 12/24 小时与秒设置。默认关闭。
   - Volume: true
     $name: Volume slider flyout
     $name:zh-CN: 音量滑块弹出
     $description: Shows a volume slider banner on the island when adjusting system volume. Disable if you prefer the default Windows volume flyout.
+    $description:zh-CN: 调节系统音量时在灵动岛显示音量滑块横幅。不喜欢可关闭，用回 Windows 默认音量弹窗。
   - Brightness: true
     $name: Brightness slider flyout
     $name:zh-CN: 亮度滑块弹出
     $description: Shows a brightness slider banner on the island when you change the screen brightness. Works with a laptop's built-in display. Disable if you prefer the default Windows brightness flyout.
+    $description:zh-CN: 调节屏幕亮度时显示亮度滑块横幅。支持笔记本内置屏幕。不喜欢可关闭。
   - CapsLock: true
     $name: Caps Lock module
     $name:zh-CN: 大写锁定模块
     $description: Shows an indicator when Caps Lock or Num Lock state changes.
+    $description:zh-CN: 大写锁定或数字锁定状态变化时显示指示。
   - Battery: true
     $name: Battery module
     $name:zh-CN: 电池模块
     $description: Shows an alert when your laptop battery is running low.
+    $description:zh-CN: 笔记本电池电量低时显示提醒。
   - BluetoothIndicator: true
     $name: Bluetooth connect/disconnect indicator
     $name:zh-CN: 蓝牙连接 / 断开指示
     $description: Shows a card with the device name, category icon, and battery level (if available) when a Bluetooth device connects or disconnects.
+    $description:zh-CN: 蓝牙设备连接或断开时显示卡片：设备名、类别图标与电量（如可用）。
   - BluetoothShowBattery: true
     $name: Show Bluetooth battery level
     $name:zh-CN: 显示蓝牙电量
     $description: Reads battery level over BLE GATT when the device supports it. Not all classic Bluetooth devices report battery this way — when unavailable, only a Connected/Disconnected label is shown.
+    $description:zh-CN: 设备支持时通过 BLE GATT 读取电量。并非所有经典蓝牙设备都上报电量——不可用时只显示「已连接 / 已断开」。
   - Progress: true
     $name: Progress module
     $name:zh-CN: 进度模块
     $description: Shows a progress ring around the island for downloads or file copies.
+    $description:zh-CN: 下载或文件复制时在灵动岛显示进度环。
   - TimerModule: true
     $name: Focus Timer module
     $name:zh-CN: 专注计时模块
     $description: Enables a Pomodoro-style focus/break timer, startable from the island's right-click menu.
+    $description:zh-CN: 启用番茄钟式专注 / 休息计时器，可从灵动岛右键菜单启动。
   - Clipboard: true
     $name: Clipboard module
     $name:zh-CN: 剪贴板模块
     $description: Shows a quick preview of the text or images you just copied.
+    $description:zh-CN: 快速预览刚复制的文字或图片。
   - StatusCountdownProgress: false
     $name: Status countdown progress bar
     $name:zh-CN: 状态倒计时进度条
     $description: Shows a subtle countdown progress bar at the bottom of temporary status alert cards (such as Clipboard, Notifications, and Device alerts). Disabled by default.
+    $description:zh-CN: 在临时状态提醒卡片（剪贴板、通知、设备提醒等）底部显示细微的倒计时进度条。默认关闭。
   - DoNotDisturbIndicator: true
     $name: Do Not Disturb status alert
     $name:zh-CN: 勿扰状态提醒
     $description: Shows a status alert card when Do Not Disturb is toggled in the Windows notification panel.
+    $description:zh-CN: 在 Windows 通知面板切换勿扰模式时显示状态提醒卡片。
   - NotificationRespectDnD: true
     $name: Notifications respect Do Not Disturb
     $name:zh-CN: 通知遵循勿扰模式
     $description: Suppresses Dynamic Island notification alerts when Windows Do Not Disturb is active.
+    $description:zh-CN: Windows 勿扰模式开启时抑制灵动岛的通知提醒。
   - HardwareMonitorModule: true
     $name: Include Hardware Monitor in scroll loop
     $name:zh-CN: 硬件监控纳入滚轮循环
     $description: Add CPU, GPU, RAM, FPS and Network stats card to mouse-wheel scroll loop.
+    $description:zh-CN: 在滚轮循环中加入 CPU、GPU、内存、FPS 与网络统计卡片。
   - GameOverlay: false
     $name: Enable game overlay mode
     $name:zh-CN: 启用游戏悬浮层模式
     $description: Replaces the clock with live stats like FPS, CPU, and RAM usage.
+    $description:zh-CN: 用 FPS、CPU、内存等实时数据替换时钟。
   - ShowMetricText: false
     $name: Show labels in metric chips
     $name:zh-CN: 指标卡片显示标签
     $description: Adds text labels (like "CPU") inside the game overlay bars.
+    $description:zh-CN: 在游戏悬浮层的条形图中加入文字标签（如「CPU」）。
   - Weather: true
     $name: Weather module
     $name:zh-CN: 天气模块
     $description: Shows the weather on the right side of the pill. Turn off to only show the clock.
+    $description:zh-CN: 在胶囊右侧显示天气。关闭则只显示时钟。
   - WeatherCity: ""
     $name: Weather City (Optional)
     $name:zh-CN: 天气城市（可选）
     $description: Enter your city (e.g. London). Leave blank to use auto IP geolocation.
+    $description:zh-CN: 输入城市（如 北京）。留空则按 IP 自动定位。
   - WeatherFahrenheit: false
     $name: Use Fahrenheit
     $name:zh-CN: 使用华氏度
     $description: Display weather temperature and wind speed in imperial units.
+    $description:zh-CN: 天气温度与风速使用英制单位。
   - MediaTabLyrics: false
     $name: Lyrics in the media tab
     $name:zh-CN: 媒体标签页中显示歌词
     $description: Adds a lyrics button to the media player controls to toggle an immersive lyrics view over the media tab. Can also be toggled from the right-click menu.
+    $description:zh-CN: 在媒体播放控制中加入歌词按钮，切换媒体标签页上的沉浸式歌词视图。也可从右键菜单切换。
   - Lyrics: false
     $name: Lyrics module
     $name:zh-CN: 歌词模块
     $description: Shows synced lyrics for the current track (fetched from LRCLIB, a free open-source lyrics database) while the island is expanded. Scroll to the Lyrics tab to view them.
+    $description:zh-CN: 展开时显示当前歌曲的同步歌词（取自免费开源歌词库 LRCLIB）。滚动到 Lyrics 标签页查看。
   - LyricsVisualizer: true
     $name: Show visualizer in Lyrics tab
     $name:zh-CN: 歌词标签页显示可视化
     $description: Shows a small live audio waveform next to the Lyrics title while a track is playing.
+    $description:zh-CN: 播放时在 Lyrics 标题旁显示小型实时音频波形。
   - KaraokeLyrics: true
     $name: Karaoke-style glow
     $name:zh-CN: 卡拉OK式发光
     $description: Lights up the active lyric line progressively, left to right, in sync with the song.
+    $description:zh-CN: 当前行随歌曲进度从左到右逐字点亮。
   - KaraokeLetterGlow: true
     $name: Karaoke letter glow
     $name:zh-CN: 卡拉OK逐字发光
     $description: As the karaoke light sweeps across the line, letters near the wipe boundary softly glow, then fade out behind it.
+    $description:zh-CN: 卡拉OK光标扫过时，边界附近的字母柔和发光并在其后淡出。
   - LyricsOffsetMs: 0
     $name: Lyrics sync offset - speakers / wired (ms)
     $name:zh-CN: 歌词同步偏移 - 扬声器 / 有线（毫秒）
     $description: "Fine-tunes lyric timing in milliseconds (-3000 to 3000, 1 ms steps). Positive = lyrics appear EARLIER, negative = LATER. Raise it if lyrics feel late, lower it if they feel early. Applies to every lyric view (Lyrics tab, collapsed pill, media-tab panel and the karaoke wipe). This value is used whenever the default audio output is NOT a Bluetooth device. You can also nudge it from the right-click menu under Lyrics sync."
+    $description:zh-CN: 微调歌词时间（毫秒，-3000 到 3000，步进 1）。正值=歌词更早出现，负值=更晚。觉得慢就调大，觉得快就调小。适用于所有歌词视图（Lyrics 标签页、收起胶囊、媒体标签页面板与卡拉OK扫光）。默认音频输出不是蓝牙时使用此值。也可在右键菜单 Lyrics sync 中微调。
   - LyricsOffsetBluetoothMs: 0
     $name: Lyrics sync offset - Bluetooth output (ms)
     $name:zh-CN: 歌词同步偏移 - 蓝牙输出（毫秒）
@@ -461,26 +537,30 @@
     $name: Show neighboring lyric lines clearly
     $name:zh-CN: 清晰显示相邻歌词行
     $description: By default the lines above and below the active line are only a faint ghost. Turn this on to make them clearly readable.
+    $description:zh-CN: 默认上下相邻行只是淡影。开启后清晰可读。
   - LyricsCache: true
     $name: Lyrics cache (disk)
     $name:zh-CN: 歌词缓存（磁盘）
     $description: Instant lyrics, less load on LRCLIB, tiny disk use, clearable anytime. Stored in the mod's storage folder. Turn off to stop all lyrics disk reads and writes.
+    $description:zh-CN: 即时歌词，减轻 LRCLIB 负担，占用磁盘极小，可随时清理。存储在模组存储文件夹。关闭即停止所有歌词磁盘读写。
   - LyricsCacheMaxMB: '25'
     $name: Lyrics cache size limit
     $name:zh-CN: 歌词缓存大小上限
     $description: Least recently used files are deleted once the cache grows past this. Off disables the disk cache.
+    $description:zh-CN: 缓存超过上限时删除最久未用的文件。Off 为关闭磁盘缓存。
     $options:
-      - '0': Off
+      - '0': 关闭
       - '10': 10 MB
-      - '25': 25 MB (default)
+      - '25': 25 MB（默认）
       - '100': 100 MB
   - Language: auto
     $name: Language
     $name:zh-CN: 语言
     $description: Language for the island's own text labels. Auto follows your Windows display language.
+    $description:zh-CN: 灵动岛自身文字的语言。Auto 跟随 Windows 显示语言。
     $options:
-      - auto: Auto (Follow Windows)
-      - en: English
+      - auto: 自动（跟随 Windows）
+      - en: 英语
       - fr: Français (French)
       - es: Español (Spanish)
       - de: Deutsch (German)
@@ -489,81 +569,97 @@
       - ru: Русский (Russian)
       - tr: Türkçe (Turkish)
       - hi: हिन्दी (Hindi)
-      - zh: 简体中文 (Simplified Chinese)
+      - zh: 简体中文
       - ja: 日本語 (Japanese)
       - ko: 한국어 (Korean)
   - ClockFormat: system
     $name: Clock format
     $name:zh-CN: 时钟格式
     $description: Choose 12-hour or 24-hour time, or follow your Windows locale setting.
+    $description:zh-CN: 12 小时制或 24 小时制，或跟随 Windows 区域设置。
     $options:
-      - system: Follow Windows locale
-      - 12h: 12-hour (3:07 PM)
-      - 24h: 24-hour (15:07)
+      - system: 跟随 Windows 区域设置
+      - 12h: 12 小时制（下午 3:07）
+      - 24h: 24 小时制（15:07）
   - ShowSeconds: false
     $name: Show seconds on the clock
     $name:zh-CN: 时钟显示秒
     $description: Include seconds in the expanded clock. Costs a little more CPU because the clock then redraws every second.
+    $description:zh-CN: 展开时钟显示秒。时钟每秒重绘，略耗 CPU。
   - DateFormat: ""
     $name: Custom date format
     $name:zh-CN: 自定义日期格式
     $description: 'Custom date pattern for the idle dashboard. Leave empty to follow your Windows locale. Supports yyyy (year), MM / M (month), dd / d (day), MMM (short month name), MMMM (full month name), ddd / dddd (weekday). Any other characters are printed as-is, so CJK formats like yyyy年MM月dd日 work.'
+    $description:zh-CN: 空闲面板的自定义日期格式。留空跟随 Windows 区域设置。支持 yyyy（年）、MM / M（月）、dd / d（日）、MMM（短月名）、MMMM（全月名）、ddd / dddd（星期）。其他字符原样输出，因此 yyyy年MM月dd日 等中文格式可用。
   - DateFirst: false
     $name: Show date above the time
     $name:zh-CN: 时间上方显示日期
     $description: Swap the idle dashboard so the date is the headline and the time sits beneath it.
+    $description:zh-CN: 空闲面板日期作标题、时间放其下。
   - FirstDayOfWeek: auto
     $name: First day of the week
     $name:zh-CN: 每周第一天
     $description: Which weekday the calendar grid starts on. Auto follows your Windows regional format.
+    $description:zh-CN: 日历网格的起始星期。Auto 跟随 Windows 区域格式。
     $options:
-      - auto: Auto (Follow Windows)
-      - monday: Monday
-      - sunday: Sunday
+      - auto: 自动（跟随 Windows）
+      - monday: 周一
+      - sunday: 周日
   - QuickLookup: false
     $name: Quick Lookup (hotkey)
     $name:zh-CN: 快速查询（快捷键）
     $description: "Press the Quick Lookup hotkey (Shortcuts tab) to open a search box on the island. Type a word or short phrase and press Enter, or pick your clipboard text or a recent lookup. Nothing is sent anywhere until you submit a search; searches go to en.wiktionary.org and en.wikipedia.org (and api.dictionaryapi.dev as a backup dictionary). Recent lookups are kept in memory only and cleared when the mod restarts."
+    $description:zh-CN: 按快速查询快捷键（Shortcuts 标签）在灵动岛打开搜索框。输入单词或短语回车，或选择剪贴板文本 / 最近查询。提交前不发送任何数据；搜索发往 en.wiktionary.org 与 en.wikipedia.org（备用词典 api.dictionaryapi.dev）。最近查询仅存内存，模组重启即清空。
   - FileTrayModule: false
     $name: File Tray (drag & drop shelf)
     $name:zh-CN: 文件托盘（拖放搁板）
     $description: Adds a File Tray card to the scroll loop. Drag files onto the island to park them there, then click to open one, or use the right-click menu to clear the shelf. Files are only referenced, never copied or moved.
+    $description:zh-CN: 在滚轮循环加入文件托盘卡片。把文件拖到灵动岛暂存，点击打开，右键菜单可清空。仅引用文件路径，不复制不移动。
   - FileTrayMaxItems: 10
     $name: File Tray capacity
     $name:zh-CN: 文件托盘容量
     $description: 1 to 25. How many files the shelf keeps before the oldest one drops off.
+    $description:zh-CN: 1 到 25。托盘最多保留的文件数，超出后最旧的移除。
   - FileTrayPersist: true
     $name: File Tray remembers items (disk)
     $name:zh-CN: 文件托盘记住项目（磁盘）
     $description: Keeps the tray's contents across restarts, in the mod's storage folder. Only file paths and pasted text snippets are stored, never copies of your files. Turn off to stop all disk reads and writes and delete the saved list.
+    $description:zh-CN: 跨重启保留托盘内容，存储在模组存储文件夹。仅存文件路径与粘贴的文本片段，绝不复制文件本身。关闭即停止磁盘读写并删除已存列表。
   - MediaExpandBlocklist: ""
     $name: Never auto-expand for these apps
     $name:zh-CN: 这些应用不自动展开
     $description: 'Comma-separated list of app or site names that should never make the island expand on a track change, while still updating quietly in the collapsed pill. Matched loosely against the media source and title, for example: chrome, tiktok, youtube.'
+    $description:zh-CN: 逗号分隔的应用或网站名单：这些来源切歌时不自动展开，仅在收起胶囊中安静更新。按媒体来源与标题宽松匹配，例如：chrome, tiktok, youtube。
   - GameOverlayShowFps: true
     $name: Game overlay - show FPS
     $name:zh-CN: 游戏悬浮层 - 显示 FPS
     $description: Include the frame rate in the game overlay strip.
+    $description:zh-CN: 游戏悬浮层条中显示帧率。
   - GameOverlayShowCpu: true
     $name: Game overlay - show CPU
     $name:zh-CN: 游戏悬浮层 - 显示 CPU
     $description: Include CPU utilization in the game overlay strip.
+    $description:zh-CN: 游戏悬浮层条中显示 CPU 占用。
   - GameOverlayShowGpu: true
     $name: Game overlay - show GPU
     $name:zh-CN: 游戏悬浮层 - 显示 GPU
     $description: Include GPU utilization in the game overlay strip.
+    $description:zh-CN: 游戏悬浮层条中显示 GPU 占用。
   - GameOverlayShowRam: true
     $name: Game overlay - show RAM
     $name:zh-CN: 游戏悬浮层 - 显示内存
     $description: Include memory usage in the game overlay strip.
+    $description:zh-CN: 游戏悬浮层条中显示内存占用。
   - GameOverlayShowDisk: true
     $name: Game overlay - show disk
     $name:zh-CN: 游戏悬浮层 - 显示磁盘
     $description: Include disk usage in the game overlay strip.
+    $description:zh-CN: 游戏悬浮层条中显示磁盘占用。
   - GameOverlayCompact: false
     $name: Game overlay - compact size
     $name:zh-CN: 游戏悬浮层 - 紧凑尺寸
     $description: Shrink the game overlay to a narrow strip that fits neatly inside the taskbar area.
+    $description:zh-CN: 把游戏悬浮层缩成能塞进任务栏区域的窄条。
   $name: Modules & Features
   $name:zh-CN: 模块与功能
 - Shortcuts:
@@ -571,10 +667,12 @@
     $name: Enable hide/show hotkey
     $name:zh-CN: 启用显示 / 隐藏快捷键
     $description: Toggle the island's visibility instantly with a keyboard shortcut. The hotkey is the only way to bring a hidden island back, so leave this on unless you're comfortable re-enabling it from Windhawk settings.
+    $description:zh-CN: 用快捷键即时切换灵动岛显示。隐藏后快捷键是唯一唤回方式，不打算去 Windhawk 设置重新开启的话请保持开启。
   - HideShowModifiers: ctrl_alt
     $name: Hotkey modifiers
     $name:zh-CN: 快捷键修饰键
     $description: Modifier keys combined with the letter/number key below.
+    $description:zh-CN: 与下方字母 / 数字键组合的修饰键。
     $options:
       - ctrl_alt: Ctrl + Alt
       - ctrl_shift: Ctrl + Shift
@@ -585,10 +683,12 @@
     $name: Hotkey letter/number key
     $name:zh-CN: 快捷键字母 / 数字键
     $description: A single A-Z or 0-9 key combined with the modifiers above. Falls back to "D" if left blank or invalid.
+    $description:zh-CN: 与上方修饰键组合的单个 A-Z 或 0-9 键。留空或无效时回退为「D」。
   - LookupModifiers: ctrl_alt
     $name: Quick Lookup hotkey modifiers
     $name:zh-CN: 快速查询修饰键
     $description: Modifier keys combined with the Quick Lookup key below.
+    $description:zh-CN: 与下方快速查询按键组合的修饰键。
     $options:
       - ctrl_alt: Ctrl + Alt
       - ctrl_shift: Ctrl + Shift
@@ -599,6 +699,7 @@
     $name: Quick Lookup hotkey key
     $name:zh-CN: 快速查询按键
     $description: 'Type Space, or a single A-Z or 0-9 key. Falls back to Space if left blank or invalid.'
+    $description:zh-CN: 输入 Space 或单个 A-Z / 0-9 键。留空或无效时回退为 Space。
   $name: Shortcuts & Hotkeys
   $name:zh-CN: 快捷键
 */
