@@ -1,10 +1,10 @@
-// ==WindhawkMod==
+﻿// ==WindhawkMod==
 // @id              cw-notificationcenter-acrylic
 // @name            CW-通知栏美化
 // @name:zh-CN      CW-通知栏美化
 // @description     Acrylic and transparent notification center, quick settings and calendar.
 // @description:zh-CN 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景。
-// @version         4.2.4
+// @version         4.2.5
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          m417z, Lanbo
 // @github          https://github.com/m417z, https://github.com/Liset999
@@ -70,6 +70,8 @@
 
 
 
+
+- **4.2.5**：快捷设置子页（WLAN 等）头部开关右对齐：补充多个目标回退路径，提高新系统版本上的命中率（CW 汉化版修复）。
 - **4.2.4**：快捷设置子页（蓝牙等）头部开关固定在右侧，修复开关出现在中间的问题（CW 汉化版修复）。
 - **4.2.3**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
 - **4.2.2**：修复横幅通知（Toast 弹窗）材质未统一的问题，全面补齐所有内置主题的 ToastBackgroundBorder 与 FlexibleToastView 适配，并在浅色对比度模式下加深横幅通知文字。
@@ -532,6 +534,12 @@ const Theme g_themeTranslucentShell = {{
     ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#FullScreenPageRoot > ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ContentPresenter > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$CommonBgBrush",
@@ -2143,6 +2151,12 @@ const Theme g_themeLiquidGlass = {{
     ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#FullScreenPageRoot > ContentPresenter#PageHeader > Border > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Border > Grid > ContentPresenter > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader > Grid > ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ContentPresenter#PageHeader ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$Background",

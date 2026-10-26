@@ -1,10 +1,10 @@
-// ==WindhawkMod==
+﻿// ==WindhawkMod==
 // @id              cw-startmenu-acrylic
 // @name            CW-开始菜单美化
 // @name:zh-CN      CW-开始菜单美化
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.1.11
+// @version         4.1.12
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -65,6 +65,8 @@
 ## 更新日志
 
 
+
+- **4.1.12**：修复：开始菜单自定义宽高超过屏幕可用区域时，底部用户/电源/设置按钮排被推出屏幕外；现在会自动钳制到屏幕工作区（CW 汉化版修复）。
 - **4.1.11**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
 - **4.1.10**：修复从任务栏打开的搜索页不透明、还是 Windows 自带深色亚克力的问题：搜索页进程（SearchHost.exe）开机就在后台待命，mod 过早挂上时没接到真正显示的界面，之后也不会再试；现在搜索页打开时会自动重新挂接，直到外框被美化为止。自定义玻璃和液态玻璃下搜索页外框保持 Windows 自带的圆角和细描边，不再加彩色描边和大圆角；「最近」列表区域背景同样透明。一键部署会顺便重启 SearchHost.exe。
 - **4.1.9**：问题反馈渠道调整，说明开头补上原作者说明；微信赞赏链接改为指向 `main` 分支。
@@ -684,6 +686,7 @@ from the **TranslucentTB** project.
 
 #undef GetCurrentTime
 
+#include <winrt/Windows.Graphics.Display.h>
 #include <winrt/Windows.UI.Xaml.h>
 
 struct ThemeTargetStyles {
@@ -15315,6 +15318,38 @@ void LoadSizeSettings() {
     g_sizeSettings.height = Wh_GetIntSetting(L"height");
 }
 
+// CW: 把自定义尺寸钳制到屏幕工作区，避免开始菜单底部按钮排被推出屏幕外。
+double ClampToWorkArea(double value, bool isHeight) {
+    try {
+        double scale = 1.0;
+        try {
+            auto displayInfo =
+                winrt::Windows::Graphics::Display::DisplayInformation::
+                    GetForCurrentView();
+            scale = displayInfo.RawPixelsPerViewPixel();
+        } catch (...) {
+        }
+        if (scale <= 0) {
+            scale = 1.0;
+        }
+        RECT workArea{};
+        if (!SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0)) {
+            return value;
+        }
+        double workAreaDip = isHeight
+                                 ? (workArea.bottom - workArea.top) / scale
+                                 : (workArea.right - workArea.left) / scale;
+        double limit = std::fmax(workAreaDip - 24.0, 200.0);
+        if (value > limit) {
+            Wh_Log(L"Size clamped to work area: %.0f -> %.0f", value, limit);
+            return limit;
+        }
+        return value;
+    } catch (...) {
+        return value;
+    }
+}
+
 namespace StartMenuUI {
 
 struct OriginalWidthParams {
@@ -15528,8 +15563,9 @@ void ApplyStyleClassicStartMenu(FrameworkElement content) {
                 g_originalClassicWidth.emplace();
                 SaveWidth(startSizingFrame, *g_originalClassicWidth);
             }
-            double width = std::fmax(
-                static_cast<double>(g_sizeSettings.width) - kPadding, 0);
+            double width = ClampToWorkArea(
+                static_cast<double>(g_sizeSettings.width), false);
+            width = std::fmax(width - kPadding, 0);
             startSizingFrame.Width(width);
             startSizingFrame.MinWidth(width);
             startSizingFrame.MaxWidth(width);
@@ -15564,8 +15600,9 @@ void ApplyStyleClassicStartMenu(FrameworkElement content) {
                 g_originalClassicHeight.emplace();
                 SaveHeight(startSizingFrame, *g_originalClassicHeight);
             }
-            double height = std::fmax(
-                static_cast<double>(g_sizeSettings.height) - kPadding, 0);
+            double height = ClampToWorkArea(
+                static_cast<double>(g_sizeSettings.height), true);
+            height = std::fmax(height - kPadding, 0);
             startSizingFrame.Height(height);
             startSizingFrame.MinHeight(height);
             startSizingFrame.MaxHeight(height);
@@ -15631,8 +15668,9 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
                 padding = frameRootActualWidth - mainMenuActualWidth;
             }
 
-            double width = static_cast<double>(
-                std::fmax(g_sizeSettings.width, kMinWidth));
+            double width = ClampToWorkArea(
+                static_cast<double>(g_sizeSettings.width), false);
+            width = static_cast<double>(std::fmax(width, kMinWidth));
             width = std::fmax(width - padding, kMinWidth);
             mainMenu.Width(width);
             mainMenu.MinWidth(width);
@@ -15647,7 +15685,8 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
                 g_originalFrameRootHeight.emplace();
                 SaveHeight(frameRoot, *g_originalFrameRootHeight);
             }
-            double height = static_cast<double>(g_sizeSettings.height);
+            double height =
+                ClampToWorkArea(static_cast<double>(g_sizeSettings.height), true);
             frameRoot.Height(height);
             frameRoot.MinHeight(height);
             frameRoot.MaxHeight(height);

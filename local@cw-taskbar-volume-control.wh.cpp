@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节。（1.4.0 起支持在任务栏按钮上滚轮调节单个应用音量）
-// @version         1.4.0
+// @version         1.4.1
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -69,6 +69,8 @@
 ## 更新日志
 
 
+
+- **1.4.1**：按需求移除静音功能：Ctrl+点击静音已移除，自动静音与托盘中键静音默认关闭；滚轮=纯调节音量（CW 汉化版调整）。
 - **1.4.0**：整合 Taskbar Volume Control Per-App（m417z，GPL-3.0）：在任务栏应用按钮上滚轮直接调节该应用音量，Ctrl+点击静音，提示格式可切换；音量步长等设置与整体音量控制共享（CW 汉化版合并）。
 - **1.3.2**：中文汉化与整合（仅元数据、说明与设置文案，代码与原版 1.3.1 一致）。
 
@@ -143,7 +145,7 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     scrolling will control the system volume. Each region is a range like
     "100-200" (pixels) or "20%-50%" (percentage of taskbar length).
   $description:zh-CN: 逗号分隔的附加区域列表，滚动这些区域也会调节音量。每个区域是一段范围，如 "100-200"（像素）或 "20%-50%"（任务栏长度的百分比）。
-- middleClickToMute: true
+- middleClickToMute: false
   $name: Middle click to mute
   $name:zh-CN: 中键点击静音
   $description: >-
@@ -189,7 +191,7 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
   - disabled: 关闭
   - withIndicator: 开启（带指示器）
   - withoutIndicator: 开启（不带指示器）
-- noAutomaticMuteToggle: false
+- noAutomaticMuteToggle: true
   $name: No automatic mute toggle
   $name:zh-CN: 不自动切换静音
   $description: >-
@@ -199,11 +201,6 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     unmuted on any change to a non-zero volume. Enabling this option turns off
     this functionality, such that the device mute status is not changed.
   $description:zh-CN: Windows 11 指示器：静音时停用音量滚动。其他指示器：默认音量降到 0 自动静音、调高自动取消静音；开启本项后不再改变静音状态。默认关闭。
-- ctrlClickToMute: true
-  $name: Ctrl + 点击任务栏按钮静音
-  $name:zh-CN: Ctrl + 点击任务栏按钮静音
-  $description: >-
-    启用后，按住 Ctrl 点击任务栏按钮可切换该应用的静音状态（Per-App 音量功能）。
 - terseFormat: false
   $name: 简洁提示格式
   $name:zh-CN: 简洁提示格式
