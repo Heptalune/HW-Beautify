@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-开始菜单美化
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.1.12
+// @version         4.1.13
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -66,6 +66,8 @@
 
 
 
+
+- **4.1.13**：钳制余量加大到 60px，进一步保证底部按钮排完整可见（CW 汉化版调整）。
 - **4.1.12**：修复：开始菜单自定义宽高超过屏幕可用区域时，底部用户/电源/设置按钮排被推出屏幕外；现在会自动钳制到屏幕工作区（CW 汉化版修复）。
 - **4.1.11**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
 - **4.1.10**：修复从任务栏打开的搜索页不透明、还是 Windows 自带深色亚克力的问题：搜索页进程（SearchHost.exe）开机就在后台待命，mod 过早挂上时没接到真正显示的界面，之后也不会再试；现在搜索页打开时会自动重新挂接，直到外框被美化为止。自定义玻璃和液态玻璃下搜索页外框保持 Windows 自带的圆角和细描边，不再加彩色描边和大圆角；「最近」列表区域背景同样透明。一键部署会顺便重启 SearchHost.exe。
@@ -15339,7 +15341,7 @@ double ClampToWorkArea(double value, bool isHeight) {
         double workAreaDip = isHeight
                                  ? (workArea.bottom - workArea.top) / scale
                                  : (workArea.right - workArea.left) / scale;
-        double limit = std::fmax(workAreaDip - 24.0, 200.0);
+        double limit = std::fmax(workAreaDip - 60.0, 200.0);  // CW: 预留窗口装饰余量
         if (value > limit) {
             Wh_Log(L"Size clamped to work area: %.0f -> %.0f", value, limit);
             return limit;

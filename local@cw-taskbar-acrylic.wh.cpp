@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.2.11
+// @version         4.2.13
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          Lanbo & m417z
 // @github          https://github.com/Liset999
@@ -67,6 +67,10 @@
 
 
 
+
+
+- **4.2.13**：撤回对「显示桌面」细条的强制尺寸（怀疑其破坏模板布局），仅保留间距收窄（CW 汉化版）。
+- **4.2.12**：修复托盘加宽后最右侧「显示桌面」细条被挤出屏幕外：收窄间距并给细条显式占位（CW 汉化版修复）。
 - **4.2.11**：托盘悬停/选中背景小框恢复相称尺寸：快捷设置与通知按钮的圆角背景加高，不再显得过小（CW 汉化版调整）。
 - **4.2.10**：按反馈调整托盘缩放：仅放大托盘软件图标与输入法图标，系统图标（WiFi、音量、电池、铃铛等）与时钟日期恢复系统原样；保留托盘垂直居中（CW 汉化版调整）。
 - **4.2.9**：托盘区等比缩放：托盘图标、系统图标、时钟日期与间距跟随任务栏高度等比放大并垂直居中，不再底部留空（CW 汉化版新增；静态值对应「等比缩放=125%」）。
@@ -939,9 +943,9 @@ const Theme g_themeTranslucentTaskbar = {{
         L"Width=20",
         L"Height=20"}},
     ThemeTargetStyles{L"SystemTray.ImageIconContent > Grid#ContainerGrid", {
-        L"Padding=5,0"}},
+        L"Padding=4,0"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
-        L"MinWidth=40"}},
+        L"MinWidth=36"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
         L"MinHeight=52"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#NotificationCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
@@ -1040,9 +1044,9 @@ const Theme g_themeSimplyTransparent = {{
         L"Width=20",
         L"Height=20"}},
     ThemeTargetStyles{L"SystemTray.ImageIconContent > Grid#ContainerGrid", {
-        L"Padding=5,0"}},
+        L"Padding=4,0"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
-        L"MinWidth=40"}},
+        L"MinWidth=36"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
         L"MinHeight=52"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#NotificationCenterButton > Grid@CommonStates > Border#BackgroundBorder", {
