@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音乐与歌词
 // @description     Compact media panel in the taskbar Widgets slot: album art, synced lyrics, playback buttons, and AI agent status.
 // @description:zh-CN 在任务栏左下角（小组件的位置）放一个音乐小面板：专辑封面、同步歌词、上一首／播放暂停／下一首，还能显示本机 AI 编程助手的状态。
-// @version         0.4.8
+// @version         0.4.7
 // @author          Lanbo
 // @github          https://github.com/Liset999
 // @donateUrl       https://ifdian.net/a/Lanboo
@@ -152,8 +152,6 @@ Codex、opencode 和 DeepSeek Harness 读 `AGENTS.md`（DeepSeek Harness 全局�
 - 歌词缓存在 `%LOCALAPPDATA%\CW桌面美化\lyrics\`。所有联网和媒体控制都在后台线程，不会卡任务栏。媒体会话与 AI 状态在多显示器间共用一份。
 
 ## 更新日志
-
-- **0.4.8**：新增「胶囊样式（全圆角）」：面板变为灵动岛式胶囊外观（默认开启），配合专辑封面与播放按钮即成媒体胶囊（CW 汉化版新增）。
 - **0.4.7**：说明里写明支持 Spotify、网易云音乐、QQ 音乐等播放器。
 - **0.4.6**：微信赞赏链接改为指向 `main` 分支。
 - **0.4.5**：AI 状态的钩子程序 `zen-status.exe` 已随包附带，说明里不再要求去 GitHub Actions 下载。
@@ -316,11 +314,6 @@ Codex、opencode 和 DeepSeek Harness 读 `AGENTS.md`（DeepSeek Harness 全局�
   $name:zh-CN: 面板玻璃
   $description: "Only for Subtle and Card. On: a translucent layer over the taskbar glass. Off: a nearly solid background. No effect with None. Default: on."
   $description:zh-CN: 只对「淡淡一层」「卡片」有用：开启时是叠在任务栏玻璃上的半透明色，关闭时是几乎不透明的底色。「无底色」时不起作用。默认开启。
-- capsuleStyle: true
-  $name: Capsule style (full round)
-  $name:zh-CN: 胶囊样式（全圆角）
-  $description: "On: the panel becomes a full-round capsule like a dynamic-island pill. Off: the classic 8px rounded panel. Default: on."
-  $description:zh-CN: 开启时面板变成灵动岛式全圆角胶囊；关闭时是经典 8px 圆角面板。默认开启。
 - multiMonitor: false
   $name: Multi-monitor
   $name:zh-CN: 多显示器
@@ -434,7 +427,6 @@ struct Settings {
     int offsetMs = 200;  // compensates player progress-report + redraw latency (tested by Lanbo)
     bool hideInFullscreen = false;
     bool panelGlass = true;
-    bool capsuleStyle = true;
     bool multiMonitor = false;
     bool enableNetease = true;
     bool enableQQ = true;
@@ -492,7 +484,6 @@ static void LoadSettings() {
         s.offsetMs = std::clamp(Wh_GetIntSetting(L"offsetMs"), -60000, 60000);
         s.hideInFullscreen = Wh_GetIntSetting(L"hideInFullscreen") != 0;
         s.panelGlass = Wh_GetIntSetting(L"panelGlass") != 0;
-        s.capsuleStyle = Wh_GetIntSetting(L"capsuleStyle") != 0;
         s.multiMonitor = Wh_GetIntSetting(L"multiMonitor") != 0;
         s.enableNetease = Wh_GetIntSetting(L"enableNetease") != 0;
         s.enableQQ = Wh_GetIntSetting(L"enableQQ") != 0;
@@ -2335,9 +2326,6 @@ static void PaintContent(Gdiplus::Graphics& g, Panel& panel, const Settings& s, 
     Gdiplus::REAL fw = (Gdiplus::REAL)L.w, fh = (Gdiplus::REAL)L.h;
     Gdiplus::RectF panelRc((Gdiplus::REAL)D(2), (Gdiplus::REAL)D(4), fw - D(4), fh - D(8));
     Gdiplus::REAL rad = (Gdiplus::REAL)D(8);
-    if (s.capsuleStyle) {
-        rad = panelRc.Height / 2.0f;  // CW: 胶囊样式——全圆角
-    }
 
     PanelLook look = LookFor(s.panelBg, s.panelGlass, L.light);
     if (look.fill) FillRound(g, look.fill, panelRc, rad);

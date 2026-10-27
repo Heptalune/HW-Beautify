@@ -591,11 +591,8 @@ foreach ($file in $files) {
         }
         Set-RegValueIfMissing $settingsPath "look.theme" "TranslucentTaskbar" String $label
         Set-RegValueIfMissing $settingsPath "maximized.enabled" 0 DWord $label
-    }
-
-    if ($id -eq "local@cw-taskbar-icon-size") {
-        $label = "Taskbar Icon Size"
-        # 这些值必须存在：mod 直接读注册表值，缺失会被当成 0（任务栏高度会变 0）
+        # 4.3.0 起整合「CW-任务栏高度与图标大小」：以下值必须存在（代码直接读注册表值，
+        # 缺失会被当成 0，任务栏高度会变 0）
         Set-RegValueIfMissing $settingsPath "TaskbarHeight" 52 DWord $label
         Set-RegValueIfMissing $settingsPath "IconSize" 32 DWord $label
         Set-RegValueIfMissing $settingsPath "TaskbarButtonWidth" 44 DWord $label

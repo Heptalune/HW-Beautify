@@ -24,15 +24,9 @@ CW桌面美化是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https
 * 默认主题「自定义玻璃」，可切换「液态玻璃」及 30 多款社区主题（Dock 风格、Windows 7、Sun Valley 等）。
 * Win+X 菜单、托盘溢出面板、音量/亮度浮窗一起换成玻璃，没有额外描边，圆角与系统一致。
 * 可选「最大化时加深背景」；可选任务栏空白处点击穿透。
+* 任务栏高度、图标大小、按钮宽度均可调（含新版系统的小图标模式）；图标默认 24×24 是从 32×32 缩小的、会发糊，本模组可直接用原始清晰度的图标。
+* 任务栏高度与图标大小部分原版：[Taskbar height and icon size](https://windhawk.net/mods/taskbar-icon-size)（m417z，GPL-3.0），本包汉化并整合。
 * 基于 m417z 的 Windows 11 Taskbar Styler（GPL-3.0），Lanbo 深度修改版。
-
-### CW-任务栏高度与图标大小
-
-控制任务栏高度与图标大小，提升图标清晰度（Windows 11 专属）。
-
-* 默认图标 24×24 是 32×32 缩小来的、会发糊；本 mod 可直接用原始清晰度图标或任意尺寸。
-* 任务栏高度、图标大小、按钮宽度均可调（含新版系统的小图标模式）。
-* 原版：[Taskbar height and icon size](https://windhawk.net/mods/taskbar-icon-size)（m417z，GPL-3.0），本包汉化。
 
 ### CW-任务栏音量控制
 

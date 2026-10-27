@@ -41,7 +41,6 @@ foreach ($id in @(
     "local@cw-notificationcenter-acrylic",
     "local@cw-desktop-toggle-icons",
     "local@cw-explorer-styler",
-    "local@cw-taskbar-icon-size",
     "local@cw-taskbar-volume-control",
     "local@cw-taskbar-dock-animation",
     "local@cw-windows-animations",
