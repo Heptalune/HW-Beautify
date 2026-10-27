@@ -2,9 +2,9 @@
 // @id              cw-windows-animations
 // @name            CW-窗口动画
 // @name:zh-CN      CW-窗口动画
-// @description     Close, minimize, restore, launch and Alt+Tab animations for windows, including the macOS genie effect.
-// @description:zh-CN 为窗口的关闭、最小化、还原、启动和 Alt+Tab 切换加入动画，包含 macOS 神奇效果。
-// @version         1.5.2
+// @description     Close, minimize, restore and launch animations for windows, including the macOS genie effect.
+// @description:zh-CN 为窗口的关闭、最小化、还原和启动加入动画，包含 macOS 神奇效果。
+// @version         1.6.0
 // @author          ReDrag, Abdullah Masood, Potassiumuncher, Lanbo
 // @github          https://github.com/redrag2105
 // @donateUrl       https://ko-fi.com/redrag2105
@@ -73,13 +73,12 @@
 
 # CW-窗口动画
 
-为窗口的关闭、最小化、还原、启动和 Alt+Tab 切换加入动画，包含从「macOS 最小化动画」合并来的 macOS 神奇效果。基于 ReDrag 的 Windows Animations v1.3.7。
+为窗口的关闭、最小化、还原和启动加入动画，包含从「macOS 最小化动画」合并来的 macOS 神奇效果。基于 ReDrag 的 Windows Animations v1.3.7。
 
 ## 功能
 
 - 关闭动画 11 种：方块碎裂、灭霸响指、柏林溶解、赛博故障、复古电视、像素融化、碎片坠落、缩小淡出、弹性收起、三维翻转、向上滑走。
 - 最小化、还原与启动动画 12 种：macOS 神奇效果、神奇效果（经典）、Windows 10、墨水飞溅、灼烧、裂片、海市蜃楼、点阵绽放、膨胀淡出、从点击处放大、弹性弹出、三维倾斜。
-- Alt+Tab 切换时的缩放淡入动画，兼容支持选择通知的 Simple Window Switcher。
 - 隐藏到托盘的窗口也可以播放关闭动画。
 - 按进程排除指定程序，由任务栏触发的动画同样会被排除。
 - 混合渲染：高密度效果在更快时使用 GPU，其余使用 CPU。
@@ -160,24 +159,6 @@
 | **Elastic Pop** | *Preview coming soon* |
 | **3D Tilt** | *Preview coming soon* |
 
----
-
-### `Alt+Tab Switch`
-
-| View | Preview |
-| --- | --- |
-| Before | ![Alt+Tab before](https://raw.githubusercontent.com/redrag2105/windhawk-windows-animations-preview/ba4e9efd647c954eb619ec2181d5435a80af7b15/switch_before.gif) |
-| After | ![Alt+Tab with Windows Animations](https://raw.githubusercontent.com/redrag2105/windhawk-windows-animations-preview/ba4e9efd647c954eb619ec2181d5435a80af7b15/switch_after.gif) |
-
-Compatible Simple Window Switcher builds also trigger this effect for confirmed
-keyboard and touchpad selections. Both mods must support selection notifications;
-cancelling the switcher does not trigger an animation.
-Minimized selections use the restore animation instead of a second switch
-effect. Compatible builds hand restoration to the target window's UI thread;
-unsupported targets retain the switcher's native restore path.
-
----
-
 ### Hybrid Renderer  
 The GPU toggles allow acceleration where it measured well; they do not force
 every effect onto the GPU. Turning a toggle off forces its entire animation
@@ -190,7 +171,6 @@ group to use the CPU.
 | Animated launch | D3D11 + DirectComposition when warm and compatible; otherwise CPU | Reuses the restore path without making a cold GPU startup block the first window. |
 | Close: Thanos or Perlin, 1 px blocks, at least 1.5 million source pixels | D3D11 + layered window | Dense particle work can outweigh the fixed synchronization cost. |
 | Other close workloads | CPU layered window | Faster for ordinary windows, larger blocks, and the other four close effects. |
-| Alt+Tab switch | Native DWM thumbnail | Independent of both GPU settings. |
 
 A full-GPU prototype was tested before this hybrid design was chosen. Restores
 benefited strongly, but ordinary minimizes and closes became slower because
@@ -358,22 +338,6 @@ itself is by **ReDrag** (MIT). Copyright of each part remains with its author.
   $name:zh-CN: "最小化、还原与启动动画"
   $description: "Animations played when a window is minimized, restored or first opened."
   $description:zh-CN: "窗口最小化、还原和首次打开时播放的动画。"
-
-- window_switch:
-  - switch_animation: false
-    $name: "Animate window switching"
-    $name:zh-CN: "启用切换动画"
-    $description: "Play a zoom-and-fade animation when switching with Alt+Tab or a window switcher. Default: off."
-    $description:zh-CN: "使用 Alt+Tab 或窗口切换器切换时播放缩放淡入动画。默认关闭。"
-  - duration_ms: 200
-    $name: "Duration (ms)"
-    $name:zh-CN: "时长（毫秒）"
-    $description: "Switch animation duration, 50–1000 ms. Default: 200."
-    $description:zh-CN: "切换动画时长，范围 50–1000 毫秒。默认 200。"
-  $name: "Window switch"
-  $name:zh-CN: "窗口切换动画"
-  $description: "Animation played when switching windows with Alt+Tab."
-  $description:zh-CN: "使用 Alt+Tab 切换窗口时播放的动画。"
 
 - excluded_programs: [""]
   $name: "Excluded programs"
@@ -574,11 +538,6 @@ struct AsyncRestoreAnimData {
     uint64_t reservationGeneration;
     BOOL restoreMaximized;
 };
-struct SwitchAnimData {
-    HWND hWnd;
-    int durationMs;
-    DWORD preparedTick;
-};
 struct SnapCache {
     HBITMAP hBmp;
     void* pBits;
@@ -606,7 +565,6 @@ struct CloseThanosParticle {
     uint32_t nextActive;
 };
 namespace AnimConstants {
-    constexpr float SwitchStartScale = 0.94f;
     constexpr float MinimizeSpread = 0.65f;
     constexpr float PerlinNoiseScale = 150.0f;
     constexpr float PerlinLifeSpan = 0.15f;
@@ -627,8 +585,6 @@ namespace AnimConstants {
     constexpr DWORD TransientTauriShowHideMs = 250;
     constexpr int PackagedLaunchMinimumHeightDip = 64;
     constexpr int MaximizedRestoreGuardMs = 3000;
-    constexpr int AltTabPollMs = 16;
-    constexpr int AltTabSessionMs = 500;
     constexpr DWORD SwsSelectionMaxAgeMs = 1500;
     // A cold lookup follows a taskbar layout invalidation. Win11's XAML UIA
     // tree can take longer than 150 ms while reflowing; returning earlier is
@@ -660,7 +616,6 @@ namespace AnimConstants {
     constexpr int ShowDesktopKeyFallbackScopeMs = 2000;
     constexpr int ShowDesktopPostedWorkTailMs = 1500;
     constexpr int ShowDesktopNativeSettleMs = 250;
-    constexpr int ShowDesktopSwitchGhostWaitMs = 1100;
     constexpr int Win10MinRestoreMs = 280;
     constexpr size_t SnapshotCacheMaxEntries = 3;
     constexpr size_t SnapshotCacheMaxBytes = 64ull * 1024ull * 1024ull;
@@ -707,10 +662,6 @@ static constexpr PCWSTR kPropLaunchAnimation =
     L"windows-animations.LaunchAnimationV1";
 static constexpr PCWSTR kPropTaskbarDockIdentity =
     L"windows-animations.TaskbarDockIdentityV1";
-static constexpr PCWSTR kPropSwitchAnimationGhost =
-    L"windows-animations.SwitchAnimationGhostV1";
-static constexpr PCWSTR kPropSwitchAnimationActive =
-    L"windows-animations.SwitchAnimationActiveV1";
 // SWS publishes a committed destination on its own input endpoint. Keeping
 // the notification off the target HWND also works across UIPI boundaries.
 namespace SwsSelectionProtocol {
@@ -733,14 +684,6 @@ namespace SwsSelectionProtocol {
     constexpr ULONG_PTR Version = 1;
 }
 UINT g_swsOwnerRestoreMessage = 0;
-struct SwsSelectionIdentity {
-    HWND endpoint{};
-    DWORD endpointProcessId{};
-    DWORD token{};
-    DWORD tick{};
-};
-std::mutex g_SwsSelectionMutex;
-SwsSelectionIdentity g_lastSwsSelection{};
 static constexpr PCWSTR kPropAnimationSession =
     SwsSelectionProtocol::OwnerAnimationProp;
 static constexpr PCWSTR kPropAnimationGhost =
@@ -820,20 +763,10 @@ std::unordered_map<HWND, uint64_t> g_AsyncRestoreReservations;
 uint64_t g_NextAsyncRestoreReservation = 0;
 std::mutex g_StateMutex;
 std::mutex g_TrayHideCloakMutex;
-std::atomic<HWINEVENTHOOK> g_hForegroundHook{NULL};
 std::atomic<HWINEVENTHOOK> g_hExplorerFgHook{NULL};
-HANDLE g_hAltTabSessionThread = NULL;
-HANDLE g_hExplorerFgThread = NULL;
 HANDLE g_hWinEventThread = NULL;
-std::mutex g_AltTabSessionMutex;
-std::mutex g_ExplorerFgThreadMutex;
 std::atomic<bool> g_winEventThreadStarted{false};
-std::atomic<bool> g_explorerAltTabTrackerEnabled{false};
-std::atomic<bool> g_altTabSessionPollRunning{false};
-std::atomic<HWND> g_lastAppForeground{nullptr};
 DWORD WINAPI WinEventHookThread(LPVOID lpParam);
-DWORD WINAPI AltTabSessionPollThread(LPVOID lpParam);
-static void EnsureExplorerForegroundThreadStarted();
 struct alignas(8) SharedAnimState {
     volatile LONG magic;
     volatile LONG sessionEpoch;
@@ -860,8 +793,6 @@ bool g_sharedStateWritable = false;
 // Shell ownership can be established after injection. Serialize every shared
 // view access so promotion can't unmap a view while a hook reads it.
 std::mutex g_SharedStateMutex;
-std::atomic<LONG> g_consumedGeneration{0};
-std::atomic<LONG> g_seenSessionEpoch{0};
 std::atomic<int> g_durationMs{360};
 std::atomic<int> g_closeDurationMs{630};
 std::atomic<int> g_closeEffectStyle{1};
@@ -874,8 +805,6 @@ std::atomic<bool> g_restoreAnimation{true};
 std::atomic<bool> g_closeAnimation{true};
 std::atomic<bool> g_hideAsClose{false};
 std::atomic<bool> g_launchAnimation{false};
-std::atomic<bool> g_switchAnimation{true};
-std::atomic<int> g_switchDurationMs{200};
 std::atomic<bool> g_unhideEnabled{false};
 std::atomic<int> g_unhideDurationMs{450};
 std::atomic<bool> g_unloading{false};
@@ -1402,9 +1331,6 @@ static void JoinWorkerThreads() {
     }
     for (HANDLE h : threads) CloseHandle(h);
 }
-static LONG HwndToShared(HWND hWnd) {
-    return (LONG)(LONG_PTR)hWnd;
-}
 static LONG NonZeroTick() {
     const LONG tick = (LONG)GetTickCount();
     return tick ? tick : 1;
@@ -1434,79 +1360,6 @@ static void ResetSharedStateLocked() {
     InterlockedExchange(&g_pSharedState->taskbarObserverPid, 0);
     InterlockedExchange(&g_pSharedState->nativeShowDesktopUntilTick, 0);
     PulseSharedHeartbeatLocked();
-}
-static void BeginAltTabSession(HWND source) {
-    std::lock_guard<std::mutex> lock(g_SharedStateMutex);
-    if (!g_pSharedState || !g_sharedStateWritable) return;
-    InterlockedExchange(&g_pSharedState->altTabSourceWindow, HwndToShared(source));
-    InterlockedExchange(&g_pSharedState->altTabStartTick, (LONG)GetTickCount());
-    LONG generation = InterlockedIncrement(&g_pSharedState->altTabGeneration);
-    if (generation == 0) InterlockedIncrement(&g_pSharedState->altTabGeneration);
-    InterlockedExchange(&g_pSharedState->lastAltTabTick, NonZeroTick());
-    PulseSharedHeartbeatLocked();
-}
-static void TouchAltTabSession() {
-    std::lock_guard<std::mutex> lock(g_SharedStateMutex);
-    if (g_pSharedState && g_sharedStateWritable) {
-        InterlockedExchange(&g_pSharedState->lastAltTabTick, NonZeroTick());
-        PulseSharedHeartbeatLocked();
-    }
-}
-static bool EnsureSharedStateMapped();
-static bool ConsumeAltTabIntent(HWND target, DWORD eventTime) {
-    if (!EnsureSharedStateMapped()) return false;
-    LONG epoch = 0;
-    LONG heartbeat = 0;
-    LONG stamp = 0;
-    LONG generation = 0;
-    DWORD startTick = 0;
-    LONG source = 0;
-    {
-        std::lock_guard<std::mutex> lock(g_SharedStateMutex);
-        if (!g_pSharedState || g_pSharedState->magic != kSharedStateMagic) return false;
-        epoch = g_pSharedState->sessionEpoch;
-        heartbeat = g_pSharedState->heartbeatTick;
-        stamp = g_pSharedState->lastAltTabTick;
-        generation = g_pSharedState->altTabGeneration;
-        startTick = static_cast<DWORD>(g_pSharedState->altTabStartTick);
-        source = g_pSharedState->altTabSourceWindow;
-        if (generation != g_pSharedState->altTabGeneration) return false;
-    }
-    LONG seen = g_seenSessionEpoch.load(std::memory_order_relaxed);
-    if (epoch != seen) {
-        g_seenSessionEpoch.store(epoch, std::memory_order_relaxed);
-        g_consumedGeneration.store(0, std::memory_order_relaxed);
-    }
-    if (!heartbeat ||
-        (LONG)(GetTickCount() - (DWORD)heartbeat) > kSharedHeartbeatStaleMs) {
-        return false;
-    }
-    if (!stamp || (LONG)(GetTickCount() - (DWORD)stamp) > AnimConstants::AltTabSessionMs) return false;
-    if (!generation) return false;
-    // Returning to the source is cancellation, not a destination. Don't let
-    // that callback consume the generation before the real destination does.
-    if (!source || source == HwndToShared(target)) return false;
-    if (eventTime && startTick &&
-        (LONG)(eventTime - startTick) < -(40 + AnimConstants::AltTabPollMs)) {
-        return false;
-    }
-    LONG consumed = g_consumedGeneration.load(std::memory_order_relaxed);
-    if (consumed == generation ||
-        !g_consumedGeneration.compare_exchange_strong(consumed, generation, std::memory_order_relaxed)) {
-        return false;
-    }
-    return true;
-}
-static bool IsAltTabSourceCandidate(HWND hWnd) {
-    if (!hWnd || !IsWindow(hWnd)) return false;
-    if (GetWindow(hWnd, GW_OWNER)) return false;
-    const LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
-    if (exStyle & WS_EX_TOOLWINDOW) return false;
-    WCHAR cls[256];
-    if (!GetClassNameW(hWnd, cls, ARRAYSIZE(cls))) return false;
-    if (_wcsicmp(cls, L"XamlExplorerHostIslandWindow") == 0) return false;
-    if (_wcsicmp(cls, L"MultitaskingViewFrame") == 0) return false;
-    return true;
 }
 static bool IsExplorerProcess() {
     static const bool isExplorer = [] {
@@ -2339,7 +2192,6 @@ struct ScreenCaptureEligibility {
     } failureReason{FailureReason::None};
     bool taskbarAboveAndOverlapping = false;
     RECT taskbarRect{};
-    HWND blockingSwitchAnimationGhost = nullptr;
     HWND blockingWindow = nullptr;
 };
 
@@ -2427,9 +2279,6 @@ static bool CanCaptureWindowFromScreen(
                             ScreenCaptureEligibility::FailureReason::
                                 OverlappingWindow;
                         eligibility.blockingWindow = candidate;
-                        if (GetPropW(candidate, kPropSwitchAnimationGhost)) {
-                            eligibility.blockingSwitchAnimationGhost = candidate;
-                        }
                         if (eligibilityOut) *eligibilityOut = eligibility;
                         return false;
                     }
@@ -2798,8 +2647,6 @@ void LoadAnimSettings() {
     g_closeAnimation.store(getBool(L"close.close_animation", true), std::memory_order_relaxed);
     g_hideAsClose.store(getBool(L"close.hide_as_close", true), std::memory_order_relaxed);
     g_launchAnimation.store(getBool(L"minimize_restore.launch_animation", false), std::memory_order_relaxed);
-    g_switchAnimation.store(getBool(L"window_switch.switch_animation", false), std::memory_order_relaxed);
-    g_switchDurationMs.store(getInt(L"window_switch.duration_ms", 200, 50, 1000), std::memory_order_relaxed);
     g_unhideEnabled.store(getBool(L"minimize_restore.unhide_taskbar", true), std::memory_order_relaxed);
     // 0 is a valid "no extra wait", so only an unseeded set uses 450 here.
     g_unhideDurationMs.store(unseeded ? 450 : Clamp(Wh_GetIntSetting(L"minimize_restore.unhide_duration_ms"), 0, 5000), std::memory_order_relaxed);
@@ -3202,19 +3049,6 @@ static bool RefreshDwmChromeAfterUncloak(HWND hWnd,
     }
     return true;
 }
-static void RestoreSwitchTargetAfterUncloak(HWND hWnd,
-                                             BOOL needsFullExplorerRepair) {
-    if (!hWnd || !IsWindow(hWnd)) return;
-
-    SetWindowCloak(hWnd, FALSE);
-    // Accent-policy acrylic can retain its policy while its visual becomes
-    // stale across a cloak. The repair helper rebuilds Translucent Windows'
-    // active AccentBlur path even when lightweight cleanup was requested.
-    // Default Explorer keeps the lightweight cleanup.
-    RefreshDwmChromeAfterUncloak(
-        hWnd, /*nonBlocking=*/true,
-        /*lightweight=*/!needsFullExplorerRepair);
-}
 static void RestoreLayeredOpacity(HWND hWnd, LONG_PTR originalExStyle) {
     SetLayeredWindowAttributes(hWnd, 0, 255, LWA_ALPHA);
     if (!(originalExStyle & WS_EX_LAYERED)) {
@@ -3495,16 +3329,12 @@ static bool NeedsLocalWinEventThread() {
     const bool needTrayHideVisibilityObserver =
         g_closeAnimation.load(std::memory_order_relaxed) &&
         g_hideAsClose.load(std::memory_order_relaxed);
-    return g_switchAnimation.load(std::memory_order_relaxed) ||
-           needTaskbarObserver || needTrayHideVisibilityObserver;
+    return needTaskbarObserver || needTrayHideVisibilityObserver;
 }
 
 void EnsureWinEventThreadStarted() {
     // This is also a lazy recovery path for a shell that became ready after
     // the ownership probe's initial fast-poll period.
-    if (g_switchAnimation.load(std::memory_order_relaxed)) {
-        EnsureExplorerForegroundThreadStarted();
-    }
     if (g_winEventThreadStarted.load(std::memory_order_relaxed)) return;
     if (g_unloading.load(std::memory_order_relaxed)) return;
     if (!NeedsLocalWinEventThread()) return;
@@ -4891,7 +4721,6 @@ POINT GetTaskbarButtonPositionAsync(
     pending->Release();
     return result;
 }
-enum class SwsSelectionIntent { Unavailable, Rejected, Accepted, Restoring };
 
 static bool IsSwsSelectionEndpoint(HWND hWnd) {
     WCHAR className[64]{};
@@ -4908,80 +4737,7 @@ static HWND FindSwsSelectionEndpoint() {
     return IsSwsSelectionEndpoint(endpoint) ? endpoint : nullptr;
 }
 
-static bool IsSwsSelectionSessionActive(HWND endpoint) {
-    if (!endpoint) return false;
-    if (IsWindowVisible(endpoint)) return true;
-    const DWORD token = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::TokenProp)));
-    const DWORD tick = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::TickProp)));
-    return token && static_cast<DWORD>(GetTickCount() - tick) <=
-                        AnimConstants::SwsSelectionMaxAgeMs;
-}
 
-static SwsSelectionIntent ConsumeSwsSelectionIntent(HWND target,
-                                                    DWORD eventTime) {
-    const HWND endpoint = FindSwsSelectionEndpoint();
-    if (!endpoint) return SwsSelectionIntent::Unavailable;
-    const DWORD token = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::TokenProp)));
-    if (!token) {
-        return IsWindowVisible(endpoint) ? SwsSelectionIntent::Rejected
-                                         : SwsSelectionIntent::Unavailable;
-    }
-    const HWND publishedTarget = static_cast<HWND>(
-        GetPropW(endpoint, SwsSelectionProtocol::TargetProp));
-    const HWND source = static_cast<HWND>(
-        GetPropW(endpoint, SwsSelectionProtocol::SourceProp));
-    const DWORD tick = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::TickProp)));
-    const DWORD processId = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::ProcessProp)));
-    const DWORD threadId = static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(
-        GetPropW(endpoint, SwsSelectionProtocol::ThreadProp)));
-    const bool restoring = GetPropW(
-        endpoint, SwsSelectionProtocol::RestoreProp) != nullptr;
-    if (static_cast<DWORD>(GetTickCount() - tick) >
-        AnimConstants::SwsSelectionMaxAgeMs) {
-        return IsWindowVisible(endpoint) ? SwsSelectionIntent::Rejected
-                                         : SwsSelectionIntent::Unavailable;
-    }
-    DWORD currentProcessId = 0;
-    const DWORD currentThreadId =
-        GetWindowThreadProcessId(target, &currentProcessId);
-    DWORD endpointProcessId = 0;
-    GetWindowThreadProcessId(endpoint, &endpointProcessId);
-    if (!source || source == target || publishedTarget != target ||
-        GetForegroundWindow() != target || !processId || !threadId ||
-        processId != currentProcessId || threadId != currentThreadId ||
-        !endpointProcessId ||
-        (eventTime && static_cast<LONG>(eventTime - tick) < 0) ||
-        static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(GetPropW(
-            endpoint, SwsSelectionProtocol::TokenProp))) != token) {
-        return SwsSelectionIntent::Rejected;
-    }
-    {
-        std::lock_guard<std::mutex> lock(g_SwsSelectionMutex);
-        if (g_lastSwsSelection.endpoint == endpoint &&
-            g_lastSwsSelection.endpointProcessId == endpointProcessId &&
-            g_lastSwsSelection.token == token &&
-            g_lastSwsSelection.tick == tick) {
-            return SwsSelectionIntent::Rejected;
-        }
-        g_lastSwsSelection = {endpoint, endpointProcessId, token, tick};
-    }
-    if (IsDiagnosticLoggingEnabled()) {
-        Wh_Log(L"SWS selection intent hwnd=%p source=%p token=%lu restore=%d",
-               target, source, static_cast<unsigned long>(token), restoring);
-    }
-    // A minimized selection belongs to the restore path even if its native
-    // show produces a foreground event before the restore session is claimed.
-    // Consume the notification, but never fall through to a second switch FX.
-    if (restoring && g_restoreAnimation.load(std::memory_order_relaxed)) {
-        return SwsSelectionIntent::Restoring;
-    }
-    return SwsSelectionIntent::Accepted;
-}
 
 static bool IsSwsOwnerRestoreRequestCurrent(HWND hWnd, HWND endpoint,
                                             DWORD token) {
@@ -5011,336 +4767,6 @@ static bool IsSwsOwnerRestoreRequestCurrent(HWND hWnd, HWND endpoint,
     }
     return static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(GetPropW(
                endpoint, SwsSelectionProtocol::TokenProp))) == token;
-}
-
-static void StartAltTabSessionPoll() {
-    if (g_unloading.load(std::memory_order_relaxed) ||
-        !g_explorerAltTabTrackerEnabled.load(std::memory_order_relaxed) ||
-        !g_switchAnimation.load(std::memory_order_relaxed)) {
-        return;
-    }
-    std::lock_guard<std::mutex> lock(g_AltTabSessionMutex);
-    if (g_unloading.load(std::memory_order_relaxed) ||
-        !g_explorerAltTabTrackerEnabled.load(std::memory_order_relaxed) ||
-        g_altTabSessionPollRunning.load(std::memory_order_relaxed)) {
-        return;
-    }
-    if (g_hAltTabSessionThread) {
-        if (WaitForSingleObject(g_hAltTabSessionThread, 0) == WAIT_OBJECT_0) {
-            CloseHandle(g_hAltTabSessionThread);
-            g_hAltTabSessionThread = NULL;
-        } else {
-            return;
-        }
-    }
-    g_altTabSessionPollRunning.store(true, std::memory_order_relaxed);
-    g_hAltTabSessionThread = CreateThread(NULL, 0, AltTabSessionPollThread, NULL, 0, NULL);
-    if (!g_hAltTabSessionThread) {
-        g_altTabSessionPollRunning.store(false, std::memory_order_relaxed);
-    }
-}
-DWORD WINAPI AltTabSessionPollThread(LPVOID lpParam) {
-    (void)lpParam;
-    while (!g_unloading.load(std::memory_order_relaxed) &&
-           g_altTabSessionPollRunning.load(std::memory_order_relaxed)) {
-        TouchAltTabSession();
-        if (!(GetAsyncKeyState(VK_MENU) & 0x8000)) break;
-        Sleep(AnimConstants::AltTabPollMs);
-    }
-    g_altTabSessionPollRunning.store(false, std::memory_order_relaxed);
-    return 0;
-}
-void CALLBACK ExplorerForegroundProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hWnd, LONG idObject,
-                                     LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
-    (void)hWinEventHook;
-    (void)dwEventThread;
-    (void)dwmsEventTime;
-    if (event != EVENT_SYSTEM_FOREGROUND || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
-    if (!hWnd || g_unloading.load(std::memory_order_relaxed) ||
-        !g_explorerAltTabTrackerEnabled.load(std::memory_order_relaxed) ||
-        !g_switchAnimation.load(std::memory_order_relaxed)) {
-        return;
-    }
-    const bool altDown = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
-    if (IsSwsSelectionEndpoint(hWnd) ||
-        IsSwsSelectionSessionActive(FindSwsSelectionEndpoint())) {
-        // Compatible SWS sessions use the exact selection signal, not a
-        // guessed Alt scope. This also prevents cancellation or outside clicks
-        // from inheriting a pending native generation.
-        if (!altDown && IsAltTabSourceCandidate(hWnd)) {
-            g_lastAppForeground.store(hWnd, std::memory_order_relaxed);
-        }
-        std::lock_guard<std::mutex> lock(g_SharedStateMutex);
-        if (g_pSharedState && g_sharedStateWritable) {
-            InterlockedExchange(&g_pSharedState->lastAltTabTick, 0);
-            InterlockedExchange(&g_pSharedState->altTabSourceWindow, 0);
-        }
-        return;
-    }
-    if (!altDown) {
-        if (IsAltTabSourceCandidate(hWnd)) {
-            g_lastAppForeground.store(hWnd, std::memory_order_relaxed);
-        }
-        return;
-    }
-    HWND source = g_lastAppForeground.load(std::memory_order_relaxed);
-    if (!source || source == hWnd || !IsAltTabSourceCandidate(source)) {
-        if (g_altTabSessionPollRunning.load(std::memory_order_relaxed)) {
-            TouchAltTabSession();
-        }
-        return;
-    }
-    if (!g_altTabSessionPollRunning.load(std::memory_order_relaxed)) {
-        BeginAltTabSession(source);
-        StartAltTabSessionPoll();
-    } else {
-        TouchAltTabSession();
-    }
-}
-DWORD WINAPI ExplorerFgHookThread(LPVOID lpParam) {
-    (void)lpParam;
-    HWND initial = GetForegroundWindow();
-    if (IsAltTabSourceCandidate(initial)) {
-        g_lastAppForeground.store(initial, std::memory_order_relaxed);
-    }
-    PulseSharedHeartbeat();
-    HWINEVENTHOOK hook = SetWinEventHook(
-        EVENT_SYSTEM_FOREGROUND,
-        EVENT_SYSTEM_FOREGROUND,
-        NULL,
-        ExplorerForegroundProc,
-        0, 0,
-        WINEVENT_OUTOFCONTEXT);
-    g_hExplorerFgHook.store(hook, std::memory_order_release);
-    if (!hook) {
-        Wh_Log(L"Explorer FOREGROUND hook failed");
-        return 0;
-    }
-    MSG msg;
-    while (GetMessageW(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
-    if (HWINEVENTHOOK oldHook = g_hExplorerFgHook.exchange(NULL, std::memory_order_acquire)) {
-        UnhookWinEvent(oldHook);
-    }
-    return 0;
-}
-static bool ConsumeAltTabIntentForForeground(HWND hWnd,
-                                             DWORD eventTime,
-                                             bool* swsSelectionOut = nullptr) {
-    if (swsSelectionOut) *swsSelectionOut = false;
-    const SwsSelectionIntent swsIntent =
-        ConsumeSwsSelectionIntent(hWnd, eventTime);
-    if (swsIntent != SwsSelectionIntent::Unavailable) {
-        const bool accepted = swsIntent == SwsSelectionIntent::Accepted;
-        if (swsSelectionOut) *swsSelectionOut = accepted;
-        return accepted;
-    }
-    if (ConsumeAltTabIntent(hWnd, eventTime)) return true;
-    if (!IsShellExplorerProcess() ||
-        !(GetAsyncKeyState(VK_MENU) & 0x8000) ||
-        g_altTabSessionPollRunning.load(std::memory_order_relaxed)) {
-        return false;
-    }
-
-    // File Explorer owns both the shell-wide Alt+Tab tracker and its local
-    // destination hook. With heavily styled Explorer windows, the local hook
-    // can win the callback race and look for the shared intent just before the
-    // tracker publishes it. Seed that same session from the already remembered
-    // source instead of dropping this switch animation.
-    const HWND source =
-        g_lastAppForeground.load(std::memory_order_relaxed);
-    if (!source || source == hWnd || !IsAltTabSourceCandidate(source)) {
-        return false;
-    }
-    BeginAltTabSession(source);
-    StartAltTabSessionPoll();
-    return ConsumeAltTabIntent(hWnd, eventTime);
-}
-DWORD WINAPI SwitchingAnimThread(LPVOID lpParam) {
-    SwitchAnimData* data = (SwitchAnimData*)lpParam;
-    HWND hWnd = data->hWnd;
-    int durationMs = data->durationMs;
-    const DWORD preparedTick = data->preparedTick;
-    // Module enumeration and backdrop queries can take several milliseconds
-    // in a heavily styled Explorer. The target is already cloaked; never do
-    // this work before concealment or on its activation thread.
-    const BOOL needsFullExplorerRepair =
-        HasModernExplorerTitleFrame(hWnd) &&
-        IsTranslucentWindowsAccentBlurActive(hWnd);
-    delete data; 
-    struct CleanupGuard {
-        HWND h;
-        BOOL needsFullExplorerRepair;
-        bool uncloaked = false; 
-        ~CleanupGuard() {
-            if (!uncloaked && IsWindow(h)) {
-                RestoreSwitchTargetAfterUncloak(
-                    h, needsFullExplorerRepair);
-                FlushDwmOrYield();
-            }
-            {
-                std::lock_guard<std::mutex> lock(g_StateMutex);
-                g_AnimActive.erase(h);
-            }
-            if (reinterpret_cast<ULONG_PTR>(
-                    GetPropW(h, kPropSwitchAnimationActive)) == 1) {
-                RemovePropW(h, kPropSwitchAnimationActive);
-            }
-        }
-    } guard{hWnd, needsFullExplorerRepair};
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-    RECT winRect;
-    if (g_unloading.load(std::memory_order_relaxed) || !IsWindow(hWnd) || !IsAppMainWindow(hWnd, true) || IsUserExcludedWindow(hWnd) || !GetWindowRect(hWnd, &winRect)) {
-        return 0; 
-    }
-    RECT extRect = winRect;
-    DwmGetWindowAttribute(hWnd, DWMWA_EXTENDED_FRAME_BOUNDS, &extRect, sizeof(extRect));
-    int ghostX = winRect.left;
-    int ghostY = winRect.top;
-    int ghostW = winRect.right - winRect.left;
-    int ghostH = winRect.bottom - winRect.top;
-    if (ghostW <= 0 || ghostH <= 0) {
-        return 0; 
-    }
-    HWND hGhost = CreateWindowExW(
-        WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_NOREDIRECTIONBITMAP,
-        L"STATIC", NULL, WS_POPUP,
-        ghostX, ghostY, ghostW, ghostH,
-        NULL, NULL, NULL, NULL);
-    if (!hGhost) return 0;
-    HTHUMBNAIL hThumb = NULL;
-    HRESULT hr = DwmRegisterThumbnail(hGhost, hWnd, &hThumb);
-    if (FAILED(hr)) {
-        Wh_Log(L"Switch thumbnail register failed hwnd=%p hr=0x%08X", hWnd, hr);
-        DestroyWindow_Original(hGhost);
-        return 0;
-    }
-    SetPropW(hGhost, kPropSwitchAnimationGhost, reinterpret_cast<HANDLE>(TRUE));
-    // Configure an invisible first frame before showing the host. Commit the
-    // real-window cloak and thumbnail setup before starting the animation
-    // clock, so setup latency cannot skip the beginning of the fade.
-    DWM_THUMBNAIL_PROPERTIES initialProps{};
-    initialProps.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_OPACITY |
-                          DWM_TNP_RECTDESTINATION;
-    initialProps.fVisible = TRUE;
-    initialProps.opacity = 0;
-    initialProps.rcDestination = {0, 0, ghostW, ghostH};
-    hr = DwmUpdateThumbnailProperties(hThumb, &initialProps);
-    if (FAILED(hr)) {
-        Wh_Log(L"Switch thumbnail setup failed hwnd=%p hr=0x%08X", hWnd, hr);
-        DwmUnregisterThumbnail(hThumb);
-        DestroyWindow_Original(hGhost);
-        return 0;
-    }
-    ShowWindow_Original(hGhost, SW_SHOWNOACTIVATE);
-    FlushDwmOrYield();
-    if (IsDiagnosticLoggingEnabled()) {
-        Wh_Log(L"Switch first frame ready hwnd=%p startup_ms=%lu fullExplorerRepair=%d",
-               hWnd, static_cast<unsigned long>(GetTickCount() - preparedTick),
-               needsFullExplorerRepair);
-    }
-    LARGE_INTEGER qpcFreq, qpcStart, qpcNow;
-    QueryPerformanceFrequency(&qpcFreq);
-    QueryPerformanceCounter(&qpcStart);
-    double totalMs = (double)durationMs;
-    float startScale = AnimConstants::SwitchStartScale;
-    int W = extRect.right - extRect.left;
-    int H = extRect.bottom - extRect.top;
-    int offsetX = extRect.left - winRect.left;
-    int offsetY = extRect.top - winRect.top;
-    for (;;) {
-        MSG msg;
-        while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-        QueryPerformanceCounter(&qpcNow);
-        double elapsedMs = (qpcNow.QuadPart - qpcStart.QuadPart) * 1000.0 / qpcFreq.QuadPart;
-        BOOL lastFrame = (elapsedMs >= totalMs);
-        float progress = lastFrame ? 1.0f : (float)(elapsedMs / totalMs);
-        float ease = 1.0f - powf(1.0f - progress, 3.0f);
-        float currentScale = startScale + (1.0f - startScale) * ease;
-        int thumbW = (int)(W * currentScale);
-        int thumbH = (int)(H * currentScale);
-        float cx = offsetX + W / 2.0f;
-        float cy = offsetY + H / 2.0f;
-        int thumbX = (int)(cx - thumbW / 2.0f);
-        int thumbY = (int)(cy - thumbH / 2.0f);
-        DWM_THUMBNAIL_PROPERTIES props{};
-        props.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_RECTDESTINATION | DWM_TNP_OPACITY;
-        props.fVisible = TRUE;
-        props.opacity = (BYTE)(255.0f * ease);
-        props.rcDestination.left = thumbX;
-        props.rcDestination.top = thumbY;
-        props.rcDestination.right = thumbX + thumbW;
-        props.rcDestination.bottom = thumbY + thumbH;
-        DwmUpdateThumbnailProperties(hThumb, &props);
-        if (lastFrame || g_unloading.load(std::memory_order_relaxed)) break;
-        FlushDwmOrYield();
-    }
-    if (IsWindow(hWnd)) {
-        RestoreSwitchTargetAfterUncloak(hWnd,
-                                        needsFullExplorerRepair);
-        guard.uncloaked = true;
-    }
-    FlushDwmOrYield();
-    if (hThumb) DwmUnregisterThumbnail(hThumb);
-    DestroyWindow_Original(hGhost);
-    return 0; 
-}
-void CALLBACK ForegroundEventProc(HWINEVENTHOOK, DWORD event, HWND hWnd,
-                                  LONG idObject, LONG idChild, DWORD,
-                                  DWORD dwmsEventTime) {
-    if (event != EVENT_SYSTEM_FOREGROUND || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
-    if (!g_switchAnimation.load(std::memory_order_relaxed) || g_unloading.load(std::memory_order_relaxed)) return;
-    DWORD windowPid = 0;
-    GetWindowThreadProcessId(hWnd, &windowPid);
-    if (windowPid != GetCurrentProcessId() || GetForegroundWindow() != hWnd ||
-        IsIconic(hWnd) || !IsAppMainWindow(hWnd, true)) return;
-    bool swsSelection = false;
-    if (!ConsumeAltTabIntentForForeground(hWnd, dwmsEventTime,
-                                          &swsSelection)) return;
-    {
-        std::lock_guard<std::mutex> lock(g_StateMutex);
-        if (!g_AnimActive.insert(hWnd).second) {
-            if (IsDiagnosticLoggingEnabled()) {
-                Wh_Log(L"Switch animation skipped hwnd=%p reason=active-animation trigger=%s",
-                       hWnd, swsSelection ? L"sws-selection" : L"alt-tab");
-            }
-            return;
-        }
-        g_AnimWantRising.erase(hWnd);
-        g_AnimRestoreRequestForeground.erase(hWnd);
-        g_AsyncRestoreReservations.erase(hWnd);
-    }
-    // Match the v1.2.0 handoff: conceal the target as soon as the switch has
-    // been accepted. In particular, no Explorer/module/backdrop inspection
-    // belongs between acceptance and this cloak.
-    const DWORD preparedTick = GetTickCount();
-    SetPropW(hWnd, kPropSwitchAnimationActive, reinterpret_cast<HANDLE>(1));
-    SetWindowCloak(hWnd, TRUE);
-    if (IsDiagnosticLoggingEnabled()) {
-        Wh_Log(L"Switch animation start hwnd=%p trigger=%s event_delay_ms=%lu",
-               hWnd, swsSelection ? L"sws-selection" : L"alt-tab",
-               static_cast<unsigned long>(dwmsEventTime
-                   ? preparedTick - dwmsEventTime : 0));
-    }
-    auto* data = new (std::nothrow)
-        SwitchAnimData{hWnd,
-                       g_switchDurationMs.load(std::memory_order_relaxed),
-                       preparedTick};
-    if (!data || !StartWorkerThread(SwitchingAnimThread, data)) {
-        Wh_Log(L"Switch animation worker failed hwnd=%p", hWnd);
-        // The repair helper itself upgrades active AccentBlur to full repair.
-        // No extra pre-cloak styling query is needed on this failure path.
-        RestoreSwitchTargetAfterUncloak(hWnd, FALSE);
-        RemovePropW(hWnd, kPropSwitchAnimationActive);
-        delete data;
-        std::lock_guard<std::mutex> lock(g_StateMutex);
-        g_AnimActive.erase(hWnd);
-    }
 }
 
 void CALLBACK TrayHideVisibilityEventProc(HWINEVENTHOOK, DWORD event,
@@ -5427,10 +4853,6 @@ void CALLBACK TaskbarLayoutEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, H
 
 DWORD WINAPI WinEventHookThread(LPVOID) {
     const bool explorerProcess = IsShellExplorerProcess();
-    HWINEVENTHOOK hook = SetWinEventHook(
-        EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, ForegroundEventProc,
-        GetCurrentProcessId(), 0, WINEVENT_OUTOFCONTEXT);
-    g_hForegroundHook.store(hook, std::memory_order_release);
     HWINEVENTHOOK trayHideVisibilityHook = SetWinEventHook(
         EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr,
         TrayHideVisibilityEventProc, GetCurrentProcessId(), 0,
@@ -5484,7 +4906,7 @@ DWORD WINAPI WinEventHookThread(LPVOID) {
         }
     }
 
-    if (!hook && !trayHideVisibilityHook &&
+    if (!trayHideVisibilityHook &&
         !observeTaskbar) {
         g_winEventThreadStarted.store(false, std::memory_order_relaxed);
         return 0;
@@ -5511,9 +4933,6 @@ DWORD WINAPI WinEventHookThread(LPVOID) {
     }
     if (taskbarHookRetryTimer) KillTimer(nullptr, taskbarHookRetryTimer);
     
-    if (HWINEVENTHOOK oldHook = g_hForegroundHook.exchange(NULL, std::memory_order_acquire)) {
-        UnhookWinEvent(oldHook);
-    }
     if (trayHideVisibilityHook) UnhookWinEvent(trayHideVisibilityHook);
     removeTaskbarHooks();
     return 0;
@@ -12236,9 +11655,6 @@ bool StartAnimation(HWND hWnd, BOOL rising, LONG_PTR originalExStyle, BOOL cloak
         (isClosing && RequiresScreenCapture(hWnd));
     const bool preferScreenCapture =
         excelCloseScreenOnlyCapture || ShouldUseBitBlt(hWnd, isClosing);
-    const bool allowShowDesktopSwitchGhostWait =
-        !rising && !isClosing && !onTargetThread &&
-        IsClassicShowDesktopOperation();
     auto CopySnapshot = [&](void* sourceBits, int sourceWidth,
                             int sourceHeight, bool makeOpaque) -> bool {
         auto* src = (DWORD*)sourceBits;
@@ -12326,35 +11742,13 @@ bool StartAnimation(HWND hWnd, BOOL rising, LONG_PTR originalExStyle, BOOL cloak
             // Refuse the fallback when another top-level window contributes
             // pixels above the target. Checking the z-order also catches the
             // hit-test-transparent ghosts during batched shell minimizes.
-            DWORD switchGhostDeadline = 0;
             for (;;) {
                 ScreenCaptureEligibility beforeCapture;
                 if (!CanCaptureWindowFromScreen(
                         hWnd, rect, hCaptureTaskbar,
                         &beforeCapture)) {
-                    if (!allowShowDesktopSwitchGhostWait ||
-                        !beforeCapture.blockingSwitchAnimationGhost) {
-                        LogScreenCaptureFailure(L"before", beforeCapture);
-                        return FALSE;
-                    }
-                    if (!switchGhostDeadline) {
-                        switchGhostDeadline =
-                            GetTickCount() +
-                            AnimConstants::ShowDesktopSwitchGhostWaitMs;
-                    }
-                    if (static_cast<LONG>(GetTickCount() -
-                                          switchGhostDeadline) >= 0) {
-                        LogScreenCaptureFailure(L"before-timeout",
-                                                beforeCapture);
-                        return FALSE;
-                    }
-                    // Alt+Tab's thumbnail belongs to the destination process,
-                    // so Explorer can't see its process-local animation set.
-                    // Let that short handoff finish before taking Win+D's
-                    // composed-screen snapshot instead of falling through to
-                    // a visible native minimize.
-                    FlushDwmOrYield();
-                    continue;
+                    LogScreenCaptureFailure(L"before", beforeCapture);
+                    return FALSE;
                 }
                 const BOOL result =
                     BitBlt(tempDC, 0, 0, rawW, rawH, hScreenDC,
@@ -12364,19 +11758,6 @@ bool StartAnimation(HWND hWnd, BOOL rising, LONG_PTR originalExStyle, BOOL cloak
                     !CanCaptureWindowFromScreen(
                         hWnd, rect, hCaptureTaskbar,
                         &afterCapture)) {
-                    if (allowShowDesktopSwitchGhostWait &&
-                        afterCapture.blockingSwitchAnimationGhost) {
-                        if (!switchGhostDeadline) {
-                            switchGhostDeadline =
-                                GetTickCount() +
-                                AnimConstants::ShowDesktopSwitchGhostWaitMs;
-                        }
-                        if (static_cast<LONG>(GetTickCount() -
-                                              switchGhostDeadline) < 0) {
-                            FlushDwmOrYield();
-                            continue;
-                        }
-                    }
                     LogScreenCaptureFailure(
                         result ? L"after" : L"bitblt", afterCapture);
                     return FALSE;
@@ -13282,27 +12663,6 @@ static void SettleClassicShowDesktopNativeMinimize(HWND hWnd) {
     if (!IsWindowVisible(hWnd) || IsIconic(hWnd)) FlushDwmOrYield();
 }
 
-static bool WaitForForeignSwitchAnimation(HWND hWnd) {
-    const DWORD targetThreadId =
-        GetWindowThreadProcessId(hWnd, nullptr);
-    if (!targetThreadId || targetThreadId == GetCurrentThreadId() ||
-        !GetPropW(hWnd, kPropSwitchAnimationActive)) {
-        return false;
-    }
-    const DWORD deadline =
-        GetTickCount() + AnimConstants::ShowDesktopSwitchGhostWaitMs;
-    while (IsWindow(hWnd) &&
-           GetPropW(hWnd, kPropSwitchAnimationActive) &&
-           !g_unloading.load(std::memory_order_relaxed) &&
-           static_cast<LONG>(GetTickCount() - deadline) < 0) {
-        // The switch worker owns only the thumbnail/ghost thread. Draining a
-        // composition frame here lets its bounded handoff finish without
-        // synchronously entering the destination window's UI thread.
-        FlushDwmOrYield();
-    }
-    return IsWindow(hWnd) &&
-           !GetPropW(hWnd, kPropSwitchAnimationActive);
-}
 
 static bool QueueClassicShowDesktopMinimize(HWND hWnd, int showCmd) {
     if (!IsShellExplorerProcess() || !hWnd ||
@@ -13467,10 +12827,6 @@ static MinimizeKick KickMinimizeAnimation(HWND hWnd, bool desktopFocusOnUnhide =
                                           NativeMinimizeBarrier* nativeMinimizeBarrier = nullptr) {
     NativeMinimizeBarrierOwner nativeBarrierOwner(nativeMinimizeBarrier);
     MinRestoreRetarget retarget = RetargetLiveMinRestore(hWnd, false);
-    if (retarget == MinRestoreRetarget::BusyOther &&
-        WaitForForeignSwitchAnimation(hWnd)) {
-        retarget = RetargetLiveMinRestore(hWnd, false);
-    }
     if (retarget == MinRestoreRetarget::Accepted) {
         return MinimizeKick::Deferred;
     }
@@ -15153,60 +14509,6 @@ static BOOL CALLBACK EnumWindowsInitProc(HWND hWnd, LPARAM) {
     }
     return TRUE;
 }
-static void EnsureExplorerForegroundThreadStarted() {
-    if (g_unloading.load(std::memory_order_relaxed) ||
-        !g_switchAnimation.load(std::memory_order_relaxed) ||
-        !IsShellExplorerProcess()) {
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(g_ExplorerFgThreadMutex);
-    if (g_unloading.load(std::memory_order_relaxed) ||
-        !g_switchAnimation.load(std::memory_order_relaxed) ||
-        !IsShellExplorerProcess()) {
-        return;
-    }
-    if (g_hExplorerFgThread &&
-        WaitForSingleObject(g_hExplorerFgThread, 0) == WAIT_OBJECT_0) {
-        CloseHandle(g_hExplorerFgThread);
-        g_hExplorerFgThread = NULL;
-    }
-    if (g_hExplorerFgThread) return;
-
-    g_explorerAltTabTrackerEnabled.store(true, std::memory_order_relaxed);
-    HANDLE hThread = CreateThread(NULL, 0, ExplorerFgHookThread, NULL, 0, NULL);
-    if (!hThread) {
-        g_explorerAltTabTrackerEnabled.store(false, std::memory_order_relaxed);
-        Wh_Log(L"Explorer FOREGROUND thread failed to start");
-        return;
-    }
-    g_hExplorerFgThread = hThread;
-}
-
-static void StopExplorerForegroundThread() {
-    g_explorerAltTabTrackerEnabled.store(false, std::memory_order_relaxed);
-    HANDLE hThread = NULL;
-    {
-        std::lock_guard<std::mutex> lock(g_ExplorerFgThreadMutex);
-        hThread = g_hExplorerFgThread;
-        g_hExplorerFgThread = NULL;
-    }
-    if (!hThread) return;
-    DWORD tid = GetThreadId(hThread);
-    while (tid && !PostThreadMessageW(tid, WM_QUIT, 0, 0)) {
-        if (WaitForSingleObject(hThread, 10) != WAIT_TIMEOUT) break;
-    }
-    WaitForSingleObject(hThread, INFINITE);
-    CloseHandle(hThread);
-}
-
-void StartSwitchThreads() {
-    EnsureExplorerForegroundThreadStarted();
-    if (!g_unloading.load(std::memory_order_relaxed) &&
-        g_switchAnimation.load(std::memory_order_relaxed)) {
-        EnumWindows(EnumWindowsInitProc, 0);
-    }
-}
 static void StopWinEventThread() {
     HANDLE hWinEvent = NULL;
     {
@@ -15223,18 +14525,7 @@ static void StopWinEventThread() {
     CloseHandle(hWinEvent);
     g_winEventThreadStarted.store(false, std::memory_order_relaxed);
 }
-void StopSwitchThreads() {
-    g_explorerAltTabTrackerEnabled.store(false, std::memory_order_relaxed);
-    {
-        std::lock_guard<std::mutex> lock(g_AltTabSessionMutex);
-        g_altTabSessionPollRunning.store(false, std::memory_order_relaxed);
-        if (g_hAltTabSessionThread) {
-            WaitForSingleObject(g_hAltTabSessionThread, INFINITE);
-            CloseHandle(g_hAltTabSessionThread);
-            g_hAltTabSessionThread = NULL;
-        }
-    }
-    StopExplorerForegroundThread();
+static void StopEventWorkerThreads() {
     if (g_unloading.load(std::memory_order_relaxed) ||
         !NeedsLocalWinEventThread()) {
         StopWinEventThread();
@@ -15251,9 +14542,6 @@ static DWORD WINAPI ShellOwnershipProbeThread(LPVOID) {
             if (shellPid != GetCurrentProcessId()) return 0;
             StopWinEventThread();
             EnsureWinEventThreadStarted();
-            if (g_switchAnimation.load(std::memory_order_relaxed)) {
-                StartSwitchThreads();
-            }
             return 0;
         }
         const DWORD elapsed = GetTickCount() - started;
@@ -15277,7 +14565,6 @@ BOOL Wh_ModInit() {
     if (!g_minimizeAnimation.load(std::memory_order_relaxed) &&
         !g_restoreAnimation.load(std::memory_order_relaxed) &&
         !g_closeAnimation.load(std::memory_order_relaxed) &&
-        !g_switchAnimation.load(std::memory_order_relaxed) &&
         !g_launchAnimation.load(std::memory_order_relaxed)) {
         return FALSE;
     }
@@ -15345,9 +14632,6 @@ void Wh_ModAfterInit() {
     // marker to avoid waiting for owner cooperation from a process in which
     // this mod is absent, stale, or still initializing.
     EnumWindows(PublishClassicShowDesktopOwnerProtocolEnumProc, 0);
-    if (g_switchAnimation.load(std::memory_order_relaxed)) {
-        StartSwitchThreads();
-    }
     if (explorerProcess && NeedsLocalWinEventThread()) {
         EnsureWinEventThreadStarted();
     } else if (NeedsLocalWinEventThread()) {
@@ -15364,12 +14648,10 @@ void Wh_ModSettingsChanged() {
     // Clear once more afterwards to close the small window in which an
     // already-scheduled predictor could have queued the old selection.
     CancelPendingGpuWarmup();
-    bool wasSwitchAnim = g_switchAnimation.load(std::memory_order_relaxed);
     bool wasNativeShowDesktop =
         g_nativeShowDesktopAnimations.load(std::memory_order_relaxed);
     LoadAnimSettings();
     CancelPendingGpuWarmup();
-    bool isSwitchAnim = g_switchAnimation.load(std::memory_order_relaxed);
     bool isNativeShowDesktop =
         g_nativeShowDesktopAnimations.load(std::memory_order_relaxed);
     if (IsShellExplorerProcess() &&
@@ -15378,9 +14660,8 @@ void Wh_ModSettingsChanged() {
         EnsureSharedEffectShuffleState();
     }
     if (IsDiagnosticLoggingEnabled()) {
-        Wh_Log(L"Settings changed switch=%d->%d nativeShowDesktop=%d->%d",
-               wasSwitchAnim, isSwitchAnim, wasNativeShowDesktop,
-               isNativeShowDesktop);
+        Wh_Log(L"Settings changed nativeShowDesktop=%d->%d",
+               wasNativeShowDesktop, isNativeShowDesktop);
     }
 
     if (!g_gpuAcceleration.load(std::memory_order_relaxed) &&
@@ -15397,12 +14678,6 @@ void Wh_ModSettingsChanged() {
         PublishNativeShowDesktopPassthrough(0);
     }
 
-    if (isSwitchAnim && !wasSwitchAnim) {
-        StartSwitchThreads();
-    } 
-    else if (!isSwitchAnim && wasSwitchAnim) {
-        StopSwitchThreads();
-    }
     if (NeedsLocalWinEventThread()) {
         if (IsShellExplorerProcess()) {
             EnsureWinEventThreadStarted();
@@ -15436,7 +14711,7 @@ void Wh_ModBeforeUninit() {
     JoinWorkerThreads();
     ShutdownGpuRenderService();
     g_gpuWarmupRunning.store(false, std::memory_order_release);
-    StopSwitchThreads();
+StopEventWorkerThreads();
 }
 
 static BOOL CALLBACK ClearPersistentAnimationPropertiesOnUninit(
@@ -15471,7 +14746,6 @@ static BOOL CALLBACK ClearPersistentAnimationPropertiesOnUninit(
         kPropClassicShowDesktopOwnerProtocolLegacy,
         kPropClassicShowDesktopOwnerProtocol,
         kPropClassicShowDesktopOwnerProbePending,
-        kPropSwitchAnimationActive,
         kPropAnimationSession,
         kPropAnimationGhost,
         SwsSelectionProtocol::OwnerRestoreMessageProp,
