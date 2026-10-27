@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-通知栏美化
 // @description     Acrylic and transparent notification center, quick settings and calendar.
 // @description:zh-CN 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景。
-// @version         4.2.5
+// @version         4.2.6
 // @donateUrl       https://ifdian.net/a/Lanboo
 // @author          m417z, Lanbo
 // @github          https://github.com/m417z, https://github.com/Liset999
@@ -71,6 +71,8 @@
 
 
 
+
+- **4.2.6**：QS 子页开关右对齐改为类名直击（ToggleSwitch 无路径限定，QS 窗口内唯一实例即子页头部开关），兼容旧路径目标（CW 汉化版修复）。
 - **4.2.5**：快捷设置子页（WLAN 等）头部开关右对齐：补充多个目标回退路径，提高新系统版本上的命中率（CW 汉化版修复）。
 - **4.2.4**：快捷设置子页（蓝牙等）头部开关固定在右侧，修复开关出现在中间的问题（CW 汉化版修复）。
 - **4.2.3**：适配 Windhawk 2.0 的严格设置校验器：数字预设下拉改为字符串类型存储，取值与行为不变。
@@ -540,6 +542,8 @@ const Theme g_themeTranslucentShell = {{
     ThemeTargetStyles{L"ContentPresenter#PageHeader > Grid > ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"ContentPresenter#PageHeader ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$CommonBgBrush",
@@ -2157,6 +2161,8 @@ const Theme g_themeLiquidGlass = {{
     ThemeTargetStyles{L"ContentPresenter#PageHeader > Grid > ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"ContentPresenter#PageHeader ToggleSwitch", {
+        L"HorizontalAlignment=Right"}},
+    ThemeTargetStyles{L"ToggleSwitch", {
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#NotificationCenterGrid", {
         L"Background:=$Background",

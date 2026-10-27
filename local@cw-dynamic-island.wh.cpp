@@ -533,6 +533,7 @@
     $name: Lyrics sync offset - Bluetooth output (ms)
     $name:zh-CN: 歌词同步偏移 - 蓝牙输出（毫秒）
     $description: "Same as above (-3000 to 3000 ms, positive = EARLIER, negative = LATER), but used automatically while the default audio output is a Bluetooth device. Bluetooth adds latency, so lyrics usually need to be shifted LATER (a negative value) here. The island switches between the two values by itself when the output changes."
+  $description:zh-CN: 同上（-3000 到 3000 毫秒，正=更早，负=更晚），但仅在默认音频输出为蓝牙设备时自动启用。蓝牙有延迟，通常需把歌词调晚（负值）。输出切换时两值自动切换。
   - LyricsNeighborLinesVisible: false
     $name: Show neighboring lyric lines clearly
     $name:zh-CN: 清晰显示相邻歌词行
