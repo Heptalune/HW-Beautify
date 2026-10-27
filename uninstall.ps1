@@ -127,7 +127,6 @@ if ($windhawkDir) {
 $modsSource = Join-Path $windhawkData "ModsSource"
 $compiledRoot = Join-Path $windhawkData "Engine\Mods"
 $cwData = Join-Path $env:LOCALAPPDATA "CWDesktop"
-$rightmenuToolDir = if ($windhawkDir) { Join-Path $windhawkDir "CW右键菜单美化" } else { $null }
 $cwTaskName = "StartupCheck"
 $cwTaskPath = "\CWDesktop\"
 
@@ -148,7 +147,6 @@ if ($installed.Count -eq 0 -and -not $task) {
     Write-Host "将要移除 (Will remove):"
     foreach ($id in $installed) { Write-Host "  - $id" }
     if ($task) { Write-Host "  - 开机自检计划任务 (startup self-check task) $cwTaskPath$cwTaskName" }
-    if ($rightmenuToolDir -and (Test-Path -LiteralPath $rightmenuToolDir)) { Write-Host "  - 右键菜单美化工具目录 (Breeze context-menu tool folder) $rightmenuToolDir" }
     Write-Host ""
     Write-Host "包括 mod 源码、编译好的 DLL、Windhawk 里的 mod 记录和设置。Windhawk 本身不会被卸载。"
     Write-Host "(Mod sources, compiled DLLs, Windhawk mod entries and their settings. Windhawk itself stays installed.)"
@@ -182,14 +180,6 @@ if ($installed.Count -eq 0 -and -not $task) {
         foreach ($key in @("HKLM:\SOFTWARE\Windhawk\Engine\Mods\$id", "HKLM:\SOFTWARE\Windhawk\Engine\ModsWritable\$id")) {
             if (Test-Path $key) { Remove-Item -Path $key -Recurse -Force -ErrorAction SilentlyContinue }
         }
-    }
-
-    # 右键菜单美化工具目录（CW-右键菜单美化 / Breeze，deploy.ps1 步骤 4b 复制）
-    if ($rightmenuToolDir -and (Test-Path -LiteralPath $rightmenuToolDir)) {
-        Write-Status "移除 (Removing) 右键菜单美化工具目录 $rightmenuToolDir"
-        Stop-Process -Name breeze -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath $rightmenuToolDir -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Status "已移除右键菜单美化工具目录。Breeze 的用户配置 (%USERPROFILE%\.breeze-shell) 保留；需要一并删除时手动删掉即可。 (User config kept under %USERPROFILE%\.breeze-shell; delete it manually if wanted.)" "Green"
     }
 
     # Windhawk rebuilds its installed-mods list from this cache file (deploy.ps1 clears it too)
@@ -228,8 +218,6 @@ Write-Host "  1. 旧版部署包往 Windhawk「设置 → 高级设置」的进�
 Write-Host "     这些没有被改动，想还原请在那里手动删除。"
 Write-Host "     (Old CW packages added dwm.exe to Windhawk's process include list and some games / anti-cheat"
 Write-Host "     processes to the exclude list. They were left as they are; remove them in Windhawk > Settings > Advanced if you want.)"
-Write-Host "  右键菜单美化 (Breeze) 的数据目录 %LOCALAPPDATA%\CWDesktop\breeze 已保留（含 config.json），需要时手动删除。"
-Write-Host "     (Breeze context-menu tool's data folder %LOCALAPPDATA%\CWDesktop\breeze was kept; delete it manually if wanted.)"
 Write-Host "  2. 接过 AI 状态的，记得把当时粘贴到各 AI 助手配置里的 zen-status 片段删掉。"
 Write-Host "     (If you connected AI status, remove the zen-status snippets you pasted into your assistants' configs.)"
 Write-Host ""

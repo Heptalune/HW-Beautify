@@ -698,31 +698,14 @@ foreach ($file in $files) {
 $script:IniStoreMode = $false
 Write-Status "Active mods successfully registered into Windhawk Engine." "Green"
 
-# 4b. Optional tool: CW-右键菜单美化 (Breeze, AGPL-3.0)
-#     把 Breeze 工具复制到 Windhawk 目录旁，供「CW-右键菜单美化」Windhawk 模组管理
-#     （在 Windhawk 里开启该模组 = 启动服务；deploy 本身不启动、不注册）。
-$rightmenuSrc = Join-Path $PSScriptRoot "optional\cw-rightmenu"
-if (Test-Path -LiteralPath $rightmenuSrc) {
-    $rightmenuDst = Join-Path $windhawkDir "CW右键菜单美化"
-    if (-not (Test-Path -LiteralPath $rightmenuDst)) { New-Item -ItemType Directory -Path $rightmenuDst -Force | Out-Null }
-    foreach ($bn in @('breeze.exe', 'shell.dll', 'shell.exp', 'LICENSE.txt', 'NOTICE.txt', 'config-template.json')) {
-        $sp = Join-Path $rightmenuSrc $bn
-        if (Test-Path -LiteralPath $sp) { Copy-Item -LiteralPath $sp -Destination (Join-Path $rightmenuDst $bn) -Force }
-    }
-    Write-Status "CW-右键菜单美化 (Breeze 0.2.0): $rightmenuDst" "Green"
-    Write-Status "   使用：在 Windhawk 中开启「CW-右键菜单美化」模组即可启动/停止 Breeze 菜单服务（无需手动运行 exe）。" "Gray"
-} else {
-    Write-Status "optional\cw-rightmenu 不存在，跳过 CW-右键菜单美化 (Breeze)。" "Gray"
-}
-
-# 5. UI Cache Regeneration (Refreshes installed list and Chinese metadata instantly)
+# 4. UI Cache Regeneration (Refreshes installed list and Chinese metadata instantly)
 $cacheFile = Join-Path $windhawkData "userprofile.json"
 if (Test-Path $cacheFile) {
     Write-Status "Clearing UI Cache (userprofile.json) to force metadata scan..." "Yellow"
     Remove-Item -Path $cacheFile -Force
 }
 
-# 6. Restart Windhawk Service and UI
+# 5. Restart Windhawk Service and UI
 Write-Status "Starting Windhawk Service (this can take up to a minute)..."
 Start-Service -Name Windhawk -ErrorAction SilentlyContinue
 

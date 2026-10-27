@@ -87,19 +87,6 @@ macOS 风格的任务栏图标悬停放大动画（Beta）。
 * 可按进程名排除指定程序，常见游戏和反作弊程序已默认排除。
 * 原作者 ReDrag（Windows Animations，MIT）；macOS 神奇效果来自 Abdullah Masood、Potassiumuncher。
 
-### CW-右键菜单美化（可选）
-
-把系统右键菜单换成 Breeze 的精致菜单：完整的经典菜单内容（属性、发送到、打开方式、全部 Shell 扩展项，没有 Win11 新菜单的「显示更多选项」两段结构），加上 Windows 11 亚克力材质、圆角与流畅动画；支持嵌入式 JavaScript 脚本 API，可以自己加菜单功能。
-
-* **在 Windhawk 里启停，不用单独运行**：deploy 会先把 Breeze 工具（约 15 MB，绿色）复制到 Windhawk 目录旁的「CW右键菜单美化」文件夹；之后在 Windhawk 里打开「CW-右键菜单美化」模组开关即启动服务，关闭即停止。
-* 服务保活：Breeze 进程异常退出时 2 秒内自动重启（可在模组设置里关闭）。
-* 菜单外观直接在本模组「设置」页调：亚克力背景开关、菜单圆角/字号/项高/间距；首次启动按设置生成 `config.json`（位于 `%LOCALAPPDATA%\CWDesktop\breeze`，只补缺不覆盖）。
-* 已知现象（上游）：退出服务时，少数场景可能触发一次资源管理器自动重启。
-* 与本包的「CW-文件管理器美化」会同时作用到菜单：若同时开启且观感冲突，二选一即可。
-* 上游 Breeze Shell 0.2.0（AGPL-3.0，std-microblock），二进制原样随包分发，署名与许可见该目录内 LICENSE.txt / NOTICE.txt。
-* 与本包的「CW-文件管理器美化」会同时作用到菜单：已开启文件管理器美化的桌面玻璃菜单时，Breeze 的渲染可能与其叠加；如果观感冲突，二选一即可。
-* 其他右键菜单相关开源项目参考（未随包分发）：ContextMenuManager（GPL-3.0，github.com/BluePointLilac/ContextMenuManager，整理增删菜单项，不改变外观）；Windhawk 模组 Explorer Context Menu Classic（恢复 Windows 10 经典菜单，与美化方向相反，仅作应急）。
-
 ## 下载
 
 到 Releases 下载，**三个压缩包选一个**：

@@ -1,10 +1,10 @@
 // ==WindhawkMod==
 // @id              cw-alt-tab-flip-3d
-// @name            CW-Alt+Tab Flip 3D（Vista 风格）
-// @name:zh-CN      CW-Alt+Tab Flip 3D（Vista 风格）
+// @name            CW-窗口切换动画（Vista 风格）
+// @name:zh-CN      CW-窗口切换动画（Vista 风格）
 // @description     Replaces Alt+Tab with a fluid, Windows Vista-style Flip 3D stack of live windows. CW build of the community "Alt+Tab Flip 3D (Vista Style)" mod by caliberda (MIT).
 // @description:zh-CN 用流畅的 Windows Vista 风格 Flip 3D 实时窗口堆栈替换 Alt+Tab。CW 版，基于社区模组 "Alt+Tab Flip 3D (Vista Style)"（作者 caliberda，MIT 许可）。
-// @version         1.0.1
+// @version         1.0.2
 // @author          caliberda, CW桌面美化
 // @github          https://github.com/cesarkali
 // @homepage        https://caliberda.com.br
@@ -16,7 +16,7 @@
 
 // ==WindhawkModReadme==
 /*
-# CW-Alt+Tab Flip 3D（Vista 风格）
+# CW-窗口切换动画（Vista 风格）
 
 在 Windows 11 上找回 Windows Vista 的 **Flip 3D** 窗口切换器，
 带 macOS 风格、弹簧阻尼的流畅动画。
@@ -46,6 +46,8 @@
 
 ## 上游署名与许可
 ## 更新日志
+
+- **1.0.2**：更名为「CW-窗口切换动画（Vista 风格）」（仅名称/标题，代码无改动；模组 id 保持 cw-alt-tab-flip-3d，已有设置不受影响）。
 
 - **1.0.1**：showDelay 默认改为 0：只要按住 Alt 就立即显示 Flip 3D 堆栈（原默认 90ms，快速短按 Alt+Tab 会被系统原生切换接管而没有动画）；连按 Tab 仍可用 showOnSecondTab 立即展开（CW 版调整）。
 - **1.0.0**：CW 初版（上游 alt-tab-flip-3d 1.7.2 切片重组，代码体与上游逐字节一致；设置区全汉化；双进程 tool-mod 架构）。
