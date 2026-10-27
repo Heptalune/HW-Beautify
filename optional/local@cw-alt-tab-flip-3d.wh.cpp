@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-Alt+Tab Flip 3D（Vista 风格）
 // @description     Replaces Alt+Tab with a fluid, Windows Vista-style Flip 3D stack of live windows. CW build of the community "Alt+Tab Flip 3D (Vista Style)" mod by caliberda (MIT).
 // @description:zh-CN 用流畅的 Windows Vista 风格 Flip 3D 实时窗口堆栈替换 Alt+Tab。CW 版，基于社区模组 "Alt+Tab Flip 3D (Vista Style)"（作者 caliberda，MIT 许可）。
-// @version         1.0.0
+// @version         1.0.1
 // @author          caliberda, CW桌面美化
 // @github          https://github.com/cesarkali
 // @homepage        https://caliberda.com.br
@@ -45,6 +45,11 @@
   或在设置里把快捷方式改为 Win+Tab。
 
 ## 上游署名与许可
+## 更新日志
+
+- **1.0.1**：showDelay 默认改为 0：只要按住 Alt 就立即显示 Flip 3D 堆栈（原默认 90ms，快速短按 Alt+Tab 会被系统原生切换接管而没有动画）；连按 Tab 仍可用 showOnSecondTab 立即展开（CW 版调整）。
+- **1.0.0**：CW 初版（上游 alt-tab-flip-3d 1.7.2 切片重组，代码体与上游逐字节一致；设置区全汉化；双进程 tool-mod 架构）。
+
 
 * 原版模组：**Alt+Tab Flip 3D (Vista Style)**，作者
   [caliberda](https://caliberda.com.br)（巴西）· [GitHub](https://github.com/cesarkali)，MIT 许可。
@@ -398,11 +403,11 @@
   $name:zh-CN: 翻转速度（%）
   $description: Speed of the spring animation when flipping between windows (25-400, default 100)
   $description:zh-CN: 窗口间翻动的弹簧动画速度（25–400，默认 100）
-- showDelay: 90
+- showDelay: 0
   $name: Show delay (ms)
   $name:zh-CN: 显示延迟（毫秒）
-  $description: A quick Alt+Tab shorter than this switches instantly without showing the stack (0-1000, default 90)
-  $description:zh-CN: 短于此值的快速 Alt+Tab 会直接切换而不显示堆栈（0–1000，默认 90）
+  $description: A quick Alt+Tab shorter than this switches instantly without showing the stack (0-1000, default 0 shows the stack as soon as Alt is held)
+  $description:zh-CN: 短于此值的快速 Alt+Tab 会直接切换而不显示堆栈（0–1000，默认 0＝按住 Alt 立即显示堆栈）
 - showOnSecondTab: false
   $name: Show at once on the second Tab
   $name:zh-CN: 第二次按 Tab 时立即显示

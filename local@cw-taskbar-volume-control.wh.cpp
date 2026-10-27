@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节。
-// @version         1.3.2
+// @version         1.3.3
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -67,6 +67,7 @@
 - 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
 
 ## 更新日志
+- **1.3.3**：移除静音相关设置（中键点击静音、不自动切换静音；自动静音行为永久关闭）与「Windows 11 旧版任务栏」指示器选项（指示器默认改为 Windows 10 风格）；滚轮/修饰键/全屏滚动功能保留（CW 汉化版调整）。
 
 - **1.3.2**：中文汉化与整合（仅元数据、说明与设置文案，代码与原版 1.3.1 一致）。
 
@@ -113,13 +114,12 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
 
 // ==WindhawkModSettings==
 /*
-- volumeIndicator: win11
+- volumeIndicator: modern
   $name: Volume control indicator
   $name:zh-CN: 音量控制指示器
   $description: The indicator style shown while scrolling.
-  $description:zh-CN: 滚动调节音量时显示的指示器样式。默认为 Windows 11 风格。
+  $description:zh-CN: 滚动调节音量时显示的指示器样式。默认为 Windows 10 风格。
   $options:
-  - win11: Windows 11
   - modern: Windows 10
   - classic: Windows 7
   - none: 无
@@ -141,13 +141,6 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     scrolling will control the system volume. Each region is a range like
     "100-200" (pixels) or "20%-50%" (percentage of taskbar length).
   $description:zh-CN: 逗号分隔的附加区域列表，滚动这些区域也会调节音量。每个区域是一段范围，如 "100-200"（像素）或 "20%-50%"（任务栏长度的百分比）。
-- middleClickToMute: true
-  $name: Middle click to mute
-  $name:zh-CN: 中键点击静音
-  $description: >-
-    With this option enabled, middle clicking the volume tray icon will
-    mute/unmute the system volume (Windows 11 version 22H2 or newer).
-  $description:zh-CN: 开启后，中键点击音量托盘图标可切换静音。需 Windows 11 22H2 或更新。默认开启。
 - ctrlScrollVolumeChange: false
   $name: Ctrl + Scroll to change volume
   $name:zh-CN: Ctrl + 滚轮调音量
@@ -187,31 +180,6 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
   - disabled: 关闭
   - withIndicator: 开启（带指示器）
   - withoutIndicator: 开启（不带指示器）
-- noAutomaticMuteToggle: false
-  $name: No automatic mute toggle
-  $name:zh-CN: 不自动切换静音
-  $description: >-
-    For the Windows 11 indicator, this option causes volume scrolling to be
-    disabled when the volume is muted. For the other control indicators: By
-    default, the output device is muted once the volume reaches zero, and is
-    unmuted on any change to a non-zero volume. Enabling this option turns off
-    this functionality, such that the device mute status is not changed.
-  $description:zh-CN: Windows 11 指示器：静音时停用音量滚动。其他指示器：默认音量降到 0 自动静音、调高自动取消静音；开启本项后不再改变静音状态。默认关闭。
-- volumeChangeStep: 2
-  $name: Volume change step
-  $name:zh-CN: 音量步长
-  $description: >-
-    Allows to configure the volume change that will occur with each notch of
-    mouse wheel movement. For the Windows 11 indicator, must be a multiple of
-    2.
-  $description:zh-CN: 每格滚轮变化的音量。Windows 11 指示器下必须是 2 的倍数。默认 2。
-- oldTaskbarOnWin11: false
-  $name: Customize the old taskbar on Windows 11
-  $name:zh-CN: 自定义 Windows 11 旧版任务栏
-  $description: >-
-    Enable this option to customize the old taskbar on Windows 11 (if using
-    ExplorerPatcher or a similar tool).
-  $description:zh-CN: 使用 ExplorerPatcher 等工具在 Windows 11 上恢复了旧版任务栏时开启本项。默认关闭。
 */
 // ==/WindhawkModSettings==
 
@@ -1915,8 +1883,9 @@ void LoadSettings() {
     }
     Wh_FreeStringSetting(fullScreenScrolling);
 
-    g_settings.noAutomaticMuteToggle =
-        Wh_GetIntSetting(L"noAutomaticMuteToggle");
+    // CW 1.3.3: automatic mute toggling was removed from the settings;
+    // never auto-mute.
+    g_settings.noAutomaticMuteToggle = true;
     g_settings.volumeChangeStep = Wh_GetIntSetting(L"volumeChangeStep");
     g_settings.oldTaskbarOnWin11 = Wh_GetIntSetting(L"oldTaskbarOnWin11");
 

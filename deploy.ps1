@@ -292,12 +292,15 @@ if (-not (Test-Path $modsSource)) {
 }
 
 # Clean retired legacy mods from Windhawk to prevent conflicts
-# （CW v1.0 移除：设置美化、任务栏音乐与歌词、果冻窗口，及更早的退役模组；
+# （CW v1.0 移除：设置美化、任务栏音乐与歌词、果冻窗口；v1.0.8 起移除：
+#   灵动岛/胶囊媒体、独立任务栏高度与图标大小（并入任务栏美化）、歌词；
 #   无 local@ 前缀的社区原版是用户手动放入 ModsSource 的，已被 CW- 汉化版取代）
 $retiredMods = @(
     "local@taskbar-background-helper", "local@start-menu-size",
     "local@windows-11-settings-styler-fork", "local@zen-taskbar-lyrics",
     "local@wobbly-windows", "local@macos-minimize-animation",
+    "local@cw-taskbar-lyrics", "local@cw-dynamic-island", "local@cw-island-media",
+    "local@cw-taskbar-icon-size",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
 )
 foreach ($rMod in $retiredMods) {
