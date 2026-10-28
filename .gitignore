@@ -48,3 +48,6 @@ sync-skills.ps1
 generated/
 docs/superpowers/
 dev/tmp/
+
+# 大体积展示视频不入库（改用 GitHub Release 附件分发）
+docs/showcase.mp4
