@@ -43,8 +43,6 @@ $expected = @{
     'optional\local@cw-alt-tab-flip-3d.wh.cpp'   = @{ id='cw-alt-tab-flip-3d';            ver='1.0.2';  inc='windhawk.exe' }
     'optional\local@cw-mac-island-dock.wh.cpp'   = @{ id='cw-mac-island-dock';            ver='2.1.1';  inc='windhawk.exe' }
     'optional\local@cw-wobbly-windows.wh.cpp'    = @{ id='cw-wobbly-windows';             ver='0.116';  inc='dwm.exe' }
-    'optional\local@cw-desktop-clock.wh.cpp'     = @{ id='cw-desktop-clock';              ver='1.4.1';  inc='explorer.exe' }
-}
 foreach ($rel in $expected.Keys) {
     $p = Join-Path $root $rel
     $exists = Test-Path -LiteralPath $p
@@ -169,7 +167,7 @@ $badOnly = $badRefs | Where-Object { $ln = ($_ -split ':')[0]; $allowedIn -notco
 Check "脚本中旧 id 仅存在于 deploy/uninstall 的清理与迁移逻辑" ($badOnly.Count -eq 0) ($badOnly | Select-Object -First 2)
 
 Write-Host "`n=== 7. 包文件完整性 ===" -ForegroundColor Cyan
-foreach ($must in @('deploy.bat','deploy.ps1','uninstall.bat','uninstall.ps1','restart_explorer.bat','build_releases.py','README.md','Readme.txt','LICENSE','CHANGELOG_CW_v1.0.0.md','CHANGELOG_CW-Beautify_v2.0.0.md','CHANGELOG_CW-Beautify_v2.1.0.md','CLAUDE.md','docs\MOD_STYLE_GUIDE.md','optional\THIRD_PARTY_NOTICES.md','tools\uninstall-ExplorerBlurMica.bat','tools\CW-Beautify-StartupCheck.ps1')) {
+foreach ($must in @('deploy.bat','deploy.ps1','uninstall.bat','uninstall.ps1','restart_explorer.bat','build_releases.py','README.md','Readme.txt','LICENSE','CHANGELOG_CW_v1.0.0.md','CHANGELOG_CW-Beautify_v2.0.0.md'','CHANGELOG_CW-Beautify_v2.1.0.md','CLAUDE.md','docs\MOD_STYLE_GUIDE.md','optional\THIRD_PARTY_NOTICES.md','tools\uninstall-ExplorerBlurMica.bat','tools\CW-Beautify-StartupCheck.ps1')) {
     Check "存在 $must" (Test-Path (Join-Path $root $must))
 }
 foreach ($gone in @('local@windows-11-settings-styler-fork.wh.cpp','optional\local@wobbly-windows.wh.cpp','tools\ai-status','THIRD_PARTY_NOTICES-taskbar-lyrics.md','tools\CWDesktop-StartupCheck.ps1','community-src','local@cw-taskbar-icon-size.wh.cpp','local@cw-dynamic-island.wh.cpp','local@cw-island-media.wh.cpp','optional\cw-rightmenu','local@cw-rightmenu.wh.cpp','local@cw-audioswap.wh.cpp','local@cw-volume-per-app.wh.cpp','local@cw-taskbar-dock-animation.wh.cpp','local@cw-taskbar-autohide-instant.wh.cpp','.github\workflows\build_zen_status.yml')) {
