@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 25 个 mod（22 核心 + 3 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 27 个 mod（22 核心 + 5 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,7 +11,7 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-22 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
+22 个核心 mod 加 5 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
 
 ### CW-任务栏美化
 
@@ -99,18 +99,6 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 * 关闭警告后改错扩展名不会再被提醒，请谨慎重命名。
 
-### CW-文件操作美化
-
-给资源管理器的文件操作对话框（复制/移动/删除进度窗口）换上可自定义的统一外观。
-
-* 内置暗蓝、石墨、午夜、暖黑、浅色、磨砂玻璃等主题，颜色、字体、字号均可自定义。
-
-### CW-音量混合器
-
-系统托盘里的可自定义音量混合器：直接调节主音量和各应用的音量。
-
-* 托盘图标点击即开，主题、透明度、背景效果、每页应用数量均可调。
-* 与「CW-任务栏音量控制」互补：一个在任务栏滚动调音量，一个开面板精细调节。
 
 ### CW-窗口拖动（Alt+拖动）
 
@@ -124,17 +112,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 * 找回 Windows 10 时代的小窗预览体验，再次点击仍可切换桌面。
 
-### CW-任务栏缩略图大小
-
-自定义任务栏悬停缩略图预览的尺寸。
-
-* 缩略图大小可调，配合高分辨率屏幕看得更清楚。
-
-### CW-滚轮切换任务栏
-
-用鼠标滚轮或键盘快捷键在任务栏按钮间循环切换窗口。
-
-* 悬停任务栏滚动滚轮即可逐个切换窗口，方向和循环方式可调。
 
 ### CW-任务栏弹性药丸
 
@@ -142,17 +119,40 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 * 切换窗口时指示条平滑滑动跟随，动画细节可调。
 
-### CW-资源管理器信息栏
-
-增强文件资源管理器底部信息栏：显示磁盘、内容、选择项与单文件详情。
-
-* 样式与颜色可自定义。
 
 ### CW-自定义右键菜单
 
 把资源管理器右键菜单换成自绘的即时打开菜单，主题、布局、颜色、动画、规则全面可自定义。
 
 * 缓存机制让菜单瞬时打开；与「CW-经典右键菜单」二选一使用，不要同时开启。
+
+### CW-任务栏歌词
+
+任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
+
+### CW-资源管理器文件大小
+
+文件大小人类可读（KB/MB/GB，可选 IEC 单位），并支持统计文件夹大小。
+
+### CW-半透明窗口
+
+在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
+
+### CW-任务栏时钟自定义
+
+自定义任务栏时钟：日期/时间格式、新闻与天气、网速、CPU/内存/电池等性能指标。
+
+### CW-最大化自动隐藏任务栏
+
+仅当有窗口最大化或贴近任务栏时才自动隐藏任务栏，平时保持可见。
+
+### CW-果冻窗口（可选）
+
+Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
+
+### CW-桌面时钟（可选）
+
+桌面时钟挂件，跟随上游 ZenDesktop 的原创模组适配而来。
 
 ### CW-窗口动画（可选）
 
@@ -167,6 +167,34 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 * 内置多款社区主题（紧凑、经典搜索框、窗口玻璃、半透明等），也支持自定义控件样式。
 * 与任务栏/开始菜单等 styler 模组同一套「样式常量/控件样式/资源变量」语法。
+
+### CW-任务栏歌词
+
+任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
+
+### CW-资源管理器文件大小
+
+文件大小人类可读（KB/MB/GB，可选 IEC 单位），并支持统计文件夹大小。
+
+### CW-半透明窗口
+
+在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
+
+### CW-任务栏时钟自定义
+
+自定义任务栏时钟：日期/时间格式、新闻与天气、网速、CPU/内存/电池等性能指标。
+
+### CW-最大化自动隐藏任务栏
+
+仅当有窗口最大化或贴近任务栏时才自动隐藏任务栏，平时保持可见。
+
+### CW-果冻窗口（可选）
+
+Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
+
+### CW-桌面时钟（可选）
+
+桌面时钟挂件，跟随上游 ZenDesktop 的原创模组适配而来。
 
 ### CW-窗口动画（可选）
 
@@ -258,4 +286,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 25 Windhawk mods (22 core + 3 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 27 Windhawk mods (22 core + 5 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.

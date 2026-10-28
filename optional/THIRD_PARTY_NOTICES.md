@@ -19,17 +19,19 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-托盘系统图标调整（cw-tray-system-icons） | m417z, Taskbar tray system icon tweaks；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-tray-system-icon-tweaks |
 | CW-经典右键菜单（cw-classic-context-menu） | m417z, Classic context menu on Windows 11；汉化；1.1.0 起新增菜单风格切换设置 | GPL-3.0 | https://windhawk.net/mods/explorer-context-menu-classic |
 | CW-关闭扩展名修改警告（cw-extension-no-warning） | m417z, Turn off change file extension warning；汉化 | GPL-3.0 | https://windhawk.net/mods/extension-change-no-warning |
-| CW-文件操作美化（cw-file-operation-styler） | digART, File Operation Styler；汉化 | GPL-3.0 | https://windhawk.net/mods/file-operation-styler |
 | CW-文件悬停信息（cw-file-hover-info） | HaVeN80, File Hover Info；汉化 | 未标注（版权归原作者） | https://windhawk.net/mods/file-hover-info |
 | CW-设置美化（cw-settings-styler） | m417z, Windows 11 Settings Styler；汉化 | GPL-3.0 | https://windhawk.net/mods/windows-11-settings-styler |
-| CW-音量混合器（cw-better-volume-mixer） | 0Allu, Better Volume Mixer；汉化 | MIT | https://windhawk.net/mods/better-volume-mixer |
 | CW-窗口拖动（cw-alt-drag） | m417z, AltDrag；汉化 | GPL-3.0 | https://windhawk.net/mods/alt-drag |
 | CW-显示桌面按钮预览（cw-aero-peek） | m417z, Aero Peek on "Show desktop" button hover；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek |
-| CW-任务栏缩略图大小（cw-thumbnail-size） | m417z, Taskbar Thumbnail Size；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-thumbnail-size |
-| CW-滚轮切换任务栏（cw-taskbar-wheel-cycle） | m417z, Cycle taskbar buttons with mouse wheel；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-wheel-cycle |
 | CW-任务栏弹性药丸（cw-taskbar-elastic-pill） | Lockframe, Taskbar Elastic WinUI Pill；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-elastic-pill |
-| CW-资源管理器信息栏（cw-explorer-info-bar） | digART, Explorer Info Bar+；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-info-bar |
 | CW-自定义右键菜单（cw-custom-context-menu） | BOLT, Custom Cached Context Menu；汉化 | MIT | https://windhawk.net/mods/custom-cached-context-menu |
+| CW-资源管理器文件大小（cw-explorer-details-file-sizes） | m417z, Better file sizes in Explorer details；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-details-better-file-sizes |
+| CW-半透明窗口（cw-translucent-windows） | Undisputed00x, Translucent Windows；汉化 | MIT | https://windhawk.net/mods/translucent-windows |
+| CW-任务栏时钟自定义（cw-taskbar-clock-customization） | m417z, Taskbar Clock Customization；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-clock-customization |
+| CW-最大化自动隐藏任务栏（cw-taskbar-autohide-when-maximized） | m417z, Taskbar auto-hide when maximized；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-auto-hide-when-maximized |
+| CW-果冻窗口（cw-wobbly-windows，可选） | lalimatyus, Wobbly Windows；汉化 | GPL-3.0-only | https://windhawk.net/mods/wobbly-windows |
+| CW-桌面时钟（cw-desktop-clock，可选） | 上游 ZenDesktop 原创（Lanbo, m417z），CW-Beautify 适配 | GPL-3.0 | 本上游仓库 |
+| CW-任务栏歌词（cw-taskbar-lyrics） | 上游 ZenDesktop 原创（Lanbo），CW-Beautify 适配 | GPL-3.0 | 本上游仓库 |
 
 ## 可选模组（仅在部署时选择安装才启用）
 

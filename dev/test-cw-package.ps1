@@ -23,26 +23,28 @@ $expected = @{
     'local@cw-notificationcenter-acrylic.wh.cpp' = @{ id='cw-notificationcenter-acrylic'; ver='4.2.6';  inc='ShellExperienceHost.exe' }
     'local@cw-explorer-styler.wh.cpp'            = @{ id='cw-explorer-styler';            ver='1.7.0';  inc='explorer.exe' }
     'local@cw-desktop-toggle-icons.wh.cpp'       = @{ id='cw-desktop-toggle-icons';       ver='4.2.0';  inc='explorer.exe' }
-    'local@cw-taskbar-volume-control.wh.cpp'     = @{ id='cw-taskbar-volume-control';     ver='1.4.0';  inc='explorer.exe' }
+    'local@cw-taskbar-volume-control.wh.cpp'     = @{ id='cw-taskbar-volume-control';     ver='1.4.1';  inc='explorer.exe' }
     'local@cw-taskbar-animation.wh.cpp'          = @{ id='cw-taskbar-animation';          ver='2.1.0';  inc='explorer.exe' }
     'local@cw-window-arrangement.wh.cpp'         = @{ id='cw-window-arrangement';         ver='1.0.3';  inc='*' }
     'local@cw-tray-system-icons.wh.cpp'          = @{ id='cw-tray-system-icons';          ver='1.3.2';  inc='explorer.exe' }
     'local@cw-classic-context-menu.wh.cpp'       = @{ id='cw-classic-context-menu';       ver='1.1.0';  inc='explorer.exe' }
     'local@cw-extension-no-warning.wh.cpp'       = @{ id='cw-extension-no-warning';       ver='1.0.2';  inc='explorer.exe'; noSettings=$true }
-    'local@cw-file-operation-styler.wh.cpp'      = @{ id='cw-file-operation-styler';      ver='1.2.1';  inc='explorer.exe' }
-    'local@cw-better-volume-mixer.wh.cpp'        = @{ id='cw-better-volume-mixer';        ver='1.6.1';  inc='windhawk.exe' }
     'local@cw-alt-drag.wh.cpp'                   = @{ id='cw-alt-drag';                   ver='1.2';    inc='*' }
     'local@cw-aero-peek.wh.cpp'                  = @{ id='cw-aero-peek';                  ver='1.0.3';  inc='explorer.exe' }
-    'local@cw-thumbnail-size.wh.cpp'             = @{ id='cw-thumbnail-size';             ver='1.2.2';  inc='explorer.exe' }
-    'local@cw-taskbar-wheel-cycle.wh.cpp'        = @{ id='cw-taskbar-wheel-cycle';        ver='1.1.12'; inc='explorer.exe' }
     'local@cw-taskbar-elastic-pill.wh.cpp'       = @{ id='cw-taskbar-elastic-pill';       ver='2.0.2';  inc='explorer.exe' }
-    'local@cw-explorer-info-bar.wh.cpp'          = @{ id='cw-explorer-info-bar';          ver='1.2.1';  inc='explorer.exe' }
     'local@cw-custom-context-menu.wh.cpp'        = @{ id='cw-custom-context-menu';        ver='1.1.2';  inc='explorer.exe' }
+    'local@cw-taskbar-autohide-when-maximized.wh.cpp'      = @{ id='cw-taskbar-autohide-when-maximized'; ver='1.2.7'; inc='explorer.exe' }
+    'local@cw-taskbar-clock-customization.wh.cpp'          = @{ id='cw-taskbar-clock-customization'; ver='1.8.2'; inc='explorer.exe' }
+    'local@cw-translucent-windows.wh.cpp'                  = @{ id='cw-translucent-windows'; ver='1.8.3'; inc='*' }
+    'local@cw-explorer-details-file-sizes.wh.cpp'          = @{ id='cw-explorer-details-file-sizes'; ver='1.7'; inc='*' }
+    'local@cw-taskbar-lyrics.wh.cpp'             = @{ id='cw-taskbar-lyrics';             ver='0.4.9';  inc='explorer.exe' }
     'local@cw-file-hover-info.wh.cpp'            = @{ id='cw-file-hover-info';            ver='1.1.3';  inc='explorer.exe' }
     'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.2';  inc='SystemSettings.exe' }
     'optional\local@cw-windows-animations.wh.cpp'= @{ id='cw-windows-animations';         ver='1.6.0';  inc='*' }
     'optional\local@cw-alt-tab-flip-3d.wh.cpp'   = @{ id='cw-alt-tab-flip-3d';            ver='1.0.2';  inc='windhawk.exe' }
     'optional\local@cw-mac-island-dock.wh.cpp'   = @{ id='cw-mac-island-dock';            ver='2.1.1';  inc='windhawk.exe' }
+    'optional\local@cw-wobbly-windows.wh.cpp'    = @{ id='cw-wobbly-windows';             ver='0.116';  inc='dwm.exe' }
+    'optional\local@cw-desktop-clock.wh.cpp'     = @{ id='cw-desktop-clock';              ver='1.4.1';  inc='explorer.exe' }
 }
 foreach ($rel in $expected.Keys) {
     $p = Join-Path $root $rel
@@ -64,7 +66,7 @@ foreach ($rel in $expected.Keys) {
     Check "设置块/说明块完整" (($hasSettings -or $expected[$rel].noSettings) -and $hasReadme)
     Check "@name:zh-CN / @description:zh-CN" ($nameZh -and $descZh)
     # 上游字符串字面量含 {{表达式}}，绝对相等不可达；改为校验与 git 基线差值一致
-    $expectedDelta = @{ 'local@cw-taskbar-acrylic.wh.cpp'=2; 'local@cw-startmenu-acrylic.wh.cpp'=3; 'local@cw-notificationcenter-acrylic.wh.cpp'=3; 'local@cw-explorer-styler.wh.cpp'=2; 'local@cw-settings-styler.wh.cpp'=2;}
+    $expectedDelta = @{ 'local@cw-taskbar-acrylic.wh.cpp'=2; 'local@cw-startmenu-acrylic.wh.cpp'=3; 'local@cw-notificationcenter-acrylic.wh.cpp'=3; 'local@cw-explorer-styler.wh.cpp'=2; 'local@cw-settings-styler.wh.cpp'=2; 'local@cw-taskbar-lyrics.wh.cpp'=1;}
     $wantDelta = 0; if ($expectedDelta.ContainsKey($rel)) { $wantDelta = $expectedDelta[$rel] }
     Check "C++ 花括号差值与上游基线一致 ($open/$close, delta=$($open-$close))" (($open - $close) -eq $wantDelta)
 }
@@ -80,12 +82,10 @@ files = [
  'local@cw-taskbar-volume-control.wh.cpp','local@cw-taskbar-animation.wh.cpp',
  'local@cw-window-arrangement.wh.cpp','local@cw-tray-system-icons.wh.cpp',
  'local@cw-classic-context-menu.wh.cpp',
- 'local@cw-file-operation-styler.wh.cpp',
- 'local@cw-better-volume-mixer.wh.cpp','local@cw-alt-drag.wh.cpp',
- 'local@cw-aero-peek.wh.cpp','local@cw-thumbnail-size.wh.cpp',
- 'local@cw-taskbar-wheel-cycle.wh.cpp','local@cw-taskbar-elastic-pill.wh.cpp',
- 'local@cw-explorer-info-bar.wh.cpp',
  'local@cw-custom-context-menu.wh.cpp',
+ 'local@cw-explorer-details-file-sizes.wh.cpp',
+ 'local@cw-translucent-windows.wh.cpp','local@cw-taskbar-clock-customization.wh.cpp',
+ 'local@cw-taskbar-autohide-when-maximized.wh.cpp',
  'local@cw-file-hover-info.wh.cpp','local@cw-settings-styler.wh.cpp',
  r'optional\local@cw-windows-animations.wh.cpp',
  r'optional\local@cw-alt-tab-flip-3d.wh.cpp',
@@ -135,14 +135,14 @@ foreach ($dir in @($root, (Join-Path $root 'optional'))) {
     }
 }
 $scanned | Format-Table -AutoSize | Out-String | Write-Host
-Check "部署扫描恰好 25 个 mod" ($scanned.Count -eq 25) "实际 $($scanned.Count)"
+Check "部署扫描恰好 27 个 mod" ($scanned.Count -eq 27) "实际 $($scanned.Count)"
 Check "全部为 cw- id" (($scanned | Where-Object { $_.Id -notlike 'local@cw-*' }).Count -eq 0)
 Check "Include 全部可解析（非空）" (($scanned | Where-Object { -not $_.Include }).Count -eq 0)
 
 Write-Host "`n=== 5. deploy.ps1 关键逻辑存在性 ===" -ForegroundColor Cyan
 $dep = Get-Content (Join-Path $root 'deploy.ps1') -Raw -Encoding UTF8
 Check "改名迁移映射（6 条 CW→cw）" (([regex]::Matches($dep, '"local@cw-')).Count -ge 6)
-Check "退役清理含 3 个被删模组" (($dep -match 'settings-styler-fork') -and ($dep -match 'cw-taskbar-lyrics') -and ($dep -match 'wobbly-windows'))
+Check "退役清理含被删模组" (($dep -match 'settings-styler-fork') -and ($dep -match 'cw-volume-per-app') -and ($dep -match 'cw-thumbnail-size'))
 Check "acrylic 含任务栏高度默认值种子" ($dep -match '"TaskbarHeight" 52')
 Check "volume-control 嵌套键种子" ($dep -match 'scrollAnywhereKeys\.shift')
 Check "dock-animation 默认值种子" ($dep -match '"BounceDelay" 500')
@@ -152,7 +152,7 @@ Check "explorer-styler 种子用新主题名" ($dep -match '"theme" "CWTransluce
 Check "音量模组 perApp 种子（合并验证）" ($dep -match '"perApp.volumeChangeStep" 10')
 Check "audioswap/per-app 已入退役清单" (($dep -match '"local@cw-audioswap"') -and ($dep -match '"local@cw-volume-per-app"'))
 Check "新模组种子块存在" (($dep -match 'local@cw-tray-system-icons"\)') -and ($dep -match 'local@cw-taskbar-animation"\)') -and ($dep -match 'local@cw-mac-island-dock"\)'))
-Check "不再写 dwm.exe 包含列表" (-not ($dep -match '\@\("dwm\.exe"\)'))
+Check "dwm.exe 仅在果冻窗口预选条件下写入" (($dep -match '\$dwmWanted') -and ($dep -match 'Merge-ProcessList \$cleanInclude @\("dwm\.exe"\)'))
 Check "不覆盖用户值（Set-RegValueIfMissing）" ($dep -match 'Set-RegValueIfMissing')
 Check "deploy 不调用 clang/编译" (-not ($dep -match 'clang'))
 
@@ -174,7 +174,7 @@ Write-Host "`n=== 7. 包文件完整性 ===" -ForegroundColor Cyan
 foreach ($must in @('deploy.bat','deploy.ps1','uninstall.bat','uninstall.ps1','restart_explorer.bat','build_releases.py','README.md','Readme.txt','LICENSE','CHANGELOG_CW_v1.0.0.md','CHANGELOG_CW-Beautify_v2.0.0.md','CHANGELOG_CW-Beautify_v2.1.0.md','CLAUDE.md','docs\MOD_STYLE_GUIDE.md','optional\THIRD_PARTY_NOTICES.md','tools\uninstall-ExplorerBlurMica.bat','tools\CW-Beautify-StartupCheck.ps1')) {
     Check "存在 $must" (Test-Path (Join-Path $root $must))
 }
-foreach ($gone in @('local@windows-11-settings-styler-fork.wh.cpp','local@cw-taskbar-lyrics.wh.cpp','optional\local@wobbly-windows.wh.cpp','tools\ai-status','THIRD_PARTY_NOTICES-taskbar-lyrics.md','tools\CWDesktop-StartupCheck.ps1','community-src','local@cw-taskbar-icon-size.wh.cpp','local@cw-dynamic-island.wh.cpp','local@cw-island-media.wh.cpp','local@cw-taskbar-lyrics.wh.cpp','optional\cw-rightmenu','local@cw-rightmenu.wh.cpp','local@cw-audioswap.wh.cpp','local@cw-volume-per-app.wh.cpp','local@cw-taskbar-dock-animation.wh.cpp','local@cw-taskbar-autohide-instant.wh.cpp','.github\workflows\build_zen_status.yml')) {
+foreach ($gone in @('local@windows-11-settings-styler-fork.wh.cpp','optional\local@wobbly-windows.wh.cpp','tools\ai-status','THIRD_PARTY_NOTICES-taskbar-lyrics.md','tools\CWDesktop-StartupCheck.ps1','community-src','local@cw-taskbar-icon-size.wh.cpp','local@cw-dynamic-island.wh.cpp','local@cw-island-media.wh.cpp','optional\cw-rightmenu','local@cw-rightmenu.wh.cpp','local@cw-audioswap.wh.cpp','local@cw-volume-per-app.wh.cpp','local@cw-taskbar-dock-animation.wh.cpp','local@cw-taskbar-autohide-instant.wh.cpp','.github\workflows\build_zen_status.yml')) {
     Check "已移除 $gone" (-not (Test-Path (Join-Path $root $gone)))
 }
 

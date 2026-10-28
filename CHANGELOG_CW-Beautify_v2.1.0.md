@@ -3,7 +3,7 @@
 > CW-Beautify 整合包（GPL-3.0），作者 Heptalune（https://github.com/Heptalune/CW-Beautify）。
 > 各 mod 的原作者署名与许可证全部保留；本整合包以 GPL-3.0 发布。
 
-本版在 v2.0.0 的 20 模组基础上调整为 **25 个模组（22 核心 + 3 可选）**。
+本版在 v2.0.0 的 20 模组基础上调整为 **27 个模组（22 核心 + 5 可选）**，并对齐上游 ZenDesktop 的最新模组阵容。
 
 ## 调整（3 个）
 
@@ -24,15 +24,16 @@
 
 | 新名 | 原版 | 原作者 | 版本 |
 |---|---|---|---|
-| CW-音量混合器 | [Better Volume Mixer](https://windhawk.net/mods/better-volume-mixer) | 0Allu | 1.6.0 → 1.6.1 |
 | CW-窗口拖动（Alt+拖动） | [AltDrag](https://windhawk.net/mods/alt-drag) | m417z | 1.1 → 1.2 |
 | CW-显示桌面按钮预览 | [Aero Peek on "Show desktop" button hover](https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek) | m417z | 1.0.2 → 1.0.3 |
-| CW-任务栏缩略图大小 | [Taskbar Thumbnail Size](https://windhawk.net/mods/taskbar-thumbnail-size) | m417z | 1.2.1 → 1.2.2 |
-| CW-滚轮切换任务栏 | [Cycle taskbar buttons with mouse wheel](https://windhawk.net/mods/taskbar-wheel-cycle) | m417z | 1.1.11 → 1.1.12 |
 | CW-任务栏弹性药丸 | [Taskbar Elastic WinUI Pill](https://windhawk.net/mods/taskbar-elastic-pill) | Lockframe | 2.0.1 → 2.0.2 |
-| CW-资源管理器信息栏 | [Explorer Info Bar+](https://windhawk.net/mods/explorer-info-bar) | digART | 1.2.0 → 1.2.1 |
 | CW-自定义右键菜单 | [Custom Cached Context Menu](https://windhawk.net/mods/custom-cached-context-menu) | BOLT | 1.1.1 → 1.1.2 |
+| CW-资源管理器文件大小 | [Better file sizes in Explorer details](https://windhawk.net/mods/explorer-details-better-file-sizes) | m417z | 1.6 → 1.7 |
+| CW-半透明窗口 | [Translucent Windows](https://windhawk.net/mods/translucent-windows) | Undisputed00x | 1.8.2 → 1.8.3 |
+| CW-任务栏时钟自定义 | [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization) | m417z | 1.8.1 → 1.8.2 |
+| CW-最大化自动隐藏任务栏 | [Taskbar auto-hide when maximized](https://windhawk.net/mods/taskbar-auto-hide-when-maximized) | m417z | 1.2.6 → 1.2.7 |
 
+另有 3 个模组自上游 ZenDesktop 加回并适配：**CW-任务栏歌词 0.4.9**、**CW-桌面时钟 1.4.1（可选）**、**CW-果冻窗口 0.116（可选）**。
 汉化仅改动元数据、说明与设置文案（CW-自定义右键菜单按用户要求连菜单内的自绘文案也做了核查），代码逻辑与上游逐字节一致；补丁版本号 +1。全部模组经过本机 Windhawk 工具链（Compiler/clang++）编译验证。
 
 ## 其他

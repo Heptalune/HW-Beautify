@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.4.0
+// @version         1.4.1
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -272,7 +272,7 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     $description: >-
       When enabled, the tooltip shows a compact format with emojis instead of
       text (e.g., "🔊 64%" instead of "Volume: 64%").
-    $description:zh-CN: 开启后，提示改用表情符号的紧凑格式（如用 "🔊 64%" 代替 "Volume: 64%"）。
+    $description:zh-CN: '开启后，提示改用表情符号的紧凑格式（如用 "🔊 64%" 代替 "Volume: 64%"）。'
   - noAutomaticMuteToggle: false
     $name: No automatic mute toggle (per-app)
     $name:zh-CN: 不自动切换静音（分应用）

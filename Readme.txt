@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（22 核心 + 3 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
+包含的 Mod（22 核心 + 5 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
 _Online 版（已装好 Windhawk 的用户用）。v1.0.0 的「Offline」包实为
@@ -29,26 +29,6 @@ _Online 版（已装好 Windhawk 的用户用）。v1.0.0 的「Offline」包实
   CW-托盘系统图标调整           隐藏/调整托盘系统图标与「显示桌面」按钮（新增）
   CW-经典右键菜单               默认显示经典右键菜单，Win10/Win11 风格可切换（新增）
   CW-关闭扩展名修改警告         改扩展名不再弹确认警告（新增）
-  CW-文件操作美化               复制/移动/删除对话框换可自定义外观（新增）
-  CW-音量混合器                 托盘里的可自定义音量混合器，主/分应用音量直调（新增）
-  CW-窗口拖动                   Alt+拖动即可移动/调整窗口大小（Linux 风格手势）（新增）
-  CW-显示桌面按钮预览           悬停「显示桌面」按钮显示 Aero Peek 窗口预览（新增）
-  CW-任务栏缩略图大小           自定义任务栏缩略图预览尺寸（新增）
-  CW-滚轮切换任务栏             滚轮/快捷键在任务栏按钮间循环切换窗口（新增）
-  CW-任务栏弹性药丸             活动任务项的弹性滑动指示条（新增）
-  CW-资源管理器信息栏           增强资源管理器底部信息栏，样式可自定义（新增）
-  CW-自定义右键菜单             自绘即时右键菜单，主题/布局/规则全面可调（新增）
-  CW-文件悬停信息               悬停文件显示可定制的详细信息卡片（新增）
-  CW-设置美化                   用社区主题/自定义样式美化设置应用（新增）
-
-  可选（部署时用 -Optional 参数选择安装）：
-  CW-窗口动画                   关窗、最小化、还原、启动动画，含 macOS 神奇效果
-  CW-窗口切换动画（Vista 风格）  Alt+Tab 换成 Vista Flip 3D 实时窗口堆栈
-  CW-Mac 灵动岛与 Dock          顶部 macOS 菜单栏式灵动岛 + 可选 Dock 任务栏
-
-  每个 mod 的详细介绍见 README.md。
-
-========================================================================
 安装步骤
 ========================================================================
 1. 把压缩包完整解压到任意文件夹（路径有空格、中文都可以）。
@@ -130,7 +110,7 @@ dwm.exe、排除列表加过一些游戏进程，卸载不会改动，想还原�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-25 Windhawk mods (22 core + 3 optional), localized into Simplified Chinese.
+27 Windhawk mods (22 core + 5 optional), localized into Simplified Chinese.
 Extract the zip, run deploy.bat as administrator, then enable the mods you
 want in Windhawk (all are installed disabled). Upgrading keeps toggles and
 settings. Uninstall: run uninstall.bat. See README.md for details.

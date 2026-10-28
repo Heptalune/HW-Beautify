@@ -57,7 +57,7 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 当前模组清单（v2.1.0，25 个 = 22 核心 + 3 可选）
+## 当前模组清单（v2.1.0，27 个 = 22 核心 + 5 可选）
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
@@ -72,19 +72,21 @@
 | CW-托盘系统图标调整 | cw-tray-system-icons | 1.3.2 | m417z Taskbar tray system icon tweaks 汉化 |
 | CW-经典右键菜单 | cw-classic-context-menu | 1.1.0 | m417z Classic context menu on Windows 11 汉化；1.1.0 起新增菜单风格切换设置 |
 | CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
-| CW-文件操作美化 | cw-file-operation-styler | 1.2.1 | digART File Operation Styler 汉化 |
 | CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
 | CW-设置美化 | cw-settings-styler | 1.2.2 | m417z Windows 11 Settings Styler 汉化 |
-| CW-音量混合器 | cw-better-volume-mixer | 1.6.1 | 0Allu Better Volume Mixer (MIT) 汉化 |
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
 | CW-显示桌面按钮预览 | cw-aero-peek | 1.0.3 | m417z Aero Peek on "Show desktop" button hover 汉化 |
-| CW-任务栏缩略图大小 | cw-thumbnail-size | 1.2.2 | m417z Taskbar Thumbnail Size 汉化 |
-| CW-滚轮切换任务栏 | cw-taskbar-wheel-cycle | 1.1.12 | m417z Cycle taskbar buttons with mouse wheel 汉化 |
 | CW-任务栏弹性药丸 | cw-taskbar-elastic-pill | 2.0.2 | Lockframe Taskbar Elastic WinUI Pill 汉化 |
-| CW-资源管理器信息栏 | cw-explorer-info-bar | 1.2.1 | digART Explorer Info Bar+ 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.2 | BOLT Custom Cached Context Menu (MIT) 汉化 |
+| CW-任务栏歌词 | cw-taskbar-lyrics | 0.4.9 | 上游 ZenDesktop 任务栏歌词适配（原 Lanbo） |
+| CW-资源管理器文件大小 | cw-explorer-details-file-sizes | 1.7 | m417z explorer-details-better-file-sizes 汉化 |
+| CW-半透明窗口 | cw-translucent-windows | 1.8.3 | Undisputed00x Translucent Windows 汉化 |
+| CW-任务栏时钟自定义 | cw-taskbar-clock-customization | 1.8.2 | m417z Taskbar Clock Customization 汉化 |
+| CW-最大化自动隐藏任务栏 | cw-taskbar-autohide-when-maximized | 1.2.7 | m417z Taskbar auto-hide when maximized 汉化 |
+| CW-果冻窗口（可选） | cw-wobbly-windows | 0.116 | lalimatyus Wobbly Windows 汉化（回归，需 dwm.exe 包含列表） |
+| CW-桌面时钟（可选） | cw-desktop-clock | 1.4.1 | 上游 ZenDesktop 桌面时钟适配（原 Lanbo, m417z） |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
 | CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
 | CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）。两者都进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle/cw-thumbnail-size（用户要求移除）。两者都进了 deploy 的退役清理列表。

@@ -308,9 +308,14 @@ if (-not (Test-Path $engineSettingsPath)) {
 $currentExclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Exclude" -ErrorAction SilentlyContinue).Exclude
 Set-ItemProperty -Path $engineSettingsPath -Name "Exclude" -Value (Merge-ProcessList $currentExclude $globalExcludeList) -Type String
 $currentInclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Include" -ErrorAction SilentlyContinue).Include
-# 旧 CW 部署曾把 dwm.exe 加入包含列表（果冻窗口已移除），这里始终移除：
-# 整合包 v2.1 不包含任何需要注入 dwm.exe 的模组。
+# 果冻窗口（cw-wobbly-windows，可选模组）需要注入 dwm.exe：仅当部署时显式
+# 预选（-Optional 含 wobbly-windows）才加入包含列表，其余情况一律移除。
+$dwmWanted = $Optional -and ($Optional -match 'wobbly')
 $cleanInclude = ($currentInclude -split '\|' | Where-Object { $_ -and $_.Trim() -ne 'dwm.exe' }) -join '|'
+if ($dwmWanted) {
+    Write-Status "果冻窗口已预选：将 dwm.exe 加入进程包含列表（Wobbly Windows 需要）。" "Yellow"
+    $cleanInclude = Merge-ProcessList $cleanInclude @("dwm.exe")
+}
 Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value $cleanInclude -Type String
 # Windhawk's own default is 0 (don't inject into games); only seeded.
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
@@ -343,10 +348,13 @@ $retiredMods = @(
     "local@taskbar-background-helper", "local@start-menu-size",
     "local@windows-11-settings-styler-fork",
     "local@wobbly-windows", "local@macos-minimize-animation",
-    "local@cw-taskbar-lyrics", "local@cw-dynamic-island", "local@cw-island-media",
+    "local@cw-dynamic-island", "local@cw-island-media",
     "local@cw-taskbar-icon-size",
     "local@cw-audioswap", "local@cw-volume-per-app",
     "local@cw-taskbar-dock-animation", "local@cw-taskbar-autohide-instant",
+    "local@cw-explorer-info-bar", "local@cw-better-volume-mixer",
+    "local@cw-file-operation-styler", "local@cw-taskbar-wheel-cycle",
+    "local@cw-thumbnail-size",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
 )
 foreach ($rMod in $retiredMods) {
@@ -471,11 +479,13 @@ $coreModIds = @(
     "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
     "local@cw-taskbar-animation", "local@cw-window-arrangement", "local@cw-tray-system-icons",
     "local@cw-classic-context-menu", "local@cw-extension-no-warning",
-    "local@cw-file-operation-styler",
     "local@cw-file-hover-info", "local@cw-settings-styler",
-    "local@cw-better-volume-mixer", "local@cw-alt-drag",
-    "local@cw-aero-peek", "local@cw-thumbnail-size", "local@cw-taskbar-wheel-cycle",
-    "local@cw-taskbar-elastic-pill", "local@cw-explorer-info-bar"
+    "local@cw-alt-drag",
+    "local@cw-aero-peek",
+    "local@cw-taskbar-elastic-pill",
+    "local@cw-taskbar-lyrics", "local@cw-explorer-details-file-sizes",
+    "local@cw-translucent-windows", "local@cw-taskbar-clock-customization",
+    "local@cw-taskbar-autohide-when-maximized"
 )
 $preselected = @()
 if ($Optional) {
@@ -753,15 +763,6 @@ foreach ($file in $files) {
     if ($id -eq "local@cw-classic-context-menu") {
         $label = "Classic Context Menu"
         Set-RegValueIfMissing $settingsPath "overrideWithCtrl" 1 DWord $label
-    }
-
-    if ($id -eq "local@cw-file-operation-styler") {
-        $label = "File Operation Styler"
-        Set-RegValueIfMissing $settingsPath "showCurrentFileProgressBar" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideSmallControlButtons" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideTitleBarPercentage" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "customization.enabled" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "customization.preset" "blueDark" String $label
     }
 
     if ($id -eq "local@cw-mac-island-dock") {
