@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 27 个 mod（22 核心 + 5 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 25 个 mod（21 核心 + 4 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,7 +11,7 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-22 个核心 mod 加 5 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
+21 个核心 mod 加 4 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
 
 ### CW-任务栏美化
 
@@ -130,10 +130,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
 
-### CW-资源管理器文件大小
-
-文件大小人类可读（KB/MB/GB，可选 IEC 单位），并支持统计文件夹大小。
-
 ### CW-半透明窗口
 
 在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
@@ -149,10 +145,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 ### CW-果冻窗口（可选）
 
 Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
-
-### CW-桌面时钟（可选）
-
-桌面时钟挂件，跟随上游 ZenDesktop 的原创模组适配而来。
 
 ### CW-窗口动画（可选）
 
@@ -172,10 +164,6 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 
 任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
 
-### CW-资源管理器文件大小
-
-文件大小人类可读（KB/MB/GB，可选 IEC 单位），并支持统计文件夹大小。
-
 ### CW-半透明窗口
 
 在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
@@ -191,10 +179,6 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 ### CW-果冻窗口（可选）
 
 Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
-
-### CW-桌面时钟（可选）
-
-桌面时钟挂件，跟随上游 ZenDesktop 的原创模组适配而来。
 
 ### CW-窗口动画（可选）
 
@@ -286,4 +270,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 27 Windhawk mods (22 core + 5 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 25 Windhawk mods (21 core + 4 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.

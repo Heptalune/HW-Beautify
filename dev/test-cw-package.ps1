@@ -32,11 +32,10 @@ $expected = @{
     'local@cw-alt-drag.wh.cpp'                   = @{ id='cw-alt-drag';                   ver='1.2';    inc='*' }
     'local@cw-aero-peek.wh.cpp'                  = @{ id='cw-aero-peek';                  ver='1.0.3';  inc='explorer.exe' }
     'local@cw-taskbar-elastic-pill.wh.cpp'       = @{ id='cw-taskbar-elastic-pill';       ver='2.0.2';  inc='explorer.exe' }
-    'local@cw-custom-context-menu.wh.cpp'        = @{ id='cw-custom-context-menu';        ver='1.1.2';  inc='explorer.exe' }
+    'local@cw-custom-context-menu.wh.cpp'        = @{ id='cw-custom-context-menu';        ver='1.1.3';  inc='explorer.exe' }
     'local@cw-taskbar-autohide-when-maximized.wh.cpp'      = @{ id='cw-taskbar-autohide-when-maximized'; ver='1.2.7'; inc='explorer.exe' }
     'local@cw-taskbar-clock-customization.wh.cpp'          = @{ id='cw-taskbar-clock-customization'; ver='1.8.2'; inc='explorer.exe' }
     'local@cw-translucent-windows.wh.cpp'                  = @{ id='cw-translucent-windows'; ver='1.8.3'; inc='*' }
-    'local@cw-explorer-details-file-sizes.wh.cpp'          = @{ id='cw-explorer-details-file-sizes'; ver='1.7'; inc='*' }
     'local@cw-taskbar-lyrics.wh.cpp'             = @{ id='cw-taskbar-lyrics';             ver='0.4.9';  inc='explorer.exe' }
     'local@cw-file-hover-info.wh.cpp'            = @{ id='cw-file-hover-info';            ver='1.1.3';  inc='explorer.exe' }
     'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.2';  inc='SystemSettings.exe' }
@@ -83,7 +82,6 @@ files = [
  'local@cw-window-arrangement.wh.cpp','local@cw-tray-system-icons.wh.cpp',
  'local@cw-classic-context-menu.wh.cpp',
  'local@cw-custom-context-menu.wh.cpp',
- 'local@cw-explorer-details-file-sizes.wh.cpp',
  'local@cw-translucent-windows.wh.cpp','local@cw-taskbar-clock-customization.wh.cpp',
  'local@cw-taskbar-autohide-when-maximized.wh.cpp',
  'local@cw-file-hover-info.wh.cpp','local@cw-settings-styler.wh.cpp',
@@ -135,7 +133,7 @@ foreach ($dir in @($root, (Join-Path $root 'optional'))) {
     }
 }
 $scanned | Format-Table -AutoSize | Out-String | Write-Host
-Check "部署扫描恰好 27 个 mod" ($scanned.Count -eq 27) "实际 $($scanned.Count)"
+Check "部署扫描恰好 25 个 mod" ($scanned.Count -eq 25) "实际 $($scanned.Count)"
 Check "全部为 cw- id" (($scanned | Where-Object { $_.Id -notlike 'local@cw-*' }).Count -eq 0)
 Check "Include 全部可解析（非空）" (($scanned | Where-Object { -not $_.Include }).Count -eq 0)
 

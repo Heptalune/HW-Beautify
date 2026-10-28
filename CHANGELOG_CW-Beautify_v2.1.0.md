@@ -3,7 +3,7 @@
 > CW-Beautify 整合包（GPL-3.0），作者 Heptalune（https://github.com/Heptalune/CW-Beautify）。
 > 各 mod 的原作者署名与许可证全部保留；本整合包以 GPL-3.0 发布。
 
-本版在 v2.0.0 的 20 模组基础上调整为 **27 个模组（22 核心 + 5 可选）**，并对齐上游 ZenDesktop 的最新模组阵容。
+本版在 v2.0.0 的 20 模组基础上调整为 **25 个模组（21 核心 + 4 可选）**，并对齐上游 ZenDesktop 的最新模组阵容。
 
 ## 调整（3 个）
 
@@ -28,7 +28,6 @@
 | CW-显示桌面按钮预览 | [Aero Peek on "Show desktop" button hover](https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek) | m417z | 1.0.2 → 1.0.3 |
 | CW-任务栏弹性药丸 | [Taskbar Elastic WinUI Pill](https://windhawk.net/mods/taskbar-elastic-pill) | Lockframe | 2.0.1 → 2.0.2 |
 | CW-自定义右键菜单 | [Custom Cached Context Menu](https://windhawk.net/mods/custom-cached-context-menu) | BOLT | 1.1.1 → 1.1.2 |
-| CW-资源管理器文件大小 | [Better file sizes in Explorer details](https://windhawk.net/mods/explorer-details-better-file-sizes) | m417z | 1.6 → 1.7 |
 | CW-半透明窗口 | [Translucent Windows](https://windhawk.net/mods/translucent-windows) | Undisputed00x | 1.8.2 → 1.8.3 |
 | CW-任务栏时钟自定义 | [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization) | m417z | 1.8.1 → 1.8.2 |
 | CW-最大化自动隐藏任务栏 | [Taskbar auto-hide when maximized](https://windhawk.net/mods/taskbar-auto-hide-when-maximized) | m417z | 1.2.6 → 1.2.7 |

@@ -25,12 +25,10 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-显示桌面按钮预览（cw-aero-peek） | m417z, Aero Peek on "Show desktop" button hover；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek |
 | CW-任务栏弹性药丸（cw-taskbar-elastic-pill） | Lockframe, Taskbar Elastic WinUI Pill；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-elastic-pill |
 | CW-自定义右键菜单（cw-custom-context-menu） | BOLT, Custom Cached Context Menu；汉化 | MIT | https://windhawk.net/mods/custom-cached-context-menu |
-| CW-资源管理器文件大小（cw-explorer-details-file-sizes） | m417z, Better file sizes in Explorer details；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-details-better-file-sizes |
 | CW-半透明窗口（cw-translucent-windows） | Undisputed00x, Translucent Windows；汉化 | MIT | https://windhawk.net/mods/translucent-windows |
 | CW-任务栏时钟自定义（cw-taskbar-clock-customization） | m417z, Taskbar Clock Customization；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-clock-customization |
 | CW-最大化自动隐藏任务栏（cw-taskbar-autohide-when-maximized） | m417z, Taskbar auto-hide when maximized；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-auto-hide-when-maximized |
 | CW-果冻窗口（cw-wobbly-windows，可选） | lalimatyus, Wobbly Windows；汉化 | GPL-3.0-only | https://windhawk.net/mods/wobbly-windows |
-| CW-桌面时钟（cw-desktop-clock，可选） | 上游 ZenDesktop 原创（Lanbo, m417z），CW-Beautify 适配 | GPL-3.0 | 本上游仓库 |
 | CW-任务栏歌词（cw-taskbar-lyrics） | 上游 ZenDesktop 原创（Lanbo），CW-Beautify 适配 | GPL-3.0 | 本上游仓库 |
 
 ## 可选模组（仅在部署时选择安装才启用）

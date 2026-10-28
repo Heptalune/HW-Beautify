@@ -23,7 +23,6 @@ common_files = [
     'local@cw-taskbar-elastic-pill.wh.cpp',
     'local@cw-custom-context-menu.wh.cpp',
     'local@cw-taskbar-lyrics.wh.cpp',
-    'local@cw-explorer-details-file-sizes.wh.cpp',
     'local@cw-translucent-windows.wh.cpp',
     'local@cw-taskbar-clock-customization.wh.cpp',
     'local@cw-taskbar-autohide-when-maximized.wh.cpp',
@@ -46,7 +45,6 @@ common_files = [
     'optional/local@cw-alt-tab-flip-3d.wh.cpp',
     'optional/local@cw-mac-island-dock.wh.cpp',
     'optional/local@cw-wobbly-windows.wh.cpp',
-    'optional/local@cw-desktop-clock.wh.cpp',
     'optional/THIRD_PARTY_NOTICES.md',
 ]
 

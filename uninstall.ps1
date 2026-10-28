@@ -53,12 +53,11 @@ foreach ($id in @(
     "local@cw-taskbar-wheel-cycle",
     "local@cw-thumbnail-size",
     "local@cw-taskbar-lyrics",
-    "local@cw-explorer-details-file-sizes",
     "local@cw-translucent-windows",
     "local@cw-taskbar-clock-customization",
     "local@cw-taskbar-autohide-when-maximized",
     "local@cw-wobbly-windows",
-    "local@cw-desktop-clock",
+
     "local@cw-extension-no-warning",
     "local@cw-file-operation-styler",
     "local@cw-audioswap",

@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-自定义右键菜单
 // @description     Instantly-opening cached Explorer context menu that is fully customizable: themes, layout, colors, animations, rules, and custom commands.
 // @description:zh-CN 把资源管理器右键菜单换成自绘的即时打开菜单，主题、布局、颜色、动画、规则全面可自定义。
-// @version         1.1.2
+// @version         1.1.3
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lole32 -lshlwapi -luuid -lcomctl32 -ladvapi32 -lgdi32 -luxtheme -lversion -ld3d11 -ld2d1 -ldwrite -ldcomp
@@ -13,47 +13,75 @@
 // @github          https://github.com/Bolt-Scripts
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.1.1 逐字节一致。
+// CW-Beautify 整合说明：汉化元数据、说明与设置文案；v1.1.3 起自绘菜单的核心骨架标签
+// 也已全部汉化（见下第 1 条），其余代码逻辑与上游 1.1.1 一致。
 // 原版 mod：https://windhawk.net/mods/custom-cached-context-menu
 //
 // 设置外汉化说明（用户可见英文清单）：除 Windhawk 设置界面外，本模组在自绘菜单与生成的
-// 配置文件里还有大量内建英文文案，合计约 300 处，远超可直接改码的阈值（20 处），故按整合
-// 规范仅在此列清单、代码保持与上游逐字节一致，未做改动。行号均指上游 1.1.1 源码：
-// 1. 菜单核心骨架标签（约 60 处；行 290、428、1175-1299、4591、13533-13700 附近）：
-//    L"Open"、L"View"（含 L"Extra large icons"~L"Content"、L"Auto arrange icons"、
-//    L"Align icons to grid"）、L"Sort by"、L"Group by"、L"(None)"、L"Ascending" /
-//    L"Descending"、L"Refresh"、L"Paste"、L"Paste shortcut"、L"New"、L"Display settings"、
-//    L"Personalize"、L"Open in new window"、L"Pin to Quick access"、L"Properties"、
-//    L"Open with"、L"Cut"、L"Copy"、L"Rename"、L"Delete"、L"Create shortcut"、L"Send to"、
-//    L"Copy as path"、L"Show classic menu"、L"Open in new process"、L"Menu settings…"、
-//    L"More options"（「更多选项」子菜单默认标签）、L"New folder"、L"New shortcut"、
-//    L"Text Document"、L"Bitmap image"、L"Rich Text Document" 等。上游 README 的
-//    Limitations 亦写明核心标签为英文；且 menu.ini 规则支持 label: 匹配这些标签、
-//    advancedSubmenuLabel 参与子菜单去重比较（行 20482），改动会影响匹配行为，故保留。
+// 配置文件里还有大量内建英文文案。v1.1.3 已把第 1 类「菜单核心骨架标签」全部汉化并同步
+// 相关匹配逻辑；其余类别仍按整合规范保留英文。行号均指上游 1.1.1 源码：
+// 1. 菜单核心骨架标签（约 60 处；行 720、1175-1299、13495-13497、13533-13736 附近）
+//    —— v1.1.3 已汉化：L"Open"→打开（多选经 FormatMultiLabel 渲染为「打开 N 个项目」，
+//    后缀 L" items" 一并汉化）、L"View"→查看（含 L"Extra large icons"→超大图标、
+//    L"Large icons"→大图标、L"Medium icons"→中等图标、L"Small icons"→小图标、
+//    L"List"→列表、L"Details"→详细信息、L"Tiles"→平铺、L"Content"→内容、
+//    L"Auto arrange icons"→自动排列图标、L"Align icons to grid"→将图标与网格对齐）、
+//    L"Sort by"→排序方式、L"Group by"→分组依据、L"(None)"→(无)、
+//    L"Ascending"/L"Descending"→升序/降序、kShellPropertyLabels（名称/修改日期/类型/大小）、
+//    L"Refresh"→刷新、L"Paste"→粘贴、L"Paste shortcut"→粘贴快捷方式、L"New"→新建、
+//    L"Display settings"→显示设置、L"Personalize"→个性化、L"Open in new window"→在新窗口中打开、
+//    L"Pin to Quick access"→固定到快速访问、L"Properties"→属性、L"Open with"→打开方式、
+//    L"Cut"→剪切、L"Copy"→复制、L"Rename"→重命名、L"Delete"→删除、
+//    L"Create shortcut"→创建快捷方式、L"Send to"→发送到、L"Copy as path"→复制文件地址、
+//    L"Show classic menu"→显示经典菜单、L"Open in new process"→在新进程中打开、
+//    L"Menu settings…"→菜单设置…（含设置窗口同名表头）、L"More options"→更多选项、
+//    L"New folder"→新建文件夹、L"New shortcut"→新建快捷方式（这两处是新建文件/文件夹的
+//    命名基准）、L"Folder"→文件夹、L"Shortcut"→快捷方式、L"Text Document"→文本文档、
+//    L"Bitmap image"→位图图像、L"Rich Text Document"→RTF 文档、
+//    L"Compressed (zipped) Folder"→压缩(zipped)文件夹（后六者为「新建」子菜单的回退显示名）。
+//    同步修改的匹配处（显示与匹配必须一起改，行为才不变）：
+//    - 行 20482 item.label == L"Send to" → L"发送到"（Send to 子菜单的填充判断，
+//      与 BuildCoreModel 的 addSubmenu 标签一致）；
+//    - L"More options" 的全部默认值一起改为 L"更多选项"：Settings 结构体默认（行 324）、
+//      LoadSettings 空值回退（行 462）、AdvancedGroupingOptions 默认（行 4625），以及
+//      设置块 advancedSubmenuLabel 的默认值与生成的 menu.ini 示例
+//      move = thirdParty -> "更多选项"（行 2475）；20516 的查找用的是设置值本身，天然一致。
+//    - 合并/去重（MergeCoreWithCached）按 LabelsMatchIgnoreCase（按标签）与 canonicalVerb
+//      （按动词）双通道匹配，核心项动词（open/cut/copy/…）未改，行为不变；
+//      advancedSubmenuItems/exclude 的令牌匹配、menu.ini 规则的 label: 匹配均针对
+//      用户配置或 shell 提供的标签，核心动词匹配不受翻译影响。
+//    保留英文的例外：行 13760 IsOpenGroupItem 的 normalized.rfind(L"Open", 0) 前缀判断
+//    （匹配的是 shell 缓存项标签，核心项全部携带 kOpenVerbs 动词、不受影响；改它会破坏
+//    英文系统上无动词项的归组）；设置默认 advancedSubmenuItems 里的 "Give access to"
+//    （shell 提供的英文标签令牌，非核心标签）；行 15205 的 L"Folder"（注册表键名）。
+//    注意：若 Windhawk 设置里已保存过旧默认值 More options，「更多选项」子菜单标签需在
+//    设置里重置该项（或清除缓存）后才会更新。
 // 2. 菜单内设置界面（约 200 处；行 1989-2114、6013-6481、10992、13003-13108 附近）：
 //    外观架构表 kAppearanceSchema 全部 55 行的分组名 / 显示名 / 描述（L"Colors"、
 //    L"Layout"、L"Shadow"、L"Panel background color; also the blur tint." 等）；显示名
 //    别名表 kOverrides 共 47 项（L"Open animation"、L"Corner radius" 等）；取色器 / 字体 /
 //    圆角控件文案（L"Saturation / value"、L"Hue"、L"Alpha"、L"Hex"、L"Red"、L"Green"、
 //    L"Blue"、L"Alpha value"、L"Default (unset)"、L"Face"、L"Size"、L"Top left"~
-//    L"Bottom left"、L"Use cornerRadius (unset)"）；设置树入口与操作（L"Menu settings…"、
-//    L"Status"、L"Target"、L"Theme"、L"Windhawk settings…"、L"Open Windhawk"、
+//    L"Bottom left"、L"Use cornerRadius (unset)"）；设置树入口与操作（L"Status"、
+//    L"Target"、L"Theme"、L"Windhawk settings…"、L"Open Windhawk"、
 //    L"Reset <分组>…"、L"Reset all appearance…"、L"Open menu.ini"、L"Open theme file"、
 //    L"About"、L"Slide options…"、L"Scale options…"、L"Replay open animation"）；状态文案
 //    L"Saved"、L"Save failed"、L"Font not found"；以及 Windhawk 设置速览的 8 个提示标签
 //    （L"Theme"、L"Menu mode"、L"Show classic menu item"、L"Top action bar"、
 //    L"Submenu delay"、L"Bypass keys"、L"Debug logging"、L"Warmup delay"）。
+//    （其中菜单入口 L"Menu settings…" 与 L"Open in new process" 已于 v1.1.3 汉化。）
 // 3. 内置主题名 17 个（行 4827-5130）：L"Custom (menu.ini)"、L"Windows 11 Dark" 等 17 项。
 //    主题名同时用作 themes\<名称>.ini 的文件名与设置枚举键，翻译会导致主题文件无法定位，
 //    必须保留英文原名。
 // 4. menu.ini 生成模板与回写警告（行 2155-2205、2433-2452、3449-3462 附近）：生成的
 //    menu.ini 英文注释头与 Examples 示例块，以及回写文件的警告文本（"invalid integer,
 //    using…"、"value N clamped to…" 等）。为与上游配置文档（CONFIG.md）及用户既有
-//    menu.ini 保持兼容而保留。
+//    menu.ini 保持兼容而保留（v1.1.3 仅把示例里指向收纳子菜单的
+//    move = thirdParty -> "More options" 同步改为 "更多选项"）。
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**BOLT**（[Custom Cached Context Menu](https://windhawk.net/mods/custom-cached-context-menu)，MIT 协议）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，代码逻辑与上游 1.1.1 保持逐字节一致。
+> 原作者：**BOLT**（[Custom Cached Context Menu](https://windhawk.net/mods/custom-cached-context-menu)，MIT 协议）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，v1.1.3 起菜单核心标签也已全部汉化（其余代码逻辑与上游 1.1.1 一致）。
 
 # CW-自定义右键菜单
 
@@ -68,7 +96,7 @@
 - **主题**：内置 17 套主题（Windows 11/10 深浅色、Nord、Dracula、Solarized、Gruvbox、One Dark、Cyberpunk、Synthwave、Terminal Green、Amber CRT、Tokyo Night、AMOLED 纯黑、高对比度），也支持完整 `menu.ini` 控制；每套主题都是独立文件，可直接编辑或复制，主题选择永不改动 `menu.ini`。
 - **动画**：打开/关闭效果可自由组合（`fade`、`slide`、`scale`、`dissolve`、`crt`、`unfold`），缓动、时长、方向可调，子菜单动画可选。
 - **叠加特效**：绘制在菜单内容之上的组合特效（`noise`、`plasma`、`hue`、`glow`、`scanlines`、`vignette`），强度、动画速度、尺寸、帧间隔可调；`overlayAnimate` 可让特效在菜单停留期间持续动（默认关闭，否则只在开/关菜单时动画）；Terminal Green 与 Amber CRT 主题自带扫描线。
-- **菜单内设置**：在「More options（更多选项）」子菜单里，或用可选的全局热键打开；外观实时编辑（滑杆可输入数值、取色器、字体名带已安装字体校验、即时预览），改完写回当前主题文件或 `menu.ini`。
+- **菜单内设置**：在「更多选项」子菜单里，或用可选的全局热键打开；外观实时编辑（滑杆可输入数值、取色器、字体名带已安装字体校验、即时预览），改完写回当前主题文件或 `menu.ini`。
 - **零代码定制**：`menu.ini` 支持规则（`hide`/`keep`/`move`）、自定义命令、自定义子菜单、逐项覆盖和图标库，无需写代码。
 
 ## 设置说明
@@ -77,13 +105,13 @@
 - **菜单模式**：默认「自定义（推荐）」。「自定义」绘制自绘菜单，多次失败后自动回退经典菜单；「经典」始终使用系统自绘菜单。
 - **绕过按键**：右键时按住 Shift 可绕过本模组、显示原版经典菜单；按住 Ctrl 则显示完全未改动的系统原生菜单。
 - **菜单即时打开**：默认开启。原生回退菜单（经典模式、回退场景）通过 TPM_NOANIMATION 跳过系统打开动画。
-- **显示经典菜单项**：默认开启。在替换菜单底部添加一个「Show classic menu」入口，随时可切回经典菜单（该入口文案内置于代码，保持英文）。
+- **显示经典菜单项**：默认开启。在替换菜单底部添加一个「显示经典菜单」入口，随时可切回经典菜单。
 - **顶部操作栏**：默认关闭。开启后把剪切、复制、粘贴、重命名、删除移到菜单靠光标一侧的图标栏上，类似 Windows 11 菜单。仅自定义菜单模式生效。
 - **子菜单打开延迟**：默认 150 毫秒。悬停多少毫秒后打开子菜单；0 为立即打开，-1 保持 Windows 系统设置。
-- **移动 Windows 附加项 / 移动第三方处理程序**：默认都开启。把配置的 Windows 附加项、以及第三方 shell 扩展条目收纳进「More options」子菜单，让主菜单更清爽。
+- **移动 Windows 附加项 / 移动第三方处理程序**：默认都开启。把配置的 Windows 附加项、以及第三方 shell 扩展条目收纳进「更多选项」子菜单，让主菜单更清爽。
 - **要移动的 Windows 项目**：逗号分隔的 Windows 项目标签或动词（verb）。动词（如 `setdesktopwallpaper`）在任何语言下都能匹配；标签则按菜单显示语言匹配。GUID 动词命令还接受别名 `openterminal`、`editwithphotos`、`editwithpaint`、`editwithnotepad`。
 - **保留在主菜单中**：默认空。逗号分隔的第三方标签或动词，这些条目留在主菜单、不移入子菜单。
-- **「More options」子菜单标签**：默认 More options。收纳附加项的子菜单显示名称。
+- **「更多选项」子菜单标签**：默认 更多选项。收纳附加项的子菜单显示名称；若此前在设置里保存过旧默认值 More options，请重置该项以让新标签生效。
 - **设置热键**：默认空。可选的全局热键，按下即打开外观设置菜单（例如 `Ctrl+Alt+M`）；留空禁用。
 - **调试日志**：默认关闭。记录耗时与诊断信息，便于排查问题。
 - **清除缓存**：默认关闭。开启后删除已缓存的菜单模型，下次使用时自动重建。
@@ -105,15 +133,19 @@
 - 自绘菜单未接入 UI 自动化（UIA）；使用读屏软件请把菜单模式切到「经典」。
 - 过高的菜单不滚动，最多显示到工作区高度。
 - 导航窗格菜单按树节点缓存（会话内有效），每个节点首次打开仍需付出 shell 填充成本。
-- **菜单核心标签为英文**（Open、Cut、Copy、Paste 等）；缓存的扩展项标签来自 shell，会跟随系统语言。嵌入所选文件名的标签（例如 Extract to "<name>"）会用当前名称重新渲染。
+- 菜单核心标签已汉化（v1.1.3：打开、剪切、复制、粘贴等）；缓存的扩展项标签来自 shell，会跟随系统语言。嵌入所选文件名的标签（例如 Extract to "<name>"）会用当前名称重新渲染。
 - 原生回退菜单在打开期间通过系统 `MenuShowDelay` 值套用子菜单延迟（关闭时恢复）；Windows 没有按菜单设置延迟的 API。
 - 上下文菜单处理程序在 Explorer 进程内运行，故障的第三方 shell 扩展可能导致其崩溃（后台预构建会加载每一个已注册的处理程序）。若打开菜单时 Explorer 崩溃，请用 ShellExView 之类的工具禁用问题扩展。
+
+## 更新日志
+
+- **1.1.3**：右键菜单里的内建英文文字全部汉化（打开、打开方式、剪切、复制、粘贴、重命名、删除、创建快捷方式、发送到、复制文件地址、属性、刷新、查看、排序方式、分组依据、升序/降序、新建、新建文件夹、显示设置、个性化、显示经典菜单、更多选项、菜单设置… 等约 60 处），并同步更新了对应的匹配逻辑（「发送到」子菜单识别、「更多选项」子菜单默认标签与 menu.ini 示例等），菜单行为不变。**更新后请在模组设置里执行一次清除缓存，或重启资源管理器**，让新文字与重新构建的菜单立即生效；若「更多选项」子菜单标签未变化，说明设置里保存过旧默认值 More options，重置该项即可。菜单内设置界面（外观编辑器）的文案暂仍为英文。
 
 ## 致谢与许可
 
 - 原作 [Custom Cached Context Menu](https://github.com/Bolt-Scripts/custom-cached-context-menu) 由 **BOLT** 开发，以 MIT 协议发布；源码、问题反馈与完整配置指南见其 GitHub 仓库。
 - 原版 mod 页面：<https://windhawk.net/mods/custom-cached-context-menu>
-- 本整合版由 CW-Beautify 整合包（作者 Heptalune）维护：汉化元数据、说明与设置文案；代码逻辑与上游 1.1.1 逐字节一致。
+- 本整合版由 CW-Beautify 整合包（作者 Heptalune）维护：汉化元数据、说明、设置文案与菜单核心标签；其余代码逻辑与上游 1.1.1 一致。
 */
 // ==/WindhawkModReadme==
 
@@ -164,7 +196,7 @@
   $name: Show classic menu item
   $name:zh-CN: 显示经典菜单项
   $description: Add a "Show classic menu" entry at the bottom of the replacement menu.
-  $description:zh-CN: 在替换菜单底部添加一个「Show classic menu（显示经典菜单）」入口（该入口文案内置于代码，保持英文）。
+  $description:zh-CN: 在替换菜单底部添加一个「显示经典菜单」入口。
 - topBar: false
   $name: Top action bar
   $name:zh-CN: 顶部操作栏
@@ -179,12 +211,12 @@
   $name: Move Windows extras
   $name:zh-CN: 移动 Windows 附加项
   $description: Move the configured Windows extras into the More options submenu.
-  $description:zh-CN: 把下方配置的 Windows 附加项移入「More options（更多选项）」子菜单。
+  $description:zh-CN: 把下方配置的 Windows 附加项移入「更多选项」子菜单。
 - advancedSubmenuThirdParty: true
   $name: Move third-party handlers
   $name:zh-CN: 移动第三方处理程序
   $description: Move third-party shell extension entries into the More options submenu.
-  $description:zh-CN: 把第三方 shell 扩展条目移入「More options（更多选项）」子菜单。
+  $description:zh-CN: 把第三方 shell 扩展条目移入「更多选项」子菜单。
 - advancedSubmenuItems: "Windows.ModernShare, pintohomefile, casttodevice, Give access to, PreviousVersions, pintostartscreen, pintohome, openterminal, setdesktopwallpaper"
   $name: Windows items to move
   $name:zh-CN: 要移动的 Windows 项目
@@ -195,9 +227,9 @@
   $name:zh-CN: 保留在主菜单中
   $description: Comma-separated third-party labels or verbs that stay in the main menu instead of moving into the submenu.
   $description:zh-CN: 逗号分隔的第三方标签或动词，这些条目保留在主菜单、不移入子菜单。
-- advancedSubmenuLabel: More options
+- advancedSubmenuLabel: 更多选项
   $name: More options submenu label
-  $name:zh-CN: 「More options」子菜单标签
+  $name:zh-CN: 「更多选项」子菜单标签
   $description: Label of the submenu that collects extra items.
   $description:zh-CN: 收纳附加项的子菜单显示名称。
 - settingsHotkey: ""
@@ -321,7 +353,7 @@ struct Settings {
     bool instantMenuFade = true;
     bool advancedSubmenuWindows = true;
     bool advancedSubmenuThirdParty = true;
-    std::wstring advancedSubmenuLabel = L"More options";
+    std::wstring advancedSubmenuLabel = L"更多选项";
     std::vector<std::wstring> advancedSubmenuItems;
     std::vector<std::wstring> advancedSubmenuExclude;
 };
@@ -459,7 +491,7 @@ void LoadSettings() {
     WindhawkUtils::StringSetting advancedLabel =
         WindhawkUtils::StringSetting::make(L"advancedSubmenuLabel");
     next.advancedSubmenuLabel =
-        advancedLabel.get()[0] ? advancedLabel.get() : L"More options";
+        advancedLabel.get()[0] ? advancedLabel.get() : L"更多选项";
 
     WindhawkUtils::StringSetting advancedItems =
         WindhawkUtils::StringSetting::make(L"advancedSubmenuItems");
@@ -721,7 +753,7 @@ std::wstring FormatMultiLabel(std::wstring_view verb, size_t count) {
     if (count <= 1) {
         return std::wstring(verb);
     }
-    return std::wstring(verb) + L" " + std::to_wstring(count) + L" items";
+    return std::wstring(verb) + L" " + std::to_wstring(count) + L" 个项目";
 }
 
 // Prunes items that cannot be shown faithfully: non-separator items without
@@ -1189,7 +1221,7 @@ void EnsureNewTemplates() {
     if (!hasZip) {
         NewTemplate zip;
         zip.kind = NewTemplate::Kind::Data;
-        zip.displayName = L"Compressed (zipped) Folder";
+        zip.displayName = L"压缩(zipped)文件夹";
         zip.extension = L".zip";
         zip.data = {0x50, 0x4B, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -1206,9 +1238,9 @@ void EnsureNewTemplates() {
         const char* data;  // optional payload
     };
     const BuiltinTemplate kBuiltins[] = {
-        {L".txt", L"Text Document", NewTemplate::Kind::NullFile, nullptr},
-        {L".bmp", L"Bitmap image", NewTemplate::Kind::NullFile, nullptr},
-        {L".rtf", L"Rich Text Document", NewTemplate::Kind::Data, "{\\rtf1}"},
+        {L".txt", L"文本文档", NewTemplate::Kind::NullFile, nullptr},
+        {L".bmp", L"位图图像", NewTemplate::Kind::NullFile, nullptr},
+        {L".rtf", L"RTF 文档", NewTemplate::Kind::Data, "{\\rtf1}"},
     };
     for (const BuiltinTemplate& builtin : kBuiltins) {
         bool present = false;
@@ -1239,11 +1271,11 @@ void EnsureNewTemplates() {
     std::vector<NewTemplate> built;
     NewTemplate folder;
     folder.kind = NewTemplate::Kind::Folder;
-    folder.displayName = L"Folder";
+    folder.displayName = L"文件夹";
     built.push_back(std::move(folder));
     NewTemplate shortcut;
     shortcut.kind = NewTemplate::Kind::Shortcut;
-    shortcut.displayName = L"Shortcut";
+    shortcut.displayName = L"快捷方式";
     shortcut.command = ExpandEnv(shortcutCommand);
     built.push_back(std::move(shortcut));
     for (NewTemplate& tmpl : filtered) {
@@ -1316,7 +1348,7 @@ bool CreateNewItemInFolder(const NewTemplate& tmpl, const std::wstring& director
     }
 
     if (tmpl.kind == NewTemplate::Kind::Folder) {
-        const std::wstring path = MakeUniquePath(directory, L"New folder", L"");
+        const std::wstring path = MakeUniquePath(directory, L"新建文件夹", L"");
         if (path.empty() || !CreateDirectoryW(path.c_str(), nullptr)) {
             return false;
         }
@@ -1330,7 +1362,7 @@ bool CreateNewItemInFolder(const NewTemplate& tmpl, const std::wstring& director
         // ShellNew command, quoted so paths with spaces survive.
         std::wstring itemPath;
         if (tmpl.kind == NewTemplate::Kind::Shortcut) {
-            itemPath = MakeUniquePath(directory, L"New shortcut", L".lnk");
+            itemPath = MakeUniquePath(directory, L"新建快捷方式", L".lnk");
             if (itemPath.empty()) {
                 return false;
             }
@@ -2472,7 +2504,7 @@ std::wstring GenerateDefaultConfigText() {
         L"; [rules]                             ; predicates: label / verb / ext / thirdParty / rule\n"
         L"; hide = label:\"Cast to Device\"       ; drop matching items\n"
         L"; keep = label:Share                  ; protect from the built-in grouping\n"
-        L"; move = thirdParty -> \"More options\"  ; move matches into a submenu\n"
+        L"; move = thirdParty -> \"更多选项\"  ; move matches into a submenu\n"
         L";\n"
         L"; [command \"Open in VS Code\"]         ; custom command (%1 file, %* all, %dir% folder)\n"
         L"; command = code.exe \"%1\"\n"
@@ -4622,7 +4654,7 @@ RulesApplication ApplyRulesConfigToModel(MenuModel& model,
 struct AdvancedGroupingOptions {
     bool moveWindows = true;
     bool moveThirdParty = true;
-    std::wstring label = L"More options";
+    std::wstring label = L"更多选项";
     std::vector<std::wstring> windowsItems;
     std::vector<std::wstring> exclude;
     const RulesConfig* rules = nullptr;
@@ -6299,7 +6331,7 @@ std::vector<MenuItem> BuildSettingsTree(const SettingsModelInputs& inputs) {
     const Appearance& working = inputs.working;
     std::vector<MenuItem> root;
 
-    root.push_back(MakeSettingsItem(ItemKind::Header, L"Menu settings"));
+    root.push_back(MakeSettingsItem(ItemKind::Header, L"菜单设置"));
 
     MenuItem status = MakeSettingsItem(ItemKind::Command, L"Status");
     status.control.kind = ControlKind::Info;
@@ -6496,7 +6528,7 @@ void AppendOpenNewProcessEntry(std::vector<MenuItem>& items) {
     MenuItem separator = MakeSettingsItem(ItemKind::Separator, L"");
     separator.action = ActionKind::ViewAction;
     items.push_back(std::move(separator));
-    MenuItem row = MakeSettingsItem(ItemKind::Command, L"Open in new process");
+    MenuItem row = MakeSettingsItem(ItemKind::Command, L"在新进程中打开");
     row.id = 0xF301;
     row.action = ActionKind::Builtin;
     row.builtinAction = BuiltinAction::OpenNewProcess;
@@ -6512,7 +6544,7 @@ void AppendSettingsEntry(std::vector<MenuItem>& items) {
     MenuItem separator = MakeSettingsItem(ItemKind::Separator, L"");
     separator.action = ActionKind::ViewAction;
     items.push_back(std::move(separator));
-    MenuItem row = MakeSettingsItem(ItemKind::Command, L"Menu settings\u2026");
+    MenuItem row = MakeSettingsItem(ItemKind::Command, L"菜单设置\u2026");
     row.id = 0xF300;  // unique: FindById must resolve this row, not id 0
     row.action = ActionKind::Builtin;
     row.builtinAction = BuiltinAction::OpenSettings;
@@ -13492,8 +13524,8 @@ const PROPERTYKEY kShellPropertyKeys[] = {
     {{0xB725F130, 0x47EF, 0x101A, {0xA5, 0xF1, 0x02, 0x60, 0x8C, 0x9E, 0xEB, 0xAC}},
      12},  // Size
 };
-const wchar_t* const kShellPropertyLabels[] = {L"Name", L"Date modified", L"Type",
-                                               L"Size"};
+const wchar_t* const kShellPropertyLabels[] = {L"名称", L"修改日期", L"类型",
+                                               L"大小"};
 constexpr uint32_t kShellPropertyKeyCount = ARRAYSIZE(kShellPropertyKeys);
 constexpr uint32_t kGroupNoneIndex = 0xFFFFFFFF;
 
@@ -13564,39 +13596,39 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
         item.id = nextId++;
         item.kind = ItemKind::Command;
         item.action = ActionKind::Fallback;
-        item.label = L"Show classic menu";
+        item.label = L"显示经典菜单";
         model.items.push_back(std::move(item));
     };
 
     const bool multi = shape == Shape::Multi;
     const uint32_t multiDisabled = multi ? kModelDisabled : kModelNone;
-    const std::wstring openLabel = FormatMultiLabel(L"Open", paths.size());
+    const std::wstring openLabel = FormatMultiLabel(L"打开", paths.size());
 
     if (scope == Scope::Background || scope == Scope::Desktop) {
-        MenuItem& viewMenu = addSubmenu(L"View");
+        MenuItem& viewMenu = addSubmenu(L"查看");
         viewMenu.iconRef = L"@glyph:E890";
-        viewMenu.children.push_back(makeViewAction(L"Extra large icons", L"viewxlarge",
+        viewMenu.children.push_back(makeViewAction(L"超大图标", L"viewxlarge",
                                                    ViewAction::ViewExtraLargeIcons,
                                                    kModelNone, L"@icon:view-xlarge", 256));
-        viewMenu.children.push_back(makeViewAction(L"Large icons", L"viewlarge",
+        viewMenu.children.push_back(makeViewAction(L"大图标", L"viewlarge",
                                                    ViewAction::ViewLargeIcons, kModelNone,
                                                    L"@icon:view-large", 96));
-        viewMenu.children.push_back(makeViewAction(L"Medium icons", L"viewmedium",
+        viewMenu.children.push_back(makeViewAction(L"中等图标", L"viewmedium",
                                                    ViewAction::ViewMediumIcons, kModelNone,
                                                    L"@icon:view-medium", 48));
-        viewMenu.children.push_back(makeViewAction(L"Small icons", L"viewsmall",
+        viewMenu.children.push_back(makeViewAction(L"小图标", L"viewsmall",
                                                    ViewAction::ViewSmallIcons, kModelNone,
                                                    L"@icon:view-small"));
-        viewMenu.children.push_back(makeViewAction(L"List", L"viewlist",
+        viewMenu.children.push_back(makeViewAction(L"列表", L"viewlist",
                                                    ViewAction::ViewList, kModelNone,
                                                    L"@icon:view-list"));
-        viewMenu.children.push_back(makeViewAction(L"Details", L"viewdetails",
+        viewMenu.children.push_back(makeViewAction(L"详细信息", L"viewdetails",
                                                    ViewAction::ViewDetails, kModelNone,
                                                    L"@icon:view-details"));
-        viewMenu.children.push_back(makeViewAction(L"Tiles", L"viewtiles",
+        viewMenu.children.push_back(makeViewAction(L"平铺", L"viewtiles",
                                                    ViewAction::ViewTiles, kModelNone,
                                                    L"@icon:view-tiles"));
-        viewMenu.children.push_back(makeViewAction(L"Content", L"viewcontent",
+        viewMenu.children.push_back(makeViewAction(L"内容", L"viewcontent",
                                                    ViewAction::ViewContent, kModelNone,
                                                    L"@icon:view-content"));
         {
@@ -13605,12 +13637,12 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
             separator.kind = ItemKind::Separator;
             viewMenu.children.push_back(std::move(separator));
         }
-        viewMenu.children.push_back(makeViewAction(L"Auto arrange icons", L"autoarrange",
+        viewMenu.children.push_back(makeViewAction(L"自动排列图标", L"autoarrange",
                                                    ViewAction::AutoArrange, kModelNone));
-        viewMenu.children.push_back(makeViewAction(L"Align icons to grid", L"aligngrid",
+        viewMenu.children.push_back(makeViewAction(L"将图标与网格对齐", L"aligngrid",
                                                    ViewAction::AlignToGrid, kModelNone));
 
-        MenuItem& sortMenu = addSubmenu(L"Sort by");
+        MenuItem& sortMenu = addSubmenu(L"排序方式");
         sortMenu.iconRef = L"@glyph:E8CB";
         for (uint32_t i = 0; i < kShellPropertyKeyCount; ++i) {
             MenuItem sortItem{};
@@ -13632,19 +13664,19 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
             MenuItem directionItem{};
             directionItem.id = nextId++;
             directionItem.kind = ItemKind::Command;
-            directionItem.label = ascending ? L"Ascending" : L"Descending";
+            directionItem.label = ascending ? L"升序" : L"降序";
             directionItem.action = ActionKind::SortDirection;
             directionItem.sortAscending = ascending;
             sortMenu.children.push_back(std::move(directionItem));
         }
 
-        MenuItem& groupMenu = addSubmenu(L"Group by");
+        MenuItem& groupMenu = addSubmenu(L"分组依据");
         groupMenu.iconRef = L"@glyph:E902";
         {
             MenuItem noneItem{};
             noneItem.id = nextId++;
             noneItem.kind = ItemKind::Command;
-            noneItem.label = L"(None)";
+            noneItem.label = L"(无)";
             noneItem.action = ActionKind::GroupBy;
             noneItem.sortIndex = kGroupNoneIndex;
             groupMenu.children.push_back(std::move(noneItem));
@@ -13668,24 +13700,24 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
             MenuItem directionItem{};
             directionItem.id = nextId++;
             directionItem.kind = ItemKind::Command;
-            directionItem.label = ascending ? L"Ascending" : L"Descending";
+            directionItem.label = ascending ? L"升序" : L"降序";
             directionItem.action = ActionKind::GroupDirection;
             directionItem.sortAscending = ascending;
             groupMenu.children.push_back(std::move(directionItem));
         }
 
-        addViewAction(L"Refresh", L"refresh", ViewAction::Refresh, kModelNone,
+        addViewAction(L"刷新", L"refresh", ViewAction::Refresh, kModelNone,
                       L"@glyph:E72C");
         addSeparator();
-        addCommand(L"Paste", L"paste", kModelNone, L"@glyph:E77F");
-        addCommand(L"Paste shortcut", L"pastelink");
+        addCommand(L"粘贴", L"paste", kModelNone, L"@glyph:E77F");
+        addCommand(L"粘贴快捷方式", L"pastelink");
         addSeparator();
-        MenuItem& newMenu = addSubmenu(L"New");
+        MenuItem& newMenu = addSubmenu(L"新建");
         BuildNewMenuChildren(newMenu.children, nextId);
         if (scope == Scope::Desktop) {
             addSeparator();
-            addCommand(L"Display settings", L"display", kModelNone, L"@glyph:E7F4");
-            addCommand(L"Personalize", L"personalize", kModelNone, L"@glyph:E790");
+            addCommand(L"显示设置", L"display", kModelNone, L"@glyph:E7F4");
+            addCommand(L"个性化", L"personalize", kModelNone, L"@glyph:E790");
         }
         addSeparator();
         addFallback();
@@ -13694,10 +13726,10 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
 
     if (scope == Scope::Drive) {
         addCommand(openLabel, L"open", kModelDefault);
-        addCommand(L"Open in new window", L"opennew");
-        addCommand(L"Pin to Quick access", L"pintohome");
+        addCommand(L"在新窗口中打开", L"opennew");
+        addCommand(L"固定到快速访问", L"pintohome");
         addSeparator();
-        addCommand(L"Properties", L"properties", kModelNone, L"@glyph:E713");
+        addCommand(L"属性", L"properties", kModelNone, L"@glyph:E713");
         addSeparator();
         addFallback();
         return model;
@@ -13705,30 +13737,30 @@ MenuModel BuildCoreModel(Scope scope, const std::vector<std::wstring>& paths, Sh
 
     if (scope == Scope::Folders) {
         addCommand(openLabel, L"open", kModelDefault);
-        addCommand(L"Open in new window", L"opennew");
-        addCommand(L"Pin to Quick access", L"pintohome");
+        addCommand(L"在新窗口中打开", L"opennew");
+        addCommand(L"固定到快速访问", L"pintohome");
         addSeparator();
         if (shape == Shape::Single) {
             // A single folder pastes into itself, like the Windows 11 menu.
-            addCommand(L"Paste", L"paste", kModelNone, L"@glyph:E77F");
+            addCommand(L"粘贴", L"paste", kModelNone, L"@glyph:E77F");
         }
     } else {
         addCommand(openLabel, L"open", kModelDefault);
-        addCommand(L"Open with", L"openwith", kModelNone, L"@glyph:E8E5");
+        addCommand(L"打开方式", L"openwith", kModelNone, L"@glyph:E8E5");
         addSeparator();
     }
 
-    addCommand(L"Cut", L"cut", kModelNone, L"@glyph:E8C6");
-    addCommand(L"Copy", L"copy", kModelNone, L"@glyph:E8C8");
-    addViewAction(L"Rename", L"rename", ViewAction::Rename, multiDisabled,
+    addCommand(L"剪切", L"cut", kModelNone, L"@glyph:E8C6");
+    addCommand(L"复制", L"copy", kModelNone, L"@glyph:E8C8");
+    addViewAction(L"重命名", L"rename", ViewAction::Rename, multiDisabled,
                   L"@glyph:E8AC");
-    addCommand(L"Delete", L"delete", kModelNone, L"@glyph:E74D");
+    addCommand(L"删除", L"delete", kModelNone, L"@glyph:E74D");
     addSeparator();
-    addCommand(L"Create shortcut", L"createshortcut", multiDisabled);
-    addSubmenu(L"Send to");
-    addCommand(L"Copy as path", L"copyaspath");
+    addCommand(L"创建快捷方式", L"createshortcut", multiDisabled);
+    addSubmenu(L"发送到");
+    addCommand(L"复制文件地址", L"copyaspath");
     addSeparator();
-    addCommand(L"Properties", L"properties", kModelNone, L"@glyph:E713");
+    addCommand(L"属性", L"properties", kModelNone, L"@glyph:E713");
     addSeparator();
     addFallback();
 
@@ -20479,7 +20511,7 @@ bool ShowReplacementMenu(PendingCapture& capture, ShellViewKind kind, HWND owner
             if (item.canonicalVerb == L"paste" && !clipboardHadData) {
                 item.flags |= kModelDisabled;
             }
-            if (item.kind == ItemKind::Submenu && item.label == L"Send to" &&
+            if (item.kind == ItemKind::Submenu && item.label == L"发送到" &&
                 item.children.empty()) {
                 item.children = GetSendToChildren();
             }

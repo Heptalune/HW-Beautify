@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（22 核心 + 5 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
+包含的 Mod（21 核心 + 4 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
 _Online 版（已装好 Windhawk 的用户用）。v1.0.0 的「Offline」包实为
@@ -110,7 +110,7 @@ dwm.exe、排除列表加过一些游戏进程，卸载不会改动，想还原�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-27 Windhawk mods (22 core + 5 optional), localized into Simplified Chinese.
+25 Windhawk mods (21 core + 4 optional), localized into Simplified Chinese.
 Extract the zip, run deploy.bat as administrator, then enable the mods you
 want in Windhawk (all are installed disabled). Upgrading keeps toggles and
 settings. Uninstall: run uninstall.bat. See README.md for details.

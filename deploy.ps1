@@ -484,8 +484,7 @@ $coreModIds = @(
     "local@cw-aero-peek",
     "local@cw-taskbar-elastic-pill",
     "local@cw-taskbar-lyrics", "local@cw-explorer-details-file-sizes",
-    "local@cw-translucent-windows", "local@cw-taskbar-clock-customization",
-    "local@cw-taskbar-autohide-when-maximized"
+    "local@cw-translucent-windows", "local@cw-taskbar-autohide-when-maximized"
 )
 $preselected = @()
 if ($Optional) {
