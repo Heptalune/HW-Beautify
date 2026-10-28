@@ -1,25 +1,43 @@
 ========================================================================
-             CW桌面美化 一键部署包 v1.0.0
+             CW-Beautify 一键部署包 v2.0.0
 ========================================================================
 
-CW桌面美化是一套 Windows 11 桌面美化 mod，运行在 Windhawk 上。
-整合自多个开源 Windhawk 模组项目（GPL-3.0），并加入三个汉化的
-社区模组；各模组的原作者信息保留在每个 mod 的说明里。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在
+Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量汉化；
+各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（装好后默认全部关闭，在 Windhawk 里按需打开）
+包含的 Mod（17 核心 + 3 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
 ========================================================================
+说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
+_Online 版（已装好 Windhawk 的用户用）。v1.0.0 的「Offline」包实为
+误打的重复内容，不再提供。
   CW-任务栏美化                 任务栏玻璃背景（默认自定义玻璃，可选液态玻璃等），
-                                Win+X 菜单、托盘溢出、音量浮窗一起美化
+                                Win+X 菜单、托盘溢出、音量浮窗一起美化；
+                                已整合任务栏高度与图标大小调整
   CW-开始菜单美化               开始菜单与搜索页玻璃效果，可调尺寸
   CW-通知栏美化                 通知中心、日历、快捷设置玻璃效果，浅色模式加白底
   CW-文件管理器美化             文件管理器整窗半透明，右键菜单玻璃（测试中），
                                 取代 ExplorerBlurMica
   CW-桌面双击隐藏图标           双击桌面空白处隐藏/显示图标，闲置时可自动隐藏
-  CW-任务栏高度与图标大小       调任务栏高度、图标大小，提升图标清晰度（汉化新版）
-  CW-任务栏音量控制             任务栏上滚动滚轮调音量，支持全屏与任意位置滚动（汉化新版）
-  CW-任务栏 Dock 动画           macOS 风格的图标悬停放大动画（Beta，汉化新版）
-  CW-窗口动画（可选）           关窗、最小化、还原、启动、Alt+Tab 动画，含 macOS 神奇效果
+  CW-任务栏音量控制             任务栏上滚动滚轮调音量，支持全屏与任意位置滚动；
+                                快捷键快速切换播放/录音设备（新增）
+  CW-任务栏 Dock 动画           macOS 风格的图标悬停放大动画（Beta）
+  CW-窗口滑动排列               拖动窗口自动吸附排列，配顺滑滑动动画（新增）
+  CW-托盘系统图标调整           隐藏/调整托盘系统图标与「显示桌面」按钮（新增）
+  CW-经典右键菜单               Win11 始终显示经典右键菜单（新增）
+  CW-任务栏秒显                 去掉自动隐藏任务栏的显示延迟，动画可调（新增）
+  CW-关闭扩展名修改警告         改扩展名不再弹确认警告（新增）
+  CW-文件操作美化               复制/移动/删除对话框换可自定义外观（新增）
+  CW-音频输出切换               托盘图标点击/滚轮循环切换首选音频设备（新增）
+  CW-分应用音量控制             悬停任务栏按钮滚动调单应用音量（新增）
+  CW-文件悬停信息               悬停文件显示可定制的详细信息卡片（新增）
+  CW-设置美化                   用社区主题/自定义样式美化设置应用（新增）
+
+  可选（部署时用 -Optional 参数选择安装）：
+  CW-窗口动画                   关窗、最小化、还原、启动动画，含 macOS 神奇效果
+  CW-窗口切换动画（Vista 风格）  Alt+Tab 换成 Vista Flip 3D 实时窗口堆栈
+  CW-Mac 灵动岛与 Dock          顶部 macOS 菜单栏式灵动岛 + 可选 Dock 任务栏
 
   每个 mod 的详细介绍见 README.md。
 
@@ -39,9 +57,11 @@ CW桌面美化是一套 Windows 11 桌面美化 mod，运行在 Windhawk 上。
 再次运行 deploy.bat（例如更新新版本）不会关掉你已打开的 mod，
 也不会覆盖你改过的设置，只补上新设置的默认值。
 
-从旧版部署升级：直接运行 deploy.bat 即可。旧模组的开关状态
-和设置会自动迁移到对应的 CW- 模组，旧条目会被清理。
-被移除的三个模组（设置美化、任务栏音乐与歌词、果冻窗口）也会被自动卸载。
+从旧版部署升级：直接运行 deploy.bat 即可。已开启的 mod 和已保存的设置
+都会保留（v2.0.0 会自动迁移旧主题命名）。被移除的旧模组会被自动卸载。
+
+从 v4.1 升级的旧用户：先双击 tools\uninstall-ExplorerBlurMica.bat，
+再运行 deploy.bat。
 
 ========================================================================
 卸载与恢复
@@ -50,7 +70,7 @@ CW桌面美化是一套 Windows 11 桌面美化 mod，运行在 Windhawk 上。
   - 从 Windhawk 移除全部 CW- 模组和旧版模组条目（源码、编译文件、
     mod 记录和设置）；
   - 删除开机自检计划任务（如果装过）；
-  - 询问是否删除 %LOCALAPPDATA%\CWDesktop（自检日志）；
+  - 询问是否删除 %LOCALAPPDATA%\CW-Beautify（自检日志，含更名前的旧目录）；
   - 询问是否重启资源管理器。
 Windhawk 本身和你自己装的其他 mod 不受影响。
 
@@ -67,35 +87,43 @@ dwm.exe、排除列表加过一些游戏进程，卸载不会改动，想还原�
   uninstall.bat / uninstall.ps1   一键卸载（同时清理旧版条目，不卸载 Windhawk）
   restart_explorer.bat            重启资源管理器
   local@*.wh.cpp                  各 mod 源码
-  optional\                       可选 mod（窗口动画）及第三方许可说明
+  optional\                       可选 mod（窗口动画、Vista 窗口切换动画、
+                                  Mac 灵动岛与 Dock）及第三方许可说明
   tools\uninstall-ExplorerBlurMica.bat  卸载旧版 ExplorerBlurMica（升级前运行）
-  tools\CWDesktop-StartupCheck.ps1   开机自检（可选，deploy.ps1 -StartupCheck check）
+  tools\CW-Beautify-StartupCheck.ps1    开机自检（可选，deploy.ps1 -StartupCheck check）
   windhawk_setup*.exe             Windhawk 官方安装程序（仅完整包/离线包）
   LICENSE                         GPL-3.0 许可证全文
+  CHANGELOG_CW-Beautify_v2.0.0.md 本版改动说明
 
 ========================================================================
 注意
 ========================================================================
 - 文件管理器美化不要和 ExplorerBlurMica 同时使用。以前注册过的，
   请先运行 tools\uninstall-ExplorerBlurMica.bat 卸载。
-- CW-任务栏 Dock 动画是 Beta 版，图标偶尔被任务栏裁切；配合
-  CW-任务栏高度与图标大小使用时，建议最大缩放不超过 130%。
+- CW-任务栏 Dock 动画是 Beta 版，图标偶尔被任务栏裁切；建议最大缩放
+  不超过 130%，或在任务栏美化里加高任务栏。
+- CW-Mac 灵动岛与 Dock 默认不改动系统任务栏；想要 Dock 需在其设置里
+  把「任务栏」选为「dock」。与任务栏美化同用时按其说明取舍。
 
 ========================================================================
 致谢与许可
 ========================================================================
-- Windhawk 与上游 Styler 系列 mod：m417z（GPL-3.0）。
-- 任务栏高度与图标大小、任务栏音量控制：m417z（GPL-3.0）。
-- 任务栏 Dock 动画：Ph0en1x-dev（GPL-3.0）。
-- 窗口动画：ReDrag（MIT），macOS 神奇效果：Abdullah Masood、Potassiumuncher。
-- 套件深度修改与汉化：Lanbo（GPL-3.0）。
+- Windhawk 与上游 Styler 系列 mod、音量控制等：m417z（GPL-3.0）。
+- 任务栏秒显：Bo0ii（GPL-3.0）；文件操作美化：digART（GPL-3.0）；
+  音频输出切换：BlackPaw（MIT）；文件悬停信息：HaVeN80。
+- 任务栏 Dock 动画：incconutwo（Plus fork）、Ph0en1x-dev（原版）（GPL-3.0）；
+  Mac 灵动岛与 Dock：caliberda（GPL-3.0）。
+- 窗口动画：ReDrag（MIT），macOS 神奇效果：Abdullah Masood、Potassiumuncher；
+  窗口切换动画（Vista 风格）：caliberda（MIT）。
+- 媒体设备快速切换参考 AudioSwitcher（xenolightning，MS-PL）重新实现。
+- 套件深度修改、汉化与桌面双击隐藏图标：Heptalune（GPL-3.0）。
 - 各 mod 的详细许可见其说明中的「致谢与许可」，第三方许可见 optional\THIRD_PARTY_NOTICES.md。
-- CW桌面美化以 GPL-3.0 发布，许可证全文见 LICENSE。
+- CW-Beautify 以 GPL-3.0 发布，许可证全文见 LICENSE。
 ========================================================================
 
-English: CW Desktop (CW桌面美化) is a Windows 11 styling suite of 9 Windhawk
-mods (deep modifications by Lanbo) with three localized community mods added.
+English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
+20 Windhawk mods (17 core + 3 optional), localized into Simplified Chinese.
 Extract the zip, run deploy.bat as administrator, then enable the mods you
-want in Windhawk (all are installed disabled). Upgrading from older packages:
-just run deploy.bat; toggle states and settings migrate to the new CW-* ids.
-Uninstall: run uninstall.bat. See README.md for details. License: GPL-3.0.
+want in Windhawk (all are installed disabled). Upgrading keeps toggles and
+settings. Uninstall: run uninstall.bat. See README.md for details.
+License: GPL-3.0.

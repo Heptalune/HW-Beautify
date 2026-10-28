@@ -1,5 +1,5 @@
 @echo off
-title CW Desktop One-Key Deploy Bootstrapper
+title CW-Beautify One-Key Deploy Bootstrapper
 setlocal EnableDelayedExpansion
 
 cd /d "%~dp0"
@@ -43,7 +43,7 @@ cd /d "%~dp0"
 color 0B
 
 echo ============================================================
-echo   CW Desktop One-Key Deploy (PowerShell Bootstrapper)
+echo   CW-Beautify One-Key Deploy (PowerShell Bootstrapper)
 echo ============================================================
 echo.
 

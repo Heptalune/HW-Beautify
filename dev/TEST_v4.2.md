@@ -1,14 +1,14 @@
-# v4.2 测试清单（Lanbo 照着打勾）
+# v4.2 测试清单（Heptalune 照着打勾）
 
 每一轮测试前都重启整台电脑。一次只多开一样。
 
 ## 第 0 轮：先看这里
-> 文件管理器透明请用 **ZenDesktop: 文件管理器美化**（`zen-explorer-styler`）。**不要**再注册 ExplorerBlurMica。
+> 文件管理器透明请用 **CW-Beautify: 文件管理器美化**（`cw-explorer-styler`）。**不要**再注册 ExplorerBlurMica。
 > 若以前注册过：管理员运行 `tools\uninstall-ExplorerBlurMica.bat`，再重启。
 
 ## 第 1 轮：基础包（不开任何可选项）
 - [ ] 运行 `deploy.bat`，不报错；**没有**弹出 ExplorerBlurMica 重新注册窗口
-- [ ] Windhawk 里能看到 `zen-explorer-styler`，默认关着；编译并开启后，文件管理器命令栏/地址栏可透明
+- [ ] Windhawk 里能看到 `cw-explorer-styler`，默认关着；编译并开启后，文件管理器命令栏/地址栏可透明
 - [ ] 桌面空白处右键：菜单应有模糊玻璃底（不是实心白/灰）；改「右键菜单：模糊」和「色调颜色」能立刻反映
 - [ ] 文件管理器里对文件右键：同样有玻璃效果；「右键菜单：玻璃效果」关掉后恢复系统默认
 - [ ] Shift+右键 /「显示更多选项」的经典菜单：本 mod 不改（预期）
@@ -29,7 +29,7 @@
 - [ ] 按几次 Win+D，再最小化、还原：没有闪烁，动画没被做两次
 
 ## 第 4 轮：任务栏歌词
-- [ ] 关掉系统小组件，开启 `zen-taskbar-lyrics`，播歌时有封面/歌词/三按钮
+- [ ] 关掉系统小组件，开启 `cw-taskbar-lyrics`，播歌时有封面/歌词/三按钮
 - [ ] （可选）按 `tools/ai-status` 接上 MCP，AI 状态能显示
 
 ## 第 5 轮：README / 发版材料

@@ -1,6 +1,6 @@
 ﻿# ============================================================
-#  CW桌面美化 Direct Injection Deploy Engine v1.0.0
-#  基于 CW v5.0.0 更名整合（GPL-3.0）
+#  CW-Beautify Direct Injection Deploy Engine v2.0.0
+#  GPL-3.0
 #  职责不变：只把 Mod 源码和元数据装到 Windhawk，不编译、不开启
 # ============================================================
 # v4.2-draft: optional mods can be preselected for unattended runs, e.g.
@@ -109,6 +109,40 @@ function Set-IniValueIfMissing ($path, $section, $key, $value) {
     if ($null -eq $existing) { Set-IniValue $path $section $key $value }
 }
 
+# v2.0 更名：mod 内部的主题值从 "Zen*" 改为 "CW*"。这里把用户已保存的、
+# 仍带旧前缀的字符串设置改写成新前缀，升级后主题不丢。
+# 只改真正包含 "Zen" 的值，其余一律不动。
+function Convert-LegacyThemeValues ($path) {
+    if ($script:IniStoreMode) {
+        $map = @{}
+        $path2 = $script:IniStorePath
+        if ((-not $path2) -or (-not (Test-Path -LiteralPath $path2))) { return }
+        $lines = [IO.File]::ReadAllLines($path2)
+        $inSettings = $false
+        foreach ($line in $lines) {
+            if ($line -match '^\s*\[(.+)\]\s*$') { $inSettings = ($Matches[1] -eq "Settings"); continue }
+            if ($inSettings -and $line -match '^\s*([^=]+?)\s*=\s*(.*)$') {
+                if ($Matches[2].Contains("Zen")) { $map[$Matches[1]] = ($Matches[2] -replace "Zen", "CW") }
+            }
+        }
+        foreach ($k in $map.Keys) { Set-IniValue $path2 "Settings" $k $map[$k] }
+        return
+    }
+    $key = Open-HklmKey $path
+    try {
+        foreach ($name in @($key.GetValueNames())) {
+            if ($key.GetValueKind($name) -ne [Microsoft.Win32.RegistryValueKind]::String) { continue }
+            $v = [string]$key.GetValue($name)
+            if ($v.Contains("Zen")) {
+                $key.SetValue($name, [string]($v -replace "Zen", "CW"), [Microsoft.Win32.RegistryValueKind]::String)
+                Write-Status "         [Settings] Migrated legacy theme value: $name" "Gray"
+            }
+        }
+    } finally {
+        $key.Close()
+    }
+}
+
 $script:IniStoreMode = $false
 $script:IniStorePath = ""
 
@@ -129,7 +163,7 @@ function Merge-ProcessList ($current, [string[]]$entries) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   CW桌面美化 Direct Injection Engine v1.0.0" "Green"
+Write-Status "   CW-Beautify Direct Injection Engine v2.0.0" "Green"
 Write-Status "================================================" "Green"
 
 # 1. Enforce Administrator Privileges
@@ -231,6 +265,8 @@ if (Test-Path $iniPath) {
 Write-Status "Windhawk Data Folder: $windhawkData" "DarkGreen"
 
 # 便携版检测：Portable=1 时模组状态存 <Data>\Engine\Mods\<id>.ini（标准版存 HKLM 注册表）
+# 注意（Windhawk 2.x 实测）：2.0 引擎的真实开关状态在 <Data>\Engine\Sessions\*.hiv
+# 会话 hive 与 ModsWritable 里，由 UI 写入；下面的 ini Disabled 值在 2.0 上不控制引擎。
 $script:IniStoreMode = $false
 $script:IniStorePath = ""
 $isPortable = $false
@@ -279,9 +315,16 @@ Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value (Merge-Process
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
 
 Write-Status "Stopping Windhawk Service & UI..."
-Stop-Process -Name windhawk -Force -ErrorAction SilentlyContinue
+# Windhawk 2.x 便携版没有 Windows 服务：引擎跑在 windhawk-mod.exe / windhawk.exe
+# 进程里。先用 -exit 优雅退出（会卸载会话 hive），再补杀全部相关进程，
+# 否则引擎在线检测到新复制的模组源码会把它们默认全部启用（v2.0 实测）。
+$windhawkExitExe = Join-Path $windhawkDir "windhawk.exe"
+if (Test-Path -LiteralPath $windhawkExitExe) {
+    & $windhawkExitExe -exit -wait 2>$null | Out-Null
+}
+Stop-Process -Name windhawk, "windhawk-mod", "windhawk-ui", "windhawk-mod-elevated" -Force -ErrorAction SilentlyContinue
 Stop-Service -Name Windhawk -Force -ErrorAction SilentlyContinue
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 2
 Write-Status "Windhawk successfully stopped." "Green"
 
 # 4. Copy and Inject Active Mods
@@ -297,7 +340,7 @@ if (-not (Test-Path $modsSource)) {
 #   无 local@ 前缀的社区原版是用户手动放入 ModsSource 的，已被 CW- 汉化版取代）
 $retiredMods = @(
     "local@taskbar-background-helper", "local@start-menu-size",
-    "local@windows-11-settings-styler-fork", "local@zen-taskbar-lyrics",
+    "local@windows-11-settings-styler-fork",
     "local@wobbly-windows", "local@macos-minimize-animation",
     "local@cw-taskbar-lyrics", "local@cw-dynamic-island", "local@cw-island-media",
     "local@cw-taskbar-icon-size",
@@ -329,21 +372,13 @@ foreach ($rMod in $retiredMods) {
 # Clean old mod files in portable leftovers if operating in standard mode
 if ($windhawkData -ne "$windhawkDir\AppData" -and (Test-Path "$windhawkDir\AppData\ModsSource")) {
     Write-Status "Cleaning leftover ModsSource in portable folder..." "Yellow"
-    Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@zen-*" -Force -ErrorAction SilentlyContinue
     Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@macos-*" -Force -ErrorAction SilentlyContinue
     Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@windows-11-settings-*" -Force -ErrorAction SilentlyContinue
 }
 
-# CW v1.0：CW → CW 更名迁移。旧 mod 状态存在且新 id 缺少对应值时，
-# 把开关状态（Disabled）与全部设置迁到新 id；然后清掉旧状态、旧源码与旧编译 DLL。
-# 新 id 已有同名值（用户已在 CW 版调过）的一律不覆盖；LibraryFileName 不迁移，
-# 新 id 必须由 Windhawk 平台重新编译。迁移前把旧文件备份到 Backup-CWMigration。
+# 更早一代整合包（v1.0.0 之前）的旧 id 迁移已由 v1.0.0 部署脚本完成，
+# 本版不再处理那些旧 id，只保留 windows-animations 的更名迁移。
 $renameMap = [ordered]@{
-    "local@zen-taskbar-acrylic"            = "local@cw-taskbar-acrylic"
-    "local@zen-startmenu-acrylic"          = "local@cw-startmenu-acrylic"
-    "local@zen-notificationcenter-acrylic" = "local@cw-notificationcenter-acrylic"
-    "local@zen-explorer-styler"            = "local@cw-explorer-styler"
-    "local@zen-desktop-toggle-icons"       = "local@cw-desktop-toggle-icons"
     "local@windows-animations"             = "local@cw-windows-animations"
 }
 $backupDir = Join-Path $windhawkData "Backup-CWMigration"
@@ -426,7 +461,16 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@cw-windows-animations")
+$optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock")
+# 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
+$coreModIds = @(
+    "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
+    "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
+    "local@cw-taskbar-dock-animation", "local@cw-window-arrangement", "local@cw-tray-system-icons",
+    "local@cw-classic-context-menu", "local@cw-taskbar-autohide-instant", "local@cw-extension-no-warning",
+    "local@cw-file-operation-styler", "local@cw-audioswap", "local@cw-volume-per-app",
+    "local@cw-file-hover-info", "local@cw-settings-styler"
+)
 $preselected = @()
 if ($Optional) {
     $preselected = $Optional.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne "none" } | ForEach-Object {
@@ -548,10 +592,11 @@ foreach ($file in $files) {
     # from their settings block (the engine reads the registry only and returns
     # 0 / "" for a missing value).
     $settingsPath = Join-Path $regPath "Settings"
+    Convert-LegacyThemeValues $settingsPath
 
     if ($id -eq "local@cw-explorer-styler") {
         $label = "File Explorer"
-        Set-RegValueIfMissing $settingsPath "theme" "ZenTranslucent" String $label
+        Set-RegValueIfMissing $settingsPath "theme" "CWTranslucent" String $label
         Set-RegValueIfMissing $settingsPath "tintPreset" "followSystem" String $label
         Set-RegValueIfMissing $settingsPath "tintColor" "#232323" String $label
         Set-RegValueIfMissing $settingsPath "tintOpacity" 23 DWord $label
@@ -618,6 +663,11 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "noAutomaticMuteToggle" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "volumeChangeStep" 2 DWord $label
         Set-RegValueIfMissing $settingsPath "oldTaskbarOnWin11" 0 DWord $label
+        # 1.3.4 起新增：媒体设备快速切换
+        Set-RegValueIfMissing $settingsPath "deviceSwitchPlaybackKey" "Ctrl+Alt+A" String $label
+        Set-RegValueIfMissing $settingsPath "deviceSwitchCaptureKey" "None" String $label
+        Set-RegValueIfMissing $settingsPath "deviceCycleSkipInactive" "1" String $label
+        Set-RegValueIfMissing $settingsPath "showDeviceSwitchToast" "1" String $label
     }
 
     if ($id -eq "local@cw-taskbar-dock-animation") {
@@ -646,6 +696,121 @@ foreach ($file in $files) {
     if ($id -eq "local@cw-notificationcenter-acrylic") {
         $label = "NotificationCenter Acrylic"
         Set-RegValueIfMissing $settingsPath "lightModeContrast" "standard" String $label
+    }
+
+    if ($id -eq "local@cw-window-arrangement") {
+        $label = "Window Arrangement"
+        Set-RegValueIfMissing $settingsPath "SnapWindowsWhenDragging" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "SnapWindowsDistance" 25 DWord $label
+        Set-RegValueIfMissing $settingsPath "KeysToDisableSnapping.Ctrl" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "KeysToDisableSnapping.Alt" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "KeysToDisableSnapping.Shift" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "SlidingAnimation" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "SnapWindowsWhenSliding" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "SlidingAnimationSlowdown" 15 DWord $label
+    }
+
+    if ($id -eq "local@cw-tray-system-icons") {
+        $label = "Tray System Icons"
+        Set-RegValueIfMissing $settingsPath "hideVolumeIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideNetworkIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideBatteryIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "grayscaleBatteryIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideMicrophoneIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideGeolocationIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideStudioEffectsIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideRecallIcon" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideLanguageBar" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideLanguageSupplementaryIcons" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideBellIcon" "never" String $label
+        Set-RegValueIfMissing $settingsPath "showDesktopButtonWidth" 12 DWord $label
+    }
+
+    if ($id -eq "local@cw-classic-context-menu") {
+        $label = "Classic Context Menu"
+        Set-RegValueIfMissing $settingsPath "overrideWithCtrl" 1 DWord $label
+    }
+
+    if ($id -eq "local@cw-taskbar-autohide-instant") {
+        $label = "Taskbar Autohide Instant"
+        Set-RegValueIfMissing $settingsPath "animationType" "slide" String $label
+        Set-RegValueIfMissing $settingsPath "showSpeedup" 400 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideSpeedup" 400 DWord $label
+        Set-RegValueIfMissing $settingsPath "showDuration" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideDuration" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "frameRate" 60 DWord $label
+        Set-RegValueIfMissing $settingsPath "unhideDelay" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideDelay" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "oldTaskbarOnWin11" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "edgeDetection" 0 DWord $label
+    }
+
+    if ($id -eq "local@cw-file-operation-styler") {
+        $label = "File Operation Styler"
+        Set-RegValueIfMissing $settingsPath "showCurrentFileProgressBar" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideSmallControlButtons" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideTitleBarPercentage" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "customization.enabled" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "customization.preset" "blueDark" String $label
+    }
+
+    if ($id -eq "local@cw-mac-island-dock") {
+        # 可选模组（默认关闭）。种子只覆盖关键项；默认任务栏模式为 windows
+        # （不改动系统任务栏），想要 Dock 效果需在设置里选 dock。
+        $label = "Mac Island Dock"
+        Set-RegValueIfMissing $settingsPath "taskbarMode" "windows" String $label
+        Set-RegValueIfMissing $settingsPath "showIsland" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "hiding.autoHide" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "icons.magnification" 170 DWord $label
+        Set-RegValueIfMissing $settingsPath "dock.iconSize" 32 DWord $label
+        Set-RegValueIfMissing $settingsPath "dock.backgroundOpacity" 50 DWord $label
+        Set-RegValueIfMissing $settingsPath "animations.enabled" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "animations.speed" 125 DWord $label
+    }
+
+    if ($id -eq "local@cw-audioswap") {
+        $label = "AudioSwap"
+        Set-RegValueIfMissing $settingsPath "advancedMode" 0 DWord $label
+    }
+
+    if ($id -eq "local@cw-volume-per-app") {
+        $label = "Volume Per App"
+        Set-RegValueIfMissing $settingsPath "volumeChangeStep" 10 DWord $label
+        Set-RegValueIfMissing $settingsPath "ctrlClickToMute" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "ctrlScrollVolumeChange" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "terseFormat" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "noAutomaticMuteToggle" 0 DWord $label
+    }
+
+    if ($id -eq "local@cw-file-hover-info") {
+        $label = "File Hover Info"
+        Set-RegValueIfMissing $settingsPath "delay" 450 DWord $label
+        Set-RegValueIfMissing $settingsPath "showOnDesktop" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "showInExplorer" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "hideNativeTooltip" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "language" "auto" String $label
+        Set-RegValueIfMissing $settingsPath "folderSizeLimit" 10 DWord $label
+        Set-RegValueIfMissing $settingsPath "dateStyle" "shortRelative" String $label
+        Set-RegValueIfMissing $settingsPath "appearance.theme" "auto" String $label
+        Set-RegValueIfMissing $settingsPath "appearance.opacity" 94 DWord $label
+        Set-RegValueIfMissing $settingsPath "appearance.fontSize" 13 DWord $label
+        Set-RegValueIfMissing $settingsPath "appearance.maxWidth" 380 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.type" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.size" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.created" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.modified" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.attributes" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.dimensions" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.duration" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.version" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.target" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.folderSize" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "fields.contents" 1 DWord $label
+    }
+
+    if ($id -eq "local@cw-settings-styler") {
+        $label = "Settings Styler"
+        Set-RegValueIfMissing $settingsPath "theme" "" String $label
     }
 
     if ($id -eq "local@cw-windows-animations") {
@@ -716,6 +881,20 @@ if (Test-Path $exePath) {
 }
 Write-Status "Windhawk restarted successfully." "Green"
 
+# Windhawk 2.x 部署后核验：真实开关状态在引擎会话 hive（Engine\Sessions\*.hiv）
+# 里，Engine\Mods\<id>.ini 的 Disabled 只是我们写的元数据，2.0 引擎不把它当开关。
+# 这里检测是否有模组被注入；若有，提示用户到 UI 里确认开关。
+Start-Sleep -Seconds 15
+$injLines = @(tasklist /M windhawk-core.dll 2>$null | Where-Object { $_ -match '\.exe\s' })
+if ($injLines.Count -gt 0) {
+    Write-Status "检测到 Windhawk 引擎已注入以下进程（Windhawk 2.x 可能把新装模组默认开启）：" "Yellow"
+    $injLines | ForEach-Object { Write-Status "  $_" "Yellow" }
+    Write-Status "请打开 Windhawk「已安装的 Mod」核对开关：不想用的请关闭，" "Yellow"
+    Write-Status "然后运行 restart_explorer.bat 让已应用的效果还原。" "Yellow"
+} else {
+    Write-Status "已确认：当前没有模组被注入（全部为关闭状态）。" "Green"
+}
+
 # The search page (SearchHost.exe) is prelaunched at sign-in and stays
 # suspended in the background, so it keeps the old Start menu mod until it is
 # restarted. Windows relaunches it automatically the next time search opens.
@@ -726,19 +905,24 @@ if (Get-Process -Name SearchHost -ErrorAction SilentlyContinue) {
 
 # 7. Optional startup self-check (scheduled task, current user, at logon).
 $cwTaskName = "StartupCheck"
-$cwTaskPath = "\CWDesktop\"
+$cwTaskPath = "\CW-Beautify\"
 if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
     if (Get-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -ErrorAction SilentlyContinue) {
         Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Confirm:$false
         Write-Status "Startup self-check task removed." "Green"
     }
+    # 更名前的旧计划任务目录也一并清理
+    if (Get-ScheduledTask -TaskName $cwTaskName -TaskPath "\CWDesktop\" -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath "\CWDesktop\" -Confirm:$false
+        Write-Status "Legacy startup self-check task (CWDesktop) removed." "Green"
+    }
 } elseif ($StartupCheck -eq "check" -or $StartupCheck -eq "restart") {
-    $checkSrc = Join-Path $PSScriptRoot "tools\CWDesktop-StartupCheck.ps1"
+    $checkSrc = Join-Path $PSScriptRoot "tools\CW-Beautify-StartupCheck.ps1"
     if (Test-Path -LiteralPath $checkSrc) {
         try {
-            $checkDir = Join-Path $env:LOCALAPPDATA "CWDesktop"
+            $checkDir = Join-Path $env:LOCALAPPDATA "CW-Beautify"
             if (-not (Test-Path $checkDir)) { New-Item -ItemType Directory -Path $checkDir -Force | Out-Null }
-            $checkDst = Join-Path $checkDir "CWDesktop-StartupCheck.ps1"
+            $checkDst = Join-Path $checkDir "CW-Beautify-StartupCheck.ps1"
             Copy-Item -LiteralPath $checkSrc -Destination $checkDst -Force
             $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
             $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$checkDst`" -Mode $StartupCheck -DelaySec 15"
@@ -747,17 +931,17 @@ if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
             $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 2)
             Register-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
             Write-Status "Startup self-check installed (mode=$StartupCheck). Log: $checkDir\startup-check.log" "Green"
-            Write-Status "Remove: deploy.ps1 -StartupCheck remove  (or Task Scheduler > CWDesktop > StartupCheck)" "Gray"
+            Write-Status "Remove: deploy.ps1 -StartupCheck remove  (or Task Scheduler > CW-Beautify > StartupCheck)" "Gray"
         } catch {
             Write-Status "Startup self-check install failed: $($_.Exception.Message)" "Red"
         }
     } else {
-        Write-Status "tools\CWDesktop-StartupCheck.ps1 not found, skipping startup self-check." "Gray"
+        Write-Status "tools\CW-Beautify-StartupCheck.ps1 not found, skipping startup self-check." "Gray"
     }
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   [SUCCESS] CW桌面美化 v1.0.0 一键部署完成！" "Green"
+Write-Status "   [SUCCESS] CW-Beautify v2.0.0 一键部署完成！" "Green"
 Write-Status "================================================" "Green"
 Write-Host ""
 Write-Host "后续说明与使用建议："

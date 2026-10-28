@@ -5,7 +5,7 @@
 // @description     Replaces Alt+Tab with a fluid, Windows Vista-style Flip 3D stack of live windows. CW build of the community "Alt+Tab Flip 3D (Vista Style)" mod by caliberda (MIT).
 // @description:zh-CN 用流畅的 Windows Vista 风格 Flip 3D 实时窗口堆栈替换 Alt+Tab。CW 版，基于社区模组 "Alt+Tab Flip 3D (Vista Style)"（作者 caliberda，MIT 许可）。
 // @version         1.0.2
-// @author          caliberda, CW桌面美化
+// @author          caliberda, CW-Beautify
 // @github          https://github.com/cesarkali
 // @homepage        https://caliberda.com.br
 // @include         windhawk.exe
@@ -45,6 +45,11 @@
   或在设置里把快捷方式改为 Win+Tab。
 
 ## 上游署名与许可
+
+- 本模组整合自社区模组 **Alt+Tab Flip 3D (Vista Style)**，原作者 **caliberda**（[GitHub](https://github.com/cesarkali)），以 MIT 许可发布，原版链接：<https://windhawk.net/mods/alt-tab-flip-3d>。上游代码的版权归 caliberda 所有。
+- CW-Beautify 整合版（作者 **Heptalune**）改动范围：全中文本地化（元数据、说明与设置文案）、更名为「CW-窗口切换动画（Vista 风格）」、showDelay 默认值调整；代码体与上游逐字节一致。
+- 本整合版同样以 MIT 许可发布。
+
 ## 更新日志
 
 - **1.0.2**：更名为「CW-窗口切换动画（Vista 风格）」（仅名称/标题，代码无改动；模组 id 保持 cw-alt-tab-flip-3d，已有设置不受影响）。

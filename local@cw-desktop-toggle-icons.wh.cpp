@@ -5,9 +5,8 @@
 // @description     Double-click empty desktop space to show or hide icons, with optional auto-hide when the system is idle.
 // @description:zh-CN 双击桌面空白处显示或隐藏图标，可在系统闲置时自动隐藏。
 // @version         4.1.5
-// @donateUrl       https://ifdian.net/a/Lanboo
-// @author          Lanbo
-// @github          https://github.com/Liset999
+// @author          Heptalune
+// @github          https://github.com/Heptalune
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32
@@ -15,9 +14,8 @@
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
 # CW-桌面双击隐藏图标
 
@@ -53,8 +51,7 @@
 
 ## 致谢与许可
 
-- Lanbo 的原创 mod。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
+- Heptalune 的原创 mod。
 */
 // ==/WindhawkModReadme==
 
@@ -134,7 +131,7 @@ static void LoadSettings()
 static void ClearAutoHideTimer(HWND hwndShell)
 {
     KillTimer(hwndShell, TIMER_AUTOHIDE);
-    RemovePropW(hwndShell, L"ZenTimerInit");
+    RemovePropW(hwndShell, L"CWTimerInit");
 }
 
 static bool SetAutoHideTimer(HWND hwndShell, UINT intervalMs)
@@ -143,7 +140,7 @@ static bool SetAutoHideTimer(HWND hwndShell, UINT intervalMs)
         intervalMs = 1;
 
     if (SetTimer(hwndShell, TIMER_AUTOHIDE, intervalMs, NULL)) {
-        SetPropW(hwndShell, L"ZenTimerInit", UlongToHandle(1));
+        SetPropW(hwndShell, L"CWTimerInit", UlongToHandle(1));
         return true;
     }
 
@@ -181,7 +178,7 @@ static void ScheduleAutoHideTimer(HWND hwndShell)
         return;
     }
 
-    DWORD autoHiddenAt = HandleToUlong(GetPropW(hwndShell, L"ZenAutoHiddenAt"));
+    DWORD autoHiddenAt = HandleToUlong(GetPropW(hwndShell, L"CWAutoHiddenAt"));
     if (autoHiddenAt != 0 && g_settings.showIconsOnAnyInput) {
         SetAutoHideTimer(hwndShell, TIMER_RESTORE_POLL_MS);
     } else {
@@ -236,7 +233,7 @@ static bool IsFullscreenWindowActive()
 // AutoHideIcons      — timer fired: hide only if visible, set auto-hide marker.
 // AutoRestoreIcons   — input detected: restore only auto-hidden icons.
 //
-// "ZenAutoHiddenAt" window property (stores GetTickCount) distinguishes
+// "CWAutoHiddenAt" window property (stores GetTickCount) distinguishes
 // auto-hidden from manually-hidden state.
 // ─────────────────────────────────────────────────────────────────────────────
 static bool GetPersistedHideState()
@@ -276,9 +273,9 @@ static void ManualToggleIcons(HWND hwndShellView)
         Wh_Log(L"[CW] ManualToggle: fallback WM_COMMAND 0x7402");
     }
     // Clear auto-hide marker — this was a deliberate user action
-    RemovePropW(hwndShellView, L"ZenAutoHiddenAt");
-    RemovePropW(hwndShellView, L"ZenMouseX");
-    RemovePropW(hwndShellView, L"ZenMouseY");
+    RemovePropW(hwndShellView, L"CWAutoHiddenAt");
+    RemovePropW(hwndShellView, L"CWMouseX");
+    RemovePropW(hwndShellView, L"CWMouseY");
     ScheduleAutoHideTimer(hwndShellView);
 }
 
@@ -290,13 +287,13 @@ static void AutoHideIcons(HWND hwndShellView)
         DWORD now = GetTickCount();
         // Avoid storing 0 (which means "not set"); extremely unlikely but be safe
         if (now == 0) now = 1;
-        SetPropW(hwndShellView, L"ZenAutoHiddenAt", UlongToHandle(now));
+        SetPropW(hwndShellView, L"CWAutoHiddenAt", UlongToHandle(now));
         
         // Store current physical mouse coordinates for zero-latency coordinate guard
         POINT pt = {};
         GetCursorPos(&pt);
-        SetPropW(hwndShellView, L"ZenMouseX", UlongToHandle((DWORD)pt.x));
-        SetPropW(hwndShellView, L"ZenMouseY", UlongToHandle((DWORD)pt.y));
+        SetPropW(hwndShellView, L"CWMouseX", UlongToHandle((DWORD)pt.x));
+        SetPropW(hwndShellView, L"CWMouseY", UlongToHandle((DWORD)pt.y));
 
         Wh_Log(L"[CW] AutoHide: icons hidden at tick=%u, mouse=(%d,%d)", now, pt.x, pt.y);
     }
@@ -310,9 +307,9 @@ static void AutoRestoreIcons(HWND hwndShellView)
         ShowWindow(hwndListView, SW_SHOW);
         Wh_Log(L"[CW] AutoRestore: icons restored");
     }
-    RemovePropW(hwndShellView, L"ZenAutoHiddenAt");
-    RemovePropW(hwndShellView, L"ZenMouseX");
-    RemovePropW(hwndShellView, L"ZenMouseY");
+    RemovePropW(hwndShellView, L"CWAutoHiddenAt");
+    RemovePropW(hwndShellView, L"CWMouseX");
+    RemovePropW(hwndShellView, L"CWMouseY");
     ScheduleAutoHideTimer(hwndShellView);
 }
 
@@ -352,10 +349,10 @@ static void UnsubclassWindows()
     auto Cleanup = [](HWND hwndShell) {
         if (!hwndShell) return;
         KillTimer(hwndShell, TIMER_AUTOHIDE);
-        RemovePropW(hwndShell, L"ZenTimerInit");
-        RemovePropW(hwndShell, L"ZenAutoHiddenAt");
-        RemovePropW(hwndShell, L"ZenMouseX");
-        RemovePropW(hwndShell, L"ZenMouseY");
+        RemovePropW(hwndShell, L"CWTimerInit");
+        RemovePropW(hwndShell, L"CWAutoHiddenAt");
+        RemovePropW(hwndShell, L"CWMouseX");
+        RemovePropW(hwndShell, L"CWMouseY");
         
         HWND lv = FindWindowExW(hwndShell, NULL, L"SysListView32", NULL);
         if (lv) {
@@ -485,7 +482,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
     HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR)
 {
     // ── One-time timer bootstrap ─────────────────────────────────────────────
-    bool timerInitialized = GetPropW(hWnd, L"ZenTimerInit") != NULL;
+    bool timerInitialized = GetPropW(hWnd, L"CWTimerInit") != NULL;
     if (!timerInitialized && g_settings.enableAutoHide) {
         ScheduleAutoHideTimer(hWnd);
     }
@@ -533,7 +530,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
         }
         DWORD now = GetTickCount();
 
-        DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"ZenAutoHiddenAt"));
+        DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"CWAutoHiddenAt"));
 
         if (isVis) {
             // Check full screen guard
@@ -565,7 +562,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
     // ── Immediate mouse/click restore (only when auto-hidden + restore-on-input enabled) ──
     // Zero-latency coordinate-based physical mouse movement detection
     {
-        DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"ZenAutoHiddenAt"));
+        DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"CWAutoHiddenAt"));
         if (autoHiddenAt != 0 && g_settings.showIconsOnAnyInput) {
             if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN) {
                 Wh_Log(L"[CW] Immediate click restore on DefView (uMsg=%u)", uMsg);
@@ -574,8 +571,8 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
             else if (uMsg == WM_MOUSEMOVE) {
                 POINT ptCurrent = {};
                 GetCursorPos(&ptCurrent);
-                DWORD savedX = HandleToUlong(GetPropW(hWnd, L"ZenMouseX"));
-                DWORD savedY = HandleToUlong(GetPropW(hWnd, L"ZenMouseY"));
+                DWORD savedX = HandleToUlong(GetPropW(hWnd, L"CWMouseX"));
+                DWORD savedY = HandleToUlong(GetPropW(hWnd, L"CWMouseY"));
 
                 if (ptCurrent.x != (int)savedX || ptCurrent.y != (int)savedY) {
                     Wh_Log(L"[CW] Physical mouse move detected: (%d,%d) vs (%d,%d) -> AutoRestore",

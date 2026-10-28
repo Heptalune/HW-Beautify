@@ -1,8 +1,6 @@
 # Ignore installers
 *.exe
 !deploy.bat
-# Prebuilt AI-status hook binary ships with the package (built by .github/workflows/build_zen_status.yml)
-!tools/ai-status/zen-status.exe
 
 # Ignore zip files
 *.zip
@@ -10,8 +8,7 @@
 # Ignore backup and build directories
 Backups/
 __pycache__/
-ZenDesktop_Backup_v2.7.0/
-ZenDesktop_OneKeyDeploy_v3.0.0_Online/
+CW-Beautify_OneKeyDeploy*/
 
 # Ignore test scripts
 test*.ps1
@@ -42,9 +39,6 @@ DWMBlurGlass/
 sync-aiskills.ps1
 sync-skills.ps1
 
-# Ignore generated packages
-ZenDesktop_OneKeyDeploy_v4.0.0/
-
 # Ignore local editor configs and credentials
 .claude/
 .specify/
@@ -53,5 +47,4 @@ ZenDesktop_OneKeyDeploy_v4.0.0/
 # Ignore generated outputs and local documents
 generated/
 docs/superpowers/
-ZenDesktop_OneKeyDeploy_v3.3.0_Online/
-ZenDesktop_OneKeyDeploy_v3.4.0_Online/
+dev/tmp/

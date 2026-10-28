@@ -1,17 +1,17 @@
-# ZenDesktop v4.2 发布说明
+# CW-Beautify v4.2 发布说明
 
 面向用户的更新摘要。仓库分支：`v4.2-draft`。装完请**重启整台电脑**，不要只重启资源管理器。
 
 ## 主要变化
 
 ### 文件管理器：用「文件管理器美化」替代 ExplorerBlurMica
-- 新增 Windhawk mod `local@zen-explorer-styler`（ZenDesktop: 文件管理器美化）。
+- 新增 Windhawk mod `local@cw-explorer-styler`（CW-Beautify: 文件管理器美化）。
 - 色调、不透明度、地址栏/搜索框、文字颜色可在 Windhawk 里调，浅色模式也做了适配。
 - **不再推荐安装或注册 ExplorerBlurMica**。若以前注册过，请管理员运行 `tools\uninstall-ExplorerBlurMica.bat`，再重启资源管理器 / 电脑，避免和 styler、任务栏抢 XAML 诊断。
 - 仓库已删除 EBM 源码/二进制目录，deploy **不会**再替你注册它。
 
 ### 开始菜单：浅色模式白雾
-- `zen-startmenu-acrylic` 修复浅色模式下开始菜单发白、发雾的问题。
+- `cw-startmenu-acrylic` 修复浅色模式下开始菜单发白、发雾的问题。
 
 ### 任务栏 4.2
 - 在上游 Taskbar Styler v1.10 基础上重写，修好最大化层监听（按显示器、忽略其他虚拟桌面）。
@@ -29,11 +29,10 @@
 - 初次安装的 mod 默认关闭（`Disabled=1`）；你开过的开关会保留。
 
 ### 任务栏音乐与歌词 0.2
-- `zen-taskbar-lyrics`：占用原小组件位置，封面 + 歌词 + 上一首/播放暂停/下一首。
+- `cw-taskbar-lyrics`：占用原小组件位置，封面 + 歌词 + 上一首/播放暂停/下一首。
 - 本机 AI 状态通过 `tools/ai-status` MCP（`set_status`）写入本地文件后显示；简介里附有提示词与 Claude Code / Codex / opencode 配置示例。
 
 ### 捐助
-- 各 mod 简介与 README 保留[爱发电](https://ifdian.net/a/Lanboo)链接和微信赞赏码。
 
 ## 升级步骤（简）
 

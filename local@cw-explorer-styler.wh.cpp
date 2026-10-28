@@ -5,9 +5,8 @@
 // @description     Translucent File Explorer with adjustable tint, transparent chrome, and glass desktop context menus.
 // @description:zh-CN 让 Windows 11 文件管理器整窗半透明模糊，色调可调，命令栏、地址栏、标签栏透明，并美化桌面与资源管理器的右键菜单。
 // @version         1.6.9
-// @donateUrl       https://ifdian.net/a/Lanboo
-// @author          Lanbo & m417z
-// @github          https://github.com/Liset999
+// @author          Heptalune & m417z
+// @github          https://github.com/Heptalune
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -ld2d1 -ldwmapi -lgdi32 -lmsimg32 -lole32 -loleaut32 -lruntimeobject -lshlwapi -luxtheme
@@ -20,34 +19,33 @@
 // https://windhawk.net/mods/windows-11-file-explorer-styler
 // https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-11-file-explorer-styler.wh.cpp
 //
-// CW modifications (Lanbo): Chinese localization of the readme and
-// settings; new integrated "ZenTranslucent" (default) and "ZenTransparent"
+// CW modifications (Heptalune): Chinese localization of the readme and
+// settings; new integrated "CWTranslucent" (default) and "CWTransparent"
 // themes; adjustable tint color/opacity (tintPreset, tintColor, tintOpacity) for
 // the AccentBlurBehind effect, which upstream hardcodes, with a default
 // "followSystem" preset that tints dark in dark mode and light in light mode;
-// address bar and search box fills in the Zen themes with an adjustable opacity
+// address bar and search box fills in the CW themes with an adjustable opacity
 // (fieldOpacity, default 0), theme-aware selected tab fill; a text color setting
 // (textColorMode) shared with the other CW mods; optional glass on the
 // Win11 desktop/Explorer context menu (contextMenuEnable / contextMenuBlur),
 // which replaces each menu's SystemBackdrop in code with an adjustable acrylic
-// controller (ZenAcrylicBackdrop; `<WindhawkAcrylicBackdrop .../>` for style
+// controller (CWAcrylicBackdrop; `<WindhawkAcrylicBackdrop .../>` for style
 // rules), reusing tintPreset and tintOpacity, and initializes a thread on its
 // first reported element when no recognized window was created on it (tracked
 // for the restore). The rest of the code is unchanged from upstream.
 //
 // For bug reports and feature requests, please open an issue here:
-// https://github.com/Liset999/ZenDesktop/issues
+// https://github.com/Heptalune/CW-Beautify/issues
 //
 // The original mod by m417z is developed here:
 // https://github.com/m417z/my-windhawk-mods
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
-> 原作者：**m417z**（[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
+> 原作者：**m417z**（[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
 # CW-文件管理器美化
 
@@ -94,11 +92,10 @@
 ## 致谢与许可
 
 - 原版 mod：[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，作者 [m417z](https://github.com/m417z)，GPL-3.0。原版源码：[windhawk-mods](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-11-file-explorer-styler.wh.cpp)、[m417z/my-windhawk-mods](https://github.com/m417z/my-windhawk-mods)。
-- Lanbo 的修改：新增两款 CW 主题、可调色调颜色与不透明度（原版固定为 #232323、约 23%）、地址栏与搜索框底色、文字颜色和中文界面，其余代码与原版一致。
+- Heptalune 的修改：新增两款 CW 主题、可调色调颜色与不透明度（原版固定为 #232323、约 23%）、地址栏与搜索框底色、文字颜色和中文界面，其余代码与原版一致。
 - 内置主题由社区贡献，详见 [Windows 11 文件管理器美化指南](https://github.com/ramensoftware/windows-11-file-explorer-styling-guide)。
 - 控件树监听基于 TranslucentTB 项目的 [ExplorerTAP](https://github.com/TranslucentTB/TranslucentTB/tree/develop/ExplorerTAP)，`WindhawkBlur` 画刷基于 TranslucentTB 的 [XamlBlurBrush](https://github.com/TranslucentTB/TranslucentTB/blob/release/ExplorerTAP/XamlBlurBrush.cpp)，整窗半透明的 GDI alpha 渲染和 accent blur behind 设置基于 [Translucent Windows](https://windhawk.net/mods/translucent-windows) mod，右键菜单的可调系统材质参照 [microsoft-ui-xaml](https://github.com/microsoft/microsoft-ui-xaml) 的 DesktopAcrylicBackdrop（MIT）。
 - 本修改版同样以 GPL-3.0 发布。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 
 ## 附录：内置主题
 
@@ -303,15 +300,15 @@ Background:=<AcrylicBrush TintColor="$mainColor" TintOpacity="0.3" />
 
 // ==WindhawkModSettings==
 /*
-- theme: "ZenTranslucent"
+- theme: "CWTranslucent"
   $name: "Theme"
   $name:zh-CN: "主题"
   $description: "A theme is a set of styles. \"CW Translucent\" blurs the whole window with an adjustable tint; \"CW Transparent\" only clears WinUI backgrounds. Other themes come from the original mod. Default: CW Translucent."
   $description:zh-CN: "主题是一组样式。「CW 半透明」整窗模糊，色调可调；「CW 仅透明」只清除 WinUI 区域背景，不带模糊底。其余主题来自原版。默认为 CW 半透明。"
   $options:
   - "": "无"
-  - ZenTranslucent: "CW 半透明（推荐）"
-  - ZenTransparent: "CW 仅透明"
+  - CWTranslucent: "CW 半透明（推荐）"
+  - CWTransparent: "CW 仅透明"
   - Translucent Explorer11: "半透明 Explorer11（Translucent Explorer11）"
   - MicaBar: "云母命令栏（MicaBar）"
   - NoCommandBar: "隐藏命令栏（NoCommandBar）"
@@ -487,28 +484,28 @@ struct Theme {
 // CW: fills for the address bar and search box. In light mode WinUI
 // fills them with TextControlBackground/ControlFillColorDefault (#B3FFFFFF, 70%
 // white), which shows as an opaque white block over the translucent window; in
-// dark mode the same resource is #0FFFFFFF. The ZenFieldFill and
-// ZenFieldFillPointerOver resources are white at the fieldOpacity setting's
+// dark mode the same resource is #0FFFFFFF. The CWFieldFill and
+// CWFieldFillPointerOver resources are white at the fieldOpacity setting's
 // alpha in both themes, they're added at runtime in
-// AddZenFieldFillResourceVariables.
+// AddCWFieldFillResourceVariables.
 #define ZEN_FIELD_TARGET_STYLES \
     ThemeTargetStyles{L"FileExplorerExtensions.AddressBarControl > Grid#PART_LayoutRoot", { \
-        L"Background:=<SolidColorBrush Color=\"{ThemeResource ZenFieldFill}\"/>"}}, \
+        L"Background:=<SolidColorBrush Color=\"{ThemeResource CWFieldFill}\"/>"}}, \
     ThemeTargetStyles{L"FileExplorerExtensions.AddressBarControl > Grid#PART_LayoutRoot > Grid#NormalModeGrid", { \
         L"Background=Transparent"}}, \
     ThemeTargetStyles{L"AutoSuggestBox#FileExplorerSearchBox > Grid#LayoutRoot > TextBox > Grid@CommonStates > Border#BorderElement", { \
-        L"Background@Normal:=<SolidColorBrush Color=\"{ThemeResource ZenFieldFill}\"/>", \
-        L"Background@PointerOver:=<SolidColorBrush Color=\"{ThemeResource ZenFieldFillPointerOver}\"/>"}}
+        L"Background@Normal:=<SolidColorBrush Color=\"{ThemeResource CWFieldFill}\"/>", \
+        L"Background@PointerOver:=<SolidColorBrush Color=\"{ThemeResource CWFieldFillPointerOver}\"/>"}}
 
 #define ZEN_THEME_RESOURCE_VARIABLES \
-    L"ZenTabSelectedFill@Dark=#40404040", \
-    L"ZenTabSelectedFill@Light=#59FFFFFF"
+    L"CWTabSelectedFill@Dark=#40404040", \
+    L"CWTabSelectedFill@Light=#59FFFFFF"
 
 // CW: transparent WinUI backgrounds only (command bar, address bar,
 // tabs, home/gallery/details panes). Keeps the window backdrop untouched, for
 // use with a background effect chosen in the settings. All targets are taken from the
 // upstream themes above.
-const Theme g_themeZenTransparent = {{
+const Theme g_themeCWTransparent = {{
     ThemeTargetStyles{L"FileExplorerExtensions.CommandBarControl_Wave1 > Grid, Grid#CommandBarControlRootGrid", {
         L"Background=Transparent"}},
     ThemeTargetStyles{L"CommandBar#FileExplorerCommandBar", {
@@ -565,7 +562,7 @@ const Theme g_themeTranslucent_Explorer11 = {{
 // adjustable). Upstream's dark-only colors (the selected tab fill #40404040)
 // are replaced with theme-aware resources, and the address bar and search box
 // get theme-aware fills, so that light mode is as clear as dark mode.
-const Theme g_themeZenTranslucent = {{
+const Theme g_themeCWTranslucent = {{
     ThemeTargetStyles{L"FileExplorerExtensions.CommandBarControl_Wave1 > Grid, Grid#CommandBarControlRootGrid", {
         L"Background=Transparent",
         L"BorderThickness=0,0,0,1",
@@ -575,7 +572,7 @@ const Theme g_themeZenTranslucent = {{
     ThemeTargetStyles{L"Grid#NavigationBarControlGrid", {
         L"Background=Transparent"}},
     ThemeTargetStyles{L"TabViewItem > Grid#LayoutRoot > Canvas > Microsoft.UI.Xaml.Shapes.Path#SelectedBackgroundPath", {
-        L"Fill:=<SolidColorBrush Color=\"{ThemeResource ZenTabSelectedFill}\"/>"}},
+        L"Fill:=<SolidColorBrush Color=\"{ThemeResource CWTabSelectedFill}\"/>"}},
     ThemeTargetStyles{L"Grid#HomeViewRootGrid", {
         L"Background=Transparent"}},
     ThemeTargetStyles{L"FileExplorerExtensions.GalleryViewControl#GalleryViewControl > Grid", {
@@ -1856,8 +1853,8 @@ void CleanupCustomizations(ElementId elementId);
 void QueueDiagnosticsRelease(InstanceHandle handle);
 void FlushDiagnosticsReleasesIfQuiet();
 void InitializeForCurrentThread();
-void ZenNoteLazyInitThread();
-void ZenContextMenuOnElementAdded(
+void CWNoteLazyInitThread();
+void CWContextMenuOnElementAdded(
     winrt::Microsoft::UI::Xaml::FrameworkElement const& element);
 
 HMODULE GetCurrentModuleHandle() {
@@ -2097,7 +2094,7 @@ HRESULT VisualTreeWatcher::OnVisualTreeChange(ParentChildRelation relation, Visu
         Wh_Log(L"Initializing for thread %u on its first element",
                GetCurrentThreadId());
         InitializeForCurrentThread();
-        ZenNoteLazyInitThread();
+        CWNoteLazyInitThread();
     }
 
     // Caught here rather than by the handler below, so that the bookkeeping
@@ -2122,7 +2119,7 @@ HRESULT VisualTreeWatcher::OnVisualTreeChange(ParentChildRelation relation, Visu
                     ApplyCustomizations(elementId, frameworkElement, element.Type);
                 }
 
-                ZenContextMenuOnElementAdded(frameworkElement);
+                CWContextMenuOnElementAdded(frameworkElement);
             }
             else
             {
@@ -5842,15 +5839,15 @@ void TrackIfRemoteImageSource(
 // SystemBackdrop is only written to a loaded CommandBarFlyoutCommandBar; before
 // that, the write waits for Loaded. The control's own Loaded handler was
 // registered first, so the default is connected by the time ours runs.
-struct ZenPendingBackdrop {
+struct CWPendingBackdrop {
     winrt::weak_ref<FrameworkElement> element;
     winrt::event_token loadedToken;
 };
 
-thread_local std::unordered_map<void*, ZenPendingBackdrop>
+thread_local std::unordered_map<void*, CWPendingBackdrop>
     g_zenPendingBackdrops;
 
-void CancelZenPendingBackdrop(DependencyObject const& elementDo) {
+void CancelCWPendingBackdrop(DependencyObject const& elementDo) {
     auto it = g_zenPendingBackdrops.find(winrt::get_abi(elementDo));
     if (it == g_zenPendingBackdrops.end()) {
         return;
@@ -5863,7 +5860,7 @@ void CancelZenPendingBackdrop(DependencyObject const& elementDo) {
     g_zenPendingBackdrops.erase(it);
 }
 
-void CancelAllZenPendingBackdrops() {
+void CancelAllCWPendingBackdrops() {
     for (auto& [key, pending] : g_zenPendingBackdrops) {
         if (auto element = pending.element.get()) {
             try {
@@ -5936,7 +5933,7 @@ winrt::Windows::Foundation::IInspectable SetOrClearValue(
     const PropertyOverrideValue& overrideValue,
     bool initialApply = false) {
     // CW: any later write or restore supersedes a deferred backdrop.
-    CancelZenPendingBackdrop(elementDo);
+    CancelCWPendingBackdrop(elementDo);
 
     winrt::Windows::Foundation::IInspectable value;
     if (auto* inspectable =
@@ -6129,9 +6126,9 @@ std::vector<std::wstring_view> SplitStringView(std::wstring_view s,
 // unchanged system acrylic. Replacing the SystemBackdrop itself is what changes
 // the menu. This is DesktopAcrylicBackdrop (microsoft-ui-xaml, MIT) with the
 // controller's tint/luminosity exposed.
-class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
+class CWAcrylicBackdrop : public Media::SystemBackdropT<CWAcrylicBackdrop> {
    public:
-    ZenAcrylicBackdrop(winrt::Windows::UI::Color tint,
+    CWAcrylicBackdrop(winrt::Windows::UI::Color tint,
                        float tintOpacity,
                        float luminosityOpacity,
                        std::optional<winrt::Windows::UI::Color> fallbackColor)
@@ -6145,7 +6142,7 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
         XamlRoot const& xamlRoot) {
         // The base implementation registers the target for the default
         // configuration (theme, input active state).
-        Media::ISystemBackdropOverridesT<ZenAcrylicBackdrop>::OnTargetConnected(
+        Media::ISystemBackdropOverridesT<CWAcrylicBackdrop>::OnTargetConnected(
             target, xamlRoot);
 
         Entry entry{target, nullptr};
@@ -6168,11 +6165,11 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
 
             entry.controller = std::move(controller);
         } catch (winrt::hresult_error const& ex) {
-            Wh_Log(L"ZenAcrylicBackdrop: connect error %08X", ex.code());
+            Wh_Log(L"CWAcrylicBackdrop: connect error %08X", ex.code());
         }
 
         m_entries.push_back(std::move(entry));
-        Wh_Log(L"ZenAcrylicBackdrop: target connected (%zu)",
+        Wh_Log(L"CWAcrylicBackdrop: target connected (%zu)",
                m_entries.size());
     }
 
@@ -6184,7 +6181,7 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
             m_entries.begin(), m_entries.end(),
             [&target](const Entry& entry) { return entry.target == target; });
         if (it == m_entries.end()) {
-            Wh_Log(L"ZenAcrylicBackdrop: ignoring unknown target");
+            Wh_Log(L"CWAcrylicBackdrop: ignoring unknown target");
             return;
         }
 
@@ -6193,7 +6190,7 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
                 it->controller.RemoveSystemBackdropTarget(target);
                 it->controller.Close();
             } catch (winrt::hresult_error const& ex) {
-                Wh_Log(L"ZenAcrylicBackdrop: disconnect error %08X",
+                Wh_Log(L"CWAcrylicBackdrop: disconnect error %08X",
                        ex.code());
             }
         }
@@ -6201,9 +6198,9 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
         m_entries.erase(it);
 
         Media::ISystemBackdropOverridesT<
-            ZenAcrylicBackdrop>::OnTargetDisconnected(target);
+            CWAcrylicBackdrop>::OnTargetDisconnected(target);
 
-        Wh_Log(L"ZenAcrylicBackdrop: target disconnected (%zu)",
+        Wh_Log(L"CWAcrylicBackdrop: target disconnected (%zu)",
                m_entries.size());
     }
 
@@ -6224,7 +6221,7 @@ class ZenAcrylicBackdrop : public Media::SystemBackdropT<ZenAcrylicBackdrop> {
 // LuminosityOpacity="0.5" FallbackColor="#AARRGGBB"/>, a value for the
 // SystemBackdrop property. The alpha of TintColor is the tint opacity.
 std::optional<winrt::Windows::Foundation::IInspectable>
-ParseZenAcrylicBackdropValue(std::wstring_view substr) {
+ParseCWAcrylicBackdropValue(std::wstring_view substr) {
     constexpr auto kPrefix = L"<WindhawkAcrylicBackdrop"sv;
     if (!substr.starts_with(kPrefix)) {
         return std::nullopt;
@@ -6288,7 +6285,7 @@ ParseZenAcrylicBackdropValue(std::wstring_view substr) {
     float tintOpacity = tint.A / 255.0f;
     tint.A = 255;
 
-    return winrt::make<ZenAcrylicBackdrop>(tint, tintOpacity,
+    return winrt::make<CWAcrylicBackdrop>(tint, tintOpacity,
                                            luminosityOpacity, fallbackColor)
         .as<winrt::Windows::Foundation::IInspectable>();
 }
@@ -6296,7 +6293,7 @@ ParseZenAcrylicBackdropValue(std::wstring_view substr) {
 // CW: context menu glass (contextMenuEnable / contextMenuBlur).
 //
 // The menu's acrylic is CommandBarFlyoutCommandBar.SystemBackdrop, so the
-// glass is a ZenAcrylicBackdrop written to that property of each menu. It's
+// glass is a CWAcrylicBackdrop written to that property of each menu. It's
 // written in code, not through a style rule: that way it doesn't depend on the
 // XAML parser resolving the property, every step can be logged, and the value
 // which was replaced is known exactly for the restore.
@@ -6309,7 +6306,7 @@ ParseZenAcrylicBackdropValue(std::wstring_view substr) {
 // reporting IsLoaded) before the flyout sets its SystemBackdrop and before the
 // template is applied, so a property changed callback on SystemBackdrop waits
 // for it and the write happens after the next layout pass (1.6.4).
-struct ZenContextMenuParams {
+struct CWContextMenuParams {
     bool enabled = false;
     winrt::Windows::UI::Color tint{};
     float tintOpacity = 0;
@@ -6317,9 +6314,9 @@ struct ZenContextMenuParams {
     winrt::Windows::UI::Color fallback{};
 };
 
-thread_local ZenContextMenuParams g_zenContextMenuParams;
+thread_local CWContextMenuParams g_zenContextMenuParams;
 
-struct ZenContextMenuEntry {
+struct CWContextMenuEntry {
     winrt::weak_ref<Controls::Primitives::CommandBarFlyoutCommandBar> menu;
     winrt::event_token loadedToken{};
     winrt::event_token layoutToken{};
@@ -6336,20 +6333,20 @@ struct ZenContextMenuEntry {
 
 // Keyed by the menu's ABI pointer; an entry whose menu is gone is replaced
 // when another object is allocated at the same address.
-thread_local std::unordered_map<void*, ZenContextMenuEntry> g_zenContextMenus;
+thread_local std::unordered_map<void*, CWContextMenuEntry> g_zenContextMenus;
 
 // Set while this mod writes the property, so that its own write doesn't
 // trigger the "backdrop changed" callback.
 thread_local bool g_zenContextMenuWriting;
 
-void ZenContextMenuWaitLoaded(void* key,
+void CWContextMenuWaitLoaded(void* key,
                               Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-                              ZenContextMenuEntry& entry);
+                              CWContextMenuEntry& entry);
 
 // The system backdrop of the menu, if any, and whether it's ours.
-bool ZenContextMenuIsOurs(
+bool CWContextMenuIsOurs(
     Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-    ZenContextMenuEntry const& entry) {
+    CWContextMenuEntry const& entry) {
     auto current = menu.SystemBackdrop();
     return current && entry.backdrop &&
            current.as<winrt::Windows::Foundation::IInspectable>() ==
@@ -6365,10 +6362,10 @@ bool ZenContextMenuIsOurs(
 // CommandBarFlyoutCommandBar::OnPropertyChanged connected it right away).
 // Replacing a backdrop which was never connected corrupts its target list
 // (see DeferSystemBackdropUntilLoaded).
-void ZenContextMenuApply(
+void CWContextMenuApply(
     void* key,
     Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-    ZenContextMenuEntry& entry,
+    CWContextMenuEntry& entry,
     PCWSTR reason) {
     const auto& params = g_zenContextMenuParams;
     if (!params.enabled) {
@@ -6390,14 +6387,14 @@ void ZenContextMenuApply(
         return;
     }
 
-    if (ZenContextMenuIsOurs(menu, entry)) {
+    if (CWContextMenuIsOurs(menu, entry)) {
         return;
     }
 
     if (!menu.IsLoaded() || !menu.XamlRoot()) {
         Wh_Log(L"[ctxmenu] backdrop present, waiting for the menu to load (%s)",
                reason);
-        ZenContextMenuWaitLoaded(key, menu, entry);
+        CWContextMenuWaitLoaded(key, menu, entry);
         return;
     }
 
@@ -6411,7 +6408,7 @@ void ZenContextMenuApply(
 
     auto original = menu.ReadLocalValue(property);
     auto backdrop =
-        winrt::make<ZenAcrylicBackdrop>(params.tint, params.tintOpacity,
+        winrt::make<CWAcrylicBackdrop>(params.tint, params.tintOpacity,
                                         params.luminosityOpacity,
                                         params.fallback)
             .as<winrt::Windows::Foundation::IInspectable>();
@@ -6439,10 +6436,10 @@ void ZenContextMenuApply(
            params.tintOpacity, params.luminosityOpacity);
 }
 
-void ZenContextMenuWaitLoaded(
+void CWContextMenuWaitLoaded(
     void* key,
     Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-    ZenContextMenuEntry& entry) {
+    CWContextMenuEntry& entry) {
     if (entry.loadedToken) {
         return;
     }
@@ -6463,7 +6460,7 @@ void ZenContextMenuWaitLoaded(
             try {
                 menu.Loaded(it->second.loadedToken);
                 it->second.loadedToken = {};
-                ZenContextMenuApply(key, menu, it->second, L"loaded");
+                CWContextMenuApply(key, menu, it->second, L"loaded");
             } catch (winrt::hresult_error const& ex) {
                 Wh_Log(L"[ctxmenu] apply error %08X: %s", ex.code(),
                        ex.message().c_str());
@@ -6475,10 +6472,10 @@ void ZenContextMenuWaitLoaded(
 // triggered this (a new backdrop, the template's backdrop roots) has been
 // fully processed by the control. A LayoutUpdated handler can be revoked on
 // unload, unlike a queued dispatcher task.
-void ZenContextMenuScheduleApply(
+void CWContextMenuScheduleApply(
     void* key,
     Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-    ZenContextMenuEntry& entry,
+    CWContextMenuEntry& entry,
     PCWSTR reason) {
     if (entry.layoutToken) {
         return;
@@ -6501,7 +6498,7 @@ void ZenContextMenuScheduleApply(
             try {
                 menu.LayoutUpdated(it->second.layoutToken);
                 it->second.layoutToken = {};
-                ZenContextMenuApply(key, menu, it->second, reasonCopy.c_str());
+                CWContextMenuApply(key, menu, it->second, reasonCopy.c_str());
             } catch (winrt::hresult_error const& ex) {
                 Wh_Log(L"[ctxmenu] apply error %08X: %s", ex.code(),
                        ex.message().c_str());
@@ -6512,10 +6509,10 @@ void ZenContextMenuScheduleApply(
     menu.InvalidateArrange();
 }
 
-void ZenContextMenuRegisterBackdropCallback(
+void CWContextMenuRegisterBackdropCallback(
     void* key,
     Controls::Primitives::CommandBarFlyoutCommandBar const& menu,
-    ZenContextMenuEntry& entry) {
+    CWContextMenuEntry& entry) {
     if (entry.backdropCallbackRegistered) {
         return;
     }
@@ -6542,7 +6539,7 @@ void ZenContextMenuRegisterBackdropCallback(
 
             try {
                 if (!menu.SystemBackdrop() ||
-                    ZenContextMenuIsOurs(menu, it->second)) {
+                    CWContextMenuIsOurs(menu, it->second)) {
                     return;
                 }
 
@@ -6553,10 +6550,10 @@ void ZenContextMenuRegisterBackdropCallback(
                 Wh_Log(L"[ctxmenu] system backdrop appeared (xamlRoot=%d)",
                        hasXamlRoot ? 1 : 0);
                 if (hasXamlRoot) {
-                    ZenContextMenuScheduleApply(key, menu, it->second,
+                    CWContextMenuScheduleApply(key, menu, it->second,
                                                 L"backdrop appeared");
                 } else {
-                    ZenContextMenuWaitLoaded(key, menu, it->second);
+                    CWContextMenuWaitLoaded(key, menu, it->second);
                 }
             } catch (winrt::hresult_error const& ex) {
                 Wh_Log(L"[ctxmenu] callback error %08X: %s", ex.code(),
@@ -6568,7 +6565,7 @@ void ZenContextMenuRegisterBackdropCallback(
 
 // The template's backdrop root was added: the backdrop is wired up now, so
 // try again if the menu was still waiting (backup for the callback).
-void ZenContextMenuOnBackdropRootAdded(FrameworkElement const& element) {
+void CWContextMenuOnBackdropRootAdded(FrameworkElement const& element) {
     if (g_zenContextMenus.empty()) {
         return;
     }
@@ -6589,17 +6586,17 @@ void ZenContextMenuOnBackdropRootAdded(FrameworkElement const& element) {
             return;
         }
 
-        if (!ZenContextMenuIsOurs(menu, it->second)) {
+        if (!CWContextMenuIsOurs(menu, it->second)) {
             Wh_Log(L"[ctxmenu] backdrop root added (backdrop %s)",
                    menu.SystemBackdrop() ? L"present" : L"missing");
-            ZenContextMenuScheduleApply(key, menu, it->second,
+            CWContextMenuScheduleApply(key, menu, it->second,
                                         L"backdrop root added");
         }
         return;
     }
 }
 
-void ZenContextMenuOnElementAdded(FrameworkElement const& element) {
+void CWContextMenuOnElementAdded(FrameworkElement const& element) {
     if (!g_zenContextMenuParams.enabled) {
         return;
     }
@@ -6610,7 +6607,7 @@ void ZenContextMenuOnElementAdded(FrameworkElement const& element) {
         try {
             auto name = element.Name();
             if (name == L"PrimaryItemsSystemBackdropRoot") {
-                ZenContextMenuOnBackdropRootAdded(element);
+                CWContextMenuOnBackdropRootAdded(element);
             }
         } catch (winrt::hresult_error const& ex) {
             Wh_Log(L"[ctxmenu] error %08X: %s", ex.code(),
@@ -6626,9 +6623,9 @@ void ZenContextMenuOnElementAdded(FrameworkElement const& element) {
             if (it->second.menu.get() == menu) {
                 // The same menu opened again.
                 if (menu.IsLoaded()) {
-                    ZenContextMenuApply(key, menu, it->second, L"reopened");
+                    CWContextMenuApply(key, menu, it->second, L"reopened");
                 } else {
-                    ZenContextMenuWaitLoaded(key, menu, it->second);
+                    CWContextMenuWaitLoaded(key, menu, it->second);
                 }
                 return;
             }
@@ -6647,22 +6644,22 @@ void ZenContextMenuOnElementAdded(FrameworkElement const& element) {
         auto& entry = g_zenContextMenus[key];
         entry.menu = menu;
 
-        ZenContextMenuRegisterBackdropCallback(key, menu, entry);
+        CWContextMenuRegisterBackdropCallback(key, menu, entry);
 
         if (menu.IsLoaded()) {
             Wh_Log(L"[ctxmenu] menu found (loaded)");
-            ZenContextMenuApply(key, menu, entry, L"found");
+            CWContextMenuApply(key, menu, entry, L"found");
             return;
         }
 
         Wh_Log(L"[ctxmenu] menu found, waiting for it to load");
-        ZenContextMenuWaitLoaded(key, menu, entry);
+        CWContextMenuWaitLoaded(key, menu, entry);
     } catch (winrt::hresult_error const& ex) {
         Wh_Log(L"[ctxmenu] error %08X: %s", ex.code(), ex.message().c_str());
     }
 }
 
-void ZenContextMenuRestoreAll() {
+void CWContextMenuRestoreAll() {
     // Detached first: restoring runs XAML work which may re-enter.
     auto menus = std::move(g_zenContextMenus);
     g_zenContextMenus.clear();
@@ -6732,8 +6729,8 @@ std::optional<PropertyOverrideValue> ParseNonXamlPropertyOverrideValue(
 
     auto substr = TrimStringView(stringValue);
 
-    // CW: a SystemBackdrop value, see ZenAcrylicBackdrop.
-    if (auto backdrop = ParseZenAcrylicBackdropValue(substr)) {
+    // CW: a SystemBackdrop value, see CWAcrylicBackdrop.
+    if (auto backdrop = ParseCWAcrylicBackdropValue(substr)) {
         Wh_Log(L"%.*s", static_cast<int>(substr.length()), substr.data());
         return PropertyOverrideValue{std::move(*backdrop)};
     }
@@ -10658,7 +10655,7 @@ const TextColorMode* GetTextColorMode() {
 
 // CW: applied after theme styles; defined later next to
 // GetAccentGradientColor so it can reuse the tint helpers.
-void ApplyZenContextMenuStyles();
+void ApplyCWContextMenuStyles();
 
 // The WinUI Foreground value, empty to keep the theme's colors.
 std::wstring GetTextColorModeBrush() {
@@ -10669,10 +10666,10 @@ std::wstring GetTextColorModeBrush() {
 const Theme* GetSelectedTheme() {
     PCWSTR themeName = Wh_GetStringSetting(L"theme");
     const Theme* theme = nullptr;
-    if (wcscmp(themeName, L"ZenTranslucent") == 0) {
-        theme = &g_themeZenTranslucent;
-    } else if (wcscmp(themeName, L"ZenTransparent") == 0) {
-        theme = &g_themeZenTransparent;
+    if (wcscmp(themeName, L"CWTranslucent") == 0) {
+        theme = &g_themeCWTranslucent;
+    } else if (wcscmp(themeName, L"CWTransparent") == 0) {
+        theme = &g_themeCWTransparent;
     } else if (wcscmp(themeName, L"Translucent Explorer11") == 0) {
         theme = &g_themeTranslucent_Explorer11;
     } else if (wcscmp(themeName, L"MicaBar") == 0) {
@@ -10757,7 +10754,7 @@ void ProcessAllStylesFromSettings() {
 
     // CW: modern Win11 context menu glass (desktop + Explorer).
     try {
-        ApplyZenContextMenuStyles();
+        ApplyCWContextMenuStyles();
     } catch (winrt::hresult_error const& ex) {
         Wh_Log(L"Error %08X", ex.code());
     } catch (std::exception const& ex) {
@@ -10779,12 +10776,12 @@ void ProcessAllStylesFromSettings() {
     std::vector<PCWSTR> themeResourceVariables =
         theme ? theme->themeResourceVariables : std::vector<PCWSTR>{};
 
-    // CW: the field fill resources of the Zen themes, from the
+    // CW: the field fill resources of the CW themes, from the
     // fieldOpacity setting. They're added after the theme's own variables and
     // before the user's, so user variables still override them. The strings
     // must outlive the ProcessResourceVariablesFromSettings call.
     std::vector<std::wstring> zenFieldFillVariables;
-    if (theme == &g_themeZenTranslucent || theme == &g_themeZenTransparent) {
+    if (theme == &g_themeCWTranslucent || theme == &g_themeCWTransparent) {
         int fieldOpacity = Wh_GetIntSetting(L"fieldOpacity");
         fieldOpacity = std::clamp(fieldOpacity, 0, 100);
         int hoverOpacity = std::min(fieldOpacity + 6, 100);
@@ -10798,10 +10795,10 @@ void ProcessAllStylesFromSettings() {
         std::wstring fill = whiteAtOpacity(fieldOpacity);
         std::wstring hover = whiteAtOpacity(hoverOpacity);
         zenFieldFillVariables = {
-            L"ZenFieldFill@Dark=" + fill,
-            L"ZenFieldFill@Light=" + fill,
-            L"ZenFieldFillPointerOver@Dark=" + hover,
-            L"ZenFieldFillPointerOver@Light=" + hover,
+            L"CWFieldFill@Dark=" + fill,
+            L"CWFieldFill@Light=" + fill,
+            L"CWFieldFillPointerOver@Dark=" + hover,
+            L"CWFieldFillPointerOver@Light=" + hover,
         };
         for (const auto& variable : zenFieldFillVariables) {
             themeResourceVariables.push_back(variable.c_str());
@@ -10912,11 +10909,11 @@ void UninitializeForCurrentThread() {
     g_elementsCustomizationRules.clear();
 
     // CW: no Loaded handler may outlive the mod.
-    CancelAllZenPendingBackdrops();
+    CancelAllCWPendingBackdrops();
 
     // CW: give every context menu its own backdrop back, so that no
     // menu keeps an object of this mod after it's unloaded.
-    ZenContextMenuRestoreAll();
+    CWContextMenuRestoreAll();
 
     UninitializeResourceVariables();
 
@@ -12340,10 +12337,10 @@ int GetAccentGradientColor(std::optional<bool> darkTheme = std::nullopt) {
 
 // CW: glass for the Win11 XAML context menu (desktop right-click and
 // Explorer). The menu's acrylic is its SystemBackdrop, not a XAML brush, so
-// the glass is a ZenAcrylicBackdrop written to each menu in code (see
-// ZenContextMenuOnElementAdded); this only prepares the parameters for the
+// the glass is a CWAcrylicBackdrop written to each menu in code (see
+// CWContextMenuOnElementAdded); this only prepares the parameters for the
 // thread. No border or background rules: the menu keeps the stock edge.
-void ApplyZenContextMenuStyles() {
+void ApplyCWContextMenuStyles() {
     g_zenContextMenuParams = {};
 
     if (!Wh_GetIntSetting(L"contextMenuEnable")) {
@@ -12523,8 +12520,8 @@ void TriggerWindowCompositionUpdate(HWND hWnd) {
                  RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
-void ZenScheduleExplorerStyleRetry();
-void ZenStopExplorerStyleRetry();
+void CWScheduleExplorerStyleRetry();
+void CWStopExplorerStyleRetry();
 
 void OnWindowCreated(HWND hWnd, PCSTR funcName) {
     TargetWindowType windowType = GetTargetWindowType(hWnd);
@@ -12542,7 +12539,7 @@ void OnWindowCreated(HWND hWnd, PCSTR funcName) {
         // CW: toolbar islands are often created shortly after the
         // CabinetWClass window; keep attaching and periodically reinject.
         if (windowType == TargetWindowType::FileExplorer) {
-            ZenScheduleExplorerStyleRetry();
+            CWScheduleExplorerStyleRetry();
         }
     }
 }
@@ -12829,7 +12826,7 @@ bool RunFromWindowThread(HWND hWnd,
 std::mutex g_zenLazyInitThreadsMutex;
 std::unordered_set<DWORD> g_zenLazyInitThreads;
 
-void ZenNoteLazyInitThread() {
+void CWNoteLazyInitThread() {
     std::lock_guard<std::mutex> guard(g_zenLazyInitThreadsMutex);
     g_zenLazyInitThreads.insert(GetCurrentThreadId());
 }
@@ -13260,7 +13257,7 @@ std::mutex g_zenExplorerStyleRetryMutex;
 // opening more windows later doesn't restyle the ones already open.
 std::atomic<bool> g_zenExplorerStyleRetryFirstCycleDone{false};
 
-void ZenStopExplorerStyleRetry() {
+void CWStopExplorerStyleRetry() {
     std::lock_guard<std::mutex> guard(g_zenExplorerStyleRetryMutex);
     if (g_zenExplorerStyleRetryTimer) {
         SetThreadpoolTimer(g_zenExplorerStyleRetryTimer, nullptr, 0, 0);
@@ -13272,14 +13269,14 @@ void ZenStopExplorerStyleRetry() {
     g_zenExplorerStyleRetryFirstCycleDone = false;
 }
 
-void ZenRunExplorerStyleRetryFromWindowThread(PVOID) {
+void CWRunExplorerStyleRetryFromWindowThread(PVOID) {
     Wh_Log(L"[boot-retry] re-attaching XAML diagnostics on thread %u",
            GetCurrentThreadId());
     InitializeForCurrentThread();
     InitializeSettingsAndTap();
 }
 
-void ZenExplorerStyleRetryTick() {
+void CWExplorerStyleRetryTick() {
     int attempt = g_zenExplorerStyleRetryAttempt.fetch_add(1) + 1;
     Wh_Log(L"[boot-retry] attempt %d", attempt);
 
@@ -13312,13 +13309,13 @@ void ZenExplorerStyleRetryTick() {
 
         for (auto hTargetWnd : hTargetWnds) {
             RunFromWindowThread(hTargetWnd,
-                                ZenRunExplorerStyleRetryFromWindowThread,
+                                CWRunExplorerStyleRetryFromWindowThread,
                                 nullptr);
         }
     }
 
     // Schedule next delay: 1.5s, 3s, 6s, then stop (4 attempts total).
-    // Do not call ZenStopExplorerStyleRetry from this timer callback — waiting
+    // Do not call CWStopExplorerStyleRetry from this timer callback — waiting
     // for the callback would deadlock.
     constexpr int kMaxAttempts = 4;
     if (attempt >= kMaxAttempts) {
@@ -13347,7 +13344,7 @@ void ZenExplorerStyleRetryTick() {
     SetThreadpoolTimer(g_zenExplorerStyleRetryTimer, &ft, 0, 0);
 }
 
-void ZenScheduleExplorerStyleRetry() {
+void CWScheduleExplorerStyleRetry() {
     std::lock_guard<std::mutex> guard(g_zenExplorerStyleRetryMutex);
     if (g_zenExplorerStyleRetryTimer) {
         // Already scheduled; bump so a fresh File Explorer window still gets
@@ -13361,7 +13358,7 @@ void ZenScheduleExplorerStyleRetry() {
         g_zenExplorerStyleRetryAttempt.store(0);
         g_zenExplorerStyleRetryTimer = CreateThreadpoolTimer(
             [](PTP_CALLBACK_INSTANCE, PVOID, PTP_TIMER) {
-                ZenExplorerStyleRetryTick();
+                CWExplorerStyleRetryTick();
             },
             nullptr, nullptr);
         if (!g_zenExplorerStyleRetryTimer) {
@@ -13507,18 +13504,18 @@ void Wh_ModAfterInit() {
     if (hTargetWnds.size() > 0) {
         Wh_Log(L"Initializing - Found target windows");
         InitializeSettingsAndTap();
-        ZenScheduleExplorerStyleRetry();
+        CWScheduleExplorerStyleRetry();
     } else {
         // Explorer may not have created CabinetWClass yet at login; still
         // retry so we attach once the first window appears.
-        ZenScheduleExplorerStyleRetry();
+        CWScheduleExplorerStyleRetry();
     }
 }
 
 void Wh_ModUninit() {
     Wh_Log(L">");
 
-    ZenStopExplorerStyleRetry();
+    CWStopExplorerStyleRetry();
 
     StopStatsTimer();
 

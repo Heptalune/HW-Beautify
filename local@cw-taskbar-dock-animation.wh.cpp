@@ -21,7 +21,7 @@
 // @compilerOptions -lole32 -loleaut32 -lruntimeobject -lshcore -lwindowsapp -luser32
 // ==/WindhawkMod==
 
-// CW桌面美化 整合说明：基于 Taskbar Dock Animation Plus (incconutwo, v2.0.1)，
+// CW-Beautify 整合说明：基于 Taskbar Dock Animation Plus (incconutwo, v2.0.1)，
 // 原版 Taskbar Dock Animation (Ph0en1x-dev, GPL-3.0)。
 // CW 新增：「弹跳抬升幅度」「防裁剪保护」；中文界面完善。
 
@@ -64,7 +64,7 @@
 - **弹跳开始延迟（毫秒）**：光标停止后等多久开始「呼吸」动画，默认 500。
 - **聚焦动画时长（毫秒）**：淡入淡出时长，默认 150。
 - **任务栏标签兼容模式**：任务栏显示窗口标题（矩形按钮）时开启，修正动画居中。
-- **排除系统按钮**：0=全部动画，1=排除开始，2=排除开始/搜索/任务视图/小组件，3=仅应用图标。
+- **排除系统按钮**：0=全部动画，1=排除开始，2=仅应用图标动画，3=等同 0。
 - **平滑度（Lerp 速度）**：越高越灵敏，越低越平滑，0 为禁用。
 - **禁用垂直「弹跳」**：禁用上下「呼吸」动画。
 - **禁用弹跳效果**：完全关闭空闲「呼吸」。

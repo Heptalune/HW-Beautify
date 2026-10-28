@@ -1,10 +1,10 @@
-# ZenDesktop - 开发者备忘录与技术沉淀
+# CW-Beautify - 开发者备忘录与技术沉淀
 
 > 注：`ExplorerBlurMica/`、`ExplorerBlurMica_Source/` 目录已从仓库删除，下文提到它们的内容仅作历史记录；旧版卸载用 `tools/uninstall-ExplorerBlurMica.bat`。
 
-> **v4.2 策略更新（2026-10）**：文件管理器透明以 Windhawk mod `local@zen-explorer-styler` 为准，**不再推荐用户安装或注册 ExplorerBlurMica**。若用户机器上仍注册着 EBM，应引导其运行 `tools/uninstall-ExplorerBlurMica.bat` 卸载后再使用 styler。下文中大量 EBM / clearWinUIBg / 黑杠排查记录保留作历史，不要再当作当前产品建议写进 README 或发布文案。`deploy.ps1` 不得重新注册 EBM。
+> **v4.2 策略更新（2026-10）**：文件管理器透明以 Windhawk mod `local@cw-explorer-styler` 为准，**不再推荐用户安装或注册 ExplorerBlurMica**。若用户机器上仍注册着 EBM，应引导其运行 `tools/uninstall-ExplorerBlurMica.bat` 卸载后再使用 styler。下文中大量 EBM / clearWinUIBg / 黑杠排查记录保留作历史，不要再当作当前产品建议写进 README 或发布文案。`deploy.ps1` 不得重新注册 EBM。
 
-这份文档记录了 ZenDesktop Mod 的架构解析、各个核心文件的作用，以及在开发过程中特别是针对 Windows API 及 Windhawk 环境踩过的坑和技术解决方案。
+这份文档记录了 CW-Beautify Mod 的架构解析、各个核心文件的作用，以及在开发过程中特别是针对 Windows API 及 Windhawk 环境踩过的坑和技术解决方案。
 
 ## 0. 当前接手状态（2026-08-20，读完这一节就能接着干）
 
@@ -15,37 +15,37 @@
 ### 用户原话（三件事）
 1. 装了 ExplorerBlurMica 之后，**每次开机第一次打开文件管理器会重启 Explorer**，再点一次才能开。
 2. 每次开机任务栏 mod「不生效」：条子透明，**托盘 / 音量图标是 Win 原生实底**。用户确认：**在 Windhawk 里把任务栏 mod 关开一次就好**（不是重启 Explorer）。
-3. 要把最大化层重新并进任务栏 mod（参考 `D:\Download\ZenDesktop_OneKeyDeploy_v4.0.0_Online-32054bd01e29\local@zen-taskbar-acrylic.wh.cpp` v3.5.0）。旧实现连续最大化/最小化会崩 Explorer。代码风格跟 [ponytail](https://github.com/DietrichGebert/ponytail)：先读根因，复用现成，最少 diff。
+3. 要把最大化层重新并进任务栏 mod（参考 `D:\Download\CW-Beautify_OneKeyDeploy_v4.0.0_Online-32054bd01e29\local@cw-taskbar-acrylic.wh.cpp` v3.5.0）。旧实现连续最大化/最小化会崩 Explorer。代码风格跟 [ponytail](https://github.com/DietrichGebert/ponytail)：先读根因，复用现成，最少 diff。
 
 ### 已核验的根因
 | 症状 | 根因 |
 |---|---|
 | 开机托盘/音量原生，开关 mod 立刻好 | TAP 只注入一次（`g_initialized.exchange(true)`）。开机时托盘 XAML island 还没建完；关开一次等于 `UninitializeSettingsAndTap` + 再 `InitializeSettingsAndTap`，岛已经在了。开始菜单早就有 `TaskbarCreated` 重试，任务栏没有。音量图标在 explorer 托盘上，所以只开任务栏 mod 就能修好，不必动通知中心。 |
 | 开机第一次开文件管理器重启 Explorer | ExplorerBlurMica 是 COM BHO。`CObjectWithSite` 构造函数里立刻 `OnWindowLoad()` → `MH_Initialize` + hook。第一个 `CabinetWClass` 还在创建。失败路径弹 `MessageBox` 或 `FreeLibraryAndExitThread`，Explorer 被干掉。官方 README 自己也写「Reopen the Explorer window」。 |
-| v3.5.0 连续 max/min 崩 | WinEvent `EVENT_OBJECT_LOCATIONCHANGE` 回调里对 Explorer UI 线程 `SendMessage`（`RunFromWindowThread`）。笔记 2.35–2.39。涂色必须走 `ZenTaskbarRuntimeBgBrush` 局部刷新，禁止拆 TAP。Win32 `SetWindowCompositionAttribute` 在 Win11 XAML 任务栏上会涂成黑底（2.23–2.29），helper 的涂色不能搬过来，只能搬它的独立线程检测。 |
+| v3.5.0 连续 max/min 崩 | WinEvent `EVENT_OBJECT_LOCATIONCHANGE` 回调里对 Explorer UI 线程 `SendMessage`（`RunFromWindowThread`）。笔记 2.35–2.39。涂色必须走 `CWTaskbarRuntimeBgBrush` 局部刷新，禁止拆 TAP。Win32 `SetWindowCompositionAttribute` 在 Win11 XAML 任务栏上会涂成黑底（2.23–2.29），helper 的涂色不能搬过来，只能搬它的独立线程检测。 |
 
 ### 2026-10-15 开机托盘不生效 + 文件管理器打不开（4.1.2，未在 Windows 实测）
 * **主嫌疑：XAML 诊断只有一个位置。** 任务栏 mod 用 `InitializeXamlDiagnosticsEx` 注 TAP；包里现在的 427KB ExplorerBlurMica 2.0.x 也调它（不在导入表，是 GetProcAddress 动态取的；字符串里有 `InitializeXamlDiagnosticsEx`、`MBox::InitializeUWPXamlDiagnostics`、`xamldiagnostics.cpp`，UWP 和 WinUI 两套都挂）。第一次开文件管理器时 EBM 抢走位置，之后新出来的托盘图标就没人涂 → 托盘原生；关开 mod = 重新抢回来。上游：windhawk-mods#1262、#3720（2.0.1 才开始冲突，1.0.7 没有）。
 * **第二嫌疑：Alert 弹窗卡住文件管理器。** 我们的 fork 默认 `xamlDiagnosticsHandling: alert`，`MessageBox` 弹在 EBM 调用的线程上，也就是第一个 `CabinetWClass` 的线程 → 窗口出不来。4.1.2 默认改 `allow`，deploy 把空值/alert 改成 allow。
 * EBM 自己也有「开机第一次打开就崩」：Maplespe/ExplorerBlurMica#209（24H2，ucrtbase `0xc0000409`，未修）、#173。
-* 4.1.2：开机重试 2.5s → 8s → 20s（不拆 TAP，只补没初始化的线程）；`[ZenDiag]` 日志记录谁在抢 XAML 诊断。
-* 可选兜底：`deploy.ps1 -StartupCheck check|restart|remove`，计划任务 `\ZenDesktop\StartupCheck`，每次开机最多重启一次 explorer，日志 `%LOCALAPPDATA%\ZenDesktop\startup-check.log`。
+* 4.1.2：开机重试 2.5s → 8s → 20s（不拆 TAP，只补没初始化的线程）；`[CWDiag]` 日志记录谁在抢 XAML 诊断。
+* 可选兜底：`deploy.ps1 -StartupCheck check|restart|remove`，计划任务 `\CW-Beautify\StartupCheck`，每次开机最多重启一次 explorer，日志 `%LOCALAPPDATA%\CW-Beautify\startup-check.log`。
 * 二分步骤见 `TEST_v4.2.md` 第 5 轮。
 * **更正**：仓库 `ExplorerBlurMica_Source` 是 1.0 系，**全源码没有一处调用 `InitializeXamlDiagnosticsEx`**（也没有任何 XAML/WinUI 代码）。抢 XAML 诊断的只有仓库里那个 427KB 的 2.0.1 二进制（版本资源 2.0.1.0，`config.ini` 的 `clearWinUIBg` 就是它的 WinUI 透明功能），没有源码，改不了。所以源码版 = 不冲突，代价是 WinUI 文件列表不透明。
 * 源码版（1.0.7.0）加固（dllmain.cpp）：ESC 改 `GetAsyncKeyState`（延迟线程上 GetKeyState 看不到）；已 hook 时新窗口直接 `RefreshConfig()`；hook 失败后清掉线程句柄允许下个窗口重试；hook 成功后 PIN 住 DLL；延迟线程持有模块引用；`delayHookMs` 可配（默认 800）；DllMain 里 `substr` 越界保护；`CurrentBuildNumber` 读取补结尾 0。Actions 现在也在 `v4.2-draft` push 时编。
 
 ### 这一轮已经改了的文件
-* `local@zen-taskbar-acrylic.wh.cpp` **4.0.0 → 4.1.1**
+* `local@cw-taskbar-acrylic.wh.cpp` **4.0.0 → 4.1.1**
   * 开机 2.5s 后自动走一遍和「关开 mod」相同的 `ReapplyTaskbarStyles(false)`
   * 复用开始菜单的 `TaskbarCreated` 隐藏窗口（Explorer 崩完重拉也要重挂 TAP）
   * 最大化层：v3.5.0 的 RuntimeBgBrush + helper 的独立 WinEvent 线程 + `SendMessageTimeout(SMTO_ABORTIFHUNG, 200ms)`，不再从 WinEvent `SendMessage`
 * `deploy.ps1`：部署时把 `local@taskbar-background-helper` 写成 `Disabled=1`，避免两套 WinEvent 叠在 explorer 上（那会黑底）
 * `ExplorerBlurMica_Source/`：构造函数不再 hook；`SetSite` 后 800ms 再 `OnWindowLoad`；`MH_ERROR_ALREADY_INITIALIZED` 当成功；禁止 MessageBox / 杀线程
-* **GitHub Actions 已编过（2026-08-20）**：commit `a63cc5e`，run https://github.com/Liset999/ZenDesktop/actions/runs/32387477393 `success`。用户下载 zip 后已覆盖 `ExplorerBlurMica/ExplorerBlurMica.dll`（217088 bytes，SHA256 `D527ED4E6A1877D4EE8F60CDFDA1DBF4D810B479B8E5D77EB398F6531DF31B27`）。BHO 实际写在 Maplespe GUID `{B44BD3C8-...}`。
+* **GitHub Actions 已编过（2026-08-20）**：commit `a63cc5e`，run https://github.com/Heptalune/CW-Beautify/actions/runs/32387477393 `success`。用户下载 zip 后已覆盖 `ExplorerBlurMica/ExplorerBlurMica.dll`（217088 bytes，SHA256 `D527ED4E6A1877D4EE8F60CDFDA1DBF4D810B479B8E5D77EB398F6531DF31B27`）。BHO 实际写在 Maplespe GUID `{B44BD3C8-...}`。
 * **主列表发白、侧栏能透（2026-08-21）**：用户 `config.ini` 已是 `effect=3`、亮色 `a=0`，不是参数不够。Win11 24H2 文件列表/命令栏是 WinUI；仓库 `ExplorerBlurMica_Source` 是 1.0 系，GitHub 编出的 217KB DLL 清不掉这块。v4.0.0 包里的 **427KB** DLL（Maplespe 2.0.x / 23H2 WinUI3）才是以前「看起来全透」的那份。已把 427KB 拷回 `ExplorerBlurMica.dll`，217KB 延迟 hook 版备份为 `ExplorerBlurMica.dll.delayhook-217k`。换 DLL 后需重新 `register.cmd`。标题栏失焦变实色仍是系统限制。
 
 ### 新对话接手清单（按顺序）
-1. 任务栏：Windhawk 源代码页打开 `local@zen-taskbar-acrylic`，确认版本 **4.1.1**，保存并编译，重启 Explorer。
+1. 任务栏：Windhawk 源代码页打开 `local@cw-taskbar-acrylic`，确认版本 **4.1.1**，保存并编译，重启 Explorer。
 2. 验证开机：重启 Windows（不要只重启 Explorer）。托盘/音量应在约 2.5 秒内自己变透明，不必再手动关开。
 3. 验证最大化：连续放大/缩小窗口，任务栏应变厚且 Explorer 不崩、Toolkit 不报不稳定。若 helper 仍在 Windhawk 里启用，先关掉。
 4. ExplorerBlurMica：用 VS 打开 `ExplorerBlurMica_Source/ExplorerBlurMica.sln` 编 x64 Release，把 DLL 拷到 `ExplorerBlurMica/`，管理员跑 `register.cmd`，再测「开机第一次打开文件管理器」。
@@ -65,22 +65,22 @@
 
 ## 1. 核心文件解析
 
-当前目录下的文件构成了 ZenDesktop 美化套件的核心：
+当前目录下的文件构成了 CW-Beautify 美化套件的核心：
 
 ### Windhawk Mods (Core Injection Code)
-*   **`local@zen-taskbar-acrylic.wh.cpp`**
+*   **`local@cw-taskbar-acrylic.wh.cpp`**
     *   **Role**: Taskbar transparency and custom visual styling mod. v4.1.0 起内置最大化状态层 + 开机 TAP 延迟重试。
     *   **Tech**: Injected into `explorer.exe` taskbar component. Overrides `TrayNotifyWnd` / `ReBarWindow32` default background rendering to apply acrylic/blur effects.
     *   **Current version**: v4.1.4
-*   **`local@zen-notificationcenter-acrylic.wh.cpp`**
+*   **`local@cw-notificationcenter-acrylic.wh.cpp`**
     *   **Role**: Notification Center transparency and style injection mod.
     *   **Tech**: Injected into the notification center process (`ShellExperienceHost.exe` / `ShellHost.exe`) to make backgrounds transparent and remove unwanted borders/shadows.
     *   **Current version**: v2.8.0
-*   **`local@zen-startmenu-acrylic.wh.cpp`**
+*   **`local@cw-startmenu-acrylic.wh.cpp`**
     *   **Role**: Start Menu pure transparency and advanced acrylic rendering mod.
     *   **Tech**: Injected into `StartMenuExperienceHost.exe`. Hooks system draw APIs and applies DWM (Desktop Window Manager) background effects, removing the default background brush.
     *   **Current version**: v2.7.0
-*   **`local@zen-desktop-toggle-icons.wh.cpp`**
+*   **`local@cw-desktop-toggle-icons.wh.cpp`**
     *   **Role**: Double-click to hide/show desktop icons; system-level global input detection for auto-hide and auto-restore (Issue #2).
     *   **Tech**: Subclasses `SHELLDLL_DefView` and `SysListView32`. Tracks system-wide activity via `GetLastInputInfo()`, sends `0x7402` (WM_COMMAND) to toggle. `g_autoHiddenAt` distinguishes manual vs. auto-hide.
     *   **Current version**: v3.1.0
@@ -97,7 +97,7 @@
 
 ## 2. 技术踩坑与经验总结
 
-在开发和完善 `zen-desktop-toggle-icons` 及部署脚本的过程中，我们总结了以下至关重要的经验教训：
+在开发和完善 `cw-desktop-toggle-icons` 及部署脚本的过程中，我们总结了以下至关重要的经验教训：
 
 ### 2.1 UI 线程与定时器 (Timer) 的安全限制
 *   **问题场景**：在桌面图标的悬停和自动淡出功能中，我们需要使用 `SetTimer` 定时检查鼠标位置。最初在 Windhawk 的初始化回调（Helper 线程）中直接调用了 `SetTimer`，导致 UI 的消息循环被阻塞，甚至引发资源管理器卡死且定时器不生效。
@@ -117,7 +117,7 @@
 ### 2.4 批处理与自动化注册表部署
 *   **问题场景**：希望用户实现"一键启用"所有 Mod。但 Windhawk 的脚本生效往往需要用户手动打开 UI 点击启用。
 *   **经验沉淀**：在缺乏 GUI 交互的自动化部署中，通过配置系统底层设置是最佳出路。在批处理中写脚本，**永远不要急于添加 `>nul 2>&1`屏蔽输出**，这会掩盖掉很多诸如权限被拒绝的关键错误。
-*   **解决方案**：`deploy.bat` 中不仅复制源码，还通过 `reg add "HKLM\\SOFTWARE\\Windhawk\\Engine\\Mods\\zen-desktop-toggle-icons" /v Disabled /t REG_DWORD /d 0 /f` 等命令强制写入配置。这样实现了"覆盖源码即激活"的无缝对接。
+*   **解决方案**：`deploy.bat` 中不仅复制源码，还通过 `reg add "HKLM\\SOFTWARE\\Windhawk\\Engine\\Mods\\cw-desktop-toggle-icons" /v Disabled /t REG_DWORD /d 0 /f` 等命令强制写入配置。这样实现了"覆盖源码即激活"的无缝对接。
 
 ### 2.5 纯底层模拟双击 (Double Click) 逻辑
 *   **问题场景**：我们要实现"桌面空白处双击"。系统的 ListView 控件本身拥有 `CS_DBLCLKS` 样式可以直接捕获 `WM_LBUTTONDBLCLK`，但在其父级 `SHELLDLL_DefView` 进行 Subclass 时，由于父窗口没这个样式，它是收不到原生双击消息的。
@@ -145,14 +145,14 @@
     2. **定时轮询路径**：在 500ms 的 `WM_TIMER` 回调中，用 `GetLastInputInfo()` 检测是否有发生在 `g_autoHiddenAt` 之后的系统输入，有则恢复。覆盖鼠标在**其他窗口**移动这种情形，最大延迟 ≤ 500ms。
 
 ### 2.9 Windhawk 官方社区代码同步机制（发布与开源）
-*   **问题场景**：ZenDesktop 套件中的部分核心 Mod（如桌面图标双击隐藏 `zen-desktop-toggle-icons`）也是公开发布在 Windhawk 官方模组库中的开源项目。如果只在本地 `ZenDesktop_OneKeyDeploy` 维护，会导致官方社区版本（即用户通过 Windhawk 商店搜索下载的版本）停滞不前。
+*   **问题场景**：CW-Beautify 套件中的部分核心 Mod（如桌面图标双击隐藏 `cw-desktop-toggle-icons`）也是公开发布在 Windhawk 官方模组库中的开源项目。如果只在本地 `CW-Beautify_OneKeyDeploy` 维护，会导致官方社区版本（即用户通过 Windhawk 商店搜索下载的版本）停滞不前。
 *   **经验沉淀**：建立清晰的 **双仓维护机制 (Dual-Repository Workflow)**。
-    1. **私有/套件仓 (`ZenDesktop_OneKeyDeploy`)**：作为主开发库。负责所有快速迭代、联调测试以及部署脚本（`deploy.bat`）的集成。
-    2. **开源/同步仓 (`windhawk-mods`)**：作为发布库（fork 自官方 `ramensoftware/windhawk-mods`）。当主仓版本稳定（如达成 v3.1.0 里程碑）后，手动将 `local@zen-desktop-toggle-icons.wh.cpp` 的内容复制、重命名（去掉 `local@`）并覆盖到同步仓的 `mods/` 目录下。
+    1. **私有/套件仓 (`CW-Beautify_OneKeyDeploy`)**：作为主开发库。负责所有快速迭代、联调测试以及部署脚本（`deploy.bat`）的集成。
+    2. **开源/同步仓 (`windhawk-mods`)**：作为发布库（fork 自官方 `ramensoftware/windhawk-mods`）。当主仓版本稳定（如达成 v3.1.0 里程碑）后，手动将 `local@cw-desktop-toggle-icons.wh.cpp` 的内容复制、重命名（去掉 `local@`）并覆盖到同步仓的 `mods/` 目录下。
 *   **解决方案与规范**：每次在主仓完成版本跃升（如修复了自动隐藏 Bug），必须执行以下发布流程：
-    1. 在 `ZenDesktop_OneKeyDeploy` 中验证全部代码和 `deploy.bat` 脚本逻辑。
+    1. 在 `CW-Beautify_OneKeyDeploy` 中验证全部代码和 `deploy.bat` 脚本逻辑。
     2. 使用文件复制或命令（如 `Copy-Item ...`）将 `.wh.cpp` 源码完整覆盖到 `windhawk-mods/mods/` 中对应的文件。
-    3. 在 `windhawk-mods` 仓内执行 Git Commit (e.g., `update zen-desktop-toggle-icons to v3.1.0`)。
+    3. 在 `windhawk-mods` 仓内执行 Git Commit (e.g., `update cw-desktop-toggle-icons to v3.1.0`)。
     4. 执行 `git push` 提交到远程 GitHub 分支，随后在 GitHub 上发起 Pull Request（PR）合并到 Windhawk 官方主线。这种模式保障了高级用户（通过一键部署包）和普通社区用户（通过 Mod 商店）都能用到最稳定的代码，且避免了混淆。
 
 ### 2.10 开始菜单文字隐藏与悬浮显示（v3.3.0 经验）
@@ -176,7 +176,7 @@
     - 错误生成：`<SolidColorBrush Color="#121212 Opacity="0.50" />`（颜色属性未闭合，XAML 解析器报错并回退）。
     - 错误生成：`<WindhawkBlur BlurAmount="30 TintColor="#121214 TintOpacity="0.50" />`（所有中间属性的闭合引号丢失）。
 *   **解决方案**：
-    - 在 `local@zen-taskbar-acrylic.wh.cpp` 与 `local@zen-notificationcenter-acrylic.wh.cpp` 的 `ProcessAllStylesFromSettings()` 拼接处，补全了所有丢失的转义引号 `\"`，生成严丝合缝的合法 XML 结构：
+    - 在 `local@cw-taskbar-acrylic.wh.cpp` 与 `local@cw-notificationcenter-acrylic.wh.cpp` 的 `ProcessAllStylesFromSettings()` 拼接处，补全了所有丢失的转义引号 `\"`，生成严丝合缝的合法 XML 结构：
       `customBrush = L"<SolidColorBrush Color=\"" + finalColor + L"\" Opacity=\"" + opacityStr + L"\" />";`
       `customBrush = L"<WindhawkBlur BlurAmount=\"" + blurStr + L"\" TintColor=\"" + finalColor + L"\" TintOpacity=\"" + opacityStr + L"\" ... />";`
     - 更新后，XAML 引擎顺利解析动态画刷，成功实现了零延迟的透明度与毛玻璃纯平滑联动！
@@ -187,7 +187,7 @@
     1.  **高频对象重构代价极高**：在 WinRT/XAML 框架下，反复重新构建动态 XAML 字符串并通过 XAML 解析器创建毛玻璃画刷是极其昂贵的。只要其参数（模糊度、颜色等）没有实质性改变，就应该完全跳过重构和重新链接 Composition 渲染层的过程。
     2.  **精细参数缓存比较**：为了实现这一点，必须在自定义结构体中实现深度比较操作。通过为 `XamlBlurBrushParams` 实现 `operator==` 并将其缓存进每个属性自定义状态中，可以在高频调用中秒级拦截重复的重新实例化。
 *   **解决方案**：
-    -   在 `local@zen-startmenu-acrylic.wh.cpp` 与 `local@zen-taskbar-acrylic.wh.cpp` 中：
+    -   在 `local@cw-startmenu-acrylic.wh.cpp` 与 `local@cw-taskbar-acrylic.wh.cpp` 中：
         1. 为 `XamlBlurBrushParams` 结构体实现了完整的 `operator==` 逻辑，支持模糊度、色彩值、透明度及主题资源的完整比对。
         2. 在 `ElementPropertyCustomizationState` 中引入了 `std::optional<XamlBlurBrushParams> lastBlurParams` 缓存字段。
         3. 修改了 `SetOrClearValue` 函数的签名，传入缓存指针。若发现本次要生成的画刷参数与上一次一致，则直接 `return` 拦截，完美杜绝了无效的对象再造。
@@ -200,7 +200,7 @@
     1.  **美学参数与性能优化解耦**：性能优化应该专注于“减少无效的对象分配”、“缓存匹配”和“提早拦截退出”等**架构层面的逻辑重构**，而不应该通过牺牲视觉效果（如削减模糊半径、砍掉渐变线等）来换取流畅度。以牺牲设计品质为代价的流畅，在美化模组开发中是不可接受的退步。
     2.  **模块化精准回退策略**：在集成多份改动时，必须清晰地区分“核心渲染引擎优化”与“主题/资源配置文件”。当发现视觉品质降级时，可通过 Git 快速定位并**仅回退主题常量与 XAML 样式定义**，而完整保留底层的 XamlBlurBrush 缓存比对逻辑。
 *   **解决方案**：
-    -   全面回退了 `local@zen-startmenu-acrylic.wh.cpp` 和 `local@zen-taskbar-acrylic.wh.cpp` 中被篡改的全部 Apple 玻璃主题常量、渐变色刷以及边界厚度设置，恢复其原本高模糊度（18/10）、高饱和度（2.0/2.2）以及棱镜色散边框的完美美学设计。
+    -   全面回退了 `local@cw-startmenu-acrylic.wh.cpp` 和 `local@cw-taskbar-acrylic.wh.cpp` 中被篡改的全部 Apple 玻璃主题常量、渐变色刷以及边界厚度设置，恢复其原本高模糊度（18/10）、高饱和度（2.0/2.2）以及棱镜色散边框的完美美学设计。
     -   100% 保留了本次新开发的 XamlBlurBrush 缓存匹配引擎，实现了“顶级液态折射画质”与“零延迟、无卡顿高帧率”的完美共存。
 
 ### 2.14 开始菜单搜索栏常规态与活动态 of 视觉美学统一（v3.3.0 经验，v3.4.0 拓展）
@@ -209,7 +209,7 @@
     1.  **内层控件模板遮挡**：搜索框底层虽然有我们定制的毛玻璃背景容器（`TaskbarSearchBackground`），但其内部的核心切换按钮（`SearchBoxToggleButton`）自带一个模板边框（`Border`）。在 Windows 默认浅色主题下，该 Border 被赋予了纯白实色，如同一膏药把底部的半透玻璃完全遮死。
     2.  **禁用状态机的“副作用变透”**：当点击文件夹展开时，开始菜单触发了全局模态。背后的搜索按钮被 Windows 强制切换到 **`Disabled` 状态**。根据 WinUI 的默认控件状态机，该按钮在 Disabled 时背景会置为 `Transparent`，结果“无意中”摘掉了这层白色膏药，让底部的玻璃图层重见天日。
 *   **解决方案与拓展（v3.4.0 沉淀）**：
-    -   **初代修复**：在 `local@zen-startmenu-acrylic.wh.cpp` 的标准与经典 Apple 主题中，直接将 `StartMenu.SearchBoxToggleButton` 和 `StartDocked.SearchBoxToggleButton` 下所有内部 `Border`（含 `BorderElement`）的 `Background` 和 `BorderBrush` 显式强制设为 `Transparent`。
+    -   **初代修复**：在 `local@cw-startmenu-acrylic.wh.cpp` 的标准与经典 Apple 主题中，直接将 `StartMenu.SearchBoxToggleButton` 和 `StartDocked.SearchBoxToggleButton` 下所有内部 `Border`（含 `BorderElement`）的 `Background` 和 `BorderBrush` 显式强制设为 `Transparent`。
     -   **全主题拓展**：由于自定义玻璃（SimplyTransparent）以及各种透明度磨砂主题（TranslucentStartMenu 系列预设）都是以基础的 `g_themeTranslucentStartMenu`（标准和经典版）为底图加载的，因此在 v3.4.0 中，我们将这一套透明覆写规则直接合入到了两个 `g_themeTranslucentStartMenu` 基础主题中，从而一次性修复了所有半透明主题的白框 Bug。
     -   **最终效果**：这一重构彻底移除了常规状态下的实白遮挡，使搜索框在**所有玻璃/半透明主题**、在**任何运行状态**下，都始终如一地展现高折射率的液态玻璃美感。
 
@@ -218,7 +218,7 @@
 *   **深层根源**：任务栏（`explorer.exe`）的视觉元素和生命周期远比开始菜单（`StartMenuExperienceHost.exe`）复杂。任务栏频繁涉及系统通知区域重绘、多显示器扩展栏以及各种第三方美化软件的 XAML 诊断拦截。在这种环境下，精细缓存的比对逻辑极易被 Windows 本身的重绘流打断或造成死锁。
 *   **解决方案**：
     -   **稳定性优先原则**：在追求绝对性能和保障绝对稳定性之间，应优先确保桌面核心组件（任务栏）的 100% 稳健。
-    -   **模块化回退**：开始菜单模组（`zen-startmenu-acrylic`）完整保留 `XamlBlurBrush` 的高频参数比较和失效判定以维持流畅度；而任务栏模组（`zen-taskbar-acrylic`）果断回退至极度稳定且经过广泛实测验证的前一版本（去除缓存结构，采用 Windows 原生重绘流机制），同时在头部保持 `3.4.0` 的版本对齐。
+    -   **模块化回退**：开始菜单模组（`cw-startmenu-acrylic`）完整保留 `XamlBlurBrush` 的高频参数比较和失效判定以维持流畅度；而任务栏模组（`cw-taskbar-acrylic`）果断回退至极度稳定且经过广泛实测验证的前一版本（去除缓存结构，采用 Windows 原生重绘流机制），同时在头部保持 `3.4.0` 的版本对齐。
 
 ### 2.16 大文件推送限制与 GitHub 仓库轻量化设计（v3.4.0 经验）
 *   **问题场景**：在将本地编译的发布包 ZIP 推送至 GitHub 时，由于离线安装包中带有完整的离线编译器导致压缩包大小达到了 `142MB`，触发了 GitHub 单文件不得超过 `100MB` 的硬限制，导致 `git push` 被远程服务器拒绝。
@@ -231,7 +231,7 @@
 *   **问题场景**：用户在 Windhawk UI 的下拉菜单中快速、连续地切换背景颜色等设置时，`explorer.exe` 会发生崩溃并被 Windows 自动重启。
 *   **深层根源**：任务栏等 Mod 在 `Wh_ModSettingsChanged()` 热重载机制中，会调用 `UninitializeForCurrentThread()` 卸载旧样式并立刻通过 `InitializeForCurrentThread()` 加载新样式。如果用户在几百毫秒内连续切换，高频的卸载/加载循环会导致 XAML 元素在还没完全恢复原状时又被再次强行卸载重置，导致 WinUI 内部状态机崩溃，引发了宿主进程（`explorer.exe`）的强制重启。
 *   **解决方案**：
-    -   在所有三个核心美化 Mod (`zen-taskbar-acrylic`, `zen-startmenu-acrylic`, `zen-notificationcenter-acrylic`) 的 `Wh_ModSettingsChanged()` 头部引入了**防抖 (Debounce) 机制**。
+    -   在所有三个核心美化 Mod (`cw-taskbar-acrylic`, `cw-startmenu-acrylic`, `cw-notificationcenter-acrylic`) 的 `Wh_ModSettingsChanged()` 头部引入了**防抖 (Debounce) 机制**。
     -   利用 `std::atomic<DWORD>` 作为自增计数器。每次调用时递增并记录当前序列号，随后休眠 300ms。休眠结束后，检查全局计数器是否依然等于当前序列号。如果不等，说明在这 300ms 内又有新的设置更改触发，当前这次中间状态的变更直接 `return` 丢弃。
     -   只有在最后一次停止切换超过 300ms 时，才会真正触发代价昂贵的 `UninitializeSettingsAndTap()` 和后续的完全重载流程。这不仅杜绝了崩溃，也显著减轻了系统的瞬时渲染压力。
 
@@ -239,12 +239,12 @@
 *   **问题场景**：开发者在一键部署脚本（`deploy.bat`）中升级替换了新的 C++ 源码文件（如 `.wh.cpp`），并成功复制到了 Windhawk 的 `ModsSource` 目录下并重启了 Windhawk 进程。然而，运行部署脚本后，即使对 `.wh.cpp` 进行了修改（如添加了 300ms 防抖机制等重大稳定性修复），系统的热重载和编译流程完全没有被触发，Windhawk 依旧顽固地加载并运行前一个版本的旧代码，导致新补丁无法生效。
 *   **深层根源**：
     1.  **DLL 编译路径缓存**：Windhawk 拥有独立的模块管理机制，当一个 Mod 在本地完成编译后，其生成的物理 `.dll` 路径会被永久写入系统注册表中：
-        `HKLM\SOFTWARE\Windhawk\Engine\Mods\<mod-id>` 项下的 **`LibraryFileName`** 键（例如 `local@zen-taskbar-acrylic_3.4.0_441282.dll`）。
+        `HKLM\SOFTWARE\Windhawk\Engine\Mods\<mod-id>` 项下的 **`LibraryFileName`** 键（例如 `local@cw-taskbar-acrylic_3.4.0_441282.dll`）。
     2.  **跳过源文件检查**：当 Windhawk 服务或主程序重启时，它会优先读取注册表中的 `LibraryFileName`。如果该键指向一个真实存在的 `.dll`，Windhawk **会无条件直接加载该 DLL，而根本不会去检查或比对 `ModsSource` 目录下的 `.wh.cpp` 是否已被修改**。
     3.  **脚本简化导致的缓存残留**：在 v4.0.0 一键部署脚本简化重构期间，由于删除了清空注册表键值的步骤，旧的 `LibraryFileName` 指针在覆盖源码文件后仍残留在注册表中。这使得每次重启 Windhawk 时都直接静默加载了旧版 DLL 缓存，使得本地的源码覆盖部署实质上沦为了“无用功”。
 *   **解决方案**：
     -   **动态 ID 提取与注册表缓存清零**：
-        1. 在 `deploy.bat` 的一键部署复制循环中，使用 Batch 的环境变量延迟扩展机制，通过截取语法 `set "MOD_NAME=%%~nf"` 与 `set "MOD_ID=!MOD_NAME:.wh=!"` 动态从文件名（如 `local@zen-taskbar-acrylic.wh.cpp`）中提取出标准 Mod ID（如 `local@zen-taskbar-acrylic`）。
+        1. 在 `deploy.bat` 的一键部署复制循环中，使用 Batch 的环境变量延迟扩展机制，通过截取语法 `set "MOD_NAME=%%~nf"` 与 `set "MOD_ID=!MOD_NAME:.wh=!"` 动态从文件名（如 `local@cw-taskbar-acrylic.wh.cpp`）中提取出标准 Mod ID（如 `local@cw-taskbar-acrylic`）。
         2. 在源码文件成功复制到 `ModsSource` 目录后，立即执行 `reg add` 指令强制将 `HKLM\SOFTWARE\Windhawk\Engine\Mods\!MOD_ID!` 下的 `LibraryFileName` 键值重置为空字符串 `""`：
            `reg add "HKLM\SOFTWARE\Windhawk\Engine\Mods\!MOD_ID!" /v "LibraryFileName" /t REG_SZ /d "" /f >nul 2>&1`
         3. 重启 Windhawk 后，引擎检测到注册表中的编译链接为空，将**立刻唤起本地编译器对最新覆盖的 C++ 源文件进行全量热编译**，彻底打通了“源码修改 -> 脚本一键部署 -> 全自动重编译生效”的完美极简开发者闭环！
@@ -267,12 +267,12 @@
     2.  **动态版本兼容**：不同模组在发展过程中其版本（`Version`）各不相同（如 `3.4.0` 或其他）。如果写死固定版本，当引擎加载到与 cpp 源码头不符的注册表声明时，可能触发完整性或兼容性验证失败。
     3.  **前台 UI 的缓存限制（`userprofile.json`）**：Windhawk 的前端 UI 并不是每次启动都实时扫描注册表或文件，而是极度依赖位于 `%ProgramData%\Windhawk\userprofile.json` 中的**本地 UI 缓存文件**。直接在底层注入注册表和文件，虽然服务层能成功在后台编译并注入 `explorer.exe`，但由于 `userprofile.json` 缓存未更新，前台 UI 的“已安装”列表依然会显示为空，给用户造成“注入失败”的重大误导。
 *   **重构设计与解决方案（设计思路）**：
-    -   **PowerShell 动态元数据提取引擎**：弃用复杂且难以维护的 Batch，核心逻辑由 [deploy.ps1](file:///d:/Repository/ZenDesktop_OneKeyDeploy/deploy.ps1) 接管。通过健壮的正则表达式，动态提取 `.wh.cpp` 的真实 `@version`、`@architecture`，以及自动提取多行 `@include` 并以 `|` 拼接为标准的 `REG_SZ` 写入注册表，实现与 Windhawk 引擎设计的 100% 贴合。
+    -   **PowerShell 动态元数据提取引擎**：弃用复杂且难以维护的 Batch，核心逻辑由 [deploy.ps1](file:///d:/Repository/CW-Beautify_OneKeyDeploy/deploy.ps1) 接管。通过健壮的正则表达式，动态提取 `.wh.cpp` 的真实 `@version`、`@architecture`，以及自动提取多行 `@include` 并以 `|` 拼接为标准的 `REG_SZ` 写入注册表，实现与 Windhawk 引擎设计的 100% 贴合。
     -   **安全创建 ModsWritable 键**：在 `HKLM\SOFTWARE\Windhawk\Engine\ModsWritable\<mod-id>` 中创建对应的运行时子键，确保引擎运行环境完整。
     -   **强力 UI 缓存强刷（终极痛点解决）**：在服务停止状态下，脚本主动检测并强行删除 `userprofile.json` 缓存。在 Windhawk 服务和 UI 重启后，UI 引擎由于检测到缓存缺失，将**无缝、重新扫描 `ModsSource` 文件夹下所有源文件头，自动重建缓存**。这使所有模组不仅能够完全在后台静默编译并注入，还能 **100% 完美呈现在 Windhawk UI 列表中**！实现了“零手工交互、全自动直接注入、前后台完美同步”的极致体验！
 
 ### 2.21 文件管理器 WinUI 全局画刷过度透明导致的可读性灾难（vNext 经验）
-*   **问题场景**：在把第三方 File Explorer 透明背景 Mod 改造成 `local@zen-fileexplorer-acrylic.wh.cpp` 后，文件管理器出现大面积发白、左侧导航栏文字和图标变得极淡、内容区像被白色蒙版覆盖的现象。用户怀疑是 Windows 透明效果或系统主题设置导致。
+*   **问题场景**：在把第三方 File Explorer 透明背景 Mod 改造成 `local@cw-fileexplorer-acrylic.wh.cpp` 后，文件管理器出现大面积发白、左侧导航栏文字和图标变得极淡、内容区像被白色蒙版覆盖的现象。用户怀疑是 Windows 透明效果或系统主题设置导致。
 *   **深层根源**：
     1.  **文件管理器不是简单的单层窗口**：Windows 11 File Explorer 的主窗口由 DWM 背景、Win32 子窗口、WinUI/XAML 资源字典和多个内容岛共同组成。把某个背景刷置为透明，并不一定能透到底层壁纸，很多时候只会露出 Explorer 自己的浅色宿主层。
     2.  **全局 WinUI 画刷污染范围过大**：早期实现为了追求“全透明”，把 `LayerFillColorDefaultBrush`、`LayerOnMicaBaseAltFillColorDefaultBrush`、`CardBackgroundFillColorDefaultBrush`、`SystemControlBackgroundChromeMediumLowBrush` 等通用资源直接替换为 `Transparent`。这些资源不仅影响文件列表，还会影响导航栏、卡片、命令栏和系统默认内容层，导致浅色主题下白底吃掉文字对比度。
@@ -282,7 +282,7 @@
     2.  **不要默认覆盖全局背景资源**：针对 Explorer，宁可先只设置窗口级 DWM/Mica/Accent 背景，也不要一上来改 WinUI 全局资源字典。全局资源覆盖必须只用于受控、可解释、可关闭的范围。
     3.  **需要可读性保护层**：当实验透明效果导致画刷污染时，新版本必须能主动把关键背景和文字画刷刷回安全颜色，而不是只停止继续透明。
 *   **解决方案**：
-    -   将 `local@zen-fileexplorer-acrylic.wh.cpp` 的默认 `theme` 从 `AppleLiquidGlass` 改为更稳定的 `Mica`，避免新用户一启用就进入高风险透明态。
+    -   将 `local@cw-fileexplorer-acrylic.wh.cpp` 的默认 `theme` 从 `AppleLiquidGlass` 改为更稳定的 `Mica`，避免新用户一启用就进入高风险透明态。
     -   新增 **`transparentFileList: false`**，文件列表透明默认关闭。只有用户显式打开时，才对子项资源和 `SysListView32` / `SHELLDLL_DefView` 做透明化处理。
     -   新增 **`readabilityGuard: true`**。在 `ApplyReadabilityGuardResources()` 中，根据系统明暗主题，把关键背景资源恢复为安全白/暗底，并把默认文字资源恢复为对应的深/浅前景色。这样旧版本造成的透明画刷污染可以被新版主动对冲。
     -   删除默认路径里对 `LayerFillColorDefaultBrush`、`LayerOnMicaBaseAltFillColorDefaultBrush`、`CardBackgroundFillColorDefaultBrush` 等全局资源的透明覆盖，把这些危险操作从默认体验中移除。
@@ -292,16 +292,16 @@
     -   在没有真实 Windhawk 编译和用户截图复验前，**不要急着重构建 release 包**。先把源码行为做稳，再统一构建最终包。
 
 ### 2.22 部署脚本与 Windhawk 平台编译的职责边界（vNext 决策）
-*   **问题场景**：为了解决源码替换后未即时生效的问题，曾尝试让 `deploy.ps1` 解析 Windhawk 自带编译器路径、调用 `clang++` 生成 `_zendeploy.dll`，再把注册表 `LibraryFileName` 指向脚本生成的 DLL。
-*   **决策结论**：该方向放弃。ZenDesktop 一键脚本只负责 **注入/替换源码与注册表元数据**，不负责本地编译。编译、保存、错误查看和最终 DLL 生成应交给 Windhawk 平台/UI 完成。
+*   **问题场景**：为了解决源码替换后未即时生效的问题，曾尝试让 `deploy.ps1` 解析 Windhawk 自带编译器路径、调用 `clang++` 生成 `_CWdeploy.dll`，再把注册表 `LibraryFileName` 指向脚本生成的 DLL。
+*   **决策结论**：该方向放弃。CW-Beautify 一键脚本只负责 **注入/替换源码与注册表元数据**，不负责本地编译。编译、保存、错误查看和最终 DLL 生成应交给 Windhawk 平台/UI 完成。
 *   **原因**：
     1.  Windhawk 平台已经拥有完整的编译、日志和错误展示流程，用户也更容易在 UI 中确认某个 mod 是否编译成功。
     2.  脚本侧手动拼接 `WH_MOD_ID`、`WH_MOD_VERSION`、compiler options、include/lib 路径时，PowerShell 到 clang 的引号/反斜杠转义非常容易出错。
-    3.  脚本生成私有 DLL 会制造额外状态，例如 `_zendeploy.dll` 文件残留、`LibraryFileName` 指向脚本产物、平台 UI 与实际加载 DLL 不一致，后续排障成本更高。
+    3.  脚本生成私有 DLL 会制造额外状态，例如 `_CWdeploy.dll` 文件残留、`LibraryFileName` 指向脚本产物、平台 UI 与实际加载 DLL 不一致，后续排障成本更高。
 *   **当前规范**：
     -   `deploy.ps1` 复制 `.wh.cpp` 到 Windhawk 的 `ModsSource`，解析 `@version`、`@architecture`、多 `@include` 并写入注册表。
     -   `LibraryFileName` 必须写为空字符串 `""`，表示交还给 Windhawk 平台编译。
-    -   脚本可以清 `userprofile.json` 以刷新 UI 缓存，但不要调用 clang，也不要生成或注册 `_zendeploy.dll`。
+    -   脚本可以清 `userprofile.json` 以刷新 UI 缓存，但不要调用 clang，也不要生成或注册 `_CWdeploy.dll`。
 
 ### 2.23 任务栏 `Blur=0 + Opacity=0` 变黑的清透明语义（vNext 经验）
 *   **问题场景**：任务栏设置为 `Custom Glass`、`Mist Grey`、`Blur=0`、`Opacity=0` 后，底部任务栏没有呈现预期的清透明效果，而是显示为一条纯黑底。
@@ -319,7 +319,7 @@
 *   **Win11 黑底修正**：`SetWindowCompositionAttribute` 兼容层只能用于 Windows 10/经典任务栏。不能只依赖 `Windows.UI.Composition.DesktopWindowContentBridge` 是否已经创建，因为 Win11 启动早期可能暂时查不到 XAML 桥窗口。应先用 `RtlGetVersion` 判断 build >= 22000，Win11 上直接禁用经典 accent，让 XAML 侧的 `WindhawkBlur` 独占背景，否则会出现纯黑任务栏。
 
 ### 2.25 任务栏 `theme=""` 导致样式未应用的黑底回归（vNext 经验）
-*   **问题场景**：Windhawk UI 中任务栏 Mod 已启用并加载 DLL，但任务栏仍然是纯黑。检查注册表发现 `HKLM\SOFTWARE\Windhawk\Engine\Mods\local@zen-taskbar-acrylic\Settings` 下 `theme` 为空字符串，`blurPreset=0`、`opacityPreset=0`。
+*   **问题场景**：Windhawk UI 中任务栏 Mod 已启用并加载 DLL，但任务栏仍然是纯黑。检查注册表发现 `HKLM\SOFTWARE\Windhawk\Engine\Mods\local@cw-taskbar-acrylic\Settings` 下 `theme` 为空字符串，`blurPreset=0`、`opacityPreset=0`。
 *   **深层根源**：`ProcessAllStylesFromSettings()` 原本只在 `theme == "TranslucentTaskbar"` 时选择 `g_themeTranslucentTaskbar`。当 `theme` 为空时，代码把它解释为设置中的 `None`，不会注册任何任务栏 XAML 目标样式，因此 Windows 自己的深色任务栏继续显示为黑色。
 *   **解决方案**：运行时把缺失或空字符串的 `theme` 视为损坏/缺省配置，回退到 `TranslucentTaskbar`。部署脚本也只在 taskbar mod 的 `Settings\theme` 缺失或为空时补写 `TranslucentTaskbar`，不覆盖用户已选择的非空主题。
 *   **维护规范**：任务栏套件默认必须有一个有效视觉风格。`"" = None` 作为官方样式选项可以保留给高级用户，但一键部署和空设置恢复路径不能让它成为默认运行态。
@@ -332,7 +332,7 @@
 
 ### 2.27 任务栏 Mod 回退到上一版源码（vNext 经验）
 *   **问题场景**：最大化状态层、Win10/经典兼容层和颜色覆盖实验叠加后，任务栏在实机上仍出现黑底和颜色设置不符合预期的问题。
-*   **处理结果**：`local@zen-taskbar-acrylic.wh.cpp` 已整体替换回 `ZenDesktop_OneKeyDeploy_v3.4.0_Online\local@zen-taskbar-acrylic.wh.cpp`，SHA256 与上一版源码一致。部署脚本中针对 taskbar 的 `theme` 自动修复块也已移除，避免一键注入额外改写任务栏用户设置。
+*   **处理结果**：`local@cw-taskbar-acrylic.wh.cpp` 已整体替换回 `CW-Beautify_OneKeyDeploy_v3.4.0_Online\local@cw-taskbar-acrylic.wh.cpp`，SHA256 与上一版源码一致。部署脚本中针对 taskbar 的 `theme` 自动修复块也已移除，避免一键注入额外改写任务栏用户设置。
 *   **维护规范**：后续任务栏功能应先基于上一版可用源码做单点、小步验证。尤其不要同时改 Win11 XAML 样式、Win32 accent fallback、最大化检测和颜色变量覆盖链路。
 
 ### 2.28 任务栏实验改动恢复前必须先重启 Explorer 复核（vNext 经验）
@@ -348,7 +348,7 @@
 
 ### 2.30 任务栏实验必须从 3.4 原版基线逐步恢复（vNext 调试策略）
 *   **问题场景**：即使删除 RootGrid 清空逻辑并重启 Explorer，任务栏仍然保持黑色。用户明确要求“从 3.4 版本一点点来”。
-*   **处理结果**：`local@zen-taskbar-acrylic.wh.cpp` 已再次机械恢复为 `ZenDesktop_OneKeyDeploy_v3.4.0_Online\local@zen-taskbar-acrylic.wh.cpp` 的 3.4 原版，SHA256 一致。当前 Windhawk `ModsSource` 里的 taskbar 源码也与该 3.4 原版一致，实验项如 `maximizedTaskbarLayer`、`classicTaskbarFallback`、`StartTaskbarStateHooks()`、`dwmapi` 均不存在。
+*   **处理结果**：`local@cw-taskbar-acrylic.wh.cpp` 已再次机械恢复为 `CW-Beautify_OneKeyDeploy_v3.4.0_Online\local@cw-taskbar-acrylic.wh.cpp` 的 3.4 原版，SHA256 一致。当前 Windhawk `ModsSource` 里的 taskbar 源码也与该 3.4 原版一致，实验项如 `maximizedTaskbarLayer`、`classicTaskbarFallback`、`StartTaskbarStateHooks()`、`dwmapi` 均不存在。
 *   **调试规范**：后续不要一次性恢复所有实验改动。必须按“基线确认 -> 单点实验 -> 编译保存 -> 重启 Explorer -> 截图/状态确认”的节奏推进。第 1 个建议恢复点只做最大化状态层的 UI 设置和读取，不碰 RootGrid/SystemTray 显式覆盖，也不碰 Win32 accent fallback。
 
 ### 2.31 任务栏逐步恢复 Step 1：只恢复最大化层设置与读取
@@ -373,7 +373,7 @@
 *   **问题场景**：Windhawk 编译 Step 3 时报告 `use of undeclared identifier 'ClampBlurAmount'` 和 `use of undeclared identifier 'ClampPercent'`。
 *   **深层根源**：`ProcessAllStylesFromSettings()` 位于源码中部，而 Step 1 新增的 `ClampPercent()` / `ClampBlurAmount()` helper 定义在文件底部 `LoadSettings()` 前。Step 3 第一次在 `ProcessAllStylesFromSettings()` 内调用这些 helper，导致 C++ 编译时尚未看到声明。
 *   **解决方案**：在 `ProcessAllStylesFromSettings()` 前增加 `int ClampPercent(int value, int fallback);` 和 `int ClampBlurAmount(int value, int fallback);` 前置声明，不移动实现，避免大范围重排源码。
-*   **验证结果**：修复后注入源码，`C:\ProgramData\Windhawk\ModsSource\local@zen-taskbar-acrylic.wh.cpp` 与仓库源码 SHA256 一致，Explorer 已加载新生成的 `local@zen-taskbar-acrylic_3.4.0_438063.dll`。
+*   **验证结果**：修复后注入源码，`C:\ProgramData\Windhawk\ModsSource\local@cw-taskbar-acrylic.wh.cpp` 与仓库源码 SHA256 一致，Explorer 已加载新生成的 `local@cw-taskbar-acrylic_3.4.0_438063.dll`。
 
 ### 2.35 任务栏逐步恢复 Step 3 防抖：避免频繁重套 XAML 导致 Toolkit 报警
 *   **问题场景**：Step 3 最大化层功能可以工作，但频繁放大/缩小窗口时会弹出 Windhawk Toolkit “检测到系统不稳定”的提示，严重时 Explorer 会重启。
@@ -383,7 +383,7 @@
 
 ### 2.36 Windhawk Mod 开发注入与状态巡检自动化
 *   **问题场景**：调试任务栏最大化层时，今天反复手工执行了同一组动作：复制单个 `.wh.cpp` 到 `C:\ProgramData\Windhawk\ModsSource`、清空 `LibraryFileName`、对比 SHA256、查看 taskbar 设置、确认 Explorer 是否加载了旧 DLL。这些动作如果手敲，容易漏一步并误判视觉结果。
-*   **自动化方案**：新增 `dev-windhawk-mod.ps1`。默认处理 `local@zen-taskbar-acrylic`，也可以用 `-ModId` 指定其他本地 mod。脚本只做开发注入和状态巡检，不调用 clang，不构建包，不替代 Windhawk UI 保存/编译。
+*   **自动化方案**：新增 `dev-windhawk-mod.ps1`。默认处理 `local@cw-taskbar-acrylic`，也可以用 `-ModId` 指定其他本地 mod。脚本只做开发注入和状态巡检，不调用 clang，不构建包，不替代 Windhawk UI 保存/编译。
 *   **使用方式**：`powershell -NoProfile -ExecutionPolicy Bypass -File .\dev-windhawk-mod.ps1` 注入默认任务栏源码；`-StatusOnly` 只巡检不写入；`-RestartExplorer` 在注入或巡检后顺手重启 Explorer。
 *   **维护规范**：以后单个 mod 调试优先用这个脚本，避免再手动拼管理员 PowerShell、注册表命令和哈希检查。全量发布或打包仍使用 `deploy.ps1` / `build_releases.py`，不要把开发巡检脚本混进 release 包职责里。
 
@@ -403,9 +403,9 @@
 *   **问题场景**：即使加入防抖和冷却窗口，连续最大化/还原仍会触发 Windhawk Toolkit “系统不稳定”提示，并导致 Explorer 反复重启或卡顿。
 *   **对标结论**：TranslucentTB 的动态任务栏状态不是在每次窗口事件里卸载/重建整套 XAML 样式，而是维护任务栏/窗口状态，然后对目标任务栏执行轻量的属性刷新。其源码里也明确避免过于频繁地向 Explorer 发送恢复默认外观相关消息。
 *   **深层根源**：`UninitializeSettingsAndTap()`、`UninitializeForCurrentThread()`、`InitializeForCurrentThread()` 属于设置热重载/卸载路径，不应挂在 `EVENT_SYSTEM_FOREGROUND` 或 `EVENT_OBJECT_LOCATIONCHANGE` 这类高频 WinEvent 上。防抖只能降低频率，不能改变“高风险重建”的本质。
-*   **解决方案**：把 `CommonBgBrush` 从初始化时写死的 brush 改成运行时变量 `{{ZenTaskbarRuntimeBgBrush}}`。最大化状态变化时只更新 `ZenTaskbarRuntimeBgBrush`，由现有 `PropagateStyleVariableChange()` 对已经命中的 `BackgroundFill` 等属性做局部重算和 `SetValue`，不再重启 XAML Diagnostics/TAP，也不再清空并重建所有自定义规则。
+*   **解决方案**：把 `CommonBgBrush` 从初始化时写死的 brush 改成运行时变量 `{{CWTaskbarRuntimeBgBrush}}`。最大化状态变化时只更新 `CWTaskbarRuntimeBgBrush`，由现有 `PropagateStyleVariableChange()` 对已经命中的 `BackgroundFill` 等属性做局部重算和 `SetValue`，不再重启 XAML Diagnostics/TAP，也不再清空并重建所有自定义规则。
 *   **检测策略**：状态检测从只看前台窗口改为按 z-order 扫描顶层可见用户窗口，寻找当前任务栏显示器上的最大化窗口，方向更接近 TranslucentTB 的“每个任务栏/显示器有自己的窗口状态”模型。当前实现仍用全局增强状态，后续若要完全 per-monitor，需要把 XamlRoot 与对应任务栏窗口/显示器稳定映射后再做。
-*   **语言规范**：新增设置项必须和 ZenDesktop 既有风格统一，使用“中文主标题 (English)”和中文说明，不能保留 `future step`、纯英文或“数值越大越清晰”这类开发阶段/语义错误文案。
+*   **语言规范**：新增设置项必须和 CW-Beautify 既有风格统一，使用“中文主标题 (English)”和中文说明，不能保留 `future step`、纯英文或“数值越大越清晰”这类开发阶段/语义错误文案。
 
 ### 2.40 通知中心 Win+A 液态玻璃覆盖不足与圆角统一
 *   **问题场景**：通知中心外壳已有玻璃效果，但 Win+A 快捷设置面板里的开关块、底部按钮、滑块区仍像系统默认样式，通知卡片和日历区圆角也不统一。
@@ -413,58 +413,58 @@
 *   **解决方案**：在 `g_themeLiquidGlass` 中补齐 Win+A 的新版控件选择器，对 `PaginatedToggleButton` 的 `Normal/PointerOver/Pressed/Checked` 状态统一使用 `ElementBackground`、`AccentBackground`、`ElementBackground2`，并给滑块区域、底部栏、通知卡片和分组卡片补 `ElementCornerRadius` 与玻璃边框。Apple 变体常量对齐任务栏/开始菜单的 20/10 主外壳与内元素圆角。
 *   **视觉规范**：通知中心面积比任务栏按钮大，彩色折射边不能直接复用任务栏的高 alpha 彩虹边。外壳边框只保留低透明度的细彩色高光，内元素边框以白/暗灰玻璃描边为主，避免整圈红橙蓝紫过饱和。
 *   **语言规范**：通知中心主题选项与任务栏/开始菜单保持一致：`LiquidGlass` 标为“液态玻璃 - 原版 (Liquid Glass Original)”，`AppleLiquidGlass` 标为“液态玻璃 (Liquid Glass)”，`AppleLiquidGlassClassic` 标为“液态玻璃 - 经典 (Liquid Glass Classic)”。
-*   **验证规范**：调试通知中心时只注入 `local@zen-notificationcenter-acrylic.wh.cpp`，保持 `LibraryFileName=""`，然后在 Windhawk 源代码页保存/编译；如果视觉不刷新，再重启 Explorer 或 ShellExperienceHost。不要为了 Win+A 样式问题去改任务栏运行态逻辑。
+*   **验证规范**：调试通知中心时只注入 `local@cw-notificationcenter-acrylic.wh.cpp`，保持 `LibraryFileName=""`，然后在 Windhawk 源代码页保存/编译；如果视觉不刷新，再重启 Explorer 或 ShellExperienceHost。不要为了 Win+A 样式问题去改任务栏运行态逻辑。
 
 ### 2.41 文件管理器透明模块改用官方社区 File Explorer Styler 基座
-*   **问题场景**：此前 `local@zen-fileexplorer-acrylic.wh.cpp` 基于一个第三方透明背景小 mod 改造，实机出现文件列表发白、左侧文字变淡、全局 WinUI 画刷过度透明等可读性问题。继续在这套代码上补丁会不断碰到 Explorer 多层 WinUI/Win32/DWM 表面不一致的问题。
+*   **问题场景**：此前 `local@cw-fileexplorer-acrylic.wh.cpp` 基于一个第三方透明背景小 mod 改造，实机出现文件列表发白、左侧文字变淡、全局 WinUI 画刷过度透明等可读性问题。继续在这套代码上补丁会不断碰到 Explorer 多层 WinUI/Win32/DWM 表面不一致的问题。
 *   **社区调研结论**：Windhawk 官方社区已有 m417z 的 `Windows 11 File Explorer Styler`，当前 v1.4，目标同样是 `explorer.exe`，内置 `Translucent Explorer11`、`MicaBar`、`WindowGlass`、`LiquidGlass` 等主题，并提供 `backgroundTranslucentEffect` 与 `backgroundTranslucentEffectRegion` 控制。其配套 `windows-11-file-explorer-styling-guide` 也持续收集 File Explorer XAML 目标和主题。
-*   **处理方案**：本地 `local@zen-fileexplorer-acrylic.wh.cpp` 保留 ZenDesktop mod id 和中文设置外壳，但源码主体替换为 m417z 官方社区 `Windows 11 File Explorer Styler v1.4`。默认主题改为 `Translucent Explorer11`，通透区域默认保持 `Frame Only`，避免再次默认透明化文件列表。
+*   **处理方案**：本地 `local@cw-fileexplorer-acrylic.wh.cpp` 保留 CW-Beautify mod id 和中文设置外壳，但源码主体替换为 m417z 官方社区 `Windows 11 File Explorer Styler v1.4`。默认主题改为 `Translucent Explorer11`，通透区域默认保持 `Frame Only`，避免再次默认透明化文件列表。
 *   **维护规范**：文件管理器属于高频生产力界面，默认策略必须保守。需要整窗透明时，应通过官方 `backgroundTranslucentEffectRegion=entireWindow` 做显式测试，并优先在深色主题验证；不要再把全局 WinUI 背景画刷批量改透明作为默认方案。
 
 ### 2.42 资源管理器右键菜单与系统菜单行为模块接入
 *   **需求场景**：用户希望继续补齐资源管理器相关体验，包括 Windows 11 右键菜单默认显示完整菜单，以及资源管理器窗口图标/系统菜单的旧式行为。
 *   **社区调研结论**：Windhawk 官方社区已有 m417z 的 `Classic context menu on Windows 11`，当前 v1.0.2，目标为 `explorer.exe`，通过阻止新版 mini menu presenter 让资源管理器默认显示经典右键菜单；同时已有 aubymori 的 `Old Explorer System Menu Behavior`，当前 v1.0.0，目标同为 `explorer.exe`，恢复窗口图标右键当前文件夹菜单、拖拽创建快捷方式等经典行为。
-*   **处理方案**：新增 `local@zen-explorer-context-menu.wh.cpp` 与 `local@zen-explorer-system-menu.wh.cpp` 两个独立模块。两者均保留社区核心 hook 逻辑，只改 ZenDesktop 本地 id、名称、中文说明、版本和 README 外壳，不和 File Explorer Styler 合并，避免把视觉 XAML 注入与 Win32/COM 行为 hook 混在一个模块里。
+*   **处理方案**：新增 `local@cw-explorer-context-menu.wh.cpp` 与 `local@cw-explorer-system-menu.wh.cpp` 两个独立模块。两者均保留社区核心 hook 逻辑，只改 CW-Beautify 本地 id、名称、中文说明、版本和 README 外壳，不和 File Explorer Styler 合并，避免把视觉 XAML 注入与 Win32/COM 行为 hook 混在一个模块里。
 *   **风险边界**：本轮没有默认接入 `dark-menus`。该社区模块的目标是 `@include *`，会影响所有 Win32 程序菜单，风险明显高于仅注入 `explorer.exe` 的右键/系统菜单模块。若后续要做深色右键菜单，应单独做可选模块并明确默认策略，而不是跟经典右键菜单绑定。
 *   **部署规范**：`deploy.ps1` 按 `local@*.wh.cpp` 自动扫描，新增文件无需额外脚本逻辑；`build_releases.py` 需要显式加入新源码文件，避免未来打包遗漏。开发期仍保持 `LibraryFileName=""`，由 Windhawk 源代码页保存/编译。
 
 ### 2.43 文件管理器 DIY 画刷拼接的 C++ 编译错误
 *   **问题场景**：文件管理器 DIY 玻璃设置接入后，Windhawk 编译时报 `expected ';' at end of declaration`，定位到 `borderBrush` 和 `elementBorderBrush` 的 `<LinearGradientBrush ...>` 生成处。
 *   **深层根源**：C++ 不会把 `std::wstring(...)` 后面紧邻的宽字符串字面量自动拼接成表达式，必须显式使用 `+`。同时，`L"..." + std::wstring` 这类“字面量在左侧”的拼接也不可靠，容易被解析成指针算术或直接编译失败。
-*   **解决方案**：所有动态 XAML 字符串拼接必须以 `std::wstring(L"...")` 起手，后续每段都显式 `+` 连接。已修正 `StripAlphaFromRgbColor()`、`BuildZenDiyBrush()`、`borderBrush`、`elementBorderBrush` 与 `AdjustTypeName()` 中的同类写法，并用文本扫描确认没有同类残留。
+*   **解决方案**：所有动态 XAML 字符串拼接必须以 `std::wstring(L"...")` 起手，后续每段都显式 `+` 连接。已修正 `StripAlphaFromRgbColor()`、`BuildCWDiyBrush()`、`borderBrush`、`elementBorderBrush` 与 `AdjustTypeName()` 中的同类写法，并用文本扫描确认没有同类残留。
 *   **维护规范**：以后新增动态 XAML 字符串时，避免用裸字面量作为 `+` 左操作数；长 XML 片段优先拆成 `std::wstring(...) + ...` 的明确表达式，否则 Windhawk 编译错误会只指向很靠后的拼接行，定位成本高。
 
 ### 2.44 文件管理器整窗透明与设置简化
 *   **问题场景**：用户期望的是资源管理器“整窗可透明、可自动调节”，而不是只有标题栏/命令栏一小块透明。旧设置仍偏向官方 File Explorer Styler 的框架透明模型，并暴露了颜色、模糊、浓度、亮度、外圆角、内圆角、描边、内容区开关等过多调试旋钮。
 *   **深层根源**：仅设置 `backgroundTranslucentEffectRegion=Frame Only` 或只改上方 `CommandBar`/`NavigationBar` 容器，无法覆盖 Home/Gallery/Details/RootContainer 等内容区表面。用户已经确认 Windows 需要完整深色模式才能让这些区域透明且可读，因此默认策略可以从“保守框架透明”切换为“深色模式优先的整窗玻璃”。
-*   **解决方案**：默认主题改为 `CustomLiquidGlass`，新增 `zenGlassCoverage=auto` 作为日常范围控制。`auto` 与 `fullWindow` 都会走 `DwmExtendFrameIntoClientArea` 整窗扩展，只有 `frameOnly` 才退回框架模式。自定义主题下追加整窗覆盖规则，给 Home/Gallery/Details/RootContainer/NavigationView 等核心容器统一套用 `MainContentBG` 或透明背景。
+*   **解决方案**：默认主题改为 `CustomLiquidGlass`，新增 `CWGlassCoverage=auto` 作为日常范围控制。`auto` 与 `fullWindow` 都会走 `DwmExtendFrameIntoClientArea` 整窗扩展，只有 `frameOnly` 才退回框架模式。自定义主题下追加整窗覆盖规则，给 Home/Gallery/Details/RootContainer/NavigationView 等核心容器统一套用 `MainContentBG` 或透明背景。
 *   **设置规范**：日常设置压缩为 6 个核心项：视觉风格、透明范围、玻璃颜色、模糊度、背景浓度、圆角。元素圆角、描边强度和内容区玻璃不再单独暴露，而是根据圆角、模糊和浓度自动计算，减少用户在 Windhawk 设置页里反复猜参数。
 *   **部署规范**：`deploy.ps1` 和 `dev-windhawk-mod.ps1` 对旧的 `Translucent Explorer11` / `Mica` / `MicaAlt` 文件管理器设置执行一次性迁移，改为 `CustomLiquidGlass + auto + acrylic`，但不覆盖用户后续主动选择的其它主题。
 
 ### 2.45 文件管理器整窗透明必须同时处理 XAML 表面与 TP 式宿主窗口层
 *   **问题场景**：用户在深色模式下启用文件管理器整窗玻璃后，Home/列表区域仍然呈现深色实底，看起来不是全透明。截图显示上方框架可被样式影响，但内容区背后仍有 Explorer 宿主层暗底。
 *   **对比结论**：m417z 的官方 File Explorer Styler 擅长处理 WinUI/XAML 控件样式，但只清 XAML 表面时，底下的 Explorer `CabinetWClass`/子窗口/DWM composition 仍可能提供实色背景。TPGoFighting 旧版透明 mod 的关键价值在于额外处理 `SetWindowCompositionAttribute`、DWM backdrop、`SHELLDLL_DefView`、`DirectUIHWND`、`SysListView32`、XAML island host 等 Win32 子窗口擦背景路径。
-*   **解决方案**：保留官方 Styler 作为 XAML 基座，同时接入一个收窄版 TP 宿主透明层：仅在 `CustomGlass` / `CustomLiquidGlass` 且 `zenGlassCoverage != frameOnly` 时启用；对 `CabinetWClass` 设置 DWM backdrop `none` 与 SWCA accent；对子窗口拦截 `WM_ERASEBKGND` 和常见 `WM_CTLCOLOR*`，并把 `SysListView32` 背景设为 `CLR_NONE`。
+*   **解决方案**：保留官方 Styler 作为 XAML 基座，同时接入一个收窄版 TP 宿主透明层：仅在 `CustomGlass` / `CustomLiquidGlass` 且 `CWGlassCoverage != frameOnly` 时启用；对 `CabinetWClass` 设置 DWM backdrop `none` 与 SWCA accent；对子窗口拦截 `WM_ERASEBKGND` 和常见 `WM_CTLCOLOR*`，并把 `SysListView32` 背景设为 `CLR_NONE`。
 *   **风险边界**：TP 原版会更宽地处理 Explorer 进程中的相关子窗口。本地实现必须限制在 `CabinetWClass` 根窗口树下，避免误伤桌面、任务栏或同进程其它 shell 窗口。设置变化和卸载时要清理子类化与 accent，防止透明状态残留。
-*   **设置规范**：文件管理器设置键名必须和任务栏/开始菜单统一，使用 `bgColorMode`、`blurPreset`、`opacityPreset`、`luminosityPreset`、`cornerRadiusPreset`。旧 `zenGlassColorMode` / `zenGlassBlur` / `zenGlassOpacity` / `zenGlassLuminosity` / `zenGlassCornerRadius` 只能作为源码内隐藏兼容键读取，不能要求用户必须跑部署脚本迁移；源码要支持用户直接在 Windhawk 新建 mod 后粘贴使用。
+*   **设置规范**：文件管理器设置键名必须和任务栏/开始菜单统一，使用 `bgColorMode`、`blurPreset`、`opacityPreset`、`luminosityPreset`、`cornerRadiusPreset`。旧 `CWGlassColorMode` / `CWGlassBlur` / `CWGlassOpacity` / `CWGlassLuminosity` / `CWGlassCornerRadius` 只能作为源码内隐藏兼容键读取，不能要求用户必须跑部署脚本迁移；源码要支持用户直接在 Windhawk 新建 mod 后粘贴使用。
 *   **验证规范**：同步源码后保持 `LibraryFileName=""`，由 Windhawk 源代码页保存/编译。若仍不透明，下一步优先看 `SetWindowCompositionAttribute` 是否成功、`DwmSetWindowAttribute` 是否被官方 backdrop 再次覆盖，以及目标子窗口是否确实位于 `CabinetWClass` 根窗口树下。
 
 ### 2.46 文件管理器 TP 宿主透明层需要链接 GDI32
 *   **问题场景**：接入 TP 式子窗口透明处理后，Windhawk 编译通过但链接失败，报 `undefined symbol: __declspec(dllimport) SetBkMode` 和 `undefined symbol: __declspec(dllimport) GetStockObject`。
 *   **深层根源**：`SetBkMode()`、`GetStockObject()` 属于 GDI32 API。旧 TP 源码的 `@compilerOptions` 包含 `-lgdi32`，而当前官方 File Explorer Styler 基座原本不需要这些函数，接入 TP 子窗口 `WM_CTLCOLOR*` 处理后漏补链接库。
-*   **解决方案**：在 `local@zen-fileexplorer-acrylic.wh.cpp` 的 `@compilerOptions` 中加入 `-lgdi32`。这只是链接依赖修复，不改变透明逻辑。
+*   **解决方案**：在 `local@cw-fileexplorer-acrylic.wh.cpp` 的 `@compilerOptions` 中加入 `-lgdi32`。这只是链接依赖修复，不改变透明逻辑。
 *   **维护规范**：以后从社区/旧版 mod 移植 Win32 绘制或窗口背景处理代码时，必须同步检查 `@compilerOptions`，尤其是 `gdi32`、`user32`、`uxtheme`、`dwmapi` 这类链接库，避免“源码编译过、链接阶段失败”的误判。
 
 ### 2.47 文件管理器 `0/0` 透明不能使用 TransparentBlurBehind
 *   **问题场景**：文件管理器 mod 编译并加载后，用户设置 `blurPreset=0`、`opacityPreset=0`，但整窗显示为一整块青绿色，而不是透明背景。
 *   **深层根源**：此前把 `blur=0` 映射到 `ACCENT_ENABLE_TRANSPARENTBLURBEHIND`，即使 `GradientColor` alpha 为 0，也可能让系统 accent/colorization 底色显露，形成整块色彩洗底。这和用户语义里的“0 = 透明”不一致。
 *   **解决方案**：`blurPreset=0 && opacityPreset=0` 时严格走 TP 原版 `Clear` 语义：先 `ClearAccent()`，再把 DWM backdrop 设为 `DWMSBT_NONE`，不再设置任何 SWCA material。只有 `blur>0` 时才使用 `ACCENT_ENABLE_ACRYLICBLURBEHIND`；`blur=0 && opacity>0` 才用 `ACCENT_ENABLE_GRADIENT` 作为纯色填充。
-*   **维护规范**：ZenDesktop 统一语义里 `0` 必须表示尽量透明，不能偷偷映射到系统材质或 accent 洗色。任何模块的 `blur=0/opacity=0` 都要优先走清除背景路径，而不是用“透明材质”兜底。
+*   **维护规范**：CW-Beautify 统一语义里 `0` 必须表示尽量透明，不能偷偷映射到系统材质或 accent 洗色。任何模块的 `blur=0/opacity=0` 都要优先走清除背景路径，而不是用“透明材质”兜底。
 
 ### 2.48 文件管理器青色洗底后回到首次成功的 TP 小模块基线
 *   **问题场景**：m417z File Explorer Styler 基座接入 TP 宿主透明层后，用户仍看到整窗青绿色洗底。源码与 Windhawk 平台哈希一致、DLL 已加载，说明问题不是未同步或未编译，而是当前 XAML Styler 基座仍有资源/目标样式在内容区绘制主题色。
 *   **对比结论**：用户提到“第一次成功但还不能调清晰度”的版本，对应 `v3.4.0` 包内 34KB 的 TPGoFighting 风格小模块，而不是 228KB 的 m417z XAML Styler。该基线通过 `SetWindowCompositionAttribute`、DWM backdrop、`CabinetWClass` 子类化、`SHELLDLL_DefView` / `SysListView32` / WinUI bridge 擦背景实现透明，没有大批 XAML 主题规则，因此不会产生 Styler 主题色洗底。
-*   **解决方案**：`local@zen-fileexplorer-acrylic.wh.cpp` 回到 TP 小模块基线，并只补最小能力：版本升到 `3.5.2`；识别 `CustomLiquidGlass`、`LiquidGlass`、`WindowGlass`、`Translucent Explorer11` 等旧/新主题值；新增 `zenGlassCoverage=fullWindow/frameOnly`；`fullWindow` 自动打开文件列表、导航树和命令栏透明；`blurPreset=0 && opacityPreset=0` 严格走 Clear。
+*   **解决方案**：`local@cw-fileexplorer-acrylic.wh.cpp` 回到 TP 小模块基线，并只补最小能力：版本升到 `3.5.2`；识别 `CustomLiquidGlass`、`LiquidGlass`、`WindowGlass`、`Translucent Explorer11` 等旧/新主题值；新增 `CWGlassCoverage=fullWindow/frameOnly`；`fullWindow` 自动打开文件列表、导航树和命令栏透明；`blurPreset=0 && opacityPreset=0` 严格走 Clear。
 *   **维护规范**：文件管理器全透明优先保留 TP 透明机制，不要再把 m417z 大 XAML Styler 作为默认基座。若未来需要更复杂的 UI 样式，只能一项一项补到 TP 基线上，且每次都先验证 `0/0/fullWindow` 不再出现青色、黑色或白色洗底。
 
 ### 2.49 教程包 ExplorerBlurMica 的完整清背景模型
@@ -475,25 +475,25 @@
 
 ### 2.50 文件管理器透明重构为单文件内置引擎
 *   **问题场景**：用户明确要求不要再走 TP 小模块路线，也不要依赖 `ExplorerBlurMica.dll` 外部引擎；目标是一个 Windhawk `.cpp` mod 直接解决文件管理器透明，并且设置项数量接近任务栏/开始菜单。
-*   **处理方案**：`local@zen-fileexplorer-acrylic.wh.cpp` 重写为 `v3.6.0` 单文件内置引擎，删除 `explorerEngine`、`externalEnginePath`、`externalEffect`、`DllGetClassObject`、外部 DLL 查找和配置写入逻辑。新实现保留一个 Explorer-only 的清背景核心：DWM/Accent 宿主 backdrop、WinUI 资源透明覆盖、GDI/DirectUI 背景绘制过滤，并且所有过滤都限制在 `CabinetWClass` 窗口树内。
-*   **设置规范**：设置压缩为 `theme`、`bgColorMode`、`blurPreset`、`opacityPreset`、`luminosityPreset`、`textColorMode`。旧的 `zenGlassCoverage`、外部引擎路径和教程 effect 不再被源码读取；用户即使直接在 Windhawk 新建 mod 粘贴源码，也不需要运行部署脚本迁移设置。
+*   **处理方案**：`local@cw-fileexplorer-acrylic.wh.cpp` 重写为 `v3.6.0` 单文件内置引擎，删除 `explorerEngine`、`externalEnginePath`、`externalEffect`、`DllGetClassObject`、外部 DLL 查找和配置写入逻辑。新实现保留一个 Explorer-only 的清背景核心：DWM/Accent 宿主 backdrop、WinUI 资源透明覆盖、GDI/DirectUI 背景绘制过滤，并且所有过滤都限制在 `CabinetWClass` 窗口树内。
+*   **设置规范**：设置压缩为 `theme`、`bgColorMode`、`blurPreset`、`opacityPreset`、`luminosityPreset`、`textColorMode`。旧的 `CWGlassCoverage`、外部引擎路径和教程 effect 不再被源码读取；用户即使直接在 Windhawk 新建 mod 粘贴源码，也不需要运行部署脚本迁移设置。
 *   **验证记录**：使用 Windhawk 自带 `clang++` 完成 `-fsyntax-only` 预检和 DLL 链接试编译；`git diff --check` 通过。开发同步仍保持 `LibraryFileName=""`，由 Windhawk UI 源代码页保存/编译。
 
 ### 2.51 文件管理器透明全面移植的第一步是把 XAML Diagnostics 接进单文件 mod
 *   **问题场景**：`v3.6.0` 单文件版即使增加了更多 GDI/Theme 绘制过滤，本质上仍然主要工作在 Explorer 宿主窗口和普通子窗口层；这不足以可靠清掉 Windows 11 文件管理器内容区的 WinUI/XamlIslands/Composition 表面。
 *   **结构对齐**：ExplorerBlurMica 的公开工程虽然缺少 `DirectUITweaker.cpp`、`visualtreewatcher.cpp`、`module.cpp` 等关键 `.cpp`，但 `ExplorerBlurMica.vcxproj`、`tapsite.h`、`visualtreewatcher.h`、`HookDef.h` 明确暴露了它的核心层次：`InitializeXamlDiagnosticsEx`、`TAPSite`、`VisualTreeWatcher`、`IVisualTreeService3`、`IXamlDiagnostics`。
-*   **处理方案**：在 `local@zen-fileexplorer-acrylic.wh.cpp` 内直接加入 `DllGetClassObject` / `DllCanUnloadNow` 导出、`ZenDesktopTAPSite`、`VisualTreeWatcher` 和 `InitializeXamlDiagnosticsEx` 调用，让当前 Windhawk mod 自己充当 TAP DLL，而不是再依赖外部 `ExplorerBlurMica.dll`。回调里优先对 `HomeViewRootGrid`、`DetailsViewControlRootGrid`、`GalleryRootGrid`、`Navigation*`、`CommandBar*`、`Address*` 等命名表面及其子树执行透明背景清理，并保留原有 DWM/Accent/GDI 兜底路径。
+*   **处理方案**：在 `local@cw-fileexplorer-acrylic.wh.cpp` 内直接加入 `DllGetClassObject` / `DllCanUnloadNow` 导出、`CW-BeautifyTAPSite`、`VisualTreeWatcher` 和 `InitializeXamlDiagnosticsEx` 调用，让当前 Windhawk mod 自己充当 TAP DLL，而不是再依赖外部 `ExplorerBlurMica.dll`。回调里优先对 `HomeViewRootGrid`、`DetailsViewControlRootGrid`、`GalleryRootGrid`、`Navigation*`、`CommandBar*`、`Address*` 等命名表面及其子树执行透明背景清理，并保留原有 DWM/Accent/GDI 兜底路径。
 *   **维护规范**：只要运行 `dev-windhawk-mod.ps1` 注入源码，`LibraryFileName` 就会被清空，Explorer 里的旧 DLL 会失效；调试视觉行为时必须在 Windhawk 源代码页重新保存/编译一次，然后再重启 Explorer。否则看到的界面不是新源码运行结果。
 
 ### 2.52 文件管理器重新切回官方 Windows 11 File Explorer Styler 基座
 *   **问题场景**：用户最终明确要求停止维护自定义透明引擎，直接采用 Windhawk 官方社区中已经能稳定做出透明效果的 `Windows 11 File Explorer Styler`。诉求不是再单独造一套效果，而是把它默认调成“整窗全局应用”。
-*   **处理方案**：`local@zen-fileexplorer-acrylic.wh.cpp` 直接覆盖为官方 `windows-11-file-explorer-styler.wh.cpp` 源码，再进行本地薄改：`@id` 改回 `zen-fileexplorer-acrylic`，名称改为 ZenDesktop 外壳，版本升到 `3.7.0`。默认 `theme` 改为 `Translucent Explorer11`，`backgroundTranslucentEffect` 改为 `acrylic`，`backgroundTranslucentEffectRegion` 改为 `entireWindow`，`xamlDiagnosticsHandling` 改为 `block`。
-*   **兼容规范**：为了兼容旧 ZenDesktop 注册表值，`GetSelectedTheme()` 增加旧值映射：`CustomGlass` / `WindowGlass` -> `WindowGlass`，`CustomLiquidGlass` / `LiquidGlass` -> `LiquidGlass`，`Mica` / `MicaAlt` -> `MicaBar`。这样用户已有设置不会因为切换回官方基座而掉到 `None`。
+*   **处理方案**：`local@cw-fileexplorer-acrylic.wh.cpp` 直接覆盖为官方 `windows-11-file-explorer-styler.wh.cpp` 源码，再进行本地薄改：`@id` 改回 `cw-fileexplorer-acrylic`，名称改为 CW-Beautify 外壳，版本升到 `3.7.0`。默认 `theme` 改为 `Translucent Explorer11`，`backgroundTranslucentEffect` 改为 `acrylic`，`backgroundTranslucentEffectRegion` 改为 `entireWindow`，`xamlDiagnosticsHandling` 改为 `block`。
+*   **兼容规范**：为了兼容旧 CW-Beautify 注册表值，`GetSelectedTheme()` 增加旧值映射：`CustomGlass` / `WindowGlass` -> `WindowGlass`，`CustomLiquidGlass` / `LiquidGlass` -> `LiquidGlass`，`Mica` / `MicaAlt` -> `MicaBar`。这样用户已有设置不会因为切换回官方基座而掉到 `None`。
 *   **编译兼容**：官方源码中多处把 lambda 直接传给 `CreateThread`、`SetWindowsHookExW`、`EnumWindows`、`RunFromWindowThread`、`CreateThreadpoolTimer`。在当前 Windhawk clang/MinGW 环境下这些写法不能直接通过，所以必须改成显式 `WINAPI` / `CALLBACK` 函数。`StartStatsTimer()` 在本地版中保留函数壳但禁用实际 stats 提交，同时从 `Wh_ModInit()` / `Wh_ModUninit()` 去掉调用，避免本地调试时引入额外网络行为。
 
 ### 2.53 文件管理器设置页中文化并补自定义整窗玻璃参数
 *   **需求场景**：用户希望文件管理器设置页像任务栏/开始菜单一样更直观，至少常用项要中文化，并能直接调“模糊程度”，而不是去高级设置手写 `styleConstants`。
-*   **处理方案**：将 `theme`、`backgroundTranslucentEffect`、`backgroundTranslucentEffectRegion` 等常用设置改为中文标题与中文选项显示；同时新增 `zenCustomBlurAmount`、`zenCustomTintOpacity`、`zenCustomTintLuminosityOpacity` 三个简单参数。默认 `theme=CustomGlass`，在本地版中将它解释为“自定义整窗玻璃”。
+*   **处理方案**：将 `theme`、`backgroundTranslucentEffect`、`backgroundTranslucentEffectRegion` 等常用设置改为中文标题与中文选项显示；同时新增 `CWCustomBlurAmount`、`CWCustomTintOpacity`、`CWCustomTintLuminosityOpacity` 三个简单参数。默认 `theme=CustomGlass`，在本地版中将它解释为“自定义整窗玻璃”。
 *   **实现方式**：不重写官方风格引擎，而是沿用 `WindowGlass` 主题的目标规则，在 `ProcessAllStylesFromSettings()` 阶段动态覆写 `Background`、`MainContentBG`、`Background2` 三个 style constant，把它们生成为 `WindhawkBlur` 画刷。这样 `BlurAmount` 和透明度参数直接由普通 Windhawk 设置项驱动，`TintOpacity=0` 时就能做到尽量全透。
 
 ### 2.54 文件管理器 v3.8.0 — 做减法修复五大 Bug
@@ -501,7 +501,7 @@
 *   **根因分析**：
     *   **问题 3/4/5 同根因**：`g_themeWindowGlass`（`CustomGlass` 复用它）的 `targetStyles` 缺少 `Grid#DetailsViewControlRootGrid` 和 `StackPanel#DetailsViewThumbnail > Grid` 两个目标。`ProcessAllStylesFromSettings()` 把 WindhawkBlur 画刷注入 `$MainContentBG` 常量，但该常量只在 `Grid#HomeViewRootGrid` 生效。导航到普通文件夹时，`DetailsViewControlRootGrid` 保持系统默认不透明背景，遮住了 DWM 层的 acrylic 和 XAML 层的 blur brush。Translucent Explorer11 和 LiquidGlass 主题不受影响，因为它们都有 `DetailsViewControlRootGrid → Transparent` 目标。
     *   **问题 1**：11 个视觉风格中大多来自上游社区未经验证，做减法砍到只保留 4 个（无/自定义玻璃/整窗通透/液态玻璃）。
-    *   **问题 2**：其他三个 mod 用"自定义玻璃 (Custom Glass)"，文件管理器用"自定义整窗玻璃 (ZenDesktop Custom Glass)"和"亚克力 (Acrylic)"，不统一。
+    *   **问题 2**：其他三个 mod 用"自定义玻璃 (Custom Glass)"，文件管理器用"自定义整窗玻璃 (CW-Beautify Custom Glass)"和"亚克力 (Acrylic)"，不统一。
 *   **修复方案**：
     *   `g_themeWindowGlass.targetStyles` 添加 `Grid#DetailsViewControlRootGrid → Background:=$MainContentBG` 和 `StackPanel#DetailsViewThumbnail > Grid → Background:=$MainContentBG`。注意必须用 `$MainContentBG` 而非 `Transparent`，否则 CustomGlass 注入的 WindhawkBlur 画刷不会应用。
     *   `theme` 设置选项从 11 → 4，`GetSelectedTheme()` 中砍掉废弃分支，加兜底回退。
@@ -515,7 +515,7 @@
     *   **自定义玻璃 (CustomGlass)**：修改为 `去文留图`，因为其真实渲染行为是隐藏命令栏上的文字标签，只保留图标。
     *   **整窗通透 (Translucent Explorer11)**：修改为 `原版全透`，因为其真实渲染行为是保持 Windows 11 原版默认样式（图标和文字均保留），但整个窗口背景透明。
     *   **液态玻璃 (LiquidGlass)**：修改为 `无图留文`，因为其真实渲染行为是隐藏命令栏上的所有图标，只保留文字标签。
-*   **修改范围**：同步修改 `local@zen-fileexplorer-acrylic.wh.cpp` 的 `$options` 及其设置说明文案，以及 Python 调色面板 GUI (`ZenDesktopCustomizer.py`) 里的选项映射字典，保证界面文字完全一致。
+*   **修改范围**：同步修改 `local@cw-fileexplorer-acrylic.wh.cpp` 的 `$options` 及其设置说明文案，以及 Python 调色面板 GUI (`CW-BeautifyCustomizer.py`) 里的选项映射字典，保证界面文字完全一致。
 
 ### 2.56 修复资源管理器列表表头与边框不透明的 Bug
 *   **问题场景**：用户在“去文留图” (CustomGlass) 或“原版全透” (Translucent Explorer11) 模式下，将模糊和色彩浓度调至 0 时，发现虽然文件列表大面积实现了完全透明，但**列标题栏 (ListView Header - 名称/修改日期/类型/大小)** 仍带有系统默认的固色背景（如黑底），且列表外部带有粗黑色矩形外框，侧边栏与主窗口交界处也存有黑色分割线。
@@ -560,7 +560,7 @@
 *   **安全边界**：
     *   仍 **禁止 ACCENT_POLICY / ExtendFrame**。
     *   subclass / DWM 属性只打 **本进程** HWND。
-    *   卸载 / 非玻璃主题 `RemoveZenGlassFocusFix` + 关 host backdrop。
+    *   卸载 / 非玻璃主题 `RemoveCWGlassFocusFix` + 关 host backdrop。
 *   **验证清单**：
     1. Windhawk 编译显示 `5.3.0`，日志应有 `CreateHostBackdropBrush OK` 与 `focus-fix ON`。
     2. 设置有焦点：玻璃正常。
@@ -604,8 +604,8 @@
 
 ### 2.64 失焦主动切「清空 chrome」brush（v5.3.4）
 *   **策略**：不再指望 HostBackdrop 失焦仍玻璃。
-    *   **有焦点** `g_zenWindowLooksActive=true`：`BuildChromeGlassBrush` → HostBackdrop Acrylic（已验证能透）。
-    *   **失焦** `g_zenWindowLooksActive=false`：同一函数返回 `<SolidColorBrush Color="#00000000"/>`，卡片路径同样清空。
+    *   **有焦点** `g_CWWindowLooksActive=true`：`BuildChromeGlassBrush` → HostBackdrop Acrylic（已验证能透）。
+    *   **失焦** `g_CWWindowLooksActive=false`：同一函数返回 `<SolidColorBrush Color="#00000000"/>`，卡片路径同样清空。
     *   `WM_ACTIVATE` / `WM_ACTIVATEAPP` 翻转标志 → 50ms 后 `SoftReloadStylesKeepingTap()` 重套样式。
 *   **预期**：失焦不再出现极光幻青实心；可能只是「全透/空」，模糊只在聚焦时有。
 *   **用户操作**：编译 **5.3.4** → 关开设置 → 测失焦。
@@ -619,11 +619,11 @@
 *   **验证**：冷启动，等约 3 秒，托盘/音量应变透明。日志应有 `Boot delayed TAP reinit`。
 
 ### 2.66 最大化层并回任务栏且连续 max/min 不崩（v4.1.0）
-*   **基线**：`D:\Download\ZenDesktop_OneKeyDeploy_v4.0.0_Online-32054bd01e29\local@zen-taskbar-acrylic.wh.cpp`（v3.5.0）已有 `ZenTaskbarRuntimeBgBrush` + 最大化设置。仓库 v4.0.0 砍了 hook，只留了死变量。
+*   **基线**：`D:\Download\CW-Beautify_OneKeyDeploy_v4.0.0_Online-32054bd01e29\local@cw-taskbar-acrylic.wh.cpp`（v3.5.0）已有 `CWTaskbarRuntimeBgBrush` + 最大化设置。仓库 v4.0.0 砍了 hook，只留了死变量。
 *   **崩点**：v3.5.0 在 AfterInit 线程上 `SetWinEventHook(LOCATIONCHANGE)`，回调里 `RunFromWindowThread` = **SendMessage** 进 Explorer UI。连续放大等于高频重入 XAML。
 *   **拼法（ponytail，两块现成的）**：
     *   检测：`taskbar-background-helper` 的独立消息泵线程（OUTOFCONTEXT 事件打到这个线程，不打 UI 线程）
-    *   涂色：v3.5.0 的 `ZenTaskbarRuntimeBgBrush` / `PropagateStyleVariableChange`，最大化时 `max(base, layer)`
+    *   涂色：v3.5.0 的 `CWTaskbarRuntimeBgBrush` / `PropagateStyleVariableChange`，最大化时 `max(base, layer)`
     *   跳 UI：`SendMessageTimeout(..., SMTO_ABORTIFHUNG, 200)`，卡住就跳过这一帧
 *   **明确不用**：helper 的 `SetWindowCompositionAttribute`（Win11 黑底）；`UninitializeSettingsAndTap` 挂 WinEvent。
 *   **部署**：`deploy.ps1` 把 helper 设 `Disabled=1`。两套同时开会黑底。
@@ -644,9 +644,9 @@
 *   本轮没有新检测框架、没有重做文件管理器引擎、没有把 helper 的 Win32 涂色搬到 Win11。
 
 ### 2.72 多显示器：一屏最大化，所有任务栏都变厚（v4.1.2）
-*   **根因**：`g_taskbarMaximizedLayerActive` 是进程级 OR。任一显示器有最大化窗口就给**所有** XAML 线程换 `ZenTaskbarRuntimeBgBrush`。
+*   **根因**：`g_taskbarMaximizedLayerActive` 是进程级 OR。任一显示器有最大化窗口就给**所有** XAML 线程换 `CWTaskbarRuntimeBgBrush`。
 *   **修**：按窗口所在 `HMONITOR` 分别判断，`thread_local` 决定刷子。每次刷新都更新所有任务栏岛（不能只在全局 OR 翻转时刷，否则 A 屏最大化后 B 屏再最大化/还原不会单独更新）。
-*   **4.1.2 仍失败**：主副任务栏经常在**同一条 UI 线程**、各有 XamlRoot。`thread_local` 一次赋值会把该线程上所有岛刷成同一种。4.1.3 对每个 `StyleVariableState` 用 AutomationPeer 屏幕矩形定位显示器，再单独设 `ZenTaskbarRuntimeBgBrush`。
+*   **4.1.2 仍失败**：主副任务栏经常在**同一条 UI 线程**、各有 XamlRoot。`thread_local` 一次赋值会把该线程上所有岛刷成同一种。4.1.3 对每个 `StyleVariableState` 用 AutomationPeer 屏幕矩形定位显示器，再单独设 `CWTaskbarRuntimeBgBrush`。
 
 ### 2.71 设置页浅色太透看不清、失焦变纯色、优化差（调查，2026-08-21，未改代码）
 *   **用户**：浅色也能透，但太透看不清字；失焦变回纯色；整体优化不好。禁止 Translucent Windows。
@@ -709,19 +709,16 @@
 *   **版本**：升级至 **v5.5.0**，通过 Windhawk 自带 Clang 编译生成 DLL 并即时热挂载。
 
 ### 2.75 全套 Mod 版本统一至 v4.1.0 & 简介开头注入开发者关注支持与原作者致谢（v4.1.0）
-*   **版本统一**：将 ZenDesktop 矩阵下的全部 6 款核心 Mod 统一版本号为 **v4.1.0**：
-    1. `ZenDesktop: Desktop Icon Toggle and Auto-Hide` (v4.1.0)
-    2. `ZenDesktop: Notification Center Acrylic Styler` (v4.1.0)
-    3. `ZenDesktop: Settings Acrylic Styler` (v4.1.0)
-    4. `ZenDesktop: Start Menu Acrylic Styler` (v4.1.0)
-    5. `ZenDesktop: Taskbar Acrylic Styler` (v4.1.0)
+*   **版本统一**：将 CW-Beautify 矩阵下的全部 6 款核心 Mod 统一版本号为 **v4.1.0**：
+    1. `CW-Beautify: Desktop Icon Toggle and Auto-Hide` (v4.1.0)
+    2. `CW-Beautify: Notification Center Acrylic Styler` (v4.1.0)
+    3. `CW-Beautify: Settings Acrylic Styler` (v4.1.0)
+    4. `CW-Beautify: Start Menu Acrylic Styler` (v4.1.0)
+    5. `CW-Beautify: Taskbar Acrylic Styler` (v4.1.0)
     6. `MacOS Minimize Animation` (v4.1.0)
 *   **简介开头规范**：
-    *   在每个 Mod 的 `// ==WindhawkModReadme==` 开头置顶注入 Lanboo 个人社交主页与赞助链接：
-        *   📺 **B站**：`https://space.bilibili.com/1280632999`
-        *   🎵 **抖音**：`https://v.douyin.com/Isl7QPpKZZ4/`
-        *   ⚡ **爱发电**：`https://ifdian.net/a/Lanboo`
-    *   清晰标明原作者出处（如 `m417z`、`Abdullah Masood & Potassiumuncher`）及 Lanboo 在该 Mod 中所做的深度重构、二开特性与定制优化细节。
+    *   在每个 Mod 的 `// ==WindhawkModReadme==` 开头置顶注入 Heptaluneo 个人社交主页与赞助链接：
+    *   清晰标明原作者出处（如 `m417z`、`Abdullah Masood & Potassiumuncher`）及 Heptaluneo 在该 Mod 中所做的深度重构、二开特性与定制优化细节。
 
 ---
 *此文档由开发者手动维护，AI 辅助整理，旨在帮助开发者和后续维护者快速理解本项目的技术架构与踩坑细节。*
@@ -730,12 +727,12 @@
 
 
 ## 2.76 模组名称中文规范与统一命名 (v4.1.0)
-已将 ZenDesktop 系列核心模组的显示名称统一规范，保留 ZenDesktop:  前缀并使用清晰标准的中文命名：
-1. local@zen-desktop-toggle-icons.wh.cpp -> **ZenDesktop: 桌面双击隐藏图标**
-2. local@zen-notificationcenter-acrylic.wh.cpp -> **ZenDesktop: 通知栏美化**
-3. local@windows-11-settings-styler-fork.wh.cpp -> **ZenDesktop: 设置美化**
-4. local@zen-startmenu-acrylic.wh.cpp -> **ZenDesktop: 开始菜单美化**
-5. local@zen-taskbar-acrylic.wh.cpp -> **ZenDesktop: 任务栏美化**
+已将 CW-Beautify 系列核心模组的显示名称统一规范，保留 CW-Beautify:  前缀并使用清晰标准的中文命名：
+1. local@cw-desktop-toggle-icons.wh.cpp -> **CW-Beautify: 桌面双击隐藏图标**
+2. local@cw-notificationcenter-acrylic.wh.cpp -> **CW-Beautify: 通知栏美化**
+3. local@windows-11-settings-styler-fork.wh.cpp -> **CW-Beautify: 设置美化**
+4. local@cw-startmenu-acrylic.wh.cpp -> **CW-Beautify: 开始菜单美化**
+5. local@cw-taskbar-acrylic.wh.cpp -> **CW-Beautify: 任务栏美化**
 6. local@macos-minimize-animation.wh.cpp -> **macOS 神奇效果最小化动画**
 
 

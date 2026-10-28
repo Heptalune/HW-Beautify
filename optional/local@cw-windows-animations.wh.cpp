@@ -5,7 +5,7 @@
 // @description     Close, minimize, restore and launch animations for windows, including the macOS genie effect.
 // @description:zh-CN 为窗口的关闭、最小化、还原和启动加入动画，包含 macOS 神奇效果。
 // @version         1.6.0
-// @author          ReDrag, Abdullah Masood, Potassiumuncher, Lanbo
+// @author          ReDrag, Abdullah Masood, Potassiumuncher, Heptalune
 // @github          https://github.com/redrag2105
 // @donateUrl       https://ko-fi.com/redrag2105
 // @include         *
@@ -65,11 +65,10 @@
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
-> 原作者：**ReDrag**（Window Animations，MIT）。本版由 Lanbo 维护与扩展，原作者的捐助链接保留在 `@donateUrl`。
+> 原作者：**ReDrag**（Window Animations，MIT）。本版由 Heptalune 维护与扩展，原作者的捐助链接保留在 `@donateUrl`。
 
 # CW-窗口动画
 
@@ -116,8 +115,7 @@
 - macOS 神奇效果移植自 [macOS Minimize Animation](https://windhawk.net/mods/macos-minimize-animation)（MIT），作者 [Abdullah Masood](https://github.com/Abdullah-Masood-05)；其 Direct2D 网格变形引擎、圆角遮罩、网格密度设置和演示动图由 [Potassiumuncher](https://github.com/Potassiumuncher)（[MacOS-Animation-for-windows](https://github.com/Potassiumuncher/MacOS-Animation-for-windows)）编写。「排除的程序」设置也来自该 mod。
 - 经典神奇效果动画来自 Abdullah Masood 的 macOS Minimize Animation。
 - 各部分版权归各自作者所有。
-- Lanbo 的修改：中文界面、游戏与反作弊进程排除名单、覆盖范围扩展、合并 macOS 神奇效果、新增关闭与最小化样式。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
+- Heptalune 的修改：中文界面、游戏与反作弊进程排除名单、覆盖范围扩展、合并 macOS 神奇效果、新增关闭与最小化样式。
 
 ## 附录：原版说明（英文）
 

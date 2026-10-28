@@ -1,12 +1,12 @@
 ﻿# ============================================================
-#  CW桌面美化 Uninstaller
-#  Removes the CW桌面美化 mods that deploy.ps1 installed into Windhawk.
+#  CW-Beautify Uninstaller
+#  Removes the CW-Beautify mods that deploy.ps1 installed into Windhawk.
 #  Also cleans up mods left by the older packages.
 #  Windhawk itself is never uninstalled.
 #
 #  uninstall.ps1               # asks before removing anything
-#  uninstall.ps1 -Yes          # no prompts; keeps %LOCALAPPDATA%\CWDesktop
-#  uninstall.ps1 -Yes -RemoveData   # no prompts; also deletes %LOCALAPPDATA%\CWDesktop
+#  uninstall.ps1 -Yes          # no prompts; keeps %LOCALAPPDATA%\CW-Beautify
+#  uninstall.ps1 -Yes -RemoveData   # no prompts; also deletes %LOCALAPPDATA%\CW-Beautify
 # ============================================================
 param(
     [switch]$Yes,
@@ -32,8 +32,7 @@ if (-not $isAdmin) {
 
 # 2. The mods deploy.ps1 installs: every local@*.wh.cpp in this folder and in
 #    optional\, plus the fixed list below in case uninstall.ps1 is run from
-#    another folder. The zen-* ids are from the older packages and
-#    are cleaned up too.
+#    another folder. Retired ids from older packages are cleaned up too.
 $modIds = New-Object System.Collections.Generic.List[string]
 foreach ($id in @(
     "local@cw-taskbar-acrylic",
@@ -41,20 +40,25 @@ foreach ($id in @(
     "local@cw-notificationcenter-acrylic",
     "local@cw-desktop-toggle-icons",
     "local@cw-explorer-styler",
-    "local@cw-taskbar-lyrics",
+    "local@cw-taskbar-volume-control",
+    "local@cw-taskbar-dock-animation",
+    "local@cw-window-arrangement",
+    "local@cw-tray-system-icons",
+    "local@cw-classic-context-menu",
+    "local@cw-taskbar-autohide-instant",
+    "local@cw-extension-no-warning",
+    "local@cw-file-operation-styler",
+    "local@cw-audioswap",
+    "local@cw-volume-per-app",
+    "local@cw-file-hover-info",
+    "local@cw-settings-styler",
+    "local@cw-mac-island-dock",
     "local@cw-alt-tab-flip-3d",
+    "local@cw-taskbar-lyrics",
     "local@cw-dynamic-island",
     "local@cw-island-media",
     "local@cw-taskbar-icon-size",
-    "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-dock-animation",
     "local@cw-windows-animations",
-    "local@zen-taskbar-acrylic",
-    "local@zen-startmenu-acrylic",
-    "local@zen-notificationcenter-acrylic",
-    "local@zen-desktop-toggle-icons",
-    "local@zen-explorer-styler",
-    "local@zen-taskbar-lyrics",
     "local@windows-11-settings-styler-fork",
     "local@wobbly-windows",
     "local@windows-animations",
@@ -126,27 +130,37 @@ if ($windhawkDir) {
 }
 $modsSource = Join-Path $windhawkData "ModsSource"
 $compiledRoot = Join-Path $windhawkData "Engine\Mods"
-$cwData = Join-Path $env:LOCALAPPDATA "CWDesktop"
+$cwDataDirs = @(
+    (Join-Path $env:LOCALAPPDATA "CW-Beautify"),
+    (Join-Path $env:LOCALAPPDATA "CWDesktop")   # 更名前的旧数据目录，一并清理
+)
 $cwTaskName = "StartupCheck"
-$cwTaskPath = "\CWDesktop\"
+$cwTaskPath = "\CW-Beautify\"
+$legacyTaskPaths = @("\CWDesktop\")
 
 # 4. Show what will be removed and confirm
 $installed = @($modIds | Where-Object {
     (Test-Path "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$_") -or (Test-Path -LiteralPath (Join-Path $modsSource "$_.wh.cpp"))
 })
 $task = Get-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -ErrorAction SilentlyContinue
+if (-not $task) {
+    foreach ($p in $legacyTaskPaths) {
+        $task = Get-ScheduledTask -TaskName $cwTaskName -TaskPath $p -ErrorAction SilentlyContinue
+        if ($task) { break }
+    }
+}
 
 Write-Status "================================================" "Green"
-Write-Status "   CW桌面美化 卸载 (Uninstall)" "Green"
+Write-Status "   CW-Beautify 卸载 (Uninstall)" "Green"
 Write-Status "================================================" "Green"
 Write-Host "Windhawk 数据目录 (data folder): $windhawkData"
 Write-Host ""
 if ($installed.Count -eq 0 -and -not $task) {
-    Write-Status "Windhawk 里没有找到 CW桌面美化的 mod，也没有开机自检任务。 (No CW Desktop mods or startup task found.)" "Yellow"
+    Write-Status "Windhawk 里没有找到 CW-Beautify 的 mod，也没有开机自检任务。 (No CW-Beautify mods or startup task found.)" "Yellow"
 } else {
     Write-Host "将要移除 (Will remove):"
     foreach ($id in $installed) { Write-Host "  - $id" }
-    if ($task) { Write-Host "  - 开机自检计划任务 (startup self-check task) $cwTaskPath$cwTaskName" }
+    if ($task) { Write-Host "  - 开机自检计划任务 (startup self-check task) $($task.TaskPath)$cwTaskName" }
     Write-Host ""
     Write-Host "包括 mod 源码、编译好的 DLL、Windhawk 里的 mod 记录和设置。Windhawk 本身不会被卸载。"
     Write-Host "(Mod sources, compiled DLLs, Windhawk mod entries and their settings. Windhawk itself stays installed.)"
@@ -188,7 +202,7 @@ if ($installed.Count -eq 0 -and -not $task) {
 
     # 6. Startup self-check task (deploy.ps1 -StartupCheck check|restart)
     if ($task) {
-        Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Confirm:$false -ErrorAction SilentlyContinue
+        Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath ($task.TaskPath) -Confirm:$false -ErrorAction SilentlyContinue
         Write-Status "已移除开机自检任务。 (Startup self-check task removed.)" "Green"
     }
 
@@ -199,8 +213,10 @@ if ($installed.Count -eq 0 -and -not $task) {
     }
 }
 
-# 7. Optional: CWDesktop's own data folder (startup-check log)
-if (Test-Path -LiteralPath $cwData) {
+# 7. Optional: the suite's own data folders (startup-check log; also the
+#    folder name used before the CW-Beautify rename)
+foreach ($cwData in $cwDataDirs) {
+    if (-not (Test-Path -LiteralPath $cwData)) { continue }
     $removeCWData = $RemoveData
     if (-not $Yes) {
         $removeCWData = Ask-YesNo "同时删除 $cwData 吗？里面是开机自检日志。 (Also delete $cwData? It holds the startup-check log.)"
@@ -218,8 +234,6 @@ Write-Host "  1. 旧版部署包往 Windhawk「设置 → 高级设置」的进�
 Write-Host "     这些没有被改动，想还原请在那里手动删除。"
 Write-Host "     (Old CW packages added dwm.exe to Windhawk's process include list and some games / anti-cheat"
 Write-Host "     processes to the exclude list. They were left as they are; remove them in Windhawk > Settings > Advanced if you want.)"
-Write-Host "  2. 接过 AI 状态的，记得把当时粘贴到各 AI 助手配置里的 zen-status 片段删掉。"
-Write-Host "     (If you connected AI status, remove the zen-status snippets you pasted into your assistants' configs.)"
 Write-Host ""
 
 if (-not $Yes) {
@@ -235,5 +249,5 @@ if (-not $Yes) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   CW桌面美化 卸载完成 (Uninstall finished)" "Green"
+Write-Status "   CW-Beautify 卸载完成 (Uninstall finished)" "Green"
 Write-Status "================================================" "Green"

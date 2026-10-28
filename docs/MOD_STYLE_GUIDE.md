@@ -1,6 +1,6 @@
-# CW桌面美化 Mod 文字规范
+# CW-Beautify Mod 文字规范
 
-本规范约束所有 CW桌面美化 Windhawk mod 中用户能看到的文字：元数据（`@name`、`@description`）、说明（`==WindhawkModReadme==`）和设置界面（`==WindhawkModSettings==`）。新 mod 和后续改动都按此执行。
+本规范约束所有 CW-Beautify Windhawk mod 中用户能看到的文字：元数据（`@name`、`@description`）、说明（`==WindhawkModReadme==`）和设置界面（`==WindhawkModSettings==`）。新 mod 和后续改动都按此执行。
 
 ## 1. 硬性约束
 
@@ -97,18 +97,17 @@
 
 ## 6. 作者信息与致谢（说明开头）
 
-- 更名整合而来的 mod，**保留原作者块**（`> **作者：Lanbo**` 及其链接）不变，紧跟一行整合说明：
+- 更名整合而来的 mod，**保留原作者块**（`> **作者：Heptalune**` 及其链接）不变，紧跟一行整合说明：
 
 ```markdown
-> 本 mod 属于「CW桌面美化」整合包。
+> 本 mod 属于CW-Beautify整合包。
 ```
 
 - 从社区引入的 mod，说明**第一段**固定为原作者块：
 
 ```markdown
-> 原作者：**<作者名>**（[<原版名>](<原版链接>)，<许可证>）。本汉化版由 CW桌面美化 整理分发，仅改动文案，未改动代码。
+> 原作者：**<作者名>**（[<原版名>](<原版链接>)，<许可证>）。本汉化版由 CW-Beautify 整理分发，仅改动文案，未改动代码。
 ```
 
 - 基于 m417z 的 Styler 系列的，原作者说明写成 `> 原作者：**m417z**（[原版名](https://windhawk.net/mods/<原版 id>)，GPL-3.0）。…`，保留源码头注释里的原仓库链接。
 
-- 元数据中加入 Windhawk 支持的 `@donateUrl`，指向爱发电：`https://ifdian.net/a/Lanboo`。基于他人 mod 且原版已有 `@donateUrl` 的（如窗口动画），保留原作者的链接，不替换；其说明开头的作者块照常写爱发电与微信赞赏链接。

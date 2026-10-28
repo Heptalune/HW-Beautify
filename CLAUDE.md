@@ -1,7 +1,7 @@
-# CW桌面美化 项目开发与部署规范
+# CW-Beautify 项目开发与部署规范
 
-> 本项目为 CW桌面美化 整合包（GPL-3.0）。
-> 项目名：CW桌面美化，包内 mod 统一命名为 `CW-<模组名>`，mod id 统一为 `cw-*`。
+> 本项目为 CW-Beautify 整合包（作者 Heptalune）（GPL-3.0），原名 CW桌面美化，v2.0.0 起更名为 CW-Beautify。
+> 包内 mod 统一命名为 `CW-<模组名>`，mod id 统一为 `cw-*`。
 > 各 mod 的原作者署名与 GPL 许可声明必须原样保留。
 
 ## 核心设计铁律（MUST ALWAYS FOLLOW）
@@ -14,7 +14,20 @@
    - 严禁通过脚本触发自动编译或后台强行编译。
    - 必须将选择权、开启权、编译权完全交由用户在 Windhawk UI 界面中按需自行开启与确认编译。
    - 若用户此前已在 Windhawk 中手动调整过开关状态，重新部署时必须保留用户的现有状态。
-   - 从旧版 id 升级时，deploy 负责把旧系列 id 的开关与设置迁移到新 `cw-*` id，然后清理旧条目。
+   - 从旧版升级：v1.0.0 已完成更早一代旧 id 的迁移；v2.0.0 起负责把旧主题值（Zen* → CW*）迁移到新命名。
+
+1b. **Windhawk 2.x 便携版实测坑（2026-10-28）**：
+   - 2.0 便携版**没有 Windows 服务**：引擎跑在 `windhawk-mod.exe` / `windhawk.exe` 进程里。
+     deploy 必须先 `windhawk.exe -exit -wait` 再补杀 `windhawk / windhawk-mod / windhawk-ui /
+     windhawk-mod-elevated` 全部进程，否则引擎在线检测到新复制的源码会把新模组**默认全部启用并自动编译注入**。
+   - 2.0 引擎的**真实开关状态**在 `<Data>\Engine\Sessions\*.hiv` 会话 hive（由 UI 写入）；
+     `Engine\Mods\<id>.ini` 的 `Disabled` 在 2.0 上**不控制引擎**（只是元数据）。
+     标准版的 HKLM `Disabled` 逻辑不变。
+   - `windhawk-cli.exe` 的 `mod list` 在便携版上会把有源码的模组一律报 `enabled:true`（不可信）；
+     `mod disable/show` 等 lifecycle 命令报 "Mod not installed"（便携版不支持）。判断是否注入用
+     `tasklist /M windhawk-core.dll`（有输出=有模组在运行）。
+   - deploy 收尾会做注入检测并提示用户到 UI 核对开关；效果残留（样式不还原）用
+     `restart_explorer.bat` 重启 explorer/StartMenuExperienceHost/SearchHost 解决。
 
 2. **全中文本地化规范**：
    - 所有引入或更新的 Mod 必须包含完整的中文本地化元数据：
@@ -31,11 +44,40 @@
 4. **注册表部署必须种子默认值**：
    - 注册表部署的 mod 读不到设置 YAML 里的默认值（缺失返回 0 或空串）。
    - 新增 mod 或新增设置项时，必须在 `deploy.ps1` 里用 `Set-RegValueIfMissing` 补种子，
-     特别是像 `CW-任务栏高度与图标大小` 这种直接读值、缺失会把任务栏高度当 0 的 mod。
+     特别是像任务栏高度（`TaskbarHeight`）这种直接读值、缺失会把任务栏高度当 0 的设置。
    - 只在值不存在时写入，绝不覆盖用户已保存的值（包括空串和 0）。
 
 5. **命名规范**：
    - mod 显示名：`CW-<中文名>`（`@name` 与 `@name:zh-CN` 一致）。
    - mod id：`cw-<英文短名>`；包内文件名：`local@cw-<英文短名>.wh.cpp`。
-   - 从社区引入的 mod 保留原作者（`@author`）、原版链接与 GPL 头注释，
-     汉化版补丁版本号 +1（如 1.3.10 → 1.3.11），并在说明中注明改动范围。
+   - 从社区引入的 mod 保留原作者（`@author`）、原版链接与许可头注释，
+     汉化版补丁版本号 +1（如 1.3.1 → 1.3.2），并在说明中注明改动范围。
+
+6. **品牌与关联**：
+   - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
+   - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
+
+## 当前模组清单（v2.0.0，20 个）
+
+| 模组 | id | 版本 | 来源 |
+|---|---|---|---|
+| CW-任务栏美化 | cw-taskbar-acrylic | 4.3.1 | m417z Taskbar Styler 深度修改，已整合高度与图标大小 |
+| CW-开始菜单美化 | cw-startmenu-acrylic | 4.1.13 | m417z Start Menu Styler 深度修改 |
+| CW-通知栏美化 | cw-notificationcenter-acrylic | 4.2.6 | m417z Notification Center Styler 深度修改 |
+| CW-文件管理器美化 | cw-explorer-styler | 1.6.9 | m417z File Explorer Styler 深度修改 |
+| CW-桌面双击隐藏图标 | cw-desktop-toggle-icons | 4.1.5 | Heptalune 原创 |
+| CW-任务栏音量控制 | cw-taskbar-volume-control | 1.3.5 | m417z 汉化；新增媒体设备快捷切换（参考 AudioSwitcher） |
+| CW-任务栏 Dock 动画 | cw-taskbar-dock-animation | 2.0.2 | incconutwo Plus fork（原版 Ph0en1x-dev） |
+| CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |
+| CW-托盘系统图标调整 | cw-tray-system-icons | 1.3.2 | m417z Taskbar tray system icon tweaks 汉化 |
+| CW-经典右键菜单 | cw-classic-context-menu | 1.0.3 | m417z Classic context menu on Windows 11 汉化 |
+| CW-任务栏秒显 | cw-taskbar-autohide-instant | 2.3 | Bo0ii Taskbar Auto-Hide Instant Show 汉化 |
+| CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
+| CW-文件操作美化 | cw-file-operation-styler | 1.2.1 | digART File Operation Styler 汉化 |
+| CW-音频输出切换 | cw-audioswap | 2.4.1 | BlackPaw AudioSwap (MIT) 汉化 |
+| CW-分应用音量控制 | cw-volume-per-app | 1.1.5 | m417z Taskbar Volume Control Per-App 汉化 |
+| CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
+| CW-设置美化 | cw-settings-styler | 1.2.2 | m417z Windows 11 Settings Styler 汉化 |
+| CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
+| CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
+| CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |

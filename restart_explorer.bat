@@ -1,6 +1,6 @@
 @echo off
 echo ===================================================
-echo   CW Desktop: Instantly Restart Explorer.exe
+echo   CW-Beautify: Instantly Restart Explorer.exe
 echo ===================================================
 echo Killing explorer.exe...
 taskkill /f /im explorer.exe

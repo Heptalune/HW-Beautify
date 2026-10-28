@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。
-// @version         1.3.4
+// @version         1.3.5
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -23,12 +23,13 @@
 // For pull requests, development takes place here:
 // https://github.com/m417z/my-windhawk-mods
 //
-// 中文界面与整合由「CW桌面美化」完成：仅改动元数据、说明与设置文案，未改动代码逻辑。
+// 中文界面与整合由 CW-Beautify 整合包（作者 Heptalune）完成：汉化元数据与设置文案；1.3.4 起新增
+// 媒体设备快速切换（参考 AudioSwitcher 重新实现，非搬运上游代码）。
 // 原版 mod：https://windhawk.net/mods/taskbar-volume-control
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**m417z**（[Taskbar Volume Control](https://windhawk.net/mods/taskbar-volume-control)，GPL-3.0）。本汉化版由 CW桌面美化 整理分发，仅改动文案，未改动代码。
+> 原作者：**m417z**（[Taskbar Volume Control](https://windhawk.net/mods/taskbar-volume-control)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化维护，并新增媒体设备快速切换功能。
 
 # CW-任务栏音量控制
 
@@ -54,6 +55,10 @@
 - **不自动切换静音**：默认关闭，即音量降到 0 自动静音、调高自动取消静音；开启后不再改变静音状态。
 - **音量步长**：每格滚轮变化的音量，默认 2；Windows 11 指示器下必须是 2 的倍数。
 - **自定义 Windows 11 旧版任务栏**：配合 ExplorerPatcher 等工具使用。
+- **媒体（播放）设备快速切换**：全局快捷键，按下后把默认播放设备切到下一个，左下角短暂提示设备名；设为 None 关闭。
+- **录音（采集）设备快速切换**：同上，作用于麦克风等录音设备，默认关闭。
+- **跳过未激活的设备**：切换时跳过已禁用或未插入的设备。
+- **切换后提示**：切换成功后在屏幕左下角短暂显示新设备名称。
 
 ## 兼容性与已知问题
 
@@ -67,6 +72,12 @@
 - 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
 
 ## 更新日志
+- **1.3.5**：修复「媒体设备快速切换」按快捷键无反应的问题。原因：热键原来注册在
+Windhawk 的临时工作线程上，线程退出后热键和消息窗口随之失效；现改在专用常驻
+线程上注册热键并处理消息。同时修正实现：设置默认设备改用系统 IPolicyConfig
+接口（CPolicyConfigClient，AudioSwitcher/SoundSwitch 同款做法），修正设备枚举、
+设备名读取，提示字体改为正常大小。
+
 - **1.3.4**：恢复音量控制指示器的「Windows 11」选项（代码一直支持 win11，之前只是设置页删掉了选项，现已加回）；
 新增「媒体设备快速切换」——快捷键循环切换系统默认播放/录音设备，切换后左下角短暂提示设备名
 （参考并重新实现了 AudioSwitcher 的热键切换设备功能，AudioSwitcher 作者 xenolightning，MS-PL 许可）。
@@ -124,10 +135,10 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
   $name: Volume control indicator
   $name:zh-CN: 音量控制指示器
   $description: The indicator style shown while scrolling.
-  $description:zh-CN: 滚动调节音量时显示的指示器样式。默认为 Windows 10 风格，可切回 Windows 11 风格。
+  $description:zh-CN: 滚动调节音量时显示的指示器样式。可选 Windows 11 / 10 / 7 风格，或不显示。
   $options:
-  - modern: Windows 10
   - win11: Windows 11
+  - modern: Windows 10
   - classic: Windows 7
   - none: 无
 - deviceSwitchPlaybackKey: "Ctrl+Alt+A"
@@ -880,18 +891,34 @@ void SndVolUninit() {
 }
 
 // ---------------------------------------------------------------------------
-// CW 1.3.4：媒体设备快速切换
-// 参考并重新实现了 AudioSwitcher（xenolightning/AudioSwitcher_v1，MS-PL）的
-// 热键切换设备功能：全局快捷键循环切换系统默认播放/录音设备，
-// 切换后在屏幕左下角短暂提示新设备名称。
-// 全部走 COM vtable 直调，不依赖 x86（MinGW）头文件里不完整的
-// mmdeviceapi.h / propsys.h 定义：
-//   IMMDeviceEnumerator:  [3]GetDefaultAudioEndpoint [5]EnumAudioEndpoints
-//                         [12]SetDefaultAudioEndpoint(IMMDevice*,...)
-//   IMMDevice:            [4]GetId [6]GetPropertyStore
-//   IMMDeviceCollection:  [3]Item [4]GetCount
-//   IPropertyStore:       [5]GetValue
+// CW：媒体设备快速切换（参考 AudioSwitcher，xenolightning/AudioSwitcher_v1，MS-PL）
+// 全局快捷键循环切换系统默认播放/录音设备，切换后在屏幕左下角短暂提示设备名。
+//
+// 实现要点：
+//   * 快捷键与消息窗口放在专用常驻线程上：Wh_ModInit/Wh_ModAfterInit 跑在
+//     Windhawk 的临时工作线程上，线程退出时窗口和热键会一并失效，因此必须
+//     自建消息循环线程（与 ScrollAnywhereThread 同一套模式）。
+//   * 设置默认设备走未公开的 IPolicyConfig（CPolicyConfigClient），与
+//     AudioSwitcher / SoundSwitch 同款做法：
+//       CLSID {870af99c-171d-4f9e-af0d-e63df40c2bc9}
+//       IID   {f8679f50-850a-41cf-9c72-430f290290c8}
+//       vtable[13] SetDefaultEndpoint(deviceId, role)
+//     枚举与查询用 mmdeviceapi.h 的标准接口（此前手算的 vtable 索引有错位，
+//     上游代码本身就在用 IMMDeviceEnumerator 的类型化接口）。
 // ---------------------------------------------------------------------------
+#ifndef MOD_NOREPEAT
+#define MOD_NOREPEAT 0x4000
+#endif
+
+static const GUID CwCLSID_PolicyConfigClient = {
+    0x870af99c, 0x171d, 0x4f9e, {0xaf, 0x0d, 0xe6, 0x3d, 0xf4, 0x0c, 0x2b, 0xc9}};
+static const GUID CwIID_PolicyConfig = {
+    0xf8679f50, 0x850a, 0x41cf, {0x9c, 0x72, 0x43, 0x0f, 0x29, 0x02, 0x90, 0xc8}};
+// PKEY_FriendlyName：fmtid a45c254e-df1c-4efd-8020-67d146a850e0，pid 14
+static const PROPERTYKEY CwPKEY_FriendlyName = {
+    {0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}},
+    14};
+
 struct CwDevSwitch {
     DWORD playMods = 0;
     wchar_t playKey = 0;
@@ -899,28 +926,21 @@ struct CwDevSwitch {
     wchar_t capKey = 0;
     bool hasPlay = false;
     bool hasCap = false;
-    int skipInactive = 1;
-    int toast = 1;
+    bool skipInactive = true;
+    bool toast = true;
 };
 
 static CwDevSwitch g_dev;
-static HWND g_devMsgWnd = NULL;
-static HWND g_devToast = NULL;
-static HFONT g_devFont = NULL;
+static HANDLE g_devThread = nullptr;
+static HWND g_devMsgWnd = nullptr;  // 仅在设备切换线程上访问
+static HWND g_devToast = nullptr;
+static HFONT g_devFont = nullptr;
 static int g_toastAlpha = 0;
 static std::wstring g_devText;
-static GUID CwPKeyFriendlyFmtid = {0x26047631, 0xE171, 0x4881,
-                                    {0x94, 0x75, 0x72, 0x65, 0x7c, 0xE8, 0x75, 0xD4}};
+static wchar_t g_devToastClassName[48] = L"CWDevToastWnd";
 
-typedef HRESULT (WINAPI *CwVt4_t)(void*, unsigned int, unsigned int, void**);
-typedef HRESULT (WINAPI *CwSetDef_t)(void*, void*, unsigned int, unsigned int);
-typedef HRESULT (WINAPI *CwGetId_t)(void*, GUID*);
-typedef HRESULT (WINAPI *CwGetPs_t)(void*, unsigned long, void**);
-typedef HRESULT (WINAPI *CwItem_t)(void*, unsigned long, void**);
-typedef HRESULT (WINAPI *CwCount_t)(void*, unsigned long*);
-typedef HRESULT (WINAPI *CwPsGet_t)(void*, void*, unsigned int, void*);
+typedef HRESULT (WINAPI *CwSetDefEndp_t)(void*, const wchar_t*, unsigned int);
 typedef unsigned long (WINAPI *CwRel_t)(void*);
-typedef HRESULT (WINAPI *CwFreeStr_t)(wchar_t*);
 typedef HWND (WINAPI *CwCreateWnd_t)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int,
                                      int, int, HWND, HMENU, HINSTANCE, LPVOID);
 
@@ -980,30 +1000,38 @@ static bool ParseHotkey(const wchar_t* s, DWORD& mods, wchar_t& key) {
     return key != 0;
 }
 
-static std::wstring DevName(void* dev) {
+static void* CwPolicyConfigCreate() {
+    void* policy = nullptr;
+    if (CoCreateInstance(CwCLSID_PolicyConfigClient, NULL, CLSCTX_INPROC_SERVER,
+                         CwIID_PolicyConfig, (LPVOID*)&policy) != 0)
+        return nullptr;
+    return policy;
+}
+
+static std::wstring DevGetId(IMMDevice* dev) {
+    std::wstring id;
+    if (dev) {
+        LPWSTR raw = nullptr;
+        if (SUCCEEDED(dev->GetId(&raw)) && raw) {
+            id = raw;
+            CoTaskMemFree(raw);
+        }
+    }
+    return id;
+}
+
+static std::wstring DevName(IMMDevice* dev) {
     std::wstring name;
     if (dev) {
-        CwGetPs_t getPs = (CwGetPs_t)CwVt(dev)[6];
-        void* ps = nullptr;
-        if (getPs(dev, 0, &ps) == 0 && ps) {
-            CwPsGet_t gval = (CwPsGet_t)CwVt(ps)[5];
-            struct PropKey {
-                GUID fmtid;
-                unsigned int pid;
-            } key;
-            key.fmtid = CwPKeyFriendlyFmtid;
-            key.pid = 14;  // PKEY_FriendlyName 的 pid
-            struct PV {
-                unsigned short vt;
-                wchar_t* bstr;
-            } pv{};
-            if (gval(ps, &key, 0, &pv) == 0 && pv.vt == 8 && pv.bstr) {  // VT_BSTR
-                name = pv.bstr;
-                // BSTR 的 IUnknown::Release 可释放 BSTR；vtable 第 1 项即 Release
-                CwFreeStr_t freeStr = (CwFreeStr_t)CwVt((void*)pv.bstr)[1];
-                freeStr(pv.bstr);
+        IPropertyStore* ps = nullptr;
+        if (SUCCEEDED(dev->OpenPropertyStore(STGM_READ, &ps)) && ps) {
+            PROPVARIANT pv{};
+            if (SUCCEEDED(ps->GetValue(CwPKEY_FriendlyName, &pv)) &&
+                pv.vt == VT_BSTR && pv.bstrVal) {
+                name = pv.bstrVal;
             }
-            CwRelease(ps);
+            PropVariantClear(&pv);
+            ps->Release();
         }
     }
     if (name.empty())
@@ -1014,85 +1042,103 @@ static std::wstring DevName(void* dev) {
 static void ShowDevToast(const std::wstring& text);
 
 static void CycleDev(bool capture) {
-    unsigned int flow = capture ? 1 : 0;  // eRender=0, eCapture=1
-    if (!g_pDeviceEnumerator &&
+    EDataFlow flow = capture ? eCapture : eRender;
+    static IMMDeviceEnumerator* en =
+        nullptr;  // 仅在设备切换线程上创建与使用，不与音量代码共用
+    if (!en) {
         CoCreateInstance(XIID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER,
-                         XIID_IMMDeviceEnumerator,
-                         (LPVOID*)&g_pDeviceEnumerator) != 0) {
-        g_pDeviceEnumerator = NULL;
+                         XIID_IMMDeviceEnumerator, (LPVOID*)&en);
     }
-    if (!g_pDeviceEnumerator) {
+    if (!en) {
         if (g_dev.toast)
             ShowDevToast(capture ? L"● 没有可用的录音设备" : L"▶ 没有可用的播放设备");
         return;
     }
-    void* en = (void*)g_pDeviceEnumerator;
-    CwVt4_t pEnum = (CwVt4_t)CwVt(en)[5];
-    CwSetDef_t pSetDef = (CwSetDef_t)CwVt(en)[12];
-    void* coll = nullptr;
-    HRESULT hr = pEnum(en, flow, g_dev.skipInactive ? 0x1 : 0xF, &coll);
-    if (FAILED(hr) || !coll) {
-        if (coll) {
-            CwRelease(coll);
+
+    void* policy = CwPolicyConfigCreate();
+    if (!policy) {
+        if (g_dev.toast)
+            ShowDevToast(L"⚠ 设备切换组件初始化失败");
+        return;
+    }
+
+    IMMDeviceCollection* coll = nullptr;
+    HRESULT hr = en->EnumAudioEndpoints(
+        flow, g_dev.skipInactive ? DEVICE_STATE_ACTIVE : DEVICE_STATEMASK_ALL,
+        &coll);
+    if (SUCCEEDED(hr) && coll && g_dev.skipInactive) {
+        UINT activeCount = 0;
+        coll->GetCount(&activeCount);
+        if (activeCount == 0) {
+            coll->Release();
             coll = nullptr;
+            hr = en->EnumAudioEndpoints(flow, DEVICE_STATEMASK_ALL, &coll);
         }
-        hr = pEnum(en, flow, 0xF, &coll);
     }
     if (FAILED(hr) || !coll) {
+        CwRelease(policy);
         if (g_dev.toast)
             ShowDevToast(capture ? L"● 没有可用的录音设备" : L"▶ 没有可用的播放设备");
         return;
     }
-    CwCount_t pCount = (CwCount_t)CwVt(coll)[4];
-    CwItem_t pItem = (CwItem_t)CwVt(coll)[3];
-    unsigned long n = 0;
-    pCount(coll, &n);
+
+    UINT n = 0;
+    coll->GetCount(&n);
     if (n == 0) {
-        CwRelease(coll);
+        coll->Release();
+        CwRelease(policy);
         if (g_dev.toast)
             ShowDevToast(capture ? L"● 没有可用的录音设备" : L"▶ 没有可用的播放设备");
         return;
     }
-    GUID cur{};
-    bool haveCur = false;
+
+    std::wstring curId;
     {
-        void* defDev = nullptr;
-        CwVt4_t pDef = (CwVt4_t)CwVt(en)[3];
-        if (pDef(en, flow, 0, &defDev) == 0 && defDev) {
-            CwGetId_t pId = (CwGetId_t)CwVt(defDev)[4];
-            if (pId(defDev, &cur) == 0)
-                haveCur = true;
-            CwRelease(defDev);
+        IMMDevice* defDev = nullptr;
+        if (SUCCEEDED(en->GetDefaultAudioEndpoint(flow, eConsole, &defDev)) &&
+            defDev) {
+            curId = DevGetId(defDev);
+            defDev->Release();
         }
     }
-    int idx = -1;
-    for (unsigned long a = 0; a < n && idx < 0; ++a) {
-        void* ep = nullptr;
-        if (pItem(coll, a, &ep) != 0 || !ep)
-            continue;
-        CwGetId_t pId = (CwGetId_t)CwVt(ep)[4];
-        GUID g2{};
-        bool match = false;
-        if (haveCur && pId(ep, &g2) == 0)
-            match = memcmp(&g2, &cur, sizeof(GUID)) == 0;
-        CwRelease(ep);
-        if (match)
-            idx = (int)a;
-    }
-    int next = (idx + 1) % (int)n;
-    void* target = nullptr;
-    if (pItem(coll, (unsigned long)next, &target) == 0 && target) {
-        std::wstring name = DevName(target);
-        HRESULT hr2 = pSetDef(en, target, flow, 0);
-        CwRelease(target);
-        if (SUCCEEDED(hr2)) {
-            Wh_Log(L"CW音量控制: %s设备已切换为 %s (%d/%lu)",
-                   capture ? L"录音" : L"播放", name.c_str(), next + 1, n);
-            if (g_dev.toast)
-                ShowDevToast((capture ? L"● " : L"▶ ") + name);
+
+    UINT idx = UINT_MAX;
+    if (!curId.empty()) {
+        for (UINT a = 0; a < n && idx == UINT_MAX; a++) {
+            IMMDevice* ep = nullptr;
+            if (FAILED(coll->Item(a, &ep)) || !ep)
+                continue;
+            if (DevGetId(ep) == curId)
+                idx = a;
+            ep->Release();
         }
     }
-    CwRelease(coll);
+    UINT next = (idx == UINT_MAX) ? 0 : (idx + 1) % n;
+
+    bool switched = false;
+    IMMDevice* target = nullptr;
+    if (SUCCEEDED(coll->Item(next, &target)) && target) {
+        std::wstring targetId = DevGetId(target);
+        if (!targetId.empty()) {
+            // 与系统“设为默认”一致：同时设置控制台与多媒体角色
+            CwSetDefEndp_t setDef = (CwSetDefEndp_t)CwVt(policy)[13];
+            HRESULT hr1 = setDef(policy, targetId.c_str(), eConsole);
+            HRESULT hr2 = setDef(policy, targetId.c_str(), eMultimedia);
+            if (SUCCEEDED(hr1) && SUCCEEDED(hr2)) {
+                switched = true;
+                std::wstring name = DevName(target);
+                Wh_Log(L"CW音量控制: %s设备已切换为 %s (%u/%u)",
+                       capture ? L"录音" : L"播放", name.c_str(), next + 1, n);
+                if (g_dev.toast)
+                    ShowDevToast((capture ? L"● " : L"▶ ") + name);
+            }
+        }
+        target->Release();
+    }
+    if (!switched && g_dev.toast)
+        ShowDevToast(L"⚠ 切换失败");
+    coll->Release();
+    CwRelease(policy);
 }
 
 static LRESULT CALLBACK DevMsgWndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
@@ -1171,7 +1217,7 @@ static void ShowDevToast(const std::wstring& text) {
     SystemParametersInfoW(SPI_GETWORKAREA, 0, &wa, 0);
     g_devToast = CwCreateWnd()(
         WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_LAYERED,
-        L"CWDevToastWnd", g_devText.c_str(), WS_POPUP, wa.left + 24,
+        g_devToastClassName, g_devText.c_str(), WS_POPUP, wa.left + 24,
         wa.bottom - bh - 40, bw, bh, NULL, NULL,
         (HINSTANCE)GetModuleHandleW(NULL), NULL);
     if (!g_devToast)
@@ -1188,8 +1234,13 @@ static void LoadDevSettings() {
     s = Wh_GetStringSetting(L"deviceSwitchCaptureKey");
     g_dev.hasCap = ParseHotkey(s, g_dev.capMods, g_dev.capKey);
     Wh_FreeStringSetting(s);
-    g_dev.skipInactive = Wh_GetIntSetting(L"deviceCycleSkipInactive");
-    g_dev.toast = Wh_GetIntSetting(L"showDeviceSwitchToast");
+    // 字符串型设置：缺失/空串视为开启（与设置页默认值一致）
+    PCWSTR skip = Wh_GetStringSetting(L"deviceCycleSkipInactive");
+    g_dev.skipInactive = wcscmp(skip, L"0") != 0;
+    Wh_FreeStringSetting(skip);
+    PCWSTR toast = Wh_GetStringSetting(L"showDeviceSwitchToast");
+    g_dev.toast = wcscmp(toast, L"0") != 0;
+    Wh_FreeStringSetting(toast);
 }
 
 static void RegisterDevHotkeys() {
@@ -1197,55 +1248,125 @@ static void RegisterDevHotkeys() {
         return;
     UnregisterHotKey(g_devMsgWnd, 1);
     UnregisterHotKey(g_devMsgWnd, 2);
-    if (g_dev.hasPlay)
-        RegisterHotKey(g_devMsgWnd, 1, g_dev.playMods, g_dev.playKey);
-    if (g_dev.hasCap)
-        RegisterHotKey(g_devMsgWnd, 2, g_dev.capMods, g_dev.capKey);
+    if (g_dev.hasPlay) {
+        if (!RegisterHotKey(g_devMsgWnd, 1, g_dev.playMods | MOD_NOREPEAT,
+                            g_dev.playKey)) {
+            Wh_Log(L"CW音量控制: 播放设备切换快捷键注册失败（可能被其他程序占用）");
+        }
+    }
+    if (g_dev.hasCap) {
+        if (!RegisterHotKey(g_devMsgWnd, 2, g_dev.capMods | MOD_NOREPEAT,
+                            g_dev.capKey)) {
+            Wh_Log(L"CW音量控制: 录音设备切换快捷键注册失败（可能被其他程序占用）");
+        }
+    }
 }
 
-static void InitDevSwitch() {
+static DWORD WINAPI DevSwitchThread(LPVOID param) {
+    HANDLE hReady = (HANDLE)param;
+    BOOL comInit = SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED));
+
     LoadDevSettings();
     HINSTANCE inst = (HINSTANCE)GetModuleHandleW(NULL);
+    // 每次加载用不同的类名，避免与旧实例残留在进程里的同名窗口类冲突
+    wchar_t msgClassName[48];
+    unsigned int seq = GetTickCount();
+    swprintf(msgClassName, 48, L"CWDevMsgWnd_%08x", seq);
+    swprintf(g_devToastClassName, 48, L"CWDevToastWnd_%08x", seq);
+
     WNDCLASSEXW wc{};
     wc.cbSize = sizeof(wc);
     wc.lpfnWndProc = DevMsgWndProc;
     wc.hInstance = inst;
-    wc.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-    wc.lpszClassName = L"CWDevMsgWnd";
+    wc.hCursor = LoadCursorW(nullptr, (LPCWSTR)IDC_ARROW);
+    wc.lpszClassName = msgClassName;
     RegisterClassExW(&wc);
-    g_devMsgWnd = CwCreateWnd()(0, L"CWDevMsgWnd", L"CWDevMsgWnd", 0, 0, 0, 0, 0,
-                                HWND_MESSAGE, NULL, inst, NULL);
+    g_devMsgWnd = CwCreateWnd()(0, msgClassName, L"CWDevMsgWnd", 0, 0, 0, 0, 0,
+                                HWND_MESSAGE, nullptr, inst, nullptr);
+
     WNDCLASSEXW wt{};
     wt.cbSize = sizeof(wt);
     wt.lpfnWndProc = DevToastWndProc;
     wt.hInstance = inst;
-    wt.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+    wt.hCursor = LoadCursorW(nullptr, (LPCWSTR)IDC_ARROW);
     wt.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wt.lpszClassName = L"CWDevToastWnd";
+    wt.lpszClassName = g_devToastClassName;
     RegisterClassExW(&wt);
+
     if (!g_devFont) {
-        g_devFont = CreateFontW(-1, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-                                 DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                                 CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                                 DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
+        g_devFont = CreateFontW(-16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                                DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                                CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                                DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
     }
+
     RegisterDevHotkeys();
     Wh_Log(L"CW音量控制: 媒体设备快速切换已初始化 (播放快捷键%s, 录音快捷键%s)",
            g_dev.hasPlay ? L"已启用" : L"关闭", g_dev.hasCap ? L"已启用" : L"关闭");
-}
 
-static void UninitDevSwitch() {
+    SetEvent(hReady);
+
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0) > 0) {
+        if (msg.hwnd == nullptr) {
+            if (msg.message == WM_APP) {
+                PostQuitMessage(0);
+                continue;
+            }
+            if (msg.message == WM_APP + 1) {
+                LoadDevSettings();
+                RegisterDevHotkeys();
+                continue;
+            }
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
     if (g_devMsgWnd) {
         UnregisterHotKey(g_devMsgWnd, 1);
         UnregisterHotKey(g_devMsgWnd, 2);
         DestroyWindow(g_devMsgWnd);
-        g_devMsgWnd = NULL;
+        g_devMsgWnd = nullptr;
     }
     if (g_devToast) {
         KillTimer(g_devToast, 1);
         KillTimer(g_devToast, 2);
         DestroyWindow(g_devToast);
-        g_devToast = NULL;
+        g_devToast = nullptr;
+    }
+    if (g_devFont) {
+        DeleteObject(g_devFont);
+        g_devFont = nullptr;
+    }
+    if (comInit)
+        CoUninitialize();
+    return 0;
+}
+
+static void DevSwitchThreadInit() {
+    if (g_devThread)
+        return;
+
+    HANDLE hReadyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    if (!hReadyEvent)
+        return;
+
+    g_devThread =
+        CreateThread(nullptr, 0, DevSwitchThread, hReadyEvent, 0, nullptr);
+    if (g_devThread) {
+        WaitForSingleObject(hReadyEvent, INFINITE);
+    }
+
+    CloseHandle(hReadyEvent);
+}
+
+static void DevSwitchThreadUninit() {
+    if (g_devThread) {
+        PostThreadMessage(GetThreadId(g_devThread), WM_APP, 0, 0);
+        WaitForSingleObject(g_devThread, INFINITE);
+        CloseHandle(g_devThread);
+        g_devThread = nullptr;
     }
 }
 
@@ -2898,7 +3019,7 @@ void Wh_ModAfterInit() {
         ScrollAnywhereThreadInit();
     }
 
-    InitDevSwitch();
+    DevSwitchThreadInit();
 }
 
 void Wh_ModUninit() {
@@ -2921,7 +3042,7 @@ void Wh_ModUninit() {
     CleanupSndVol();
     SndVolUninit();
 
-    UninitDevSwitch();
+    DevSwitchThreadUninit();
 }
 
 BOOL Wh_ModSettingsChanged(BOOL* bReload) {
@@ -2932,9 +3053,8 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
 
     LoadSettings();
 
-    if (g_devMsgWnd) {
-        LoadDevSettings();
-        RegisterDevHotkeys();
+    if (g_devThread) {
+        PostThreadMessage(GetThreadId(g_devThread), WM_APP + 1, 0, 0);
     }
 
     if (g_target == Target::ShellExperienceHost || g_target == Target::SndVol) {

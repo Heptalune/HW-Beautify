@@ -1,8 +1,8 @@
 ﻿# ============================================================
-#  CWDesktop startup self-check (optional, off by default)
+#  CW-Beautify startup self-check (optional, off by default)
 #  PowerShell 5.1 compatible. Installed by: deploy.ps1 -StartupCheck check|restart
 #  Remove with:  deploy.ps1 -StartupCheck remove
-#            or: schtasks /Delete /TN "CWDesktop\StartupCheck" /F
+#            or: schtasks /Delete /TN "CW-Beautify\StartupCheck" /F
 #
 #  Runs once per logon (scheduled task, ~15s after logon). It restarts
 #  explorer.exe AT MOST ONCE PER BOOT, and only when:
@@ -10,7 +10,7 @@
 #                    or explorer.exe crashed since boot (Application log, ID 1000).
 #    -Mode restart : always (automates the manual "restart explorer once after
 #                    boot" workaround; use only if 'check' does not catch it).
-#  Log: %LOCALAPPDATA%\CWDesktop\startup-check.log (last ~200 lines kept)
+#  Log: %LOCALAPPDATA%\CW-Beautify\startup-check.log (last ~200 lines kept)
 # ============================================================
 param(
     [ValidateSet("check", "restart")]
@@ -19,7 +19,7 @@ param(
 )
 $ErrorActionPreference = 'Continue'
 
-$dir = Join-Path $env:LOCALAPPDATA "CWDesktop"
+$dir = Join-Path $env:LOCALAPPDATA "CW-Beautify"
 if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 $log = Join-Path $dir "startup-check.log"
 $marker = Join-Path $dir "startup-check.lastboot"

@@ -5,9 +5,8 @@
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also controls taskbar height and icon size.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并整合任务栏高度与图标大小控制。
 // @version         4.3.1
-// @donateUrl       https://ifdian.net/a/Lanboo
-// @author          Lanbo & m417z
-// @github          https://github.com/Liset999
+// @author          Heptalune & m417z
+// @github          https://github.com/Heptalune
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -ldwmapi -lgdi32 -lole32 -loleaut32 -lruntimeobject -lshcore -lshlwapi -lversion
@@ -16,7 +15,7 @@
 // Source code is published under The GNU General Public License v3.0.
 //
 // For bug reports and feature requests, please open an issue here:
-// https://github.com/Liset999/ZenDesktop/issues
+// https://github.com/Heptalune/CW-Beautify/issues
 //
 // Based on "Windows 11 Taskbar Styler" by m417z (https://github.com/m417z),
 // licensed under GPL-3.0. The original mod is developed here:
@@ -24,11 +23,10 @@
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
-> 原作者：**m417z**（[Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
+> 原作者：**m417z**（[Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
 # CW-任务栏美化
 
@@ -89,11 +87,10 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Taskbar Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- Lanbo 的修改：背景颜色/模糊/不透明度预设、溢出面板与音量浮窗独立玻璃、最大化状态层、文字颜色与中文设置。
+- Heptalune 的修改：背景颜色/模糊/不透明度预设、溢出面板与音量浮窗独立玻璃、最大化状态层、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 
 ## 附录：原版说明（英文）
 
@@ -6641,7 +6638,7 @@ const Theme g_themeAppleLiquidGlass = {{
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"HorizontalAlignment=Left"}},
 }, {
-    // Zen Liquid Glass shared language (aligned with Start / Notification)
+    // CW Liquid Glass shared language (aligned with Start / Notification)
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -6831,7 +6828,7 @@ const Theme g_themeAppleLiquidGlass_variant_Alternate = {{
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"HorizontalAlignment=Left"}},
 }, {
-    // Zen Liquid Glass shared language (aligned with Start / Notification)
+    // CW Liquid Glass shared language (aligned with Start / Notification)
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -7013,7 +7010,7 @@ const Theme g_themeAppleLiquidGlass_variant_Classic = {{
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"HorizontalAlignment=Left"}},
 }, {
-    // Zen Liquid Glass Classic — thinner refraction, same specular language
+    // CW Liquid Glass Classic — thinner refraction, same specular language
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -7203,7 +7200,7 @@ const Theme g_themeAppleLiquidGlass_variant_Classic_Alternate = {{
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"HorizontalAlignment=Left"}},
 }, {
-    // Zen Liquid Glass Classic — thinner refraction, same specular language
+    // CW Liquid Glass Classic — thinner refraction, same specular language
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -19645,7 +19642,7 @@ void MergeResourceVariables();
 // While a maximized window is on a monitor, the taskbar on that monitor uses a
 // denser background brush (maximizedLayer* settings). ProcessAllStylesFromSettings
 // replaces the theme's main background constant with the style variable
-// {{ZenTaskbarRuntimeBgBrush}}. The mod publishes that variable in every
+// {{CWTaskbarRuntimeBgBrush}}. The mod publishes that variable in every
 // XamlRoot's StyleVariableState (one XamlRoot per taskbar) under a synthetic
 // owner id, and the upstream variable code re-applies just the styles that use
 // it whenever the value changes.
@@ -19655,8 +19652,8 @@ void MergeResourceVariables();
 // when that set changes. The UI threads map each XamlRoot to its monitor
 // (cached, re-resolved when the displays change) and update the variable.
 
-constexpr WCHAR kZenRuntimeBgBrushVariable[] = L"ZenTaskbarRuntimeBgBrush";
-constexpr ElementId kZenRuntimeBgBrushOwner = static_cast<ElementId>(~0ULL);
+constexpr WCHAR kCWRuntimeBgBrushVariable[] = L"CWTaskbarRuntimeBgBrush";
+constexpr ElementId kCWRuntimeBgBrushOwner = static_cast<ElementId>(~0ULL);
 
 // Only set while the layer is in use on this thread (enabled when the styles
 // were processed). Empty otherwise, in which case the brush is a constant.
@@ -19673,31 +19670,31 @@ std::vector<winrt::weak_ref<winrt::Windows::System::DispatcherQueue>>
 size_t g_zenMaxPendingCallbacks;
 std::condition_variable g_zenMaxPendingCallbacksCv;
 
-void ZenMaxLayerRequestRefresh();
+void CWMaxLayerRequestRefresh();
 
-struct ZenMaxRootMonitor {
+struct CWMaxRootMonitor {
     winrt::weak_ref<XamlRoot> xamlRoot;
     HMONITOR monitor = nullptr;
     unsigned displayEpoch = 0;
     int resolveAttempts = 0;
 };
 
-thread_local std::list<ZenMaxRootMonitor> g_zenMaxRootMonitors;
+thread_local std::list<CWMaxRootMonitor> g_zenMaxRootMonitors;
 thread_local winrt::Windows::System::DispatcherQueue g_zenMaxDispatcher{
     nullptr};
 
 // The island of a new taskbar can report its root before its content is
 // attached, so the XamlRoot can't be matched to a window right away. Ask for a
 // few refreshes, ~120 ms apart, to resolve it later.
-constexpr int kZenMaxResolveAttempts = 10;
+constexpr int kCWMaxResolveAttempts = 10;
 
-HMONITOR ZenMaxMonitorForXamlRoot(XamlRoot const& xamlRoot,
+HMONITOR CWMaxMonitorForXamlRoot(XamlRoot const& xamlRoot,
                                   unsigned displayEpoch) {
-    g_zenMaxRootMonitors.remove_if([](ZenMaxRootMonitor const& entry) {
+    g_zenMaxRootMonitors.remove_if([](CWMaxRootMonitor const& entry) {
         return !entry.xamlRoot.get();
     });
 
-    ZenMaxRootMonitor* entry = nullptr;
+    CWMaxRootMonitor* entry = nullptr;
     for (auto& candidate : g_zenMaxRootMonitors) {
         if (candidate.xamlRoot.get() == xamlRoot) {
             entry = &candidate;
@@ -19721,22 +19718,22 @@ HMONITOR ZenMaxMonitorForXamlRoot(XamlRoot const& xamlRoot,
         if (rootHwnd) {
             entry->monitor =
                 MonitorFromWindow(rootHwnd, MONITOR_DEFAULTTONEAREST);
-        } else if (entry->resolveAttempts < kZenMaxResolveAttempts) {
+        } else if (entry->resolveAttempts < kCWMaxResolveAttempts) {
             entry->resolveAttempts++;
-            ZenMaxLayerRequestRefresh();
+            CWMaxLayerRequestRefresh();
         }
     }
 
     return entry->monitor;
 }
 
-StyleVariableValue ZenRuntimeBgBrushValue(
+StyleVariableValue CWRuntimeBgBrushValue(
     StyleVariableState* state,
     const std::vector<HMONITOR>& maximizedMonitors,
     unsigned displayEpoch) {
     bool maximized = false;
     if (auto xamlRoot = state->xamlRoot.get()) {
-        HMONITOR monitor = ZenMaxMonitorForXamlRoot(xamlRoot, displayEpoch);
+        HMONITOR monitor = CWMaxMonitorForXamlRoot(xamlRoot, displayEpoch);
         maximized = monitor && std::binary_search(maximizedMonitors.begin(),
                                                   maximizedMonitors.end(),
                                                   monitor);
@@ -19748,69 +19745,69 @@ StyleVariableValue ZenRuntimeBgBrushValue(
     return value;
 }
 
-void ZenMaxSnapshot(std::vector<HMONITOR>* maximizedMonitors,
+void CWMaxSnapshot(std::vector<HMONITOR>* maximizedMonitors,
                     unsigned* displayEpoch) {
     std::lock_guard<std::mutex> lock(g_zenMaxMutex);
     *maximizedMonitors = g_zenMaxMonitors;
     *displayEpoch = g_zenMaxDisplayEpoch;
 }
 
-bool ZenHasRuntimeBgBrushCapture(StyleVariableState* state) {
-    auto it = state->variables.find(kZenRuntimeBgBrushVariable);
+bool CWHasRuntimeBgBrushCapture(StyleVariableState* state) {
+    auto it = state->variables.find(kCWRuntimeBgBrushVariable);
     if (it == state->variables.end()) {
         return false;
     }
     return std::any_of(it->second.begin(), it->second.end(),
                        [](const StyleVariableCapture& capture) {
-                           return capture.elementId == kZenRuntimeBgBrushOwner;
+                           return capture.elementId == kCWRuntimeBgBrushOwner;
                        });
 }
 
 // Called by ApplyCustomizations for each element before its styles are
 // resolved, so the variable is defined before any style of a new XamlRoot reads
 // it.
-void ZenEnsureRuntimeBgBrushVariable(StyleVariableState* state) {
-    if (g_zenBaseBgBrush.empty() || ZenHasRuntimeBgBrushCapture(state)) {
+void CWEnsureRuntimeBgBrushVariable(StyleVariableState* state) {
+    if (g_zenBaseBgBrush.empty() || CWHasRuntimeBgBrushCapture(state)) {
         return;
     }
 
     std::vector<HMONITOR> maximizedMonitors;
     unsigned displayEpoch;
-    ZenMaxSnapshot(&maximizedMonitors, &displayEpoch);
+    CWMaxSnapshot(&maximizedMonitors, &displayEpoch);
 
-    state->variables[kZenRuntimeBgBrushVariable].push_back(
-        {kZenRuntimeBgBrushOwner,
-         ZenRuntimeBgBrushValue(state, maximizedMonitors, displayEpoch)});
+    state->variables[kCWRuntimeBgBrushVariable].push_back(
+        {kCWRuntimeBgBrushOwner,
+         CWRuntimeBgBrushValue(state, maximizedMonitors, displayEpoch)});
 }
 
 // Runs on a UI thread, from a dispatcher callback.
-void ZenMaxLayerRefreshCurrentThread() {
+void CWMaxLayerRefreshCurrentThread() {
     if (!g_initializedForThread || g_zenBaseBgBrush.empty()) {
         return;
     }
 
     std::vector<HMONITOR> maximizedMonitors;
     unsigned displayEpoch;
-    ZenMaxSnapshot(&maximizedMonitors, &displayEpoch);
+    CWMaxSnapshot(&maximizedMonitors, &displayEpoch);
 
-    const std::wstring varName = kZenRuntimeBgBrushVariable;
+    const std::wstring varName = kCWRuntimeBgBrushVariable;
 
     // Propagation runs XAML work which can re-enter; the pin keeps the states
     // from being reaped, and std::list keeps the iteration valid if one is
     // added.
     StyleVariableStatePin statePin;
     for (auto& state : g_styleVariableState) {
-        if (!ZenHasRuntimeBgBrushCapture(&state)) {
+        if (!CWHasRuntimeBgBrushCapture(&state)) {
             continue;
         }
         SetStyleVariableIfChangedAndPropagate(
-            &state, varName, kZenRuntimeBgBrushOwner,
-            ZenRuntimeBgBrushValue(&state, maximizedMonitors, displayEpoch));
+            &state, varName, kCWRuntimeBgBrushOwner,
+            CWRuntimeBgBrushValue(&state, maximizedMonitors, displayEpoch));
     }
 }
 
 // Called from InitializeForCurrentThread, after the styles were processed.
-void ZenMaxLayerRegisterCurrentThread() {
+void CWMaxLayerRegisterCurrentThread() {
     if (g_zenBaseBgBrush.empty() || g_zenMaxDispatcher) {
         return;
     }
@@ -19830,7 +19827,7 @@ void ZenMaxLayerRegisterCurrentThread() {
 }
 
 // Called from UninitializeForCurrentThread.
-void ZenMaxLayerUnregisterCurrentThread() {
+void CWMaxLayerUnregisterCurrentThread() {
     g_zenMaxRootMonitors.clear();
     g_zenBaseBgBrush.clear();
     g_zenMaximizedBgBrush.clear();
@@ -19849,8 +19846,8 @@ void ZenMaxLayerUnregisterCurrentThread() {
 }
 
 // Same scheme as TrackImageRetryCallback: counts a callback handed to a
-// dispatcher, so that ZenMaxLayerStop can wait until it ran or was dropped.
-std::shared_ptr<void> ZenMaxTrackCallback() {
+// dispatcher, so that CWMaxLayerStop can wait until it ran or was dropped.
+std::shared_ptr<void> CWMaxTrackCallback() {
     {
         std::lock_guard<std::mutex> lock(g_zenMaxMutex);
         if (!g_zenMaxActive) {
@@ -19868,7 +19865,7 @@ std::shared_ptr<void> ZenMaxTrackCallback() {
     });
 }
 
-void ZenMaxDispatchToUiThreads() {
+void CWMaxDispatchToUiThreads() {
     std::vector<winrt::Windows::System::DispatcherQueue> dispatchers;
     {
         std::lock_guard<std::mutex> lock(g_zenMaxMutex);
@@ -19885,28 +19882,28 @@ void ZenMaxDispatchToUiThreads() {
     }
 
     for (auto& dispatcher : dispatchers) {
-        auto callbackRef = ZenMaxTrackCallback();
+        auto callbackRef = CWMaxTrackCallback();
         if (!callbackRef) {
             return;
         }
         try {
             dispatcher.TryEnqueue(
-                [callbackRef]() { ZenMaxLayerRefreshCurrentThread(); });
+                [callbackRef]() { CWMaxLayerRefreshCurrentThread(); });
         } catch (...) {
             Wh_Log(L"Error %08X", winrt::to_hresult());
         }
     }
 }
 
-// The tracking thread. Everything in ZenMaxThreadState is only touched on it.
+// The tracking thread. Everything in CWMaxThreadState is only touched on it.
 
-constexpr UINT kZenMaxMsgRefresh = WM_APP + 1;  // wParam: force a UI refresh.
-constexpr UINT kZenMaxDebounceMs = 120;
+constexpr UINT kCWMaxMsgRefresh = WM_APP + 1;  // wParam: force a UI refresh.
+constexpr UINT kCWMaxDebounceMs = 120;
 // A window which keeps firing events (e.g. an app animating a maximized
 // window) must not postpone the update forever.
-constexpr DWORD kZenMaxMaxDelayMs = 500;
+constexpr DWORD kCWMaxMaxDelayMs = 500;
 
-struct ZenMaxThreadState {
+struct CWMaxThreadState {
     // Windows whose events can change the result: the counted maximized windows
     // and the taskbars.
     std::unordered_set<HWND> trackedWindows;
@@ -19916,11 +19913,11 @@ struct ZenMaxThreadState {
     bool forcePending = false;
 };
 
-ZenMaxThreadState* g_zenMaxThreadState;
+CWMaxThreadState* g_zenMaxThreadState;
 HANDLE g_zenMaxThread;  // Guarded by g_zenLifecycleMutex.
 std::atomic<DWORD> g_zenMaxThreadId;
 
-bool ZenMaxIsOwnTaskbarWindow(HWND hWnd) {
+bool CWMaxIsOwnTaskbarWindow(HWND hWnd) {
     DWORD processId = 0;
     if (!GetWindowThreadProcessId(hWnd, &processId) ||
         processId != GetCurrentProcessId()) {
@@ -19932,7 +19929,7 @@ bool ZenMaxIsOwnTaskbarWindow(HWND hWnd) {
             _wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0);
 }
 
-bool ZenMaxIsCountedMaximizedWindow(HWND hWnd) {
+bool CWMaxIsCountedMaximizedWindow(HWND hWnd) {
     if (!IsWindowVisible(hWnd) || IsIconic(hWnd) || !IsZoomed(hWnd)) {
         return false;
     }
@@ -19949,7 +19946,7 @@ bool ZenMaxIsCountedMaximizedWindow(HWND hWnd) {
     return true;
 }
 
-void ZenMaxRecompute(bool force) {
+void CWMaxRecompute(bool force) {
     auto& threadState = *g_zenMaxThreadState;
 
     struct EnumResult {
@@ -19961,11 +19958,11 @@ void ZenMaxRecompute(bool force) {
     EnumWindows(
         [](HWND hWnd, LPARAM lParam) -> BOOL {
             auto& out = *reinterpret_cast<EnumResult*>(lParam);
-            if (ZenMaxIsOwnTaskbarWindow(hWnd)) {
+            if (CWMaxIsOwnTaskbarWindow(hWnd)) {
                 out.taskbars.push_back(
                     {hWnd, MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST)});
                 out.trackedWindows.insert(hWnd);
-            } else if (ZenMaxIsCountedMaximizedWindow(hWnd)) {
+            } else if (CWMaxIsCountedMaximizedWindow(hWnd)) {
                 out.monitors.push_back(
                     MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST));
                 out.trackedWindows.insert(hWnd);
@@ -19999,27 +19996,27 @@ void ZenMaxRecompute(bool force) {
     }
 
     if (monitorsChanged || displaysChanged || force) {
-        ZenMaxDispatchToUiThreads();
+        CWMaxDispatchToUiThreads();
     }
 }
 
-void ZenMaxScheduleRecompute(bool force) {
+void CWMaxScheduleRecompute(bool force) {
     auto& threadState = *g_zenMaxThreadState;
     threadState.forcePending |= force;
 
     DWORD now = GetTickCount();
     if (threadState.timer) {
-        if (now - threadState.pendingSince >= kZenMaxMaxDelayMs) {
+        if (now - threadState.pendingSince >= kCWMaxMaxDelayMs) {
             return;  // Let the pending timer fire.
         }
         KillTimer(nullptr, threadState.timer);
     } else {
         threadState.pendingSince = now;
     }
-    threadState.timer = SetTimer(nullptr, 0, kZenMaxDebounceMs, nullptr);
+    threadState.timer = SetTimer(nullptr, 0, kCWMaxDebounceMs, nullptr);
 }
 
-void CALLBACK ZenMaxWinEventProc(HWINEVENTHOOK,
+void CALLBACK CWMaxWinEventProc(HWINEVENTHOOK,
                                  DWORD event,
                                  HWND hWnd,
                                  LONG idObject,
@@ -20032,7 +20029,7 @@ void CALLBACK ZenMaxWinEventProc(HWINEVENTHOOK,
     }
 
     if (g_zenMaxThreadState->trackedWindows.contains(hWnd)) {
-        ZenMaxScheduleRecompute(false);
+        CWMaxScheduleRecompute(false);
         return;
     }
 
@@ -20046,15 +20043,15 @@ void CALLBACK ZenMaxWinEventProc(HWINEVENTHOOK,
         return;
     }
 
-    if (IsZoomed(hWnd) || ZenMaxIsOwnTaskbarWindow(hWnd)) {
-        ZenMaxScheduleRecompute(false);
+    if (IsZoomed(hWnd) || CWMaxIsOwnTaskbarWindow(hWnd)) {
+        CWMaxScheduleRecompute(false);
     }
 }
 
-DWORD WINAPI ZenMaxThreadProc(LPVOID parameter) {
+DWORD WINAPI CWMaxThreadProc(LPVOID parameter) {
     HANDLE readyEvent = static_cast<HANDLE>(parameter);
 
-    ZenMaxThreadState threadState;
+    CWMaxThreadState threadState;
     g_zenMaxThreadState = &threadState;
 
     // Create the message queue before anyone can post to it.
@@ -20071,7 +20068,7 @@ DWORD WINAPI ZenMaxThreadProc(LPVOID parameter) {
     for (size_t i = 0; i < ARRAYSIZE(kEventRanges); i++) {
         hooks[i] = SetWinEventHook(kEventRanges[i].first,
                                    kEventRanges[i].second, nullptr,
-                                   ZenMaxWinEventProc, 0, 0,
+                                   CWMaxWinEventProc, 0, 0,
                                    WINEVENT_OUTOFCONTEXT);
         if (!hooks[i]) {
             Wh_Log(L"SetWinEventHook failed: %u", GetLastError());
@@ -20081,21 +20078,21 @@ DWORD WINAPI ZenMaxThreadProc(LPVOID parameter) {
     g_zenMaxThreadId = GetCurrentThreadId();
     SetEvent(readyEvent);
 
-    ZenMaxRecompute(/*force=*/true);
+    CWMaxRecompute(/*force=*/true);
 
     // WinEvent callbacks are delivered from within GetMessage.
     while (GetMessage(&msg, nullptr, 0, 0) > 0) {
         if (msg.hwnd) {
             DispatchMessage(&msg);
-        } else if (msg.message == kZenMaxMsgRefresh) {
-            ZenMaxScheduleRecompute(msg.wParam != 0);
+        } else if (msg.message == kCWMaxMsgRefresh) {
+            CWMaxScheduleRecompute(msg.wParam != 0);
         } else if (msg.message == WM_TIMER &&
                    msg.wParam == threadState.timer) {
             KillTimer(nullptr, threadState.timer);
             threadState.timer = 0;
             bool force = threadState.forcePending;
             threadState.forcePending = false;
-            ZenMaxRecompute(force);
+            CWMaxRecompute(force);
         }
     }
 
@@ -20114,14 +20111,14 @@ DWORD WINAPI ZenMaxThreadProc(LPVOID parameter) {
 
 // Asks the tracking thread to recompute and refresh all UI threads. Can be
 // called from any thread; a no-op when the thread isn't running.
-void ZenMaxLayerRequestRefresh() {
+void CWMaxLayerRequestRefresh() {
     if (DWORD threadId = g_zenMaxThreadId) {
-        PostThreadMessage(threadId, kZenMaxMsgRefresh, TRUE, 0);
+        PostThreadMessage(threadId, kCWMaxMsgRefresh, TRUE, 0);
     }
 }
 
 // Start / stop are called with g_zenLifecycleMutex held.
-void ZenMaxLayerStart() {
+void CWMaxLayerStart() {
     if (g_zenMaxThread) {
         return;
     }
@@ -20138,7 +20135,7 @@ void ZenMaxLayerStart() {
     }
 
     g_zenMaxThread =
-        CreateThread(nullptr, 0, ZenMaxThreadProc, readyEvent, 0, nullptr);
+        CreateThread(nullptr, 0, CWMaxThreadProc, readyEvent, 0, nullptr);
     if (g_zenMaxThread) {
         HANDLE handles[] = {readyEvent, g_zenMaxThread};
         WaitForMultipleObjects(ARRAYSIZE(handles), handles, FALSE, INFINITE);
@@ -20151,7 +20148,7 @@ void ZenMaxLayerStart() {
     CloseHandle(readyEvent);
 }
 
-void ZenMaxLayerStop() {
+void CWMaxLayerStop() {
     if (g_zenMaxThread) {
         g_zenMaxThreadId = 0;
         DWORD threadId = GetThreadId(g_zenMaxThread);
@@ -20204,7 +20201,7 @@ void ApplyCustomizations(ElementId elementId,
         return;
     }
 
-    ZenEnsureRuntimeBgBrushVariable(state);
+    CWEnsureRuntimeBgBrushVariable(state);
 
     auto resolved = FindElementPropertyOverrides(element, fallbackClassName);
     if (resolved.overridesPerVSG.empty() && resolved.captures.empty()) {
@@ -21361,20 +21358,20 @@ std::optional<bool> IsOsFeatureEnabled(UINT32 featureId) {
 
 // CW: background color / blur / opacity / luminosity presets.
 //
-// The theme's main background constant (the first of kZenBgConstantNames that
+// The theme's main background constant (the first of kCWBgConstantNames that
 // the theme defines) is rebuilt from the presets. Its tint color is kept unless
 // a color preset is chosen. The tray overflow panel and the volume / brightness
 // flyouts get their own TrayBgBrush / VolumeBgBrush constants, which the
 // TranslucentTaskbar theme uses.
 
-constexpr PCWSTR kZenBgConstantNames[] = {
-    L"CommonBgBrush",     L"Apple_Background", L"ZenBg",
+constexpr PCWSTR kCWBgConstantNames[] = {
+    L"CommonBgBrush",     L"Apple_Background", L"CWBg",
     L"Background",        L"ElementBackground", L"base",
     L"overlay",           L"overlay2",          L"BackgroundBrush",
     L"bgBrush",
 };
 
-constexpr std::pair<PCWSTR, PCWSTR> kZenBgColorPresets[] = {
+constexpr std::pair<PCWSTR, PCWSTR> kCWBgColorPresets[] = {
     {L"Accent", L"{ThemeResource SystemAccentColor}"},
     {L"GlassWhite", L"#FFFFFF"},
     {L"MistGrey", L"#2E2E2E"},
@@ -21390,7 +21387,7 @@ constexpr std::pair<PCWSTR, PCWSTR> kZenBgColorPresets[] = {
     {L"MorandiSage", L"#4E5E50"},
 };
 
-constexpr std::pair<PCWSTR, PCWSTR> kZenTextColorPresets[] = {
+constexpr std::pair<PCWSTR, PCWSTR> kCWTextColorPresets[] = {
     {L"white", L"White"},
     {L"dark", L"Black"},
     {L"system", L"{ThemeResource SystemControlForegroundBaseHighBrush}"},
@@ -21414,30 +21411,30 @@ constexpr std::pair<PCWSTR, PCWSTR> kZenTextColorPresets[] = {
 // Settings saved by older versions use flat keys (theme, blurPreset, ...).
 // Windhawk writes all settings together, so whether look.bgColorMode exists
 // tells which layout is stored; with the old layout, the flat keys are read.
-enum class ZenSettingsLayout { kUnseeded, kLegacy, kNested };
+enum class CWSettingsLayout { kUnseeded, kLegacy, kNested };
 
-ZenSettingsLayout ZenGetSettingsLayout() {
+CWSettingsLayout CWGetSettingsLayout() {
     string_setting_unique_ptr nested(Wh_GetStringSetting(L"look.bgColorMode"));
     if (*nested.get()) {
-        return ZenSettingsLayout::kNested;
+        return CWSettingsLayout::kNested;
     }
     string_setting_unique_ptr legacy(Wh_GetStringSetting(L"bgColorMode"));
-    return *legacy.get() ? ZenSettingsLayout::kLegacy
-                         : ZenSettingsLayout::kUnseeded;
+    return *legacy.get() ? CWSettingsLayout::kLegacy
+                         : CWSettingsLayout::kUnseeded;
 }
 
-bool ZenSettingsUnseeded() {
-    return ZenGetSettingsLayout() == ZenSettingsLayout::kUnseeded;
+bool CWSettingsUnseeded() {
+    return CWGetSettingsLayout() == CWSettingsLayout::kUnseeded;
 }
 
 // Reads a string setting by its grouped key, falling back to the flat key
 // from older versions. Unseeded settings may still have a key seeded by the
 // installer under either name.
-PCWSTR ZenGetStringSetting(PCWSTR nestedName, PCWSTR legacyName) {
-    switch (ZenGetSettingsLayout()) {
-        case ZenSettingsLayout::kNested:
+PCWSTR CWGetStringSetting(PCWSTR nestedName, PCWSTR legacyName) {
+    switch (CWGetSettingsLayout()) {
+        case CWSettingsLayout::kNested:
             return Wh_GetStringSetting(nestedName);
-        case ZenSettingsLayout::kLegacy:
+        case CWSettingsLayout::kLegacy:
             return Wh_GetStringSetting(legacyName);
         default:
             break;
@@ -21450,11 +21447,11 @@ PCWSTR ZenGetStringSetting(PCWSTR nestedName, PCWSTR legacyName) {
     return Wh_GetStringSetting(legacyName);
 }
 
-int ZenGetIntSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
-    switch (ZenGetSettingsLayout()) {
-        case ZenSettingsLayout::kNested:
+int CWGetIntSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
+    switch (CWGetSettingsLayout()) {
+        case CWSettingsLayout::kNested:
             return Wh_GetIntSetting(nestedName);
-        case ZenSettingsLayout::kLegacy:
+        case CWSettingsLayout::kLegacy:
             return Wh_GetIntSetting(legacyName);
         default:
             return Wh_GetIntSetting(nestedName) || Wh_GetIntSetting(legacyName);
@@ -21464,24 +21461,24 @@ int ZenGetIntSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
 // Whether the flyouts follow the taskbar background. Off for settings saved
 // by older versions, which had no such option, so that their separate flyout
 // values keep working.
-bool ZenUnifyFlyouts() {
-    switch (ZenGetSettingsLayout()) {
-        case ZenSettingsLayout::kNested:
+bool CWUnifyFlyouts() {
+    switch (CWGetSettingsLayout()) {
+        case CWSettingsLayout::kNested:
             return Wh_GetIntSetting(L"unifyFlyouts") != 0;
-        case ZenSettingsLayout::kLegacy:
+        case CWSettingsLayout::kLegacy:
             return false;
         default:
             return true;
     }
 }
 
-// Set by ZenApplyBrushPresets for the current pass.
+// Set by CWApplyBrushPresets for the current pass.
 thread_local bool g_zenSettingsUnseeded;
 
 // Int settings are stored as numbers, so Wh_GetIntSetting is the right reader.
 // Falls back to the settings-block default when the settings are missing or
 // the value is out of range.
-int ZenGetIntSettingInRange(PCWSTR nestedName,
+int CWGetIntSettingInRange(PCWSTR nestedName,
                             PCWSTR legacyName,
                             int minValue,
                             int maxValue,
@@ -21489,15 +21486,15 @@ int ZenGetIntSettingInRange(PCWSTR nestedName,
     if (g_zenSettingsUnseeded) {
         return fallback;
     }
-    int value = ZenGetIntSettingCompat(nestedName, legacyName);
+    int value = CWGetIntSettingCompat(nestedName, legacyName);
     return value >= minValue && value <= maxValue ? value : fallback;
 }
 
 template <size_t N>
-PCWSTR ZenLookupPreset(const std::pair<PCWSTR, PCWSTR> (&presets)[N],
+PCWSTR CWLookupPreset(const std::pair<PCWSTR, PCWSTR> (&presets)[N],
                        PCWSTR nestedName,
                        PCWSTR legacyName) {
-    string_setting_unique_ptr value(ZenGetStringSetting(nestedName, legacyName));
+    string_setting_unique_ptr value(CWGetStringSetting(nestedName, legacyName));
     for (const auto& [key, presetValue] : presets) {
         if (wcscmp(value.get(), key) == 0) {
             return presetValue;
@@ -21506,7 +21503,7 @@ PCWSTR ZenLookupPreset(const std::pair<PCWSTR, PCWSTR> (&presets)[N],
     return nullptr;
 }
 
-StyleConstant* ZenFindStyleConstant(StyleConstants& styleConstants,
+StyleConstant* CWFindStyleConstant(StyleConstants& styleConstants,
                                     std::wstring_view name) {
     for (auto& styleConstant : styleConstants) {
         if (styleConstant.first == name) {
@@ -21519,10 +21516,10 @@ StyleConstant* ZenFindStyleConstant(StyleConstants& styleConstants,
 // Adds a constant unless the theme or the user already defines it. Keeps the
 // longest-name-first order LoadStyleConstants establishes, which
 // ApplyStyleConstants relies on.
-void ZenAddStyleConstantIfMissing(StyleConstants& styleConstants,
+void CWAddStyleConstantIfMissing(StyleConstants& styleConstants,
                                   std::wstring name,
                                   std::wstring value) {
-    if (ZenFindStyleConstant(styleConstants, name)) {
+    if (CWFindStyleConstant(styleConstants, name)) {
         return;
     }
     auto it = std::find_if(styleConstants.begin(), styleConstants.end(),
@@ -21533,11 +21530,11 @@ void ZenAddStyleConstantIfMissing(StyleConstants& styleConstants,
 }
 
 // The tint color of a theme brush, following up to 5 `$Name` references.
-std::wstring ZenExtractTintColor(StyleConstants& styleConstants,
+std::wstring CWExtractTintColor(StyleConstants& styleConstants,
                                  std::wstring brush) {
     for (int depth = 0; depth < 5 && brush.starts_with(L'$'); depth++) {
         auto* referenced =
-            ZenFindStyleConstant(styleConstants, std::wstring_view(brush).substr(1));
+            CWFindStyleConstant(styleConstants, std::wstring_view(brush).substr(1));
         if (!referenced) {
             break;
         }
@@ -21561,7 +21558,7 @@ std::wstring ZenExtractTintColor(StyleConstants& styleConstants,
     return L"#25323232";
 }
 
-std::wstring ZenBuildBgBrush(int blur,
+std::wstring CWBuildBgBrush(int blur,
                              int opacity,
                              const std::wstring& color,
                              int luminosity) {
@@ -21589,75 +21586,75 @@ std::wstring ZenBuildBgBrush(int blur,
 
 // Called right after the style constants are loaded, before the theme styles
 // are expanded with them.
-void ZenApplyBrushPresets(StyleConstants& styleConstants) {
-    g_zenSettingsUnseeded = ZenSettingsUnseeded();
+void CWApplyBrushPresets(StyleConstants& styleConstants) {
+    g_zenSettingsUnseeded = CWSettingsUnseeded();
     if (g_zenSettingsUnseeded) {
         Wh_Log(L"Settings missing, using the defaults");
     }
 
     StyleConstant* bgConstant = nullptr;
-    for (PCWSTR name : kZenBgConstantNames) {
-        bgConstant = ZenFindStyleConstant(styleConstants, name);
+    for (PCWSTR name : kCWBgConstantNames) {
+        bgConstant = CWFindStyleConstant(styleConstants, name);
         if (bgConstant) {
             break;
         }
     }
 
-    PCWSTR colorPreset = ZenLookupPreset(kZenBgColorPresets, L"look.bgColorMode", L"bgColorMode");
+    PCWSTR colorPreset = CWLookupPreset(kCWBgColorPresets, L"look.bgColorMode", L"bgColorMode");
     std::wstring color =
         colorPreset ? std::wstring(colorPreset)
-                    : ZenExtractTintColor(
+                    : CWExtractTintColor(
                           styleConstants,
                           bgConstant ? bgConstant->second : std::wstring());
 
-    int blur = ZenGetIntSettingInRange(L"taskbar.blurPreset", L"blurPreset", 0, 100, 30);
-    int opacity = ZenGetIntSettingInRange(L"taskbar.opacityPreset", L"opacityPreset", 0, 100, 50);
-    int luminosity = ZenGetIntSettingInRange(L"taskbar.luminosityPreset", L"luminosityPreset", 0, 150, 20);
+    int blur = CWGetIntSettingInRange(L"taskbar.blurPreset", L"blurPreset", 0, 100, 30);
+    int opacity = CWGetIntSettingInRange(L"taskbar.opacityPreset", L"opacityPreset", 0, 100, 50);
+    int luminosity = CWGetIntSettingInRange(L"taskbar.luminosityPreset", L"luminosityPreset", 0, 150, 20);
 
-    std::wstring baseBrush = ZenBuildBgBrush(blur, opacity, color, luminosity);
+    std::wstring baseBrush = CWBuildBgBrush(blur, opacity, color, luminosity);
 
     // With the maximized layer, the background is the runtime variable, which
     // switches between the two brushes per taskbar.
     g_zenBaseBgBrush.clear();
     g_zenMaximizedBgBrush.clear();
     if (g_zenMaxLayerEnabled) {
-        g_zenMaximizedBgBrush = ZenBuildBgBrush(
-            ZenGetIntSettingInRange(L"maximized.blur", L"maximizedLayerBlur", 0, 100, 24),
-            ZenGetIntSettingInRange(L"maximized.opacity", L"maximizedLayerOpacity", 0, 100, 72),
+        g_zenMaximizedBgBrush = CWBuildBgBrush(
+            CWGetIntSettingInRange(L"maximized.blur", L"maximizedLayerBlur", 0, 100, 24),
+            CWGetIntSettingInRange(L"maximized.opacity", L"maximizedLayerOpacity", 0, 100, 72),
             color,
-            ZenGetIntSettingInRange(L"maximized.luminosity", L"maximizedLayerLuminosity", 0, 150, 20));
+            CWGetIntSettingInRange(L"maximized.luminosity", L"maximizedLayerLuminosity", 0, 150, 20));
         g_zenBaseBgBrush = std::move(baseBrush);
         baseBrush =
-            std::wstring(L"{{") + kZenRuntimeBgBrushVariable + L"}}";
+            std::wstring(L"{{") + kCWRuntimeBgBrushVariable + L"}}";
     }
 
     if (bgConstant) {
         bgConstant->second = std::move(baseBrush);
     } else {
-        ZenAddStyleConstantIfMissing(styleConstants, L"CommonBgBrush",
+        CWAddStyleConstantIfMissing(styleConstants, L"CommonBgBrush",
                                      std::move(baseBrush));
     }
 
-    bool unifyFlyouts = ZenUnifyFlyouts();
+    bool unifyFlyouts = CWUnifyFlyouts();
     auto panelBrush = [&](PCWSTR group, PCWSTR legacyPrefix) {
         if (unifyFlyouts) {
-            return ZenBuildBgBrush(blur, opacity, color, luminosity);
+            return CWBuildBgBrush(blur, opacity, color, luminosity);
         }
         auto get = [&](PCWSTR key, PCWSTR legacyKey, int maxValue,
                        int fallback) {
             std::wstring nested = std::wstring(group) + L"." + key;
             std::wstring legacy = std::wstring(legacyPrefix) + legacyKey;
-            return ZenGetIntSettingInRange(nested.c_str(), legacy.c_str(), 0,
+            return CWGetIntSettingInRange(nested.c_str(), legacy.c_str(), 0,
                                            maxValue, fallback);
         };
-        return ZenBuildBgBrush(
+        return CWBuildBgBrush(
             get(L"blurPreset", L"BlurPreset", 100, blur),
             get(L"opacityPreset", L"OpacityPreset", 100, opacity), color,
             get(L"luminosityPreset", L"LuminosityPreset", 150, luminosity));
     };
-    ZenAddStyleConstantIfMissing(styleConstants, L"TrayBgBrush",
+    CWAddStyleConstantIfMissing(styleConstants, L"TrayBgBrush",
                                  panelBrush(L"tray", L"tray"));
-    ZenAddStyleConstantIfMissing(styleConstants, L"VolumeBgBrush",
+    CWAddStyleConstantIfMissing(styleConstants, L"VolumeBgBrush",
                                  panelBrush(L"volume", L"volume"));
 
     if (blur == 0) {
@@ -21674,7 +21671,7 @@ void ZenApplyBrushPresets(StyleConstants& styleConstants) {
 
 // Called after the theme styles, before the user's control styles, so that
 // the user can still override these.
-void ZenAddExtraStyles() {
+void CWAddExtraStyles() {
     try {
         AddElementCustomizationRules(L"Grid#SystemTrayFrameGrid",
                                      {L"Background=Transparent"});
@@ -21682,7 +21679,7 @@ void ZenAddExtraStyles() {
                                      {L"Background=Transparent"});
 
         if (PCWSTR foreground =
-                ZenLookupPreset(kZenTextColorPresets, L"look.textColorMode",
+                CWLookupPreset(kCWTextColorPresets, L"look.textColorMode",
                                 L"textColorMode")) {
             std::vector<std::wstring> styles{std::wstring(L"Foreground=") +
                                              foreground};
@@ -21697,14 +21694,14 @@ void ZenAddExtraStyles() {
 }
 
 void ProcessAllStylesFromSettings() {
-    PCWSTR themeName = ZenGetStringSetting(L"look.theme", L"theme");
+    PCWSTR themeName = CWGetStringSetting(L"look.theme", L"theme");
     const Theme* theme = nullptr;
     // CW: legacy TranslucentTaskbar_* presets from earlier versions.
     std::vector<PCWSTR> overrideStyleConstants;
     // CW: an empty theme means "None", unless the settings are
     // missing altogether, in which case use the default theme.
     if (wcscmp(themeName, L"TranslucentTaskbar") == 0 ||
-        (!*themeName && ZenSettingsUnseeded())) {
+        (!*themeName && CWSettingsUnseeded())) {
         theme = &g_themeTranslucentTaskbar;
     } else if (wcscmp(themeName, L"TranslucentTaskbar_Clear") == 0) {
         theme = &g_themeTranslucentTaskbar;
@@ -21894,7 +21891,7 @@ void ProcessAllStylesFromSettings() {
             ? overrideStyleConstants
             : (theme ? theme->styleConstants : std::vector<PCWSTR>{}));
 
-    ZenApplyBrushPresets(styleConstants);
+    CWApplyBrushPresets(styleConstants);
 
     if (theme) {
         for (const auto& themeTargetStyle : theme->targetStyles) {
@@ -21914,7 +21911,7 @@ void ProcessAllStylesFromSettings() {
         }
     }
 
-    ZenAddExtraStyles();
+    CWAddExtraStyles();
 
     for (int i = 0;; i++) {
         try {
@@ -21967,7 +21964,7 @@ void UninitializeResourceVariables() {
 
 void UninitializeForCurrentThread() {
     // CW: no more maximized layer refreshes for this thread.
-    ZenMaxLayerUnregisterCurrentThread();
+    CWMaxLayerUnregisterCurrentThread();
 
     // Drop the click-through subclasses before restoring the windows below.
     // ClearClickThroughRegions calls SetWindowRgn, which sends
@@ -22082,7 +22079,7 @@ void InitializeForCurrentThread() {
 
     ProcessAllStylesFromSettings();
 
-    ZenMaxLayerRegisterCurrentThread();
+    CWMaxLayerRegisterCurrentThread();
 
     g_initializedForThread = true;
 }
@@ -22102,7 +22099,7 @@ std::mutex g_zenTapRetryMutex;
 PTP_TIMER g_zenTapRetryTimer;  // Guarded by g_zenTapRetryMutex.
 std::atomic<bool> g_zenTapRetryUsed;
 
-void ZenScheduleTapRetry() {
+void CWScheduleTapRetry() {
     std::lock_guard<std::mutex> lock(g_zenTapRetryMutex);
 
     if (g_zenUnloading || !g_zenTapRetryTimer ||
@@ -22120,7 +22117,7 @@ void ZenScheduleTapRetry() {
     Wh_Log(L"Scheduled a TAP injection retry");
 }
 
-void ZenStopTapRetry() {
+void CWStopTapRetry() {
     PTP_TIMER timer;
     {
         std::lock_guard<std::mutex> lock(g_zenTapRetryMutex);
@@ -22145,7 +22142,7 @@ void InitializeSettingsAndTap() {
         Wh_Log(L"Error %08X", hr);
         // CW: allow a later attempt instead of staying uninjected.
         g_initialized = false;
-        ZenScheduleTapRetry();
+        CWScheduleTapRetry();
     }
 }
 
@@ -22203,7 +22200,7 @@ bool RunFromWindowThread(HWND hWnd,
 
 // CW: besides the taskbar, also style the XAML islands of the tray
 // overflow, the notification icon overflow and the thumbnail windows.
-bool ZenIsExtraXamlHostClass(PCWSTR className) {
+bool CWIsExtraXamlHostClass(PCWSTR className) {
     return _wcsicmp(className, L"TopLevelWindowForOverflowXamlIsland") == 0 ||
            _wcsicmp(className, L"NotifyIconOverflowWindow") == 0 ||
            _wcsicmp(className, L"TaskListThumbnailWnd") == 0;
@@ -22230,7 +22227,7 @@ void OnWindowCreated(HWND hWnd,
         (_wcsicmp(className, L"Shell_TrayWnd") == 0 ||
          _wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0 ||
          _wcsicmp(className, L"XamlExplorerHostIslandWindow") == 0 ||
-         ZenIsExtraXamlHostClass(className))) {
+         CWIsExtraXamlHostClass(className))) {
         Wh_Log(L"Initializing - Created DesktopWindowContentBridge window");
         InitializeForCurrentThread();
         InitializeSettingsAndTap();
@@ -22240,7 +22237,7 @@ void OnWindowCreated(HWND hWnd,
     if (bTextualClassName &&
         (_wcsicmp(lpClassName, L"XamlExplorerHostIslandWindow") == 0 ||
          _wcsicmp(lpClassName, L"Shell_InputSwitchTopLevelWindow") == 0 ||
-         ZenIsExtraXamlHostClass(lpClassName))) {
+         CWIsExtraXamlHostClass(lpClassName))) {
         Wh_Log(L"Initializing - Created XAML host window: %08X via %S",
                (DWORD)(ULONG_PTR)hWnd, funcName);
         InitializeForCurrentThread();
@@ -22558,7 +22555,7 @@ std::vector<HWND> GetXamlHostWnds() {
             if (_wcsicmp(szClassName, L"XamlExplorerHostIslandWindow") == 0 ||
                 _wcsicmp(szClassName, L"Shell_InputSwitchTopLevelWindow") ==
                     0 ||
-                ZenIsExtraXamlHostClass(szClassName)) {
+                CWIsExtraXamlHostClass(szClassName)) {
                 param.hWnds->push_back(hWnd);
             }
 
@@ -22642,7 +22639,7 @@ bool StartStatsTimer() {
             Wh_Log(L">");
 
             string_setting_unique_ptr themeName(
-                ZenGetStringSetting(L"look.theme", L"theme"));
+                CWGetStringSetting(L"look.theme", L"theme"));
             if (!*themeName.get()) {
                 return;
             }
@@ -22733,7 +22730,7 @@ void StopStatsTimer() {
 void LoadSettings() {
     g_settings.clickThroughTaskbar = Wh_GetIntSetting(L"clickThroughTaskbar");
     g_zenMaxLayerEnabled =
-        ZenGetIntSettingCompat(L"maximized.enabled", L"maximizedTaskbarLayer") != 0;
+        CWGetIntSettingCompat(L"maximized.enabled", L"maximizedTaskbarLayer") != 0;
 
     PCWSTR xamlDiagnosticsHandling =
         Wh_GetStringSetting(L"xamlDiagnosticsHandling");
@@ -26069,7 +26066,7 @@ void Wh_ModAfterInit() {
     }
 
     if (g_zenMaxLayerEnabled) {
-        ZenMaxLayerStart();
+        CWMaxLayerStart();
     }
 }
 
@@ -26084,13 +26081,13 @@ void Wh_ModUninit() {
         std::lock_guard<std::mutex> lock(g_zenTapRetryMutex);
         g_zenUnloading = true;
     }
-    ZenStopTapRetry();
+    CWStopTapRetry();
 
     std::lock_guard<std::mutex> lifecycleLock(g_zenLifecycleMutex);
 
     // Before the UI threads are uninitialized, and waits for the refreshes
     // already queued to them.
-    ZenMaxLayerStop();
+    CWMaxLayerStop();
 
     HWND restartExplorerPromptWindow = g_restartExplorerPromptWindow;
     if (restartExplorerPromptWindow) {
@@ -26173,11 +26170,11 @@ void Wh_ModSettingsChanged() {
     }
 
     if (g_zenMaxLayerEnabled) {
-        ZenMaxLayerStart();
+        CWMaxLayerStart();
         // The UI threads were reinitialized, so refresh them even if the
         // maximized windows didn't change.
-        ZenMaxLayerRequestRefresh();
+        CWMaxLayerRequestRefresh();
     } else {
-        ZenMaxLayerStop();
+        CWMaxLayerStop();
     }
 }

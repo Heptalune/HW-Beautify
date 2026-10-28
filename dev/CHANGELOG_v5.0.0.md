@@ -1,14 +1,13 @@
-# ZenDesktop v5.0.0
+# CW-Beautify v5.0.0
 
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
+> **作者：Heptalune**
 
 相对 v4.1 的主要更新。
 
 ## 新增
-- **文件管理器美化**（`zen-explorer-styler` 1.6.6）：替代 ExplorerBlurMica，色调、不透明度、文字颜色都能在 Windhawk 里调，适配浅色模式；右键菜单玻璃效果（测试中）。
+- **文件管理器美化**（`cw-explorer-styler` 1.6.6）：替代 ExplorerBlurMica，色调、不透明度、文字颜色都能在 Windhawk 里调，适配浅色模式；右键菜单玻璃效果（测试中）。
 - **任务栏音乐与歌词**（0.4.7）：占用小组件位置，显示封面、滚动歌词和播放控制，支持 Spotify、网易云音乐、QQ 音乐等播放器；歌词默认偏移 +200 毫秒，可在设置里调。
-- **AI 工作状态**：歌词面板可显示本机 AI 编程助手（Claude Code、Codex、opencode、Antigravity、DeepSeek Harness 等）的状态。运行 `tools/ai-status/install.ps1` 即可配置，已附带编译好的 `zen-status.exe`。
+- **AI 工作状态**：歌词面板可显示本机 AI 编程助手（Claude Code、Codex、opencode、Antigravity、DeepSeek Harness 等）的状态。运行 `tools/ai-status/install.ps1` 即可配置，已附带编译好的 `cw-status.exe`。
 - **可选 Mod**：果冻窗口（0.115.4）、窗口动画（1.5.2，含 macOS 神奇效果和多种新的打开/关闭样式）。和其他 mod 一起装进 Windhawk，**默认关闭**，想用时在 Windhawk 里打开。
 - **一键卸载**：`uninstall.bat`，删除前会列出内容让你确认，不卸载 Windhawk 本身。
 
@@ -24,9 +23,9 @@
 ## 下载哪个
 | 文件 | 适合 |
 |------|------|
-| `ZenDesktop_OneKeyDeploy_v5.0.0.zip` | 大多数人，内含 Windhawk 联网安装器 |
-| `ZenDesktop_OneKeyDeploy_v5.0.0_Offline.zip` | 网络差，内含 Windhawk 离线安装器 |
-| `ZenDesktop_OneKeyDeploy_v5.0.0_Online.zip` | 已经装好 Windhawk，只含 Mod 和脚本 |
+| `CW-Beautify_OneKeyDeploy_v5.0.0.zip` | 大多数人，内含 Windhawk 联网安装器 |
+| `CW-Beautify_OneKeyDeploy_v5.0.0_Offline.zip` | 网络差，内含 Windhawk 离线安装器 |
+| `CW-Beautify_OneKeyDeploy_v5.0.0_Online.zip` | 已经装好 Windhawk，只含 Mod 和脚本 |
 
 ## 安装
 1. 解压后双击 `deploy.bat`，在权限提示里点「是」。
@@ -40,4 +39,3 @@
 双击 `uninstall.bat`。
 
 ## 支持作者
-[爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://raw.githubusercontent.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)

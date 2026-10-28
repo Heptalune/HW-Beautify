@@ -260,7 +260,7 @@ function Show-ModStatus {
         $settings = Get-ItemProperty -Path $settingsPath
         $settingNames = @(
             "theme",
-            "zenGlassCoverage",
+            "CWGlassCoverage",
             "bgColorMode",
             "blurPreset",
             "opacityPreset",
@@ -305,7 +305,7 @@ function Restart-WindowsExplorer {
     Start-Sleep -Seconds 2
 }
 
-Write-DevStatus "CW桌面美化 Windhawk Mod Dev Helper"
+Write-DevStatus "CW-Beautify Windhawk Mod Dev Helper"
 Write-DevStatus "Mode: $(if ($StatusOnly) { 'status only' } else { 'inject source, platform compile' })"
 
 if (-not $StatusOnly -and -not $NoElevate -and -not (Test-IsAdministrator)) {

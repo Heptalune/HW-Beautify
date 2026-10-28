@@ -5,9 +5,8 @@
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
 // @version         4.1.13
-// @donateUrl       https://ifdian.net/a/Lanboo
-// @author          Lanbo & m417z
-// @github          https://github.com/Liset999
+// @author          Heptalune & m417z
+// @github          https://github.com/Heptalune
 // @include         StartMenuExperienceHost.exe
 // @include         SearchHost.exe
 // @include         SearchApp.exe
@@ -18,7 +17,7 @@
 // Source code is published under The GNU General Public License v3.0.
 //
 // For bug reports and feature requests, please open an issue here:
-// https://github.com/Liset999/ZenDesktop/issues
+// https://github.com/Heptalune/CW-Beautify/issues
 //
 // Based on "Windows 11 Start Menu Styler" by m417z (https://github.com/m417z),
 // licensed under GPL-3.0. The original mod is developed here:
@@ -26,11 +25,10 @@
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
-> 原作者：**m417z**（[Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
+> 原作者：**m417z**（[Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
 # CW-开始菜单美化
 
@@ -79,11 +77,10 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Start Menu Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- Lanbo 的修改：重构 HostBackdrop 渲染与卡片模糊层、文件夹面板独立参数、尺寸调整、文字颜色与中文设置。
+- Heptalune 的修改：重构 HostBackdrop 渲染与卡片模糊层、文件夹面板独立参数、尺寸调整、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 
 ## 附录：原版说明（英文）
 
@@ -5534,7 +5531,7 @@ const Theme g_themeLiquidGlass = {{
         L"RenderTransform@Pressed:=<ScaleTransform ScaleX=\"0.8\" ScaleY=\"0.8\" />",
         L"RenderTransformOrigin=0.5,0.5"}},
 }, {
-    // Zen Liquid Glass Original — shared specular language with AppleLiquidGlass
+    // CW Liquid Glass Original — shared specular language with AppleLiquidGlass
     L"BorderThickness=0",
     L"ElementBorderThickness=0",
     L"CornerRadius=8",
@@ -5803,7 +5800,7 @@ const Theme g_themeAppleLiquidGlass = {{
     // -- Text foreground: textColorMode when set; otherwise app names get
     //    TextFillColorPrimaryBrush in code (ProcessAllStylesFromSettings). --
 }, {
-    // Zen Liquid Glass shared language (aligned with Taskbar / Notification)
+    // CW Liquid Glass shared language (aligned with Taskbar / Notification)
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -6073,7 +6070,7 @@ const Theme g_themeAppleLiquidGlass_variant_Classic = {{
     // -- Text foreground: textColorMode when set; otherwise app names get
     //    TextFillColorPrimaryBrush in code (ProcessAllStylesFromSettings). --
 }, {
-    // Zen Liquid Glass Classic — thinner refraction, same specular language
+    // CW Liquid Glass Classic — thinner refraction, same specular language
     L"Apple_BorderThickness=0",
     L"Apple_ElementBorderThickness=0",
     L"Apple_CornerRadius=8",
@@ -7589,7 +7586,7 @@ std::atomic<DWORD> g_targetThreadId = 0;
 // CW: set once the search page frame (Border#AppBorder in
 // SearchHost.exe) has gone through ApplyCustomizations, i.e. the TAP is
 // attached to the XAML tree that's actually shown. See
-// ZenScheduleSearchAttachRetry.
+// CWScheduleSearchAttachRetry.
 std::atomic<bool> g_zenSearchFrameSeen = false;
 
 void ApplyCustomizations(InstanceHandle handle,
@@ -8011,8 +8008,8 @@ static DWORD WINAPI TaskbarCreatedWindowThread(LPVOID lpParam);
 static void  CleanupTaskbarCreatedWindow();
 void ScheduleBootStyleReinit();
 void StopBootReinitTimer();
-void ZenScheduleSearchAttachRetry();
-void ZenStopSearchAttachRetry();
+void CWScheduleSearchAttachRetry();
+void CWStopSearchAttachRetry();
 // ─────────────────────────────────────────────────────────────────────────
 
 // https://stackoverflow.com/a/51274008
@@ -13581,19 +13578,19 @@ void MergeResourceVariables() {
 //   menu and filter tabs, and text that ignores textColorMode.
 // The helpers below generate matching XAML rules and WebView CSS.
 
-enum class ZenSearchFamily {
+enum class CWSearchFamily {
     None,
     Translucent,  // TranslucentStartMenu and the custom glass variants.
     Liquid,       // AppleLiquidGlass, AppleLiquidGlassClassic, LiquidGlass.
 };
 
-enum class ZenSearchDesign {
+enum class CWSearchDesign {
     Dark,   // Light text on dark glass.
     Light,  // Dark text on light glass.
     Auto,   // Follow the system theme.
 };
 
-bool ZenIsDarkTextBrush(const std::wstring& brush) {
+bool CWIsDarkTextBrush(const std::wstring& brush) {
     return brush == L"Black" ||
            (brush.size() == 9 && brush[0] == L'#' &&
             brush.ends_with(L"000000"));
@@ -13602,7 +13599,7 @@ bool ZenIsDarkTextBrush(const std::wstring& brush) {
 // Converts a XAML color ("White", "Black", "#RRGGBB", "#AARRGGBB") to CSS
 // rgba() with an extra alpha multiplier. Returns an empty string for anything
 // else, such as {ThemeResource ...}.
-std::wstring ZenXamlColorToCss(const std::wstring& color, double alphaScale) {
+std::wstring CWXamlColorToCss(const std::wstring& color, double alphaScale) {
     unsigned a = 255, r = 0, g = 0, b = 0;
     if (color == L"White") {
         r = g = b = 255;
@@ -13626,7 +13623,7 @@ std::wstring ZenXamlColorToCss(const std::wstring& color, double alphaScale) {
     return buffer;
 }
 
-struct ZenSearchWebPalette {
+struct CWSearchWebPalette {
     PCWSTR tile;
     PCWSTR hover;
     PCWSTR pressed;
@@ -13635,7 +13632,7 @@ struct ZenSearchWebPalette {
     PCWSTR menu;
 };
 
-ZenSearchWebPalette ZenGetSearchWebPalette(ZenSearchFamily family,
+CWSearchWebPalette CWGetSearchWebPalette(CWSearchFamily family,
                                            bool darkDesign) {
     // Liquid no longer adds a specular edge.
     if (darkDesign) {
@@ -13652,7 +13649,7 @@ ZenSearchWebPalette ZenGetSearchWebPalette(ZenSearchFamily family,
     return {
         // Liquid Glass stays clear in light mode too: a 30% white tile/preview
         // card read as a white haze over the glass.
-        family == ZenSearchFamily::Liquid ? L"rgba(255, 255, 255, 0.08)"
+        family == CWSearchFamily::Liquid ? L"rgba(255, 255, 255, 0.08)"
                                           : L"rgba(255, 255, 255, 0.30)",
         L"rgba(0, 0, 0, 0.05)",
         L"rgba(0, 0, 0, 0.09)",
@@ -13662,10 +13659,10 @@ ZenSearchWebPalette ZenGetSearchWebPalette(ZenSearchFamily family,
     };
 }
 
-std::wstring ZenBuildSearchWebMaterialCss(ZenSearchFamily family,
+std::wstring CWBuildSearchWebMaterialCss(CWSearchFamily family,
                                           bool darkDesign,
                                           std::wstring_view prefix) {
-    const auto palette = ZenGetSearchWebPalette(family, darkDesign);
+    const auto palette = CWGetSearchWebPalette(family, darkDesign);
     // Liquid Glass keeps the native shape: same radii as the other families.
     const PCWSTR itemRadius = L"8px";
     const PCWSTR cardRadius = L"14px";
@@ -13729,13 +13726,13 @@ std::wstring ZenBuildSearchWebMaterialCss(ZenSearchFamily family,
     return css;
 }
 
-void ZenBuildSearchWebContent(ZenSearchFamily family,
-                              ZenSearchDesign design,
+void CWBuildSearchWebContent(CWSearchFamily family,
+                              CWSearchDesign design,
                               const std::wstring& fgBrush,
                               bool swapToDarkTheme) {
     std::wstring css;
 
-    if (family != ZenSearchFamily::None) {
+    if (family != CWSearchFamily::None) {
         // Let the XAML glass (Border#AppBorder) show through everywhere.
         css +=
             L"html, body, #root, #qfContainer, .suggsListContainer, "
@@ -13744,20 +13741,20 @@ void ZenBuildSearchWebContent(ZenSearchFamily family,
             L".groupHeader {\n"
             L"background-color: transparent !important;\n}\n";
 
-        if (design == ZenSearchDesign::Auto) {
-            css += ZenBuildSearchWebMaterialCss(family, true, L".darkTheme ");
-            css += ZenBuildSearchWebMaterialCss(family, false, L".lightTheme ");
+        if (design == CWSearchDesign::Auto) {
+            css += CWBuildSearchWebMaterialCss(family, true, L".darkTheme ");
+            css += CWBuildSearchWebMaterialCss(family, false, L".lightTheme ");
         } else {
-            css += ZenBuildSearchWebMaterialCss(
-                family, design == ZenSearchDesign::Dark, L"");
+            css += CWBuildSearchWebMaterialCss(
+                family, design == CWSearchDesign::Dark, L"");
         }
     }
 
     // Text color, the same as the XAML text (textColorMode or the custom glass
     // default). Applies to all themes.
-    std::wstring fg = ZenXamlColorToCss(fgBrush, 1.0);
+    std::wstring fg = CWXamlColorToCss(fgBrush, 1.0);
     if (!fg.empty()) {
-        std::wstring fgSecondary = ZenXamlColorToCss(fgBrush, 0.72);
+        std::wstring fgSecondary = CWXamlColorToCss(fgBrush, 0.72);
         css +=
             L"#root, #root div, #root span, #root p, #root h1, #root h2, "
             L"#root h3, #root h4, #root h5, #root li, #root a, #root button, "
@@ -13821,9 +13818,9 @@ void ZenBuildSearchWebContent(ZenSearchFamily family,
     }
 }
 
-void ZenAddSearchMaterialRules(const Theme* theme,
-                               ZenSearchFamily family,
-                               ZenSearchDesign design,
+void CWAddSearchMaterialRules(const Theme* theme,
+                               CWSearchFamily family,
+                               CWSearchDesign design,
                                const std::wstring& fgBrush,
                                const StyleConstants& styleConstants) {
     auto add = [&](PCWSTR target, std::vector<std::wstring> styles) {
@@ -13884,14 +13881,14 @@ void ZenAddSearchMaterialRules(const Theme* theme,
         }
     }
 
-    if (family == ZenSearchFamily::None) {
+    if (family == CWSearchFamily::None) {
         return;
     }
 
     // The search box: one layer with the theme's element material, the same in
     // the Start menu and on the search page.
     std::wstring field, fieldHover, fieldActive, stroke, thickness, radius;
-    if (family == ZenSearchFamily::Liquid) {
+    if (family == CWSearchFamily::Liquid) {
         std::wstring prefix =
             theme == &g_themeLiquidGlass ? L"$" : L"$Apple_";
         field = prefix + L"ElementBackground";
@@ -13901,18 +13898,18 @@ void ZenAddSearchMaterialRules(const Theme* theme,
         thickness = prefix + L"ElementBorderThickness";
         radius = prefix + L"ElementCornerRadius";
     } else {
-        std::wstring color = design == ZenSearchDesign::Dark ? L"#FFFFFF"
-                             : design == ZenSearchDesign::Light
+        std::wstring color = design == CWSearchDesign::Dark ? L"#FFFFFF"
+                             : design == CWSearchDesign::Light
                                  ? L"#000000"
                                  : L"{ThemeResource SystemBaseHighColor}";
         auto solid = [&](PCWSTR opacity) {
             return L"<SolidColorBrush Color=\"" + color + L"\" Opacity=\"" +
                    opacity + L"\" />";
         };
-        field = solid(design == ZenSearchDesign::Light ? L"0.04" : L"0.07");
-        fieldHover = solid(design == ZenSearchDesign::Light ? L"0.06" : L"0.10");
-        fieldActive = solid(design == ZenSearchDesign::Light ? L"0.06" : L"0.10");
-        stroke = design == ZenSearchDesign::Dark
+        field = solid(design == CWSearchDesign::Light ? L"0.04" : L"0.07");
+        fieldHover = solid(design == CWSearchDesign::Light ? L"0.06" : L"0.10");
+        fieldActive = solid(design == CWSearchDesign::Light ? L"0.06" : L"0.10");
+        stroke = design == CWSearchDesign::Dark
                      ? L"<LinearGradientBrush StartPoint=\"0,0\" "
                        L"EndPoint=\"0,1\"><GradientStop Color=\"#33FFFFFF\" "
                        L"Offset=\"0\" /><GradientStop Color=\"#0FFFFFFF\" "
@@ -14191,7 +14188,7 @@ void ProcessAllStylesFromSettings() {
 
     std::wstring existingBrush = L"";
     static const std::wstring kBgVarNames_extract[] = {
-        L"CommonBgBrush", L"Apple_Background", L"ZenBg", L"Background", L"ElementBackground",
+        L"CommonBgBrush", L"Apple_Background", L"CWBg", L"Background", L"ElementBackground",
         L"base", L"overlay", L"overlay2", L"BackgroundBrush", L"bgBrush",
     };
     for (const auto& varName : kBgVarNames_extract) {
@@ -14589,7 +14586,7 @@ void ProcessAllStylesFromSettings() {
             // ("Black" or #xx000000) mean a light design, which is left alone.
             // "{ThemeResource ...}" text follows the forced theme and stays
             // readable.
-            bool darkText = ZenIsDarkTextBrush(newFgBrush);
+            bool darkText = CWIsDarkTextBrush(newFgBrush);
             forceDark = isCustomTheme && !newFgBrush.empty() && !darkText;
         }
         Wh_FreeStringSetting(controlTheme);
@@ -14604,29 +14601,29 @@ void ProcessAllStylesFromSettings() {
 
     // CW: give the search page the same material as the Start menu.
     {
-        ZenSearchFamily searchFamily = ZenSearchFamily::None;
+        CWSearchFamily searchFamily = CWSearchFamily::None;
         if (theme == &g_themeTranslucentStartMenu ||
             theme == &g_themeTranslucentStartMenu_variant_ClassicStartMenu) {
-            searchFamily = ZenSearchFamily::Translucent;
+            searchFamily = CWSearchFamily::Translucent;
         } else if (theme == &g_themeAppleLiquidGlass ||
                    theme == &g_themeAppleLiquidGlass_variant_Classic ||
                    theme == &g_themeLiquidGlass) {
-            searchFamily = ZenSearchFamily::Liquid;
+            searchFamily = CWSearchFamily::Liquid;
         }
 
-        ZenSearchDesign searchDesign = ZenSearchDesign::Auto;
+        CWSearchDesign searchDesign = CWSearchDesign::Auto;
         if (forceDark) {
-            searchDesign = ZenSearchDesign::Dark;
+            searchDesign = CWSearchDesign::Dark;
         } else if (!newFgBrush.empty() && newFgBrush[0] != L'{') {
-            searchDesign = ZenIsDarkTextBrush(newFgBrush)
-                               ? ZenSearchDesign::Light
-                               : ZenSearchDesign::Dark;
+            searchDesign = CWIsDarkTextBrush(newFgBrush)
+                               ? CWSearchDesign::Light
+                               : CWSearchDesign::Dark;
         }
 
-        ZenAddSearchMaterialRules(theme, searchFamily, searchDesign,
+        CWAddSearchMaterialRules(theme, searchFamily, searchDesign,
                                   newFgBrush, styleConstants);
         if (g_target == Target::SearchHost) {
-            ZenBuildSearchWebContent(searchFamily, searchDesign, newFgBrush,
+            CWBuildSearchWebContent(searchFamily, searchDesign, newFgBrush,
                                      forceDark);
         }
     }
@@ -16001,14 +15998,14 @@ void Wh_ModAfterInit() {
     }
 
     ScheduleBootStyleReinit();
-    ZenScheduleSearchAttachRetry();
+    CWScheduleSearchAttachRetry();
 }
 
 void Wh_ModBeforeUninit() {
     Wh_Log(L">");
 
     StopBootReinitTimer();
-    ZenStopSearchAttachRetry();
+    CWStopSearchAttachRetry();
 
     // Start Menu custom sizing: signal unloading so ApplyStyle() restores
     // original dimensions, then detach event handlers on the CoreWindow
@@ -16110,7 +16107,7 @@ void Wh_ModSettingsChanged() {
         Wh_Log(L"Reinitializing - Found core window");
         RunFromWindowThread(
             hCoreWnd, Acrylic_SettingsChangedFromWindowThread, nullptr);
-        ZenScheduleSearchAttachRetry();
+        CWScheduleSearchAttachRetry();
 
         // Start Menu custom sizing: re-apply size on the CoreWindow thread
         // (StartMenu target only).
@@ -16225,10 +16222,10 @@ static void WINAPI TriggerFullReinitFromWindowThread(PVOID) {
 // while the search page is open.
 PTP_TIMER g_zenSearchAttachRetryTimer = nullptr;
 std::atomic<int> g_zenSearchAttachRetryTicks = 0;
-constexpr int kZenSearchAttachRetryMaxTicks = 40;
-constexpr DWORD kZenSearchAttachRetryIntervalMs = 3000;
+constexpr int kCWSearchAttachRetryMaxTicks = 40;
+constexpr DWORD kCWSearchAttachRetryIntervalMs = 3000;
 
-static void WINAPI ZenSearchAttachFromWindowThread(PVOID) {
+static void WINAPI CWSearchAttachFromWindowThread(PVOID) {
     if (g_zenSearchFrameSeen.load()) {
         return;
     }
@@ -16252,7 +16249,7 @@ static void WINAPI ZenSearchAttachFromWindowThread(PVOID) {
 // Visible and not cloaked. The search window is usually cloaked, not hidden,
 // when the search page is closed. dwmapi is loaded dynamically since the mod
 // doesn't link it.
-static bool ZenIsWindowShown(HWND hWnd) {
+static bool CWIsWindowShown(HWND hWnd) {
     if (!IsWindowVisible(hWnd)) {
         return false;
     }
@@ -16280,7 +16277,7 @@ static bool ZenIsWindowShown(HWND hWnd) {
     return true;
 }
 
-void ZenStopSearchAttachRetry() {
+void CWStopSearchAttachRetry() {
     if (g_zenSearchAttachRetryTimer) {
         SetThreadpoolTimer(g_zenSearchAttachRetryTimer, nullptr, 0, 0);
         WaitForThreadpoolTimerCallbacks(g_zenSearchAttachRetryTimer, TRUE);
@@ -16289,7 +16286,7 @@ void ZenStopSearchAttachRetry() {
     }
 }
 
-static void CALLBACK ZenSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
+static void CALLBACK CWSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
                                               PVOID,
                                               PTP_TIMER timer) {
     if (g_zenSearchFrameSeen.load()) {
@@ -16298,7 +16295,7 @@ static void CALLBACK ZenSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
     }
 
     int tick = ++g_zenSearchAttachRetryTicks;
-    if (tick > kZenSearchAttachRetryMaxTicks) {
+    if (tick > kCWSearchAttachRetryMaxTicks) {
         Wh_Log(L"[CW] Search attach retry: giving up, search frame "
                L"never seen");
         SetThreadpoolTimer(timer, nullptr, 0, 0);
@@ -16313,7 +16310,7 @@ static void CALLBACK ZenSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
     // Only while the search page is actually shown, so a hidden, prelaunched
     // SearchHost isn't reattached over and over and the attempts aren't used
     // up before the page is first opened.
-    if (!ZenIsWindowShown(hCoreWnd)) {
+    if (!CWIsWindowShown(hCoreWnd)) {
         --g_zenSearchAttachRetryTicks;
         return;
     }
@@ -16321,12 +16318,12 @@ static void CALLBACK ZenSearchAttachRetryTick(PTP_CALLBACK_INSTANCE,
     // A fresh attach on the first tick, then every other tick (6 seconds),
     // giving each attach time to walk the tree.
     if (tick % 2 == 1 || g_targetThreadId.load() == 0) {
-        RunFromWindowThread(hCoreWnd, ZenSearchAttachFromWindowThread,
+        RunFromWindowThread(hCoreWnd, CWSearchAttachFromWindowThread,
                             nullptr);
     }
 }
 
-void ZenScheduleSearchAttachRetry() {
+void CWScheduleSearchAttachRetry() {
     if (g_target != Target::SearchHost || g_zenSearchFrameSeen.load()) {
         return;
     }
@@ -16334,7 +16331,7 @@ void ZenScheduleSearchAttachRetry() {
     g_zenSearchAttachRetryTicks = 0;
     if (!g_zenSearchAttachRetryTimer) {
         g_zenSearchAttachRetryTimer =
-            CreateThreadpoolTimer(ZenSearchAttachRetryTick, nullptr, nullptr);
+            CreateThreadpoolTimer(CWSearchAttachRetryTick, nullptr, nullptr);
         if (!g_zenSearchAttachRetryTimer) {
             return;
         }
@@ -16349,7 +16346,7 @@ void ZenScheduleSearchAttachRetry() {
     ft.dwLowDateTime = due.LowPart;
     ft.dwHighDateTime = due.HighPart;
     SetThreadpoolTimer(g_zenSearchAttachRetryTimer, &ft,
-                       kZenSearchAttachRetryIntervalMs, 500);
+                       kCWSearchAttachRetryIntervalMs, 500);
 }
 
 static void TriggerFullReinit() {
@@ -16390,7 +16387,7 @@ static LRESULT CALLBACK TaskbarCreatedWndProc(
 
 static DWORD WINAPI TaskbarCreatedWindowThread(LPVOID /*lpParam*/) {
     // Register a minimal window class.
-    constexpr LPCWSTR kClassName = L"ZenStartMenuAcrylic_TaskbarCreatedMsgWnd";
+    constexpr LPCWSTR kClassName = L"CWStartMenuAcrylic_TaskbarCreatedMsgWnd";
 
     WNDCLASSEXW wc = {};
     wc.cbSize        = sizeof(wc);

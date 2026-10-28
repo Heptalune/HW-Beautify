@@ -5,9 +5,8 @@
 // @description     Acrylic and transparent notification center, quick settings and calendar.
 // @description:zh-CN 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景。
 // @version         4.2.6
-// @donateUrl       https://ifdian.net/a/Lanboo
-// @author          m417z, Lanbo
-// @github          https://github.com/m417z, https://github.com/Liset999
+// @author          m417z, Heptalune
+// @github          https://github.com/m417z, https://github.com/Heptalune
 // @twitter         https://twitter.com/m417z
 // @homepage        https://m417z.com/
 // @include         ShellExperienceHost.exe
@@ -19,7 +18,7 @@
 // Source code is published under The GNU General Public License v3.0.
 //
 // For bug reports and feature requests, please open an issue here:
-// https://github.com/Liset999/ZenDesktop/issues
+// https://github.com/Heptalune/CW-Beautify/issues
 //
 // Based on "Windows 11 Notification Center Styler" by m417z (https://github.com/m417z),
 // licensed under GPL-3.0. The original mod is developed here:
@@ -27,11 +26,10 @@
 
 // ==WindhawkModReadme==
 /*
-> **作者：Lanbo**
-> [B站](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo) · [微信赞赏](https://github.com/Liset999/ZenDesktop/main/docs/donate-wechat.png)
-> 本 mod 属于「CW桌面美化」整合包。
+> **作者：Heptalune**
+> 本 mod 属于CW-Beautify整合包。
 
-> 原作者：**m417z**（[Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler)，GPL-3.0）。本版由 Lanbo 修改与维护。
+> 原作者：**m417z**（[Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
 # CW-通知栏美化
 
@@ -58,7 +56,7 @@
   - 不要同时再开上游「Windows 11 Notification Center Styler」，会抢同一条 XAML 诊断通道
 - **版本对照（经验）**
   - 22H2 / 23H2：通知 + 日历 + 快捷设置多在 `ShellExperienceHost`，一般正常
-  - 24H2 / 25H2：快捷设置在 `ShellHost`；若只看到通知变了、快捷设置没变，确认 Windhawk 高级选项包含列表里有 `ShellHost.exe`，或重新跑一次 CW桌面美化 deploy
+  - 24H2 / 25H2：快捷设置在 `ShellHost`；若只看到通知变了、快捷设置没变，确认 Windhawk 高级选项包含列表里有 `ShellHost.exe`，或重新跑一次 CW-Beautify deploy
   - `ShellHost.exe` 空闲一段时间后可能被系统关掉，再打开快捷设置时 Windhawk 会重新注入；若偶发没效果，关掉再开一次快捷设置，或重载本 mod
 - **其他**
   - 同一时间只能有一个程序使用 XAML 诊断（UWPSpy、同类 styler 等），冲突时可能完全无效果
@@ -86,11 +84,10 @@
 ## 致谢与许可
 
 - 原版 mod：Windows 11 Notification Center Styler，作者 [m417z](https://github.com/m417z)，GPL-3.0。
-- Lanbo 的修改：重构模糊画刷计算、新增视觉预设、文字颜色与中文设置。
+- Heptalune 的修改：重构模糊画刷计算、新增视觉预设、文字颜色与中文设置。
 - 内置的社区主题由各自作者贡献，详见对应的 Windows 11 styling guide 仓库。
 - 控件树监听基于 TranslucentTB 项目的 ExplorerTAP，`WindhawkBlur` 画刷基于 TranslucentTB 的 XamlBlurBrush。
 - 本修改版同样以 GPL-3.0 发布。
-- 开发者：Lanbo（[哔哩哔哩](https://space.bilibili.com/1280632999) · [抖音](https://v.douyin.com/Isl7QPpKZZ4/) · [爱发电](https://ifdian.net/a/Lanboo)）
 
 ## 附录：原版说明（英文）
 
@@ -2556,7 +2553,7 @@ const Theme g_themeLiquidGlass = {{
     ThemeTargetStyles{L"Button#ExpandCollapseButton", {
         L"AccessKey=e"}},
 }, {
-    // Zen Liquid Glass — shared specular language (less flat acrylic)
+    // CW Liquid Glass — shared specular language (less flat acrylic)
     L"transparent = Transparent",
     L"Background = <WindhawkBlur BlurAmount=\"14\" TintColor=\"#00FFFFFF\" TintOpacity=\"0.04\" TintSaturation=\"2.0\" FallbackColor=\"#18FFFFFF\" />",
     L"ElementBackground = <WindhawkBlur BlurAmount=\"12\" TintColor=\"#00FFFFFF\" TintOpacity=\"0.08\" FallbackColor=\"#14FFFFFF\" />",
@@ -8906,7 +8903,7 @@ void ProcessAllStylesFromSettings() {
     std::vector<PCWSTR> overrideStyleConstants;
     if (wcscmp(themeName, L"TranslucentShell") == 0) {
         theme = &g_themeTranslucentShell;
-    } else if (wcscmp(themeName, L"ZenMatterLayout") == 0) {
+    } else if (wcscmp(themeName, L"CWMatterLayout") == 0) {
         theme = &g_themeMatter;
     } else if (wcscmp(themeName, L"Unified") == 0) {
         theme = &g_themeUnified;
@@ -8976,7 +8973,7 @@ void ProcessAllStylesFromSettings() {
 
     std::wstring existingBrush = L"";
     static const std::wstring kBgVarNames_extract[] = {
-        L"CommonBgBrush", L"Apple_Background", L"ZenBg", L"Background", L"ElementBackground",
+        L"CommonBgBrush", L"Apple_Background", L"CWBg", L"Background", L"ElementBackground",
         L"base", L"overlay", L"overlay2", L"BackgroundBrush", L"bgBrush",
     };
     for (const auto& varName : kBgVarNames_extract) {
