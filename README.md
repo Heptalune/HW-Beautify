@@ -3,19 +3,15 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量、快捷键或托盘切换播放设备、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 20 个 mod（17 核心 + 3 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 25 个 mod（22 核心 + 3 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
-![Windhawk 中的 mod 列表](docs/screenshots/windhawk-mod-list.jpg)
-
-![文件管理器与任务栏](docs/screenshots/file-explorer-taskbar-lyrics.jpg)
-
-![开始菜单与快捷设置](docs/screenshots/start-menu-quick-settings-media.jpg)
+> 截图待更新：旧项目时期的截图已移除，后续补上新版效果图。
 
 ## Mod 介绍
 
-17 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
+22 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
 
 ### CW-任务栏美化
 
@@ -63,14 +59,18 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 * 音量指示器可选 Windows 11 / 10 / 7 风格；滚动区域可限定任务栏、托盘或自定义区域。
 * 按住修饰键可在屏幕任意位置滚动调音量；全屏时也能在任务栏位置滚动。
 * **媒体设备快速切换**（本整合包新增）：按全局快捷键（默认 Ctrl+Alt+A）把默认播放/录音设备循环切到下一个，切换后左下角短暂提示设备名。
+* **分应用音量**（1.4.0 起并入，原独立模组已退役）：悬停任务栏按钮滚动滚轮，调节对应应用自己的音量；设置在「分应用音量控制」分组里。
 * 中键点击音量托盘图标切换静音。
 
-### CW-任务栏 Dock 动画
+### CW-任务栏动画
 
-macOS 风格的任务栏图标悬停放大动画（Beta）。
+任务栏动画合集（2.1.0 起由「Dock 动画」与「任务栏秒显」合并而成）：
 
-* 三种动画曲线；相邻图标间距让位；空闲「呼吸」动画可调，还有弹跳抬升幅度与防裁剪保护。
-* 支持顶部任务栏镜像、排除系统按钮、标签栏兼容模式。
+* **图标动画**：macOS 风格的任务栏图标悬停放大（三种动画曲线、相邻图标让位、
+  空闲「呼吸」可调、弹跳抬升幅度与防裁剪保护、顶部任务栏镜像等）。
+* **秒显动画**：去掉自动隐藏任务栏的显示延迟，出现/隐藏动画可选
+  （无、滑动、弹性、回弹、淡入淡出等），设置在「任务栏秒显」分组。
+* 两套动画相互独立，可只用其一。
 
 ### CW-窗口滑动排列
 
@@ -88,16 +88,10 @@ macOS 风格的任务栏图标悬停放大动画（Beta）。
 
 ### CW-经典右键菜单
 
-在 Windows 11 上始终显示经典（Win10 风格）右键菜单。
+在 Windows 11 上默认显示经典（Win10 风格）右键菜单。
 
-* 不用再点「显示更多选项」或按住 Shift；按住 Ctrl 可临时切回新版菜单。
-
-### CW-任务栏秒显
-
-去掉任务栏自动隐藏后重新出现的延迟。
-
-* 配合系统「自动隐藏任务栏」使用，鼠标碰到底边任务栏立即出现。
-* 出现动画可选：无、滑动、弹性、回弹、淡入淡出等，速度与时长可调。
+* 不用再点「显示更多选项」或按住 Shift；按住 Ctrl 可临时切换到另一种菜单。
+* **菜单风格可切换**（1.1.0 新增）：设置里选「经典」或「新版」，选新版时本模组不干预。
 
 ### CW-关闭扩展名修改警告
 
@@ -111,20 +105,56 @@ macOS 风格的任务栏图标悬停放大动画（Beta）。
 
 * 内置暗蓝、石墨、午夜、暖黑、浅色、磨砂玻璃等主题，颜色、字体、字号均可自定义。
 
-### CW-音频输出切换
+### CW-音量混合器
 
-在系统托盘用图标循环切换多个首选音频输出设备（最多 6 个）。
+系统托盘里的可自定义音量混合器：直接调节主音量和各应用的音量。
 
-* 左键点击或滚轮即可在设备间切换，不用再进声音设置；图标随当前设备变化。
-* 与「CW-任务栏音量控制」的快捷键切换设备功能互补：一个用快捷键，一个用托盘图标。
+* 托盘图标点击即开，主题、透明度、背景效果、每页应用数量均可调。
+* 与「CW-任务栏音量控制」互补：一个在任务栏滚动调音量，一个开面板精细调节。
 
-### CW-分应用音量控制
+### CW-窗口拖动（Alt+拖动）
 
-鼠标悬停在任务栏按钮上滚动滚轮，调节对应应用自己的音量。
+Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键拖动调整大小。
 
-* 与「CW-任务栏音量控制」搭配：一个调系统音量，一个调单个应用；支持 Ctrl+点击静音。
+* 触发键可自定义；保留短按点击；支持拖动无标题栏的窗口。
 
-### CW-文件悬停信息
+### CW-显示桌面按钮预览
+
+悬停任务栏最右「显示桌面」按钮时，显示窗口的 Aero Peek 预览。
+
+* 找回 Windows 10 时代的小窗预览体验，再次点击仍可切换桌面。
+
+### CW-任务栏缩略图大小
+
+自定义任务栏悬停缩略图预览的尺寸。
+
+* 缩略图大小可调，配合高分辨率屏幕看得更清楚。
+
+### CW-滚轮切换任务栏
+
+用鼠标滚轮或键盘快捷键在任务栏按钮间循环切换窗口。
+
+* 悬停任务栏滚动滚轮即可逐个切换窗口，方向和循环方式可调。
+
+### CW-任务栏弹性药丸
+
+为任务栏当前活动项注入一条带弹性动画的滑动指示条。
+
+* 切换窗口时指示条平滑滑动跟随，动画细节可调。
+
+### CW-资源管理器信息栏
+
+增强文件资源管理器底部信息栏：显示磁盘、内容、选择项与单文件详情。
+
+* 样式与颜色可自定义。
+
+### CW-自定义右键菜单
+
+把资源管理器右键菜单换成自绘的即时打开菜单，主题、布局、颜色、动画、规则全面可自定义。
+
+* 缓存机制让菜单瞬时打开；与「CW-经典右键菜单」二选一使用，不要同时开启。
+
+### CW-窗口动画（可选）
 
 鼠标悬停在桌面或文件管理器的文件/文件夹上时，显示可自定义主题的信息卡片。
 
@@ -217,9 +247,10 @@ macOS 风格的任务栏图标悬停放大动画（Beta）。
 CW-Beautify 以 GNU General Public License v3.0 发布。
 
 *   Windhawk 和任务栏、开始菜单、通知中心、文件管理器的上游 Styler mod：m417z（GPL-3.0）。
-*   任务栏音量控制、窗口滑动排列、托盘系统图标调整、经典右键菜单、关闭扩展名修改警告、分应用音量控制、设置美化：m417z（GPL-3.0）。
-*   任务栏秒显：Bo0ii（GPL-3.0）；文件操作美化：digART（GPL-3.0）；音频输出切换：BlackPaw（MIT）；文件悬停信息：HaVeN80。
-*   任务栏 Dock 动画：incconutwo（Plus fork）、Ph0en1x-dev（原版）（GPL-3.0）；Mac 灵动岛与 Dock：caliberda（GPL-3.0）。
+*   任务栏音量控制（含并入的分应用音量）、窗口滑动排列、托盘系统图标调整、经典右键菜单、关闭扩展名修改警告、设置美化、窗口拖动（AltDrag）、显示桌面按钮预览、任务栏缩略图大小、滚轮切换任务栏：m417z（GPL-3.0）。
+*   任务栏秒显：Bo0ii（GPL-3.0）；文件操作美化、资源管理器信息栏：digART（GPL-3.0）；文件悬停信息：HaVeN80（MIT/未标注）。
+*   任务栏动画（Dock 动画 + 秒显合并）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）；Mac 灵动岛与 Dock：caliberda（GPL-3.0）。
+*   音量混合器：0Allu（MIT）；自定义右键菜单：BOLT（MIT）；任务栏弹性药丸：Lockframe（GPL-3.0）。
 *   窗口动画：ReDrag（MIT）；macOS 神奇效果：Abdullah Masood、Potassiumuncher；窗口切换动画（Vista 风格）：caliberda（MIT）。
 *   媒体设备快速切换参考 AudioSwitcher（xenolightning，MS-PL）重新实现。
 *   套件深度修改、汉化与桌面双击隐藏图标：Heptalune（GPL-3.0）。
@@ -227,4 +258,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 20 Windhawk mods (17 core + 3 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 25 Windhawk mods (22 core + 3 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.

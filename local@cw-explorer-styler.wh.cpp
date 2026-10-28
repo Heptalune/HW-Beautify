@@ -1,10 +1,10 @@
-// ==WindhawkMod==
+﻿// ==WindhawkMod==
 // @id              cw-explorer-styler
 // @name            CW-文件管理器美化
 // @name:zh-CN      CW-文件管理器美化
 // @description     Translucent File Explorer with adjustable tint, transparent chrome, and glass desktop context menus.
 // @description:zh-CN 让 Windows 11 文件管理器整窗半透明模糊，色调可调，命令栏、地址栏、标签栏透明，并美化桌面与资源管理器的右键菜单。
-// @version         1.6.9
+// @version         1.7.0
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -70,7 +70,8 @@
 - **地址栏与搜索框不透明度**：范围 0–100，默认 0（完全透明），鼠标悬停时会稍亮一些。只对两款 CW 主题生效。
 - **文字颜色**：WinUI 区域在任何主题下都生效；文件列表、列标题、导航栏、状态栏等传统区域只在背景效果覆盖整个窗口时生效，选「跟随系统」时保持系统颜色。
 - **浅色模式**：浅色模式下文件列表和导航栏的文字是深色的，色调建议使用「跟随系统」，避免深色色调配深色文字。
-- **右键菜单：玻璃效果**：默认开启。作用在 Windows 11 桌面和文件管理器里的现代（XAML）右键菜单（顶部图标行和下面的菜单项）。「新建」「查看」「排序方式」等展开的子菜单保持系统原样：它们的材质会被系统转交给弹出层、mod 无法安全收回，强改可能在关闭或更新 mod 后让资源管理器崩溃。菜单的毛玻璃是系统背景材质（SystemBackdrop），不是普通画刷，在上面叠画刷看不出区别，所以本项直接替换这层材质，色调颜色和不透明度沿用上方的「色调颜色」「色调不透明度」，边框保持系统原样。开启或修改后需要重新打开菜单才生效。Shift+右键或「显示更多选项」打开的经典 Win32 菜单不在范围内。
+- **右键菜单：玻璃效果**：默认开启。作用在 Windows 11 桌面和文件管理器里的现代（XAML）右键菜单（顶部图标行和下面的菜单项）。菜单的毛玻璃是系统背景材质（SystemBackdrop），不是普通画刷，在上面叠画刷看不出区别，所以本项直接替换这层材质，色调颜色和不透明度沿用上方的「色调颜色」「色调不透明度」，边框保持系统原样。开启或修改后需要重新打开菜单才生效。Shift+右键或「显示更多选项」打开的经典 Win32 菜单不在范围内。
+- **子菜单玻璃效果（实验性）**：默认关闭。开启后「查看」「新建」「排序方式」等展开的子菜单（二级面板）也使用同样的玻璃。1.6.9 及之前版本因收回安全性问题刻意排除子菜单；现以实验性开关提供，恢复路径只处理仍存活的对象，若资源管理器出现不稳定请关闭此项。
 - **右键菜单：磨砂程度**：仅在开启玻璃效果后生效，范围 0–60，默认 30。数值越小越通透，越大越磨砂（系统原样大约相当于 90，所以 60 仍比原版通透）；0 为只有模糊和色调。系统材质的模糊半径固定，无法调整。
 - **高级：样式常量 / 控件样式 / 资源变量 / 顶部框架高度**：用于编写自定义样式，语法见下文「高级样式」。
 
@@ -82,6 +83,11 @@
 - 同一时间只能有一个程序使用 XAML 诊断，处理方式由「高级：XAML 诊断冲突处理」决定：「弹窗询问」每次让你选择；「阻止其他程序」保证本 mod 生效，但对方可能失效；「允许其他程序」让对方生效，但本 mod 的样式可能失效。
 
 ## 更新日志
+
+- **1.7.0**：新增「子菜单玻璃效果（实验性）」设置（默认关闭）：开启后右键菜单展开的
+二级面板也使用玻璃效果，恢复路径只处理仍存活的对象，尽力避免旧版排除子菜单时担心的
+卸载风险；若资源管理器出现不稳定，关闭该开关即可。
+
 
 - **1.6.9**：修复 1.6.8 编译失败（深色模式标志在声明前就被使用）。
 - **1.6.8**：加固内容底色清理：深色模式覆盖到系统三级底 #282828，浅色模式一并清掉靠近白的灰底（如 #F3F3F3）；补上 `Rectangle` 绘制路径。单显示器上发灰发亮的色块与跨屏材质不统一是同一类问题。
@@ -401,13 +407,18 @@ Background:=<AcrylicBrush TintColor="$mainColor" TintOpacity="0.3" />
 - contextMenuEnable: true
   $name: "Context menu glass"
   $name:zh-CN: "右键菜单：玻璃效果"
-  $description: "Replace the system acrylic of the Windows 11 desktop and File Explorer context menus with adjustable glass. Submenus stay stock. Uses the tint color and tint opacity above. Default: on."
-  $description:zh-CN: "把 Windows 11 桌面和文件管理器现代右键菜单的系统亚克力换成可调的玻璃，色调沿用上方的色调颜色和不透明度；展开的子菜单保持原样。默认开启。"
+  $description: "Replace the system acrylic of the Windows 11 desktop and File Explorer context menus with adjustable glass. Submenus can be included with the experimental submenu glass option below. Uses the tint color and tint opacity above. Default: on."
+  $description:zh-CN: "把 Windows 11 桌面和文件管理器现代右键菜单的系统亚克力换成可调的玻璃，色调沿用上方的色调颜色和不透明度；展开的子菜单默认保持原样，可用下方的实验性开关一并开启。默认开启。"
 - contextMenuBlur: 30
   $name: "Context menu: frost"
   $name:zh-CN: "右键菜单：磨砂程度"
   $description: "Frost of the context menu glass, 0–60. Lower is clearer; 0 is blur and tint only. The system blur radius itself is fixed. Only applies when context menu glass is on. Default: 30."
   $description:zh-CN: "右键菜单玻璃的磨砂程度，范围 0–60，越小越通透，0 为只有模糊和色调；系统材质的模糊半径固定。仅在开启「右键菜单：玻璃效果」后生效。默认 30。"
+- contextMenuSubmenu: false
+  $name: "Context menu: submenu glass (experimental)"
+  $name:zh-CN: "子菜单玻璃效果（实验性）"
+  $description: "Also give the submenus opened from the context menu (View, New, ...) the same glass. Experimental: on some Windows builds closing or updating the mod may briefly stutter; turn this off if Explorer becomes unstable. Only applies when context menu glass is on. Default: off."
+  $description:zh-CN: "把右键菜单展开的子菜单（「查看」「新建」等二级面板）也换成玻璃。实验性：个别系统版本上关闭或更新模组时可能短暂卡顿，若资源管理器出现不稳定请关闭此项。仅在开启「右键菜单：玻璃效果」后生效。默认关闭。"
 - styleConstants: [""]
   $name: "Advanced: style constants"
   $name:zh-CN: "高级：样式常量"
@@ -6308,6 +6319,9 @@ ParseCWAcrylicBackdropValue(std::wstring_view substr) {
 // for it and the write happens after the next layout pass (1.6.4).
 struct CWContextMenuParams {
     bool enabled = false;
+    // CW: also give the submenus of the menu the same glass (experimental,
+    // see the submenu glass section below).
+    bool submenu = false;
     winrt::Windows::UI::Color tint{};
     float tintOpacity = 0;
     float luminosityOpacity = 0;
@@ -6596,9 +6610,21 @@ void CWContextMenuOnBackdropRootAdded(FrameworkElement const& element) {
     }
 }
 
+// CW: submenu glass, see the submenu glass section below.
+void CWSubmenuOnElementAdded(Controls::MenuFlyoutPresenter const& presenter);
+
 void CWContextMenuOnElementAdded(FrameworkElement const& element) {
     if (!g_zenContextMenuParams.enabled) {
         return;
+    }
+
+    // CW: the submenus opened from the menu ("View", "New", ...) are
+    // MenuFlyoutPresenter elements; they're only handled when the
+    // experimental submenu glass is on.
+    if (g_zenContextMenuParams.submenu) {
+        if (auto presenter = element.try_as<Controls::MenuFlyoutPresenter>()) {
+            CWSubmenuOnElementAdded(presenter);
+        }
     }
 
     auto menu =
@@ -6719,6 +6745,371 @@ void CWContextMenuRestoreAll() {
 
     if (restored) {
         Wh_Log(L"[ctxmenu] restored %zu menu(s)", restored);
+    }
+}
+
+// CW: submenu glass (contextMenuSubmenu, experimental).
+//
+// The submenus opened from the context menu ("View", "New", ...) are
+// MenuFlyoutPresenter elements, which carry a SystemBackdrop the same way the
+// menu itself does: the system hands its own acrylic to every presenter, so a
+// CWAcrylicBackdrop written to that property gives them the same glass, with
+// the same parameters as the menu. This mirrors the menu glass above, but is
+// separate and off by default: the original mod kept the submenus stock out of
+// concern for the restore on unload or update. The risk is contained here: the
+// feature sits behind its own switch, the restore only touches presenters
+// which are still alive (weak_ref; a gone presenter is skipped, nothing is
+// ever written to a destroyed object), every write is wrapped, and a value is
+// only restored while it's still ours.
+//
+// Entries are pruned lazily when their presenter is gone, the same way the
+// menus are.
+struct CWSubmenuEntry {
+    winrt::weak_ref<Controls::MenuFlyoutPresenter> presenter;
+    winrt::event_token loadedToken{};
+    winrt::event_token layoutToken{};
+    int64_t backdropCallbackToken = 0;
+    bool backdropCallbackRegistered = false;
+    bool loggedWaiting = false;
+    // Loop guard: re-applies in quick succession (someone keeps replacing
+    // the backdrop back).
+    ULONGLONG lastApplyTick = 0;
+    int burst = 0;
+    winrt::Windows::Foundation::IInspectable originalValue{nullptr};
+    winrt::Windows::Foundation::IInspectable backdrop{nullptr};
+};
+
+// Keyed by the presenter's ABI pointer; an entry whose presenter is gone is
+// replaced when another object is allocated at the same address.
+thread_local std::unordered_map<void*, CWSubmenuEntry> g_zenSubmenus;
+
+void CWSubmenuWaitLoaded(void* key,
+                         Controls::MenuFlyoutPresenter const& presenter,
+                         CWSubmenuEntry& entry);
+
+// The system backdrop of the presenter, if any, and whether it's ours.
+bool CWSubmenuIsOurs(Controls::MenuFlyoutPresenter const& presenter,
+                     CWSubmenuEntry const& entry) {
+    auto current = presenter.SystemBackdrop();
+    return current && entry.backdrop &&
+           current.as<winrt::Windows::Foundation::IInspectable>() ==
+               entry.backdrop;
+}
+
+// Writes the glass if the presenter has a system backdrop which isn't ours,
+// with the same parameters as the menu glass.
+//
+// The same connected-backdrop rule as the menus: only a loaded presenter with
+// a XamlRoot gets the write, otherwise the write waits for Loaded. The write
+// is made under g_zenContextMenuWriting like the menu write, so that our own
+// property changed callback doesn't fire on it (defensive: the callback is
+// ours, the flag keeps both sections consistent).
+void CWSubmenuApply(void* key,
+                    Controls::MenuFlyoutPresenter const& presenter,
+                    CWSubmenuEntry& entry,
+                    PCWSTR reason) {
+    const auto& params = g_zenContextMenuParams;
+    if (!params.enabled || !params.submenu) {
+        return;
+    }
+
+    auto property = Controls::MenuFlyoutPresenter::SystemBackdropProperty();
+
+    auto current = presenter.SystemBackdrop();
+    if (!current) {
+        // The presenter can be added to the tree before the flyout gives it
+        // its backdrop; the property changed callback picks it up later.
+        if (!entry.loggedWaiting) {
+            Wh_Log(L"[ctxmenu-submenu] waiting for system backdrop (%s)",
+                   reason);
+            entry.loggedWaiting = true;
+        }
+        return;
+    }
+
+    if (CWSubmenuIsOurs(presenter, entry)) {
+        return;
+    }
+
+    if (!presenter.IsLoaded() || !presenter.XamlRoot()) {
+        Wh_Log(L"[ctxmenu-submenu] backdrop present, waiting for the submenu "
+               L"to load (%s)",
+               reason);
+        CWSubmenuWaitLoaded(key, presenter, entry);
+        return;
+    }
+
+    ULONGLONG now = GetTickCount64();
+    entry.burst = (now - entry.lastApplyTick < 1000) ? entry.burst + 1 : 0;
+    entry.lastApplyTick = now;
+    if (entry.burst >= 4) {
+        Wh_Log(L"[ctxmenu-submenu] backdrop keeps being replaced, giving up "
+               L"for now");
+        return;
+    }
+
+    auto original = presenter.ReadLocalValue(property);
+    auto backdrop =
+        winrt::make<CWAcrylicBackdrop>(params.tint, params.tintOpacity,
+                                        params.luminosityOpacity,
+                                        params.fallback)
+            .as<winrt::Windows::Foundation::IInspectable>();
+
+    bool prevWriting = g_zenContextMenuWriting;
+    g_zenContextMenuWriting = true;
+    try {
+        presenter.SetValue(property, backdrop);
+    } catch (...) {
+        g_zenContextMenuWriting = prevWriting;
+        throw;
+    }
+    g_zenContextMenuWriting = prevWriting;
+
+    // The value to restore is the latest one which isn't ours.
+    if (!entry.backdrop || original != entry.backdrop) {
+        entry.originalValue = original;
+    }
+    entry.backdrop = backdrop;
+    entry.loggedWaiting = false;
+
+    Wh_Log(L"[ctxmenu-submenu] glass applied (%s): tint #%02X%02X%02X, tint "
+           L"opacity %.2f, frost %.2f",
+           reason, params.tint.R, params.tint.G, params.tint.B,
+           params.tintOpacity, params.luminosityOpacity);
+}
+
+void CWSubmenuWaitLoaded(void* key,
+                         Controls::MenuFlyoutPresenter const& presenter,
+                         CWSubmenuEntry& entry) {
+    if (entry.loadedToken) {
+        return;
+    }
+
+    entry.loadedToken = presenter.Loaded(
+        [key](winrt::Windows::Foundation::IInspectable const&,
+              RoutedEventArgs const&) {
+            auto it = g_zenSubmenus.find(key);
+            if (it == g_zenSubmenus.end()) {
+                return;
+            }
+
+            auto presenter = it->second.presenter.get();
+            if (!presenter) {
+                return;
+            }
+
+            try {
+                presenter.Loaded(it->second.loadedToken);
+                it->second.loadedToken = {};
+                CWSubmenuApply(key, presenter, it->second, L"loaded");
+            } catch (winrt::hresult_error const& ex) {
+                Wh_Log(L"[ctxmenu-submenu] apply error %08X: %s", ex.code(),
+                       ex.message().c_str());
+            }
+        });
+}
+
+// Applies after the next layout pass of the presenter: by then the change
+// which triggered this (a new backdrop) has been fully processed by the
+// control. A LayoutUpdated handler can be revoked on unload, unlike a queued
+// dispatcher task.
+void CWSubmenuScheduleApply(void* key,
+                            Controls::MenuFlyoutPresenter const& presenter,
+                            CWSubmenuEntry& entry,
+                            PCWSTR reason) {
+    if (entry.layoutToken) {
+        return;
+    }
+
+    std::wstring reasonCopy = reason;
+    entry.layoutToken = presenter.LayoutUpdated(
+        [key, reasonCopy](winrt::Windows::Foundation::IInspectable const&,
+                          winrt::Windows::Foundation::IInspectable const&) {
+            auto it = g_zenSubmenus.find(key);
+            if (it == g_zenSubmenus.end()) {
+                return;
+            }
+
+            auto presenter = it->second.presenter.get();
+            if (!presenter) {
+                return;
+            }
+
+            try {
+                presenter.LayoutUpdated(it->second.layoutToken);
+                it->second.layoutToken = {};
+                CWSubmenuApply(key, presenter, it->second, reasonCopy.c_str());
+            } catch (winrt::hresult_error const& ex) {
+                Wh_Log(L"[ctxmenu-submenu] apply error %08X: %s", ex.code(),
+                       ex.message().c_str());
+            }
+        });
+
+    // Make sure there is a layout pass even if nothing else changes.
+    presenter.InvalidateArrange();
+}
+
+void CWSubmenuRegisterBackdropCallback(
+    void* key,
+    Controls::MenuFlyoutPresenter const& presenter,
+    CWSubmenuEntry& entry) {
+    if (entry.backdropCallbackRegistered) {
+        return;
+    }
+
+    // Stays registered for the presenter's lifetime (until restore): the
+    // same presenter is reused for later opens, and the system may hand it
+    // a new backdrop each time.
+    entry.backdropCallbackToken = presenter.RegisterPropertyChangedCallback(
+        Controls::MenuFlyoutPresenter::SystemBackdropProperty(),
+        [key](DependencyObject const&, DependencyProperty const&) {
+            if (g_zenContextMenuWriting) {
+                return;  // Our own write.
+            }
+
+            auto it = g_zenSubmenus.find(key);
+            if (it == g_zenSubmenus.end()) {
+                return;
+            }
+
+            auto presenter = it->second.presenter.get();
+            if (!presenter) {
+                return;
+            }
+
+            try {
+                if (!presenter.SystemBackdrop() ||
+                    CWSubmenuIsOurs(presenter, it->second)) {
+                    return;
+                }
+
+                // Read now, while the control has just seen the new backdrop.
+                bool hasXamlRoot = presenter.XamlRoot() != nullptr;
+                Wh_Log(L"[ctxmenu-submenu] system backdrop appeared "
+                       L"(xamlRoot=%d)",
+                       hasXamlRoot ? 1 : 0);
+                if (hasXamlRoot) {
+                    CWSubmenuScheduleApply(key, presenter, it->second,
+                                           L"backdrop appeared");
+                } else {
+                    CWSubmenuWaitLoaded(key, presenter, it->second);
+                }
+            } catch (winrt::hresult_error const& ex) {
+                Wh_Log(L"[ctxmenu-submenu] callback error %08X: %s",
+                       ex.code(), ex.message().c_str());
+            }
+        });
+    entry.backdropCallbackRegistered = true;
+}
+
+void CWSubmenuOnElementAdded(Controls::MenuFlyoutPresenter const& presenter) {
+    if (!g_zenContextMenuParams.enabled || !g_zenContextMenuParams.submenu) {
+        return;
+    }
+
+    try {
+        void* key = winrt::get_abi(presenter);
+        if (auto it = g_zenSubmenus.find(key); it != g_zenSubmenus.end()) {
+            if (it->second.presenter.get() == presenter) {
+                // The same submenu opened again.
+                if (presenter.IsLoaded()) {
+                    CWSubmenuApply(key, presenter, it->second, L"reopened");
+                } else {
+                    CWSubmenuWaitLoaded(key, presenter, it->second);
+                }
+                return;
+            }
+            g_zenSubmenus.erase(it);
+        }
+
+        // Drop entries of submenus which are gone.
+        if (g_zenSubmenus.size() >= 32) {
+            for (auto it = g_zenSubmenus.begin(); it != g_zenSubmenus.end();) {
+                it = it->second.presenter.get() ? std::next(it)
+                                                : g_zenSubmenus.erase(it);
+            }
+        }
+
+        auto& entry = g_zenSubmenus[key];
+        entry.presenter = presenter;
+
+        CWSubmenuRegisterBackdropCallback(key, presenter, entry);
+
+        if (presenter.IsLoaded()) {
+            Wh_Log(L"[ctxmenu-submenu] submenu found (loaded)");
+            CWSubmenuApply(key, presenter, entry, L"found");
+            return;
+        }
+
+        Wh_Log(L"[ctxmenu-submenu] submenu found, waiting for it to load");
+        CWSubmenuWaitLoaded(key, presenter, entry);
+    } catch (winrt::hresult_error const& ex) {
+        Wh_Log(L"[ctxmenu-submenu] error %08X: %s", ex.code(),
+               ex.message().c_str());
+    }
+}
+
+// Gives every submenu presenter its own backdrop back, so that no presenter
+// keeps an object of this mod after the mod was unloaded or the setting
+// changed. Presenters which are gone are skipped: nothing is ever touched
+// after it was destroyed.
+void CWSubmenuRestoreAll() {
+    // Detached first: restoring runs XAML work which may re-enter.
+    auto presenters = std::move(g_zenSubmenus);
+    g_zenSubmenus.clear();
+
+    size_t restored = 0;
+    for (auto& [key, entry] : presenters) {
+        auto presenter = entry.presenter.get();
+        if (!presenter) {
+            continue;
+        }
+
+        auto property = Controls::MenuFlyoutPresenter::SystemBackdropProperty();
+
+        try {
+            if (entry.backdropCallbackRegistered) {
+                presenter.UnregisterPropertyChangedCallback(
+                    property, entry.backdropCallbackToken);
+                entry.backdropCallbackRegistered = false;
+            }
+
+            if (entry.loadedToken) {
+                presenter.Loaded(entry.loadedToken);
+            }
+
+            if (entry.layoutToken) {
+                presenter.LayoutUpdated(entry.layoutToken);
+            }
+
+            if (!entry.backdrop) {
+                continue;
+            }
+
+            // Only if it's still ours: something else may have replaced it.
+            if (presenter.ReadLocalValue(property) != entry.backdrop) {
+                continue;
+            }
+
+            bool prevWriting = g_zenContextMenuWriting;
+            g_zenContextMenuWriting = true;
+            if (!entry.originalValue ||
+                entry.originalValue == DependencyProperty::UnsetValue()) {
+                presenter.ClearValue(property);
+            } else {
+                presenter.SetValue(property, entry.originalValue);
+            }
+            g_zenContextMenuWriting = prevWriting;
+            restored++;
+        } catch (winrt::hresult_error const& ex) {
+            g_zenContextMenuWriting = false;
+            Wh_Log(L"[ctxmenu-submenu] restore error %08X: %s", ex.code(),
+                   ex.message().c_str());
+        }
+    }
+
+    if (restored) {
+        Wh_Log(L"[ctxmenu-submenu] restored %zu submenu(s)", restored);
     }
 }
 
@@ -10915,6 +11306,10 @@ void UninitializeForCurrentThread() {
     // menu keeps an object of this mod after it's unloaded.
     CWContextMenuRestoreAll();
 
+    // CW: give every submenu presenter its own backdrop back too (the
+    // experimental submenu glass); presenters which are gone are skipped.
+    CWSubmenuRestoreAll();
+
     UninitializeResourceVariables();
 
     g_initializedForThread = false;
@@ -12362,6 +12757,8 @@ void ApplyCWContextMenuStyles() {
 
     auto& params = g_zenContextMenuParams;
     params.enabled = true;
+    // CW: the experimental submenu glass reuses these parameters as is.
+    params.submenu = Wh_GetIntSetting(L"contextMenuSubmenu") != 0;
     params.tint = {0xFF, static_cast<uint8_t>(r), static_cast<uint8_t>(g),
                    static_cast<uint8_t>(b)};
     params.tintOpacity = a / 255.0f;

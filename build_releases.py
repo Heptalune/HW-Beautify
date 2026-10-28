@@ -13,15 +13,20 @@ common_files = [
     'local@cw-desktop-toggle-icons.wh.cpp',
     'local@cw-explorer-styler.wh.cpp',
     'local@cw-taskbar-volume-control.wh.cpp',
-    'local@cw-taskbar-dock-animation.wh.cpp',
+    'local@cw-taskbar-animation.wh.cpp',
     'local@cw-window-arrangement.wh.cpp',
     'local@cw-tray-system-icons.wh.cpp',
     'local@cw-classic-context-menu.wh.cpp',
-    'local@cw-taskbar-autohide-instant.wh.cpp',
     'local@cw-extension-no-warning.wh.cpp',
     'local@cw-file-operation-styler.wh.cpp',
-    'local@cw-audioswap.wh.cpp',
-    'local@cw-volume-per-app.wh.cpp',
+    'local@cw-better-volume-mixer.wh.cpp',
+    'local@cw-alt-drag.wh.cpp',
+    'local@cw-aero-peek.wh.cpp',
+    'local@cw-thumbnail-size.wh.cpp',
+    'local@cw-taskbar-wheel-cycle.wh.cpp',
+    'local@cw-taskbar-elastic-pill.wh.cpp',
+    'local@cw-explorer-info-bar.wh.cpp',
+    'local@cw-custom-context-menu.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
     # 部署 / 卸载脚本
@@ -31,9 +36,8 @@ common_files = [
     'uninstall.ps1',
     'LICENSE',
     'Readme.txt',
-    'CHANGELOG_CW-Beautify_v2.0.0.md',
+    'CHANGELOG_CW-Beautify_v2.1.0.md',
     'README.md',
-    'docs/screenshots',  # README.md preview images
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
     'tools/CW-Beautify-StartupCheck.ps1',  # optional, installed only with -StartupCheck
@@ -45,12 +49,12 @@ common_files = [
 ]
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.0.0.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.0.0_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.1.0.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.1.0_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：
-#   'CW-Beautify_OneKeyDeploy_v2.0.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
+#   'CW-Beautify_OneKeyDeploy_v2.1.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
 
 for zip_name, file_list in releases.items():
     print(f"Creating {zip_name}...")

@@ -1,5 +1,5 @@
 ﻿# ============================================================
-#  CW-Beautify Direct Injection Deploy Engine v2.0.0
+#  CW-Beautify Direct Injection Deploy Engine v2.1.0
 #  GPL-3.0
 #  职责不变：只把 Mod 源码和元数据装到 Windhawk，不编译、不开启
 # ============================================================
@@ -163,7 +163,7 @@ function Merge-ProcessList ($current, [string[]]$entries) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   CW-Beautify Direct Injection Engine v2.0.0" "Green"
+Write-Status "   CW-Beautify Direct Injection Engine v2.1.0" "Green"
 Write-Status "================================================" "Green"
 
 # 1. Enforce Administrator Privileges
@@ -308,9 +308,10 @@ if (-not (Test-Path $engineSettingsPath)) {
 $currentExclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Exclude" -ErrorAction SilentlyContinue).Exclude
 Set-ItemProperty -Path $engineSettingsPath -Name "Exclude" -Value (Merge-ProcessList $currentExclude $globalExcludeList) -Type String
 $currentInclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Include" -ErrorAction SilentlyContinue).Include
-# CW v1.0 清理：旧 CW 部署曾把 dwm.exe 加入包含列表（果冻窗口已移除），这里移除
+# 旧 CW 部署曾把 dwm.exe 加入包含列表（果冻窗口已移除），这里始终移除：
+# 整合包 v2.1 不包含任何需要注入 dwm.exe 的模组。
 $cleanInclude = ($currentInclude -split '\|' | Where-Object { $_ -and $_.Trim() -ne 'dwm.exe' }) -join '|'
-Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value (Merge-ProcessList $cleanInclude $globalIncludeList) -Type String
+Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value $cleanInclude -Type String
 # Windhawk's own default is 0 (don't inject into games); only seeded.
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
 
@@ -344,6 +345,8 @@ $retiredMods = @(
     "local@wobbly-windows", "local@macos-minimize-animation",
     "local@cw-taskbar-lyrics", "local@cw-dynamic-island", "local@cw-island-media",
     "local@cw-taskbar-icon-size",
+    "local@cw-audioswap", "local@cw-volume-per-app",
+    "local@cw-taskbar-dock-animation", "local@cw-taskbar-autohide-instant",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
 )
 foreach ($rMod in $retiredMods) {
@@ -466,10 +469,13 @@ $optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
     "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-dock-animation", "local@cw-window-arrangement", "local@cw-tray-system-icons",
-    "local@cw-classic-context-menu", "local@cw-taskbar-autohide-instant", "local@cw-extension-no-warning",
-    "local@cw-file-operation-styler", "local@cw-audioswap", "local@cw-volume-per-app",
-    "local@cw-file-hover-info", "local@cw-settings-styler"
+    "local@cw-taskbar-animation", "local@cw-window-arrangement", "local@cw-tray-system-icons",
+    "local@cw-classic-context-menu", "local@cw-extension-no-warning",
+    "local@cw-file-operation-styler",
+    "local@cw-file-hover-info", "local@cw-settings-styler",
+    "local@cw-better-volume-mixer", "local@cw-alt-drag",
+    "local@cw-aero-peek", "local@cw-thumbnail-size", "local@cw-taskbar-wheel-cycle",
+    "local@cw-taskbar-elastic-pill", "local@cw-explorer-info-bar"
 )
 $preselected = @()
 if ($Optional) {
@@ -668,10 +674,17 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "deviceSwitchCaptureKey" "None" String $label
         Set-RegValueIfMissing $settingsPath "deviceCycleSkipInactive" "1" String $label
         Set-RegValueIfMissing $settingsPath "showDeviceSwitchToast" "1" String $label
+        # 1.4.0 起并入分应用音量控制（原独立模组的键迁移为 perApp.* 前缀）
+        Set-RegValueIfMissing $settingsPath "perApp.volumeChangeStep" 10 DWord $label
+        Set-RegValueIfMissing $settingsPath "perApp.ctrlClickToMute" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "perApp.ctrlScrollVolumeChange" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "perApp.terseFormat" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "perApp.noAutomaticMuteToggle" 0 DWord $label
     }
 
-    if ($id -eq "local@cw-taskbar-dock-animation") {
-        $label = "Taskbar Dock Animation"
+    if ($id -eq "local@cw-taskbar-animation") {
+        $label = "Taskbar Animation"
+        # 图标动画（原 Dock 动画）
         Set-RegValueIfMissing $settingsPath "AnimationType" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "MaxScale" 130 DWord $label
         Set-RegValueIfMissing $settingsPath "EffectRadius" 100 DWord $label
@@ -684,6 +697,17 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "ExcludeSystemButtonsMode" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "LerpSpeed" 60 DWord $label
         Set-RegValueIfMissing $settingsPath "DisableBounce" 0 DWord $label
+        # 任务栏秒显（autoHide.* 前缀，原独立模组的键）
+        Set-RegValueIfMissing $settingsPath "autoHide.animationType" "slide" String $label
+        Set-RegValueIfMissing $settingsPath "autoHide.showSpeedup" 400 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.hideSpeedup" 400 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.showDuration" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.hideDuration" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.frameRate" 60 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.unhideDelay" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.hideDelay" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.oldTaskbarOnWin11" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.edgeDetection" 0 DWord $label
     }
 
     if ($id -eq "local@cw-startmenu-acrylic") {
@@ -731,20 +755,6 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "overrideWithCtrl" 1 DWord $label
     }
 
-    if ($id -eq "local@cw-taskbar-autohide-instant") {
-        $label = "Taskbar Autohide Instant"
-        Set-RegValueIfMissing $settingsPath "animationType" "slide" String $label
-        Set-RegValueIfMissing $settingsPath "showSpeedup" 400 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideSpeedup" 400 DWord $label
-        Set-RegValueIfMissing $settingsPath "showDuration" 200 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideDuration" 200 DWord $label
-        Set-RegValueIfMissing $settingsPath "frameRate" 60 DWord $label
-        Set-RegValueIfMissing $settingsPath "unhideDelay" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideDelay" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "oldTaskbarOnWin11" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "edgeDetection" 0 DWord $label
-    }
-
     if ($id -eq "local@cw-file-operation-styler") {
         $label = "File Operation Styler"
         Set-RegValueIfMissing $settingsPath "showCurrentFileProgressBar" 1 DWord $label
@@ -766,20 +776,6 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "dock.backgroundOpacity" 50 DWord $label
         Set-RegValueIfMissing $settingsPath "animations.enabled" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "animations.speed" 125 DWord $label
-    }
-
-    if ($id -eq "local@cw-audioswap") {
-        $label = "AudioSwap"
-        Set-RegValueIfMissing $settingsPath "advancedMode" 0 DWord $label
-    }
-
-    if ($id -eq "local@cw-volume-per-app") {
-        $label = "Volume Per App"
-        Set-RegValueIfMissing $settingsPath "volumeChangeStep" 10 DWord $label
-        Set-RegValueIfMissing $settingsPath "ctrlClickToMute" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "ctrlScrollVolumeChange" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "terseFormat" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "noAutomaticMuteToggle" 0 DWord $label
     }
 
     if ($id -eq "local@cw-file-hover-info") {
@@ -941,7 +937,7 @@ if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   [SUCCESS] CW-Beautify v2.0.0 一键部署完成！" "Green"
+Write-Status "   [SUCCESS] CW-Beautify v2.1.0 一键部署完成！" "Green"
 Write-Status "================================================" "Green"
 Write-Host ""
 Write-Host "后续说明与使用建议："

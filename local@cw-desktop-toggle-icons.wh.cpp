@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-桌面双击隐藏图标
 // @description     Double-click empty desktop space to show or hide icons, with optional auto-hide when the system is idle.
 // @description:zh-CN 双击桌面空白处显示或隐藏图标，可在系统闲置时自动隐藏。
-// @version         4.1.5
+// @version         4.2.0
 // @author          Heptalune
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -27,7 +27,7 @@
 - 系统闲置达到设定时长后自动隐藏图标，检测的是全局键盘和鼠标输入。
 - 自动隐藏后任意输入即可恢复；双击手动隐藏的图标不会被自动恢复。
 - 资源管理器重启、插拔显示器后自动重新挂接。
-- 通过隐藏桌面 `SysListView32` 实现切换；找不到该窗口时回退到系统「显示桌面图标」命令，不打乱图标排列。
+- 通过系统「显示桌面图标」命令实现切换（与右键菜单 → 查看 → 显示桌面图标 是同一个开关）：菜单勾选状态、系统持久化与实际显示永远同步，不打乱图标排列。
 
 ## 设置说明
 
@@ -38,10 +38,15 @@
 ## 兼容性与已知问题
 
 - 适用于 Windows 11，注入 `explorer.exe`。
-- 如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」（系统菜单里是这一项，勾选为显示、取消勾选为隐藏）。系统会记住该状态；本 mod 双击隐藏后也会自行记住，资源管理器重启后仍会保持隐藏。
+- 如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」（勾选为显示、取消勾选为隐藏）。状态由系统管理并持久化；本模组的双击/闲置切换与该状态完全同步，资源管理器重启后保持不变。
 - 如果想让任务栏也在闲置时淡出，可以配合任务栏类 mod 使用。
 
 ## 更新日志
+
+- **4.2.0**：隐藏/显示机制重做——改用系统「显示桌面图标」命令（`WM_COMMAND 0x7402`，与右键菜单
+「查看」里的开关同源），状态源改为系统的 `HideIcons`；右键菜单勾选状态、系统持久化与实际显示
+从此完全同步。卸载模组不再强行恢复图标显示（保留系统当前状态）。双击、闲置自动隐藏/恢复的
+触发逻辑不变。
 
 - **4.1.5**：微信赞赏链接改为指向 `main` 分支。
 - **4.1.4**：日志里的版本号改为与 mod 版本一致。
@@ -148,6 +153,8 @@ static bool SetAutoHideTimer(HWND hwndShell, UINT intervalMs)
     return false;
 }
 
+static bool IsIconsHidden();  // 前置声明（定义在下方"Icon visibility helpers"区）
+
 static void ScheduleAutoHideTimer(HWND hwndShell)
 {
     if (!hwndShell || !g_settings.enableAutoHide) {
@@ -162,8 +169,8 @@ static void ScheduleAutoHideTimer(HWND hwndShell)
         return;
     }
 
-    bool isVisible = IsWindowVisible(hwndListView) != 0;
-    if (isVisible) {
+    bool iconsVisible = !IsIconsHidden();
+    if (iconsVisible) {
         LASTINPUTINFO lii = { sizeof(LASTINPUTINFO) };
         if (!GetLastInputInfo(&lii)) {
             SetAutoHideTimer(hwndShell, TIMER_FULLSCREEN_RECHECK_MS);
@@ -229,6 +236,11 @@ static bool IsFullscreenWindowActive()
 // ─────────────────────────────────────────────────────────────────────────────
 // Icon visibility helpers
 //
+// 状态源 = 系统的「显示桌面图标」开关（HKCU\...\Advanced\HideIcons），
+// 与右键菜单 → 查看 → 显示桌面图标 是同一个开关、同一个状态。
+// 4.2.0 起所有隐藏/显示/状态判断都走这条路径（旧的 SysListView32
+// ShowWindow 方式已废弃），双击、闲置隐藏与系统菜单永远保持同步。
+//
 // ManualToggleIcons  — user double-clicked: toggle and clear auto-hide marker.
 // AutoHideIcons      — timer fired: hide only if visible, set auto-hide marker.
 // AutoRestoreIcons   — input detected: restore only auto-hidden icons.
@@ -236,42 +248,40 @@ static bool IsFullscreenWindowActive()
 // "CWAutoHiddenAt" window property (stores GetTickCount) distinguishes
 // auto-hidden from manually-hidden state.
 // ─────────────────────────────────────────────────────────────────────────────
-static bool GetPersistedHideState()
+static bool IsIconsHidden()
 {
     HKEY hKey;
     DWORD value = 0;
     DWORD size = sizeof(DWORD);
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\CW", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-        RegQueryValueExW(hKey, L"HideDesktopIcons", nullptr, nullptr, (LPBYTE)&value, &size);
+    if (RegOpenKeyExW(HKEY_CURRENT_USER,
+                      L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                      0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        RegQueryValueExW(hKey, L"HideIcons", nullptr, nullptr, (LPBYTE)&value, &size);
         RegCloseKey(hKey);
     }
     return value != 0;
 }
 
-static void SetPersistedHideState(bool hide)
+// 通过桌面视图的原生命令切换（与右键菜单「显示桌面图标」是同一条命令）。
+// 系统会自行更新 HideIcons 并持久化。
+static void ToggleIconsViaShell(HWND hwndShellView)
 {
-    HKEY hKey;
-    if (RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\CW", 0, nullptr, 0, KEY_WRITE, nullptr, &hKey, nullptr) == ERROR_SUCCESS) {
-        DWORD value = hide ? 1 : 0;
-        RegSetValueExW(hKey, L"HideDesktopIcons", 0, REG_DWORD, (const BYTE*)&value, sizeof(DWORD));
-        RegCloseKey(hKey);
-    }
+    if (hwndShellView)
+        PostMessageW(hwndShellView, WM_COMMAND, 0x7402, 0);
+}
+
+// 把图标设置为指定状态（仅在状态不符时发切换命令）
+static void SetIconsHidden(HWND hwndShellView, bool hide)
+{
+    if (IsIconsHidden() != hide)
+        ToggleIconsViaShell(hwndShellView);
 }
 
 static void ManualToggleIcons(HWND hwndShellView)
 {
-    HWND hwndListView = FindWindowExW(hwndShellView, NULL, L"SysListView32", NULL);
-    if (hwndListView) {
-        bool isVisible = IsWindowVisible(hwndListView) != 0;
-        bool newVisible = !isVisible;
-        ShowWindow(hwndListView, newVisible ? SW_SHOW : SW_HIDE);
-        SetPersistedHideState(!newVisible);
-        Wh_Log(L"[CW] ManualToggle: %s", newVisible ? L"SHOW" : L"HIDE");
-    } else {
-        // Fallback: use the native shell toggle if ListView handle is missing
-        PostMessageW(hwndShellView, WM_COMMAND, 0x7402, 0);
-        Wh_Log(L"[CW] ManualToggle: fallback WM_COMMAND 0x7402");
-    }
+    // 走系统「显示桌面图标」命令：状态与右键菜单同步、由系统持久化
+    ToggleIconsViaShell(hwndShellView);
+    Wh_Log(L"[CW] ManualToggle: posted shell toggle 0x7402");
     // Clear auto-hide marker — this was a deliberate user action
     RemovePropW(hwndShellView, L"CWAutoHiddenAt");
     RemovePropW(hwndShellView, L"CWMouseX");
@@ -281,14 +291,13 @@ static void ManualToggleIcons(HWND hwndShellView)
 
 static void AutoHideIcons(HWND hwndShellView)
 {
-    HWND hwndListView = FindWindowExW(hwndShellView, NULL, L"SysListView32", NULL);
-    if (hwndListView && IsWindowVisible(hwndListView)) {
-        ShowWindow(hwndListView, SW_HIDE);
+    if (!IsIconsHidden()) {
+        SetIconsHidden(hwndShellView, true);
         DWORD now = GetTickCount();
         // Avoid storing 0 (which means "not set"); extremely unlikely but be safe
         if (now == 0) now = 1;
         SetPropW(hwndShellView, L"CWAutoHiddenAt", UlongToHandle(now));
-        
+
         // Store current physical mouse coordinates for zero-latency coordinate guard
         POINT pt = {};
         GetCursorPos(&pt);
@@ -302,9 +311,8 @@ static void AutoHideIcons(HWND hwndShellView)
 
 static void AutoRestoreIcons(HWND hwndShellView)
 {
-    HWND hwndListView = FindWindowExW(hwndShellView, NULL, L"SysListView32", NULL);
-    if (hwndListView && !IsWindowVisible(hwndListView)) {
-        ShowWindow(hwndListView, SW_SHOW);
+    if (IsIconsHidden()) {
+        SetIconsHidden(hwndShellView, false);
         Wh_Log(L"[CW] AutoRestore: icons restored");
     }
     RemovePropW(hwndShellView, L"CWAutoHiddenAt");
@@ -332,10 +340,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM)
             if (hwndListView) {
                 Wh_Log(L"[CW] Subclassing ListView=%p", hwndListView);
                 WindhawkUtils::SetWindowSubclassFromAnyThread(hwndListView, DesktopListViewSubclassProc, 0);
-                if (GetPersistedHideState()) {
-                    ShowWindow(hwndListView, SW_HIDE);
-                    Wh_Log(L"[CW] Initialized desktop icons to HIDE based on persisted registry state.");
-                }
+                // 图标可见性由系统 HideIcons 状态决定（explorer 启动时自行应用），
+                // 本模组不再额外干预。
             }
         }
     }
@@ -353,17 +359,13 @@ static void UnsubclassWindows()
         RemovePropW(hwndShell, L"CWAutoHiddenAt");
         RemovePropW(hwndShell, L"CWMouseX");
         RemovePropW(hwndShell, L"CWMouseY");
-        
+
+        // 注意：不再恢复 SysListView32 可见性——图标状态是系统 HideIcons
+        // 状态，卸载模组不应改变用户当前选择的桌面外观；需要显示时
+        // 右键 → 查看 → 显示桌面图标（状态与系统菜单同步）。
+
         HWND lv = FindWindowExW(hwndShell, NULL, L"SysListView32", NULL);
         if (lv) {
-            DWORD pid = 0;
-            // Verify window validity and process ownership before restoring visibility
-            if (IsWindow(lv) && GetWindowThreadProcessId(lv, &pid) && pid == GetCurrentProcessId()) {
-                if (!IsWindowVisible(lv)) {
-                    ShowWindow(lv, SW_SHOW);
-                    Wh_Log(L"[CW] Cleanup: restored SysListView32 visibility");
-                }
-            }
             WindhawkUtils::RemoveWindowSubclassFromAnyThread(lv, DesktopListViewSubclassProc);
         }
         WindhawkUtils::RemoveWindowSubclassFromAnyThread(hwndShell, DesktopShellViewSubclassProc);
@@ -403,10 +405,7 @@ HWND WINAPI Hook_CreateWindowExW(
             {
                 Wh_Log(L"[CW] Hook: new desktop ListView=%p created", hWnd);
                 WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DesktopListViewSubclassProc, 0);
-                if (GetPersistedHideState()) {
-                    ShowWindow(hWnd, SW_HIDE);
-                    Wh_Log(L"[CW] Hook initialized desktop icons to HIDE based on persisted registry state.");
-                }
+                // 图标可见性由系统 HideIcons 状态决定，本模组不再额外干预。
             }
         }
     }
@@ -421,6 +420,15 @@ HWND WINAPI Hook_CreateWindowExW(
 LRESULT CALLBACK DesktopListViewSubclassProc(
     HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR)
 {
+    // 兜底：若系统切换后 SysListView32 仍保持可见（只是不画图标），
+    // 桌面鼠标移动会落在这里——自动隐藏状态下移动鼠标即恢复。
+    if (uMsg == WM_MOUSEMOVE) {
+        HWND hwndParent = GetParent(hWnd);
+        if (hwndParent && GetPropW(hwndParent, L"CWAutoHiddenAt") != NULL) {
+            PostMessageW(hwndParent, g_msgAutoRestore, 0, 0);
+        }
+    }
+
     if (uMsg == WM_LBUTTONDBLCLK || uMsg == WM_LBUTTONDOWN) {
         bool hasDblClkStyle = (GetClassLongPtrW(hWnd, GCL_STYLE) & CS_DBLCLKS) != 0;
         bool isDblClick = false;
@@ -521,7 +529,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
             return 0;
         }
 
-        bool isVis = IsWindowVisible(hwndListView) != 0;
+        bool iconsVisible = !IsIconsHidden();
 
         LASTINPUTINFO lii = { sizeof(LASTINPUTINFO) };
         if (!GetLastInputInfo(&lii)) {
@@ -532,7 +540,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
 
         DWORD autoHiddenAt = HandleToUlong(GetPropW(hWnd, L"CWAutoHiddenAt"));
 
-        if (isVis) {
+        if (iconsVisible) {
             // Check full screen guard
             if (IsFullscreenWindowActive()) {
                 SetAutoHideTimer(hWnd, TIMER_FULLSCREEN_RECHECK_MS);
@@ -626,7 +634,7 @@ LRESULT CALLBACK DesktopShellViewSubclassProc(
 // ─────────────────────────────────────────────────────────────────────────────
 BOOL Wh_ModInit()
 {
-    Wh_Log(L"[CW] === Wh_ModInit v4.1.5 ===");
+    Wh_Log(L"[CW] === Wh_ModInit v4.2.0 ===");
     g_msgRefreshTimer = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.RefreshTimer");
     g_msgManualToggle = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.ManualToggle");
     g_msgAutoHide = RegisterWindowMessageW(L"Windhawk.CWDesktop.DesktopIconToggle.AutoHide");

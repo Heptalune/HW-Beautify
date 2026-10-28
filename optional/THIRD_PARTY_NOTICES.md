@@ -13,18 +13,23 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-通知栏美化（cw-notificationcenter-acrylic） | m417z, Windows 11 Notification Center Styler；Heptalune 深度修改 | GPL-3.0 | https://windhawk.net/mods/windows-11-notification-center-styler |
 | CW-文件管理器美化（cw-explorer-styler） | m417z, Windows 11 File Explorer Styler；Heptalune 深度修改 | GPL-3.0 | https://windhawk.net/mods/windows-11-file-explorer-styler |
 | CW-桌面双击隐藏图标（cw-desktop-toggle-icons） | Heptalune 原创 | GPL-3.0 | 本仓库 |
-| CW-任务栏音量控制（cw-taskbar-volume-control） | m417z, Taskbar Volume Control；汉化整合；媒体设备快捷切换功能参考 AudioSwitcher（xenolightning，MS-PL）重新实现，未复制其代码 | GPL-3.0 / MS-PL | https://windhawk.net/mods/taskbar-volume-control |
-| CW-任务栏 Dock 动画（cw-taskbar-dock-animation） | incconutwo, Taskbar Dock Animation Plus（基于 Ph0en1x-dev 原版）；CW 新增弹跳抬升与防裁剪 | GPL-3.0 | https://windhawk.net/mods/taskbar-dock-animation |
+| CW-任务栏音量控制（cw-taskbar-volume-control） | m417z, Taskbar Volume Control + Taskbar Volume Control Per-App（1.4.0 起并入）；汉化整合；媒体设备快捷切换功能参考 AudioSwitcher（xenolightning，MS-PL）重新实现，未复制其代码 | GPL-3.0 / MS-PL | https://windhawk.net/mods/taskbar-volume-control |
+| CW-任务栏动画（cw-taskbar-animation） | incconutwo, Taskbar Dock Animation Plus（基于 Ph0en1x-dev 原版）+ Bo0ii, Taskbar Auto-Hide Instant Show（2.1.0 合并为一个模组）；CW 新增弹跳抬升与防裁剪 | GPL-3.0 | https://windhawk.net/mods/taskbar-dock-animation |
 | CW-窗口滑动排列（cw-window-arrangement） | m417z, Slick Window Arrangement；汉化 | GPL-3.0 | https://windhawk.net/mods/slick-window-arrangement |
 | CW-托盘系统图标调整（cw-tray-system-icons） | m417z, Taskbar tray system icon tweaks；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-tray-system-icon-tweaks |
-| CW-经典右键菜单（cw-classic-context-menu） | m417z, Classic context menu on Windows 11；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-context-menu-classic |
-| CW-任务栏秒显（cw-taskbar-autohide-instant） | Bo0ii, Taskbar Auto-Hide Instant Show；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-autohide-instant-show |
+| CW-经典右键菜单（cw-classic-context-menu） | m417z, Classic context menu on Windows 11；汉化；1.1.0 起新增菜单风格切换设置 | GPL-3.0 | https://windhawk.net/mods/explorer-context-menu-classic |
 | CW-关闭扩展名修改警告（cw-extension-no-warning） | m417z, Turn off change file extension warning；汉化 | GPL-3.0 | https://windhawk.net/mods/extension-change-no-warning |
 | CW-文件操作美化（cw-file-operation-styler） | digART, File Operation Styler；汉化 | GPL-3.0 | https://windhawk.net/mods/file-operation-styler |
-| CW-音频输出切换（cw-audioswap） | BlackPaw, AudioSwap；汉化 | MIT | https://windhawk.net/mods/audioswap |
-| CW-分应用音量控制（cw-volume-per-app） | m417z, Taskbar Volume Control Per-App；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-volume-control-per-app |
 | CW-文件悬停信息（cw-file-hover-info） | HaVeN80, File Hover Info；汉化 | 未标注（版权归原作者） | https://windhawk.net/mods/file-hover-info |
 | CW-设置美化（cw-settings-styler） | m417z, Windows 11 Settings Styler；汉化 | GPL-3.0 | https://windhawk.net/mods/windows-11-settings-styler |
+| CW-音量混合器（cw-better-volume-mixer） | 0Allu, Better Volume Mixer；汉化 | MIT | https://windhawk.net/mods/better-volume-mixer |
+| CW-窗口拖动（cw-alt-drag） | m417z, AltDrag；汉化 | GPL-3.0 | https://windhawk.net/mods/alt-drag |
+| CW-显示桌面按钮预览（cw-aero-peek） | m417z, Aero Peek on "Show desktop" button hover；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek |
+| CW-任务栏缩略图大小（cw-thumbnail-size） | m417z, Taskbar Thumbnail Size；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-thumbnail-size |
+| CW-滚轮切换任务栏（cw-taskbar-wheel-cycle） | m417z, Cycle taskbar buttons with mouse wheel；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-wheel-cycle |
+| CW-任务栏弹性药丸（cw-taskbar-elastic-pill） | Lockframe, Taskbar Elastic WinUI Pill；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-elastic-pill |
+| CW-资源管理器信息栏（cw-explorer-info-bar） | digART, Explorer Info Bar+；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-info-bar |
+| CW-自定义右键菜单（cw-custom-context-menu） | BOLT, Custom Cached Context Menu；汉化 | MIT | https://windhawk.net/mods/custom-cached-context-menu |
 
 ## 可选模组（仅在部署时选择安装才启用）
 
