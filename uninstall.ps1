@@ -47,6 +47,7 @@ foreach ($id in @(
     "local@cw-classic-context-menu",
     "local@cw-taskbar-autohide-instant",
     "local@cw-taskbar-animation",
+    "local@cw-invisible-borders",
     "local@cw-explorer-info-bar",
     "local@cw-better-volume-mixer",
     "local@cw-file-operation-styler",

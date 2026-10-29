@@ -28,6 +28,17 @@
      `tasklist /M windhawk-core.dll`（有输出=有模组在运行）。
    - deploy 收尾会做注入检测并提示用户到 UI 核对开关；效果残留（样式不还原）用
      `restart_explorer.bat` 重启 explorer/StartMenuExperienceHost/SearchHost 解决。
+   - 2.0 引擎对每个模组同时编译 x86 与 x64 两份 DLL：模组代码必须 x86 兼容——
+     禁止把无捕获 lambda 直接传给 WINAPI/stdcall 回调类型（WNDENUMPROC/HOOKPROC/
+     RunFromWindowThreadProc_t 等），必须改用显式 `static ... CALLBACK/WINAPI` 函数，
+     否则 x86 目标报 "no known conversion ... __attribute__((stdcall))"
+     （cw-taskbar-volume-control 1.4.1 实测失效案例，1.4.2 修复）。
+   - windhawk-cli 必须加 `--app-root <便携根目录>` 才能看到便携版模组：`mod list`
+     可用；`mod compile` 报 "Mod not installed"（便携不支持）；`mod install --file
+     <源文件>` 走完整引擎编译（x86+x64）并注册，成功后保留用户设置与开关状态。
+     模组的链接库来自元数据 `@compilerOptions`（`source meta` 可提取）。
+   - 无注入本地编译验证：`dev\compile-verify.ps1`（clang++ 直调，x64+x86 双架构，
+     自动带 @compilerOptions 与 windhawk.lib，不触碰引擎，可随时安全运行）。
 
 2. **全中文本地化规范**：
    - 所有引入或更新的 Mod 必须包含完整的中文本地化元数据：
@@ -57,7 +68,7 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 当前模组清单（v2.1.0，25 个 = 21 核心 + 4 可选）
+## 当前模组清单（v2.2.0，20 个 = 17 核心 + 3 可选）
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
@@ -66,25 +77,20 @@
 | CW-通知栏美化 | cw-notificationcenter-acrylic | 4.2.6 | m417z Notification Center Styler 深度修改 |
 | CW-文件管理器美化 | cw-explorer-styler | 1.7.0 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
 | CW-桌面双击隐藏图标 | cw-desktop-toggle-icons | 4.2.0 | Heptalune 原创；4.2.0 起改用系统「显示桌面图标」命令实现（状态与系统菜单同步） |
-| CW-任务栏音量控制 | cw-taskbar-volume-control | 1.4.1 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制（原 cw-volume-per-app 已退役） |
-| CW-任务栏动画 | cw-taskbar-animation | 2.1.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显合并；设置键 autoHide.* 隔离 |
+| CW-任务栏音量控制 | cw-taskbar-volume-control | 1.4.2 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制；1.4.2 修复 x86 编译兼容 |
+| CW-任务栏动画 | cw-taskbar-animation | 2.2.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；设置键 autoHide.*/pill.* 隔离 |
 | CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |
-| CW-托盘系统图标调整 | cw-tray-system-icons | 1.3.2 | m417z Taskbar tray system icon tweaks 汉化 |
 | CW-经典右键菜单 | cw-classic-context-menu | 1.1.0 | m417z Classic context menu on Windows 11 汉化；1.1.0 起新增菜单风格切换设置 |
 | CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
 | CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
 | CW-设置美化 | cw-settings-styler | 1.2.2 | m417z Windows 11 Settings Styler 汉化 |
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
 | CW-显示桌面按钮预览 | cw-aero-peek | 1.0.3 | m417z Aero Peek on "Show desktop" button hover 汉化 |
-| CW-任务栏弹性药丸 | cw-taskbar-elastic-pill | 2.0.2 | Lockframe Taskbar Elastic WinUI Pill 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
-| CW-任务栏歌词 | cw-taskbar-lyrics | 0.4.9 | 上游 ZenDesktop 任务栏歌词适配（原 Lanbo） |
-| CW-半透明窗口 | cw-translucent-windows | 1.8.3 | Undisputed00x Translucent Windows 汉化 |
-| CW-任务栏时钟自定义 | cw-taskbar-clock-customization | 1.8.2 | m417z Taskbar Clock Customization 汉化 |
 | CW-最大化自动隐藏任务栏 | cw-taskbar-autohide-when-maximized | 1.2.7 | m417z Taskbar auto-hide when maximized 汉化 |
-| CW-果冻窗口（可选） | cw-wobbly-windows | 0.116 | lalimatyus Wobbly Windows 汉化（回归，需 dwm.exe 包含列表） |
+| CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii Invisible Window Borders (MIT) 汉化 |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
 | CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
 | CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle/cw-thumbnail-size（用户要求移除）。两者都进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle/cw-thumbnail-size（用户要求移除）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。

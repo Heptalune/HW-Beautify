@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.4.1
+// @version         1.4.2
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -3407,39 +3407,62 @@ std::optional<AppVolumeResult> ToggleAppMute(DWORD targetPID) {
     return result;
 }
 
+BOOL CALLBACK FindCurrentProcessTaskbarWndEnumProc(HWND hWnd,
+                                                   LPARAM lParam) {
+    DWORD dwProcessId;
+    WCHAR className[32];
+    if (GetWindowThreadProcessId(hWnd, &dwProcessId) &&
+        dwProcessId == GetCurrentProcessId() &&
+        GetClassName(hWnd, className, ARRAYSIZE(className)) &&
+        _wcsicmp(className, L"Shell_TrayWnd") == 0) {
+        *reinterpret_cast<HWND*>(lParam) = hWnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
 HWND FindCurrentProcessTaskbarWnd() {
     HWND hTaskbarWnd = nullptr;
 
-    EnumWindows(
-        [](HWND hWnd, LPARAM lParam) -> BOOL {
-            DWORD dwProcessId;
-            WCHAR className[32];
-            if (GetWindowThreadProcessId(hWnd, &dwProcessId) &&
-                dwProcessId == GetCurrentProcessId() &&
-                GetClassName(hWnd, className, ARRAYSIZE(className)) &&
-                _wcsicmp(className, L"Shell_TrayWnd") == 0) {
-                *reinterpret_cast<HWND*>(lParam) = hWnd;
-                return FALSE;
-            }
-            return TRUE;
-        },
-        reinterpret_cast<LPARAM>(&hTaskbarWnd));
+    EnumWindows(FindCurrentProcessTaskbarWndEnumProc,
+                reinterpret_cast<LPARAM>(&hTaskbarWnd));
 
     return hTaskbarWnd;
 }
 
 using RunFromWindowThreadProc_t = void(WINAPI*)(void* parameter);
 
+struct RUN_FROM_WINDOW_THREAD_PARAM {
+    RunFromWindowThreadProc_t proc;
+    void* procParam;
+};
+
+UINT GetRunFromWindowThreadRegisteredMsg() {
+    static const UINT runFromWindowThreadRegisteredMsg =
+        RegisterWindowMessage(L"Windhawk_RunFromWindowThread_" WH_MOD_ID);
+    return runFromWindowThreadRegisteredMsg;
+}
+
+LRESULT CALLBACK RunFromWindowThreadCallWndProc(int nCode,
+                                                WPARAM wParam,
+                                                LPARAM lParam) {
+    if (nCode == HC_ACTION) {
+        const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+        if (cwp->message == GetRunFromWindowThreadRegisteredMsg()) {
+            RUN_FROM_WINDOW_THREAD_PARAM* param =
+                (RUN_FROM_WINDOW_THREAD_PARAM*)cwp->lParam;
+            param->proc(param->procParam);
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
 bool RunFromWindowThread(HWND hWnd,
                          RunFromWindowThreadProc_t proc,
                          void* procParam) {
-    static const UINT runFromWindowThreadRegisteredMsg =
-        RegisterWindowMessage(L"Windhawk_RunFromWindowThread_" WH_MOD_ID);
-
-    struct RUN_FROM_WINDOW_THREAD_PARAM {
-        RunFromWindowThreadProc_t proc;
-        void* procParam;
-    };
+    const UINT runFromWindowThreadRegisteredMsg =
+        GetRunFromWindowThreadRegisteredMsg();
 
     DWORD dwThreadId = GetWindowThreadProcessId(hWnd, nullptr);
     if (dwThreadId == 0) {
@@ -3451,21 +3474,9 @@ bool RunFromWindowThread(HWND hWnd,
         return true;
     }
 
-    HHOOK hook = SetWindowsHookEx(
-        WH_CALLWNDPROC,
-        [](int nCode, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            if (nCode == HC_ACTION) {
-                const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
-                if (cwp->message == runFromWindowThreadRegisteredMsg) {
-                    RUN_FROM_WINDOW_THREAD_PARAM* param =
-                        (RUN_FROM_WINDOW_THREAD_PARAM*)cwp->lParam;
-                    param->proc(param->procParam);
-                }
-            }
-
-            return CallNextHookEx(nullptr, nCode, wParam, lParam);
-        },
-        nullptr, dwThreadId);
+    HHOOK hook = SetWindowsHookEx(WH_CALLWNDPROC,
+                                  RunFromWindowThreadCallWndProc, nullptr,
+                                  dwThreadId);
     if (!hook) {
         return false;
     }
@@ -4310,18 +4321,17 @@ void AfterInit() {
     }
 }
 
+void WINAPI UninitFromTaskbarThread(void* parameter) {
+    HideVolumeTooltip();
+    SndVolUninit();
+}
+
 void Uninit() {
     Wh_Log(L">");
 
     HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd();
     if (hTaskbarWnd) {
-        RunFromWindowThread(
-            hTaskbarWnd,
-            [](void*) {
-                HideVolumeTooltip();
-                SndVolUninit();
-            },
-            nullptr);
+        RunFromWindowThread(hTaskbarWnd, UninitFromTaskbarThread, nullptr);
     }
 }
 

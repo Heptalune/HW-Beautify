@@ -4,7 +4,7 @@
 #  职责不变：只把 Mod 源码和元数据装到 Windhawk，不编译、不开启
 # ============================================================
 # v4.2-draft: optional mods can be preselected for unattended runs, e.g.
-#   deploy.ps1 -Optional "wobbly-windows,windows-animations"
+#   deploy.ps1 -Optional "windows-animations"
 #   deploy.ps1 -Optional none
 # Optional startup self-check (scheduled task at logon, off by default):
 #   deploy.ps1 -StartupCheck check    # restart explorer once only if taskbar missing/hung/crashed
@@ -308,14 +308,9 @@ if (-not (Test-Path $engineSettingsPath)) {
 $currentExclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Exclude" -ErrorAction SilentlyContinue).Exclude
 Set-ItemProperty -Path $engineSettingsPath -Name "Exclude" -Value (Merge-ProcessList $currentExclude $globalExcludeList) -Type String
 $currentInclude = (Get-ItemProperty -Path $engineSettingsPath -Name "Include" -ErrorAction SilentlyContinue).Include
-# 果冻窗口（cw-wobbly-windows，可选模组）需要注入 dwm.exe：仅当部署时显式
-# 预选（-Optional 含 wobbly-windows）才加入包含列表，其余情况一律移除。
-$dwmWanted = $Optional -and ($Optional -match 'wobbly')
+# 果冻窗口（cw-wobbly-windows）已从整合包移除：历史部署写入的 dwm.exe 包含项
+# 一律清理，避免引擎继续向 dwm.exe 注入。
 $cleanInclude = ($currentInclude -split '\|' | Where-Object { $_ -and $_.Trim() -ne 'dwm.exe' }) -join '|'
-if ($dwmWanted) {
-    Write-Status "果冻窗口已预选：将 dwm.exe 加入进程包含列表（Wobbly Windows 需要）。" "Yellow"
-    $cleanInclude = Merge-ProcessList $cleanInclude @("dwm.exe")
-}
 Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value $cleanInclude -Type String
 # Windhawk's own default is 0 (don't inject into games); only seeded.
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
@@ -355,6 +350,13 @@ $retiredMods = @(
     "local@cw-explorer-info-bar", "local@cw-better-volume-mixer",
     "local@cw-file-operation-styler", "local@cw-taskbar-wheel-cycle",
     "local@cw-thumbnail-size",
+    # v2.2.0 移除：托盘系统图标调整、任务栏时钟自定义、任务栏歌词、
+    # 半透明窗口、果冻窗口；弹性药丸并入任务栏动画。
+    "local@cw-tray-system-icons", "local@cw-taskbar-clock-customization",
+    "local@cw-taskbar-lyrics", "local@cw-translucent-windows",
+    "local@cw-wobbly-windows", "local@cw-taskbar-elastic-pill",
+    # v2.1.0 后补移除：桌面时钟、文件大小
+    "local@cw-desktop-clock", "local@cw-explorer-details-file-sizes",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
 )
 foreach ($rMod in $retiredMods) {
@@ -477,14 +479,14 @@ $optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
     "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-animation", "local@cw-window-arrangement", "local@cw-tray-system-icons",
+    "local@cw-taskbar-animation", "local@cw-window-arrangement",
     "local@cw-classic-context-menu", "local@cw-extension-no-warning",
     "local@cw-file-hover-info", "local@cw-settings-styler",
     "local@cw-alt-drag",
     "local@cw-aero-peek",
-    "local@cw-taskbar-elastic-pill",
-    "local@cw-taskbar-lyrics", "local@cw-explorer-details-file-sizes",
-    "local@cw-translucent-windows", "local@cw-taskbar-autohide-when-maximized"
+    "local@cw-taskbar-autohide-when-maximized",
+    "local@cw-custom-context-menu",
+    "local@cw-invisible-borders"
 )
 $preselected = @()
 if ($Optional) {
@@ -717,6 +719,28 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "autoHide.hideDelay" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.oldTaskbarOnWin11" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.edgeDetection" 0 DWord $label
+        # 任务栏弹性药丸（pill.* 前缀，2.2.0 起并入，原独立模组的键）
+        Set-RegValueIfMissing $settingsPath "pill.Dimensions" "16, 3" String $label
+        Set-RegValueIfMissing $settingsPath "pill.Margins" "0, 5" String $label
+        Set-RegValueIfMissing $settingsPath "pill.PillRadius" "2" String $label
+        Set-RegValueIfMissing $settingsPath "pill.HideInactiveDots" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "pill.TrackSystemButtons" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "pill.AnimationStyle" "stretch" String $label
+        Set-RegValueIfMissing $settingsPath "pill.UseSpringPhysics" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "pill.ElasticIntensity" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.SpeedMultiplier" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.FadeTransition" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "pill.SquishTransition" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "pill.SquishMultiplier" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.FadeDurationMultiplier" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.HoverScale" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.PressedScale" "1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.HoverBgColor" "" String $label
+        Set-RegValueIfMissing $settingsPath "pill.PressedBgColor" "" String $label
+        Set-RegValueIfMissing $settingsPath "pill.BgOpacity" "1.0, 1.0" String $label
+        Set-RegValueIfMissing $settingsPath "pill.ColorMode" "accent" String $label
+        Set-RegValueIfMissing $settingsPath "pill.CustomColor" "" String $label
+        Set-RegValueIfMissing $settingsPath "pill.BgGradientDirection" "horizontal" String $label
     }
 
     if ($id -eq "local@cw-startmenu-acrylic") {
@@ -741,22 +765,6 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "SlidingAnimation" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "SnapWindowsWhenSliding" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "SlidingAnimationSlowdown" 15 DWord $label
-    }
-
-    if ($id -eq "local@cw-tray-system-icons") {
-        $label = "Tray System Icons"
-        Set-RegValueIfMissing $settingsPath "hideVolumeIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideNetworkIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideBatteryIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "grayscaleBatteryIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideMicrophoneIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideGeolocationIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideStudioEffectsIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideRecallIcon" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideLanguageBar" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideLanguageSupplementaryIcons" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "hideBellIcon" "never" String $label
-        Set-RegValueIfMissing $settingsPath "showDesktopButtonWidth" 12 DWord $label
     }
 
     if ($id -eq "local@cw-classic-context-menu") {

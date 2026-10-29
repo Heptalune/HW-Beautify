@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 25 个 mod（21 核心 + 4 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 20 个 mod（17 核心 + 3 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,7 +11,7 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-21 个核心 mod 加 4 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
+17 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
 
 ### CW-任务栏美化
 
@@ -64,13 +64,15 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ### CW-任务栏动画
 
-任务栏动画合集（2.1.0 起由「Dock 动画」与「任务栏秒显」合并而成）：
+任务栏动画合集（2.1.0 起由「Dock 动画」与「任务栏秒显」合并而成，2.2.0 起再并入弹性药丸）：
 
 * **图标动画**：macOS 风格的任务栏图标悬停放大（三种动画曲线、相邻图标让位、
   空闲「呼吸」可调、弹跳抬升幅度与防裁剪保护、顶部任务栏镜像等）。
 * **秒显动画**：去掉自动隐藏任务栏的显示延迟，出现/隐藏动画可选
   （无、滑动、弹性、回弹、淡入淡出等），设置在「任务栏秒显」分组。
-* 两套动画相互独立，可只用其一。
+* **弹性药丸**（2.2.0 起并入，原独立模组退役）：为当前活动项注入一条带弹性
+  动画的滑动指示条，设置在「任务栏弹性药丸」分组。
+* 三套功能相互独立，可只用其一。
 
 ### CW-窗口滑动排列
 
@@ -78,13 +80,6 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 * 拖动窗口到屏幕边缘/其他窗口时自动吸附，距离可调；按住 Alt 临时禁用吸附。
 * 松手后窗口以滑动动画归位，速度可调。
-
-### CW-托盘系统图标调整
-
-隐藏或调整任务栏托盘的系统图标。
-
-* 可隐藏音量、网络、电池、麦克风、位置、Studio Effects、Recall 等系统图标和语言栏。
-* 通知铃铛可设为无新通知时隐藏；「显示桌面」按钮宽度可调。
 
 ### CW-经典右键菜单
 
@@ -99,7 +94,6 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 * 关闭警告后改错扩展名不会再被提醒，请谨慎重命名。
 
-
 ### CW-窗口拖动（Alt+拖动）
 
 Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键拖动调整大小。
@@ -111,14 +105,7 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 悬停任务栏最右「显示桌面」按钮时，显示窗口的 Aero Peek 预览。
 
 * 找回 Windows 10 时代的小窗预览体验，再次点击仍可切换桌面。
-
-
-### CW-任务栏弹性药丸
-
-为任务栏当前活动项注入一条带弹性动画的滑动指示条。
-
-* 切换窗口时指示条平滑滑动跟随，动画细节可调。
-
+* **前提**：系统需在「性能选项 → 视觉效果」里开启「启用 Peek」，该开关关闭时本模组无法生效。
 
 ### CW-自定义右键菜单
 
@@ -126,27 +113,11 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 * 缓存机制让菜单瞬时打开；与「CW-经典右键菜单」二选一使用，不要同时开启。
 
-### CW-任务栏歌词
-
-任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
-
-### CW-半透明窗口
-
-在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
-
-### CW-任务栏时钟自定义
-
-自定义任务栏时钟：日期/时间格式、新闻与天气、网速、CPU/内存/电池等性能指标。
-
 ### CW-最大化自动隐藏任务栏
 
 仅当有窗口最大化或贴近任务栏时才自动隐藏任务栏，平时保持可见。
 
-### CW-果冻窗口（可选）
-
-Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
-
-### CW-窗口动画（可选）
+### CW-文件悬停信息
 
 鼠标悬停在桌面或文件管理器的文件/文件夹上时，显示可自定义主题的信息卡片。
 
@@ -160,25 +131,11 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 * 内置多款社区主题（紧凑、经典搜索框、窗口玻璃、半透明等），也支持自定义控件样式。
 * 与任务栏/开始菜单等 styler 模组同一套「样式常量/控件样式/资源变量」语法。
 
-### CW-任务栏歌词
+### CW-隐形窗口边框
 
-任务栏上的音乐控制与歌词显示，跟随正在播放的媒体。
+让窗口四周边框隐形，同时保留系统圆角，窗口轮廓更干净。
 
-### CW-半透明窗口
-
-在 Windows 11 上启用原生半透明效果（与任务栏美化类模组叠加使用时注意视觉层级）。
-
-### CW-任务栏时钟自定义
-
-自定义任务栏时钟：日期/时间格式、新闻与天气、网速、CPU/内存/电池等性能指标。
-
-### CW-最大化自动隐藏任务栏
-
-仅当有窗口最大化或贴近任务栏时才自动隐藏任务栏，平时保持可见。
-
-### CW-果冻窗口（可选）
-
-Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
+* 基于社区模组 [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)（作者 Bo0ii）汉化整合。
 
 ### CW-窗口动画（可选）
 
@@ -206,8 +163,8 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 
 | 文件 | 适合谁 |
 | --- | --- |
-| `CW-Beautify_OneKeyDeploy_v2.0.0.zip` | **大多数人选这个**。内含 Windhawk 安装器和全部 mod |
-| `CW-Beautify_OneKeyDeploy_v2.0.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
+| `CW-Beautify_OneKeyDeploy_v2.2.0.zip` | **大多数人选这个**。内含 Windhawk 安装器和全部 mod |
+| `CW-Beautify_OneKeyDeploy_v2.2.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
 
 ## 安装
 
@@ -225,7 +182,7 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 
 ### 从旧版部署升级
 
-直接运行 `deploy.bat`。已开启的 mod 与已保存的设置都会保留（v2.0.0 会自动把旧主题名迁移到新命名）；被移除的模组（设置美化、任务栏音乐与歌词、果冻窗口、灵动岛/胶囊媒体、独立任务栏高度与图标大小）会被自动卸载。
+直接运行 `deploy.bat`。已开启的 mod 与已保存的设置都会保留（v2.0.0 会自动把旧主题名迁移到新命名）；被移除的模组（托盘系统图标调整、任务栏时钟自定义、任务栏歌词、半透明窗口、果冻窗口、任务栏弹性药丸（已并入任务栏动画）、桌面时钟、文件大小，以及更早退役的模组）会被自动卸载。
 
 从 v4.1 升级的旧用户：先双击 **`tools/uninstall-ExplorerBlurMica.bat`**，再运行 `deploy.bat`。
 
@@ -252,17 +209,17 @@ Compiz/KDE Plasma 风格的果冻窗口效果（实验性，注入 dwm.exe）。
 *   **快捷键切换播放设备没反应**：确认快捷键没被其他程序占用（可在 Windhawk 日志里看到注册失败提示）；换成 Ctrl+Alt+Q 等组合试试。
 *   **Mac 灵动岛与任务栏美化想一起用**：灵动岛的「任务栏」模式选「windowsApps」或「windows」，两者分别管上下两条，避免同时接管任务栏。
 
-问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.0.0.md`。
+问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.2.0.md`。
 
 ## 致谢与许可证
 
 CW-Beautify 以 GNU General Public License v3.0 发布。
 
 *   Windhawk 和任务栏、开始菜单、通知中心、文件管理器的上游 Styler mod：m417z（GPL-3.0）。
-*   任务栏音量控制（含并入的分应用音量）、窗口滑动排列、托盘系统图标调整、经典右键菜单、关闭扩展名修改警告、设置美化、窗口拖动（AltDrag）、显示桌面按钮预览、任务栏缩略图大小、滚轮切换任务栏：m417z（GPL-3.0）。
+*   任务栏音量控制（含并入的分应用音量）、窗口滑动排列、经典右键菜单、关闭扩展名修改警告、设置美化、窗口拖动（AltDrag）、显示桌面按钮预览：m417z（GPL-3.0）。
 *   任务栏秒显：Bo0ii（GPL-3.0）；文件操作美化、资源管理器信息栏：digART（GPL-3.0）；文件悬停信息：HaVeN80（MIT/未标注）。
-*   任务栏动画（Dock 动画 + 秒显合并）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）；Mac 灵动岛与 Dock：caliberda（GPL-3.0）。
-*   音量混合器：0Allu（MIT）；自定义右键菜单：BOLT（MIT）；任务栏弹性药丸：Lockframe（GPL-3.0）。
+*   任务栏动画（Dock 动画 + 秒显 + 弹性药丸三合一）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、Lockframe（GPL-3.0）；Mac 灵动岛与 Dock：caliberda（GPL-3.0）。
+*   音量混合器：0Allu（MIT）；自定义右键菜单：BOLT（MIT）；隐形窗口边框：Bo0ii（许可证见 optional/THIRD_PARTY_NOTICES.md）。
 *   窗口动画：ReDrag（MIT）；macOS 神奇效果：Abdullah Masood、Potassiumuncher；窗口切换动画（Vista 风格）：caliberda（MIT）。
 *   媒体设备快速切换参考 AudioSwitcher（xenolightning，MS-PL）重新实现。
 *   套件深度修改、汉化与桌面双击隐藏图标：Heptalune（GPL-3.0）。
@@ -270,4 +227,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 25 Windhawk mods (21 core + 4 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 20 Windhawk mods (17 core + 3 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.

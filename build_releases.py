@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-# CW-Beautify v2.0.0 打包清单
+# CW-Beautify v2.2.0 打包清单
 # 用法：在本目录（源码根）执行 python build_releases.py，
 # 生成的 zip 复制到 上一级的「发布包」目录发布。
 
@@ -15,17 +15,13 @@ common_files = [
     'local@cw-taskbar-volume-control.wh.cpp',
     'local@cw-taskbar-animation.wh.cpp',
     'local@cw-window-arrangement.wh.cpp',
-    'local@cw-tray-system-icons.wh.cpp',
     'local@cw-classic-context-menu.wh.cpp',
     'local@cw-extension-no-warning.wh.cpp',
     'local@cw-alt-drag.wh.cpp',
     'local@cw-aero-peek.wh.cpp',
-    'local@cw-taskbar-elastic-pill.wh.cpp',
     'local@cw-custom-context-menu.wh.cpp',
-    'local@cw-taskbar-lyrics.wh.cpp',
-    'local@cw-translucent-windows.wh.cpp',
-    'local@cw-taskbar-clock-customization.wh.cpp',
     'local@cw-taskbar-autohide-when-maximized.wh.cpp',
+    'local@cw-invisible-borders.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
     # 部署 / 卸载脚本
@@ -35,7 +31,7 @@ common_files = [
     'uninstall.ps1',
     'LICENSE',
     'Readme.txt',
-    'CHANGELOG_CW-Beautify_v2.1.0.md',
+    'CHANGELOG_CW-Beautify_v2.2.0.md',
     'README.md',
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
@@ -44,13 +40,12 @@ common_files = [
     'optional/local@cw-windows-animations.wh.cpp',
     'optional/local@cw-alt-tab-flip-3d.wh.cpp',
     'optional/local@cw-mac-island-dock.wh.cpp',
-    'optional/local@cw-wobbly-windows.wh.cpp',
     'optional/THIRD_PARTY_NOTICES.md',
 ]
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.1.0.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.1.0_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.2.0.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.2.0_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：

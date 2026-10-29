@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-显示桌面按钮预览
 // @description     Enable Aero Peek when hovering over the "Show Desktop" button, like it was possible before Windows 11
 // @description:zh-CN 悬停任务栏最右侧的「显示桌面」按钮时显示 Aero Peek 桌面速览，找回 Windows 11 之前的体验。
-// @version         1.0.3
+// @version         1.0.4
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -36,6 +36,8 @@
 
 仅支持 Windows 11。Windows 7~10 系统自带该行为，无需本模组。
 
+**前提：系统需开启「启用 Peek」**。若在「性能选项 → 视觉效果」里取消了「启用 Peek」（对应注册表 `HKCU\Software\Microsoft\Windows\DWM\EnableAeroPeek` 为 0），Windows 会阻止悬停「显示桌面」按钮时的桌面速览，本模组也无法生效（`Win+,` 快捷键同样受其控制）。模组"失效"时请先检查这个系统开关。
+
 ![演示图](https://i.imgur.com/TsJX013.gif)
 
 ## 功能
@@ -52,6 +54,7 @@
 
 - 原版 mod：Aero Peek on "Show desktop" button hover，作者 [m417z](https://github.com/m417z)，GPL-3.0，原版链接：<https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek>。
 - 本汉化版同样以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）汉化整理。
+- 1.0.4：补充系统「启用 Peek」开关的前提说明；SetTimer 回调改为显式函数以兼容 32 位编译目标（行为不变）。
 */
 // ==/WindhawkModReadme==
 
@@ -148,21 +151,23 @@ void AeroPeekOnHoverStart() {
     }
 }
 
+// CW 适配：SetTimer 回调改为显式函数（无捕获 lambda 在 x86 编译目标下无法
+// 转换为 stdcall 的 TIMERPROC），行为不变。
+void CALLBACK HoverTimerProc(HWND hwnd,         // handle of window for timer messages
+                             UINT uMsg,         // WM_TIMER message
+                             UINT_PTR idEvent,  // timer identifier
+                             DWORD dwTime) {    // current system time
+    Wh_Log(L">");
+
+    KillTimer(nullptr, g_hoverTimer);
+    g_hoverTimer = 0;
+
+    AeroPeekOnHoverStart();
+}
+
 void AeroPeekOnHoverStartTimer() {
     g_hoverTimer =
-        SetTimer(nullptr, g_hoverTimer, g_settings.hoverDelay,
-                 [](HWND hwnd,         // handle of window for timer messages
-                    UINT uMsg,         // WM_TIMER message
-                    UINT_PTR idEvent,  // timer identifier
-                    DWORD dwTime       // current system time
-                 ) {
-                     Wh_Log(L">");
-
-                     KillTimer(nullptr, g_hoverTimer);
-                     g_hoverTimer = 0;
-
-                     AeroPeekOnHoverStart();
-                 });
+        SetTimer(nullptr, g_hoverTimer, g_settings.hoverDelay, HoverTimerProc);
 }
 
 void AeroPeekOnHoverStop() {
