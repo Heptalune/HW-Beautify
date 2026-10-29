@@ -16,6 +16,9 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-任务栏音量控制（cw-taskbar-volume-control） | m417z, Taskbar Volume Control + Taskbar Volume Control Per-App（1.4.0 起并入）；汉化整合；媒体设备快捷切换功能参考 AudioSwitcher（xenolightning，MS-PL）重新实现，未复制其代码 | GPL-3.0 / MS-PL | https://windhawk.net/mods/taskbar-volume-control |
 | CW-任务栏动画（cw-taskbar-animation） | incconutwo, Taskbar Dock Animation Plus（基于 Ph0en1x-dev 原版）+ Bo0ii, Taskbar Auto-Hide Instant Show（2.1.0 合并）+ Lockframe, Taskbar Elastic WinUI Pill（2.2.0 并入弹性药丸）；CW 新增弹跳抬升与防裁剪 | GPL-3.0 | https://windhawk.net/mods/taskbar-dock-animation |
 | CW-隐形窗口边框（cw-invisible-borders） | Bo0ii, Invisible Window Borders；汉化 | MIT | https://windhawk.net/mods/invisible-borders |
+| CW-晃动找指针（cw-shake-find-cursor） | Darius Vernelis, Shake to Find Cursor + Jaali, macOS magnifying cursor（合并，取长补短）；汉化 | MIT | https://windhawk.net/mods/shake-to-find-cursor |
+| CW-任务栏缩略图即时预览（cw-instant-thumbnail-previews） | Alchemy, Instant Taskbar Thumbnail Previews；汉化 | MIT | https://windhawk.net/mods/instant-taskbar-thumbnail-previews |
+| CW-任务栏缩略图大小（cw-thumbnail-size） | m417z, Taskbar Thumbnail Size；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-thumbnail-size |
 | CW-窗口滑动排列（cw-window-arrangement） | m417z, Slick Window Arrangement；汉化 | GPL-3.0 | https://windhawk.net/mods/slick-window-arrangement |
 | CW-经典右键菜单（cw-classic-context-menu） | m417z, Classic context menu on Windows 11；汉化；1.1.0 起新增菜单风格切换设置 | GPL-3.0 | https://windhawk.net/mods/explorer-context-menu-classic |
 | CW-关闭扩展名修改警告（cw-extension-no-warning） | m417z, Turn off change file extension warning；汉化 | GPL-3.0 | https://windhawk.net/mods/extension-change-no-warning |
@@ -33,6 +36,8 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-窗口动画（cw-windows-animations） | ReDrag, Windows Animations（CW 修改）；macOS 神奇效果：Abdullah Masood、Potassiumuncher（并入 1.4.0 的 macOS Genie 样式） | MIT | https://windhawk.net/mods/windows-animations |
 | CW-窗口切换动画（Vista 风格）（cw-alt-tab-flip-3d） | caliberda, Alt+Tab Flip 3D (Vista Style)；全中文本地化 | MIT | https://windhawk.net/mods/alt-tab-flip-3d |
 | CW-Mac 灵动岛与 Dock（cw-mac-island-dock） | caliberda, Mac Island & Dock；汉化 | GPL-3.0 | https://windhawk.net/mods/mac-island-dock |
+| CW-快速启动 Dock（cw-quick-launch-dock） | cheliks1123, Quick Launch Dock；汉化 | 未标注（版权归原作者） | https://windhawk.net/mods/quick-launch-dock |
+| CW-动态视频壁纸（cw-live-video-wallpaper） | AKS HAY, Live Video Wallpaper；汉化 | GPL-3.0 | https://windhawk.net/mods/live-video-wallpaper |
 
 ## 已移除
 

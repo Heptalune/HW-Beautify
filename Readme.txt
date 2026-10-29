@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（17 核心 + 3 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
+包含的 Mod（20 核心 + 5 可选；装好后默认全部关闭，在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
 _Online 版（已装好 Windhawk 的用户用）。
@@ -33,10 +33,15 @@ _Online 版（已装好 Windhawk 的用户用）。
   CW-文件悬停信息               悬停文件时显示大小、日期、图片尺寸等信息卡片
   CW-设置美化                   用社区主题或自定义样式美化 Windows 设置应用
   CW-最大化自动隐藏任务栏       仅当有窗口最大化或贴近任务栏时才自动隐藏
-  CW-隐形窗口边框               隐藏窗口边框、保留系统圆角（新增）
+  CW-隐形窗口边框               隐藏窗口边框、保留系统圆角
+  CW-晃动找指针                 晃动鼠标即放大指针帮助定位（两个社区模组合并，新增）
+  CW-任务栏缩略图即时预览       悬停立即显示任务栏缩略图预览（新增）
+  CW-任务栏缩略图大小           自定义任务栏缩略图大小（新增）
   CW-窗口动画（可选）           窗口关闭/最小化/还原/启动动画，含 macOS 神奇效果
   CW-窗口切换动画（可选）       Vista 风格 Flip 3D 等 20 多种 Alt+Tab 切换样式
   CW-Mac 灵动岛与 Dock（可选）  顶部灵动岛 + 可选 macOS 风格 Dock
+  CW-快速启动 Dock（可选）      屏幕边缘的纤细动画启动坞，单击启动程序（新增）
+  CW-动态视频壁纸（可选）       MP4 视频硬件加速动态壁纸，带性能 HUD（新增）
 
 安装步骤
 ========================================================================
@@ -124,7 +129,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-20 Windhawk mods (17 core + 3 optional), localized into Simplified Chinese.
+25 Windhawk mods (20 core + 5 optional), localized into Simplified Chinese.
 Extract the zip, run deploy.bat as administrator, then enable the mods you
 want in Windhawk (all are installed disabled). Upgrading keeps toggles and
 settings. Uninstall: run uninstall.bat. See README.md for details.

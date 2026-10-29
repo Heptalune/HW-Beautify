@@ -68,7 +68,7 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 当前模组清单（v2.2.0，20 个 = 17 核心 + 3 可选）
+## 当前模组清单（v2.2.0，25 个 = 20 核心 + 5 可选）
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
@@ -89,8 +89,13 @@
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
 | CW-最大化自动隐藏任务栏 | cw-taskbar-autohide-when-maximized | 1.2.7 | m417z Taskbar auto-hide when maximized 汉化 |
 | CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii Invisible Window Borders (MIT) 汉化 |
+| CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis Shake to Find Cursor + Jaali macOS magnifying cursor 合并汉化（tool mod） |
+| CW-任务栏缩略图即时预览 | cw-instant-thumbnail-previews | 1.1.1 | Alchemy Instant Taskbar Thumbnail Previews (MIT) 汉化 |
+| CW-任务栏缩略图大小 | cw-thumbnail-size | 1.2.2 | m417z Taskbar Thumbnail Size 汉化（v2.1.0 周期退役后回归） |
+| CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
+| CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化 |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
 | CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
 | CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle/cw-thumbnail-size（用户要求移除）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；cw-thumbnail-size 同期退役、v2.2.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。

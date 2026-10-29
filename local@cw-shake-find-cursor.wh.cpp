@@ -1,0 +1,2115 @@
+﻿// ==WindhawkMod==
+// @id              cw-shake-find-cursor
+// @name            CW-晃动找指针
+// @name:zh-CN      CW-晃动找指针
+// @description     Temporarily enlarges the mouse cursor when you shake the mouse, like macOS "Shake to locate"
+// @description:zh-CN 复刻 macOS「摇晃以定位」：晃动鼠标（或在触摸板上快速来回滑动）时临时放大指针，停下后自动缩回。Raw Input 事件驱动 + 系统光标原位放大：无覆盖窗口、无拖尾、空闲零 CPU。
+// @version         1.5.0
+// @author          Darius Varnelis
+// @github          https://github.com/Darius-Varnelis
+// @include         windhawk.exe
+// @compilerOptions -luser32 -lgdi32 -lshell32 -ladvapi32 -lshcore
+// ==/WindhawkMod==
+
+// CW-Beautify 整合说明：本模组由以下两个模组合并而成（CW-Beautify 整合汉化，GPL-3.0）：
+// - 基底：Shake to Find Cursor v1.4.1（Darius Varnelis，MIT 许可证）
+//     https://windhawk.net/mods/shake-to-find-cursor
+//     https://github.com/Darius-Varnelis/shake-to-find-cursor
+//   代码主体与上游一致（Raw Input 监听 + SetSystemCursor 原位放大系统光标）。
+// - 被吸收方：macOS magnifying cursor v1.4.7（Jaali，MIT 许可证）
+//     https://windhawk.net/mods/mac-magnifying-cursor
+//     https://github.com/alivca
+//   吸收其注销/关机（WM_QUERYENDSESSION/WM_ENDSESSION）还原系统光标的保护；其覆盖
+//   窗口式放大机制未吸收（与基底机制互斥且基底方案更优），理由见 readme「与原版差异」。
+// 吸收的代码在 WindowProc 与 CreateWindowExW 处均有 [CW-Beautify] 注释标记；
+// 设置项与基底 v1.4.1 一一对应，键名未改动。
+
+// ==WindhawkModReadme==
+/*
+# CW-晃动找指针
+
+晃动鼠标（或在触摸板上快速来回滑动），指针随即放大，一眼就能找到；停止晃动后自动缩回。复刻 macOS 的「摇晃以定位」（Shake to locate）。
+
+## 致谢与来源
+
+本模组是 CW-Beautify 的整合汉化版，由以下两个开源模组合并而成，版权归各自作者所有：
+
+- **基底**：Shake to Find Cursor v1.4.1 —— Darius Varnelis（MIT 许可证）
+  - 原版：https://windhawk.net/mods/shake-to-find-cursor
+  - 源码：https://github.com/Darius-Varnelis/shake-to-find-cursor
+- **被吸收方**：macOS magnifying cursor v1.4.7 —— Jaali（MIT 许可证）
+  - 原版：https://windhawk.net/mods/mac-magnifying-cursor
+  - 作者：https://github.com/alivca
+
+两个上游模组均为 MIT 许可证（基底由其作者仓库 README 明示；被吸收方按 Windhawk 官方模组合集规则「未标注许可证的模组按 MIT 提交」）。本整合包以 GPL-3.0 发布，两位原作者的版权与署名在此原样保留。
+
+## 工作原理
+
+- 以 **tool mod** 形式运行在独立的后台 windhawk.exe 进程中，完全不触碰 Explorer。
+- 监听鼠标 Raw Input 原始输入：不轮询、鼠标空闲时零 CPU 占用，也不会像低级鼠标钩子那样给输入增加延迟。
+- 「晃动」的判定：光标在**时间窗口**内移动了很长的路程（**触发距离**），而活动范围却很小（**往返比例**）。
+- 放大的实现是把系统光标替换为按目标尺寸重绘的「当前光标方案」大号版本。放大后的光标就是真正的指针：没有覆盖窗口、没有拖尾，并保留你的光标样式与颜色。还原方式与控制面板应用指针方案完全相同。
+- 持续晃动时指针持续变大、越来越慢：每再放大同样一步所需的时间翻倍。默认上限是屏幕高度，晃到上限需要数小时。
+- 放大与缩小动画基于时间、按显示器刷新率驱动。每帧只重绘屏幕上的那一种光标；其余光标类型每帧在微小的时间预算内分批处理，保证每帧开销都很低。
+- 动态光标（.ani）同样平滑地放大缩小，且放大期间继续播放动画：模组自行逐帧播放，结束后交还给真实光标。
+- 注销或关机时自动还原系统光标（吸收自 macOS magnifying cursor 的保护机制）。
+
+## 与原版差异
+
+### 相对基底 Shake to Find Cursor v1.4.1
+
+- 新增注销/关机（WM_QUERYENDSESSION/WM_ENDSESSION）时的系统光标还原保护，吸收自 macOS magnifying cursor。基底只能依赖「模组下次启动时还原」兜底，合并版在会话结束前即时还原。为此工作窗口从消息专用窗口改为隐藏的顶层工具窗口（只有顶层窗口能收到该广播）；窗口从不显示、大小为 0、不可激活，其余行为不变。
+- 全量中文本地化；版本号 1.4.1 → 1.5.0。设置项与基底一一对应，无增减。
+
+### 相对被吸收方 macOS magnifying cursor v1.4.7（未吸收的部分及理由）
+
+- **覆盖窗口式放大**（隐藏系统光标 + 自绘覆盖窗口每 16-40ms 轮询重绘）：未吸收。基底以 SetSystemCursor 原位放大，无拖尾、无覆盖窗口、空闲零 CPU，且保留真实光标样式与颜色；被吸收方的方案快速移动时会出现拖尾，空闲时仍有轮询开销，且其把系统光标替换为透明占位，自绘失败期间会出现「无光标」。两种机制互斥（不能同时启用），基底明显更优，故整体不采纳。
+- **应用自绘光标的放大**：被吸收方可在覆盖窗口中放大应用自定义的光标；基底只替换 Windows 的系统光标，应用自绘光标保持原尺寸（基底原版即注明该限制）。实现该能力必须引入覆盖窗口机制，与基底设计冲突，故不吸收，保留该限制。
+- **放大/缩小速度分别调节**（lerpSpeedUpPercent / lerpSpeedDownPercent）：未吸收。基底的「放大动画时长 / 缩小动画时长（毫秒）」已覆盖同一能力，且按时间驱动、缓动曲线固定、必定到达目标尺寸；被吸收方的 lerp 系数按帧外推，理论上不收敛且受帧率影响。
+- **摇晃判定的双阈值迟滞**（触发与释放用不同阈值）：未吸收。基底以「晃动→放大→缩回」阶段状态机加「保持放大时长」实现等效效果，且触发距离、往返比例、时间窗口均可调，粒度更细。
+- **全屏检测的 500ms 结果缓存**：未吸收。基底只在触发放大前查询一次系统状态，开销更低。
+- 被吸收方的 maxScalePercent、shakeThreshold 与基底的「放大尺寸」「触发距离」一一对应，无新增能力，不重复引入。
+
+## 注意事项
+
+- 很大的光标（Windows 无障碍设置里的大指针、大尺寸光标方案或很高的放大倍数）会让 Windows 每一步画得更久，放大缩小动画可能不够顺滑。
+- 自己绘制光标的应用会保留它们自己的小光标，不受影响。
+- 光标文件里的图像最大 256 像素，超过后只能拉伸放大，边缘会变软。
+- 如果模组进程在光标放大时被杀掉，正常光标会在模组下次启动时自动还原（在鼠标属性里重新应用一次指针方案也能立即修复）。
+- 取决于 Windows 版本，当提权窗口（任务管理器、UAC 提示、安装程序）持有焦点时，Raw Input 可能到不了模组；此时在这些窗口上晃动不会被检测到，焦点移开后恢复。
+*/
+// ==/WindhawkModReadme==
+
+// ==WindhawkModSettings==
+/*
+- scalePercent: 400
+  $name: Enlarged size (%)
+  $name:zh-CN: 放大尺寸（%）
+  $description: Size of the enlarged cursor relative to its normal size (400 = 4x bigger) (default = 400)
+  $description:zh-CN: 放大后光标相对原始尺寸的大小（400 = 放大到 4 倍）（默认 = 400）
+- keepGrowing: 50
+  $name: Keep growing while shaking (%)
+  $name:zh-CN: 持续晃动继续放大（%）
+  $description: >-
+    If you keep shaking after the first enlargement, the cursor keeps growing.
+    It grows by this much in the first second, then slower and slower (the next
+    step of the same size takes 2 s, then 4 s, 8 s and so on).
+    0 = stop at the first enlargement (default = 50)
+  $description:zh-CN: 首次放大后若继续晃动，光标会继续变大：第一秒再变大这么多，之后越来越慢（同样大小的下一步分别需要 2 秒、4 秒、8 秒……）。0 = 首次放大后不再变大（默认 = 50）
+- sizeLimit: 0
+  $name: Size limit (px)
+  $name:zh-CN: 尺寸上限（像素）
+  $description: The cursor never grows past this size (0 = the height of your screen) (default = 0)
+  $description:zh-CN: 光标不会放大超过此尺寸（0 = 屏幕高度）（默认 = 0）
+- shakeDistance: 800
+  $name: Shake distance (px)
+  $name:zh-CN: 触发距离（像素）
+  $description: How far the cursor has to travel within the time window. Lower = easier to trigger (default = 800)
+  $description:zh-CN: 在时间窗口内光标需要移动的路程。越低越容易触发（默认 = 800）
+- shakeRatio: 350
+  $name: Back-and-forth ratio (%)
+  $name:zh-CN: 往返比例（%）
+  $description: >-
+    Distance travelled divided by the diagonal of the area the cursor stayed in.
+    A straight swipe is about 100, four strokes left and right about 400.
+    Lower = easier to trigger, but fast normal movements may start to count as shakes (default = 350)
+  $description:zh-CN: 移动总路程除以光标活动区域对角线之比。直线划过约为 100，左右往返四次约为 400。越低越容易触发，但普通的快速移动也可能被误判为晃动（默认 = 350）
+- shakeWindow: 1000
+  $name: Time window (ms)
+  $name:zh-CN: 时间窗口（毫秒）
+  $description: How much recent movement is looked at when detecting a shake (default = 1000)
+  $description:zh-CN: 判定晃动时回看最近多长时间内的移动（默认 = 1000）
+- holdTime: 500
+  $name: Stay enlarged for (ms)
+  $name:zh-CN: 保持放大时长（毫秒）
+  $description: How long the cursor stays big after you stop shaking (default = 500)
+  $description:zh-CN: 停止晃动后光标保持放大的时长（默认 = 500）
+- growDuration: 150
+  $name: Grow animation (ms)
+  $name:zh-CN: 放大动画时长（毫秒）
+  $description: How long the cursor takes to grow (0 = instant) (default = 150)
+  $description:zh-CN: 光标放大动画的时长（0 = 立即放大）（默认 = 150）
+- shrinkDuration: 250
+  $name: Shrink animation (ms)
+  $name:zh-CN: 缩小动画时长（毫秒）
+  $description: How long the cursor takes to shrink back (0 = instant) (default = 250)
+  $description:zh-CN: 光标缩回动画的时长（0 = 立即缩回）（默认 = 250）
+- disableInFullscreen: true
+  $name: Disable in fullscreen apps and games
+  $name:zh-CN: 全屏应用与游戏中禁用
+  $description: Don't enlarge the cursor while a fullscreen app, game or presentation is in the foreground (default = on)
+  $description:zh-CN: 前台为全屏应用、游戏或演示时不放大光标（默认 = 开）
+*/
+// ==/WindhawkModSettings==
+
+#include <windows.h>
+#include <shellapi.h>
+#include <shellscalingapi.h>
+
+#include <algorithm>
+#include <cmath>
+#include <deque>
+#include <atomic>
+#include <memory>
+#include <vector>
+
+////////////////////////////////////////////////////////////////////////////////
+// Settings
+
+struct Settings {
+    int scalePercent = 400;
+    int keepGrowingPercent = 50;
+    int sizeLimit = 0;  // 0 = height of the screen.
+    int shakeDistance = 800;
+    int shakeRatioPercent = 350;
+    int shakeWindowMs = 1000;
+    int holdMs = 500;
+    int growMs = 150;
+    int shrinkMs = 250;
+    bool disableInFullscreen = true;
+};
+
+// Only accessed on the worker thread once it's running.
+Settings g_settings;
+
+int PositiveIntSetting(PCWSTR name, int fallback, int minValue, int maxValue) {
+    int value = Wh_GetIntSetting(name);
+    if (value <= 0) {
+        value = fallback;
+    }
+    return std::clamp(value, minValue, maxValue);
+}
+
+Settings LoadSettings() {
+    Settings s;
+    s.scalePercent = PositiveIntSetting(L"scalePercent", 400, 110, 1000);
+    s.keepGrowingPercent = std::clamp(Wh_GetIntSetting(L"keepGrowing"), 0, 500);
+    const int sizeLimit = Wh_GetIntSetting(L"sizeLimit");
+    s.sizeLimit = sizeLimit <= 0 ? 0 : std::clamp(sizeLimit, 32, 4096);
+    s.shakeDistance = PositiveIntSetting(L"shakeDistance", 800, 100, 20000);
+    s.shakeRatioPercent = PositiveIntSetting(L"shakeRatio", 350, 150, 2000);
+    s.shakeWindowMs = PositiveIntSetting(L"shakeWindow", 1000, 200, 5000);
+    s.holdMs = std::clamp(Wh_GetIntSetting(L"holdTime"), 0, 10000);
+    s.growMs = std::clamp(Wh_GetIntSetting(L"growDuration"), 0, 5000);
+    s.shrinkMs = std::clamp(Wh_GetIntSetting(L"shrinkDuration"), 0, 5000);
+    s.disableInFullscreen = Wh_GetIntSetting(L"disableInFullscreen") != 0;
+    return s;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// System cursors
+
+struct CursorType {
+    DWORD id;               // OCR_* value used by SetSystemCursor.
+    PCWSTR registryName;    // Value under HKCU\Control Panel\Cursors.
+    bool animatedByDefault; // Built-in version is animated.
+};
+
+// OCR_* constants need OEMRESOURCE defined before <windows.h>, which Windhawk
+// has already included by now, so the raw values are used.
+constexpr CursorType kCursorTypes[] = {
+    {32512, L"Arrow", false},        // OCR_NORMAL
+    {32513, L"IBeam", false},        // OCR_IBEAM
+    {32514, L"Wait", true},          // OCR_WAIT
+    {32515, L"Crosshair", false},    // OCR_CROSS
+    {32516, L"UpArrow", false},      // OCR_UP
+    {32642, L"SizeNWSE", false},     // OCR_SIZENWSE
+    {32643, L"SizeNESW", false},     // OCR_SIZENESW
+    {32644, L"SizeWE", false},       // OCR_SIZEWE
+    {32645, L"SizeNS", false},       // OCR_SIZENS
+    {32646, L"SizeAll", false},      // OCR_SIZEALL
+    {32648, L"No", false},           // OCR_NO
+    {32649, L"Hand", false},         // OCR_HAND
+    {32650, L"AppStarting", true},   // OCR_APPSTARTING
+    {32651, L"Help", false},         // OCR_HELP
+    {32631, L"NWPen", false},        // Handwriting
+    {32671, L"Pin", false},          // Location select
+    {32672, L"Person", false},       // Person select
+};
+
+// Reads the cursor file configured for this cursor type in the current scheme.
+// An empty value means the scheme uses the built-in cursor.
+bool GetSchemeCursorPath(PCWSTR registryName, WCHAR (&path)[MAX_PATH]) {
+    WCHAR raw[MAX_PATH];
+    DWORD bytes = sizeof(raw);
+    if (RegGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Cursors",
+                     registryName,
+                     RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
+                     nullptr, raw, &bytes) != ERROR_SUCCESS ||
+        !raw[0]) {
+        return false;
+    }
+
+    DWORD length = ExpandEnvironmentStringsW(raw, path, MAX_PATH);
+    return length > 0 && length <= MAX_PATH;
+}
+
+bool IsAnimatedCursorFile(PCWSTR path) {
+    int length = lstrlenW(path);
+    return length >= 4 && lstrcmpiW(path + length - 4, L".ani") == 0;
+}
+
+// One frame of an animated cursor, kept in memory so the grow and shrink
+// animations can show it at any size without decoding every frame of the .ani
+// file (60+ frames in some themes) on every animation step.
+struct StaticFrame {
+    std::vector<BYTE> file;      // The frame's .cur/.ico data.
+    std::vector<BYTE> resource;  // The image in use, prepared for
+                                 // CreateIconFromResourceEx.
+    int preparedEntry = -1;      // Which image `resource` holds.
+    int width = 0;
+    int height = 0;
+    int hotspotX = 0;
+    int hotspotY = 0;
+};
+
+constexpr DWORD FourCC(char a, char b, char c, char d) {
+    return static_cast<DWORD>(static_cast<BYTE>(a)) |
+           static_cast<DWORD>(static_cast<BYTE>(b)) << 8 |
+           static_cast<DWORD>(static_cast<BYTE>(c)) << 16 |
+           static_cast<DWORD>(static_cast<BYTE>(d)) << 24;
+}
+
+bool ReadAt(HANDLE file, ULONGLONG offset, void* buffer, DWORD size) {
+    LARGE_INTEGER position;
+    position.QuadPart = static_cast<LONGLONG>(offset);
+    DWORD read = 0;
+    return SetFilePointerEx(file, position, nullptr, FILE_BEGIN) &&
+           ReadFile(file, buffer, size, &read, nullptr) && read == size;
+}
+
+// Where each frame of an .ani file is and when each one is shown, so the grow
+// and shrink animations can show the frame that's due at each step without
+// decoding the whole file. Only chunk headers and the timing tables are read
+// up front; frames are read one at a time, when they're needed.
+struct AniIndex {
+    std::vector<ULONGLONG> frameOffsets;  // Start of each frame's .cur data.
+    std::vector<DWORD> frameSizes;
+    std::vector<DWORD> stepFrames;    // Frame shown at each step.
+    std::vector<DWORD> stepJiffies;   // How long each step lasts (1/60 s).
+    ULONGLONG totalJiffies = 0;
+};
+
+constexpr DWORD kMaxAniFrames = 4096;
+
+bool ReadAniIndex(PCWSTR path, AniIndex& index) {
+    index = {};
+    HANDLE file = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, nullptr,
+                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+
+    // anih: cbSize, nFrames, nSteps, cx, cy, bitCount, planes, jifRate, flags.
+    DWORD header[9]{};
+    bool haveHeader = false;
+    std::vector<DWORD> rates;
+    std::vector<DWORD> sequence;
+
+    LARGE_INTEGER fileSize{};
+    DWORD riff[3];
+    if (GetFileSizeEx(file, &fileSize) && ReadAt(file, 0, riff, sizeof(riff)) &&
+        riff[0] == FourCC('R', 'I', 'F', 'F') &&
+        riff[2] == FourCC('A', 'C', 'O', 'N')) {
+        const ULONGLONG end = static_cast<ULONGLONG>(fileSize.QuadPart);
+        ULONGLONG offset = 12;
+        DWORD chunk[2];
+        while (offset + 8 <= end && ReadAt(file, offset, chunk, sizeof(chunk))) {
+            const ULONGLONG data = offset + 8;
+            const ULONGLONG chunkEnd = data + chunk[1];
+            if (chunkEnd > end) {
+                break;
+            }
+
+            if (chunk[0] == FourCC('a', 'n', 'i', 'h') &&
+                chunk[1] >= sizeof(header)) {
+                haveHeader = ReadAt(file, data, header, sizeof(header));
+            } else if ((chunk[0] == FourCC('r', 'a', 't', 'e') ||
+                        chunk[0] == FourCC('s', 'e', 'q', ' ')) &&
+                       chunk[1] / 4 <= kMaxAniFrames) {
+                std::vector<DWORD>& table =
+                    chunk[0] == FourCC('r', 'a', 't', 'e') ? rates : sequence;
+                table.resize(chunk[1] / 4);
+                if (!table.empty() &&
+                    !ReadAt(file, data, table.data(),
+                            static_cast<DWORD>(table.size() * 4))) {
+                    table.clear();
+                }
+            } else if (chunk[0] == FourCC('L', 'I', 'S', 'T') && chunk[1] >= 4) {
+                DWORD listType;
+                if (ReadAt(file, data, &listType, sizeof(listType)) &&
+                    listType == FourCC('f', 'r', 'a', 'm')) {
+                    ULONGLONG inner = data + 4;
+                    DWORD icon[2];
+                    while (inner + 8 <= chunkEnd &&
+                           index.frameOffsets.size() < kMaxAniFrames &&
+                           ReadAt(file, inner, icon, sizeof(icon))) {
+                        if (inner + 8 + icon[1] > chunkEnd) {
+                            break;
+                        }
+                        if (icon[0] == FourCC('i', 'c', 'o', 'n') &&
+                            icon[1] >= 6 && icon[1] <= 16 * 1024 * 1024) {
+                            index.frameOffsets.push_back(inner + 8);
+                            index.frameSizes.push_back(icon[1]);
+                        }
+                        inner += 8ULL + icon[1] + (icon[1] & 1);
+                    }
+                }
+            }
+
+            offset = chunkEnd + (chunk[1] & 1);
+        }
+    }
+    CloseHandle(file);
+
+    const size_t frames = index.frameOffsets.size();
+    if (!haveHeader || frames == 0) {
+        index = {};
+        return false;
+    }
+
+    // Without a "seq " chunk, step i shows frame i. Without a "rate" chunk,
+    // every step lasts the header's default rate.
+    size_t steps = header[2] ? header[2] : frames;
+    steps = std::min<size_t>(steps, kMaxAniFrames);
+    index.stepFrames.resize(steps);
+    index.stepJiffies.resize(steps);
+    for (size_t i = 0; i < steps; i++) {
+        const DWORD frame = i < sequence.size() ? sequence[i] : static_cast<DWORD>(i);
+        index.stepFrames[i] = frame < frames ? frame : static_cast<DWORD>(i % frames);
+        const DWORD jiffies = i < rates.size() ? rates[i] : header[7];
+        index.stepJiffies[i] = std::clamp<DWORD>(jiffies, 1, 600);
+        index.totalJiffies += index.stepJiffies[i];
+    }
+    return true;
+}
+
+// The step that's due `elapsedMs` after the animation started, looping.
+size_t AniStepAt(const AniIndex& index, ULONGLONG elapsedMs) {
+    ULONGLONG jiffy = (elapsedMs * 60 / 1000) % index.totalJiffies;
+    for (size_t i = 0; i < index.stepJiffies.size(); i++) {
+        if (jiffy < index.stepJiffies[i]) {
+            return i;
+        }
+        jiffy -= index.stepJiffies[i];
+    }
+    return index.stepJiffies.size() - 1;
+}
+
+// The frame that's due `elapsedMs` after the animation started, looping.
+size_t AniFrameAt(const AniIndex& index, ULONGLONG elapsedMs) {
+    return index.stepFrames[AniStepAt(index, elapsedMs)];
+}
+
+// Reads one frame's .cur data.
+bool ReadAniFrame(PCWSTR path, const AniIndex& index, size_t frameIndex,
+                  std::vector<BYTE>& frame) {
+    HANDLE file = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, nullptr,
+                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+    frame.resize(index.frameSizes[frameIndex]);
+    const bool ok = ReadAt(file, index.frameOffsets[frameIndex], frame.data(),
+                           index.frameSizes[frameIndex]);
+    CloseHandle(file);
+    if (!ok) {
+        frame.clear();
+    }
+    return ok;
+}
+
+// Validates the .cur/.ico data of a frame (the frame format inside .ani files)
+// before any of its images are used.
+bool IsValidIconFile(const std::vector<BYTE>& file) {
+    if (file.size() < 6) {
+        return false;
+    }
+    const WORD type = static_cast<WORD>(file[2] | file[3] << 8);
+    const WORD count = static_cast<WORD>(file[4] | file[5] << 8);
+    return (type == 1 || type == 2) && count > 0 &&
+           file.size() >= 6 + 16 * static_cast<size_t>(count);
+}
+
+// Picks the image to scale from, like LoadImage does for the full cursor: the
+// smallest one at least `size` wide, or the largest one if none is that big.
+// Returns -1 if the file has no usable image.
+int PickIconEntry(const std::vector<BYTE>& file, int size) {
+    auto readDword = [&](size_t at) {
+        return static_cast<DWORD>(file[at]) |
+               static_cast<DWORD>(file[at + 1]) << 8 |
+               static_cast<DWORD>(file[at + 2]) << 16 |
+               static_cast<DWORD>(file[at + 3]) << 24;
+    };
+
+    const int count = file[4] | file[5] << 8;
+    int fitting = -1;
+    int fittingWidth = 0;
+    int largest = -1;
+    int largestWidth = 0;
+    for (int i = 0; i < count; i++) {
+        const size_t entry = 6 + 16 * static_cast<size_t>(i);
+        const int width = file[entry] ? file[entry] : 256;
+        const DWORD bytes = readDword(entry + 8);
+        const DWORD offset = readDword(entry + 12);
+        if (bytes == 0 || offset > file.size() || bytes > file.size() - offset) {
+            continue;
+        }
+        if (width > largestWidth) {
+            largest = i;
+            largestWidth = width;
+        }
+        if (width >= size && (fitting < 0 || width < fittingWidth)) {
+            fitting = i;
+            fittingWidth = width;
+        }
+    }
+    return fitting >= 0 ? fitting : largest;
+}
+
+// Prepares one image of the frame for CreateIconFromResourceEx: its hotspot as
+// two WORDs, followed by the image data.
+void PrepareIconEntry(StaticFrame& frame, int index) {
+    const std::vector<BYTE>& file = frame.file;
+    auto readWord = [&](size_t at) {
+        return static_cast<WORD>(file[at] | file[at + 1] << 8);
+    };
+    auto readDword = [&](size_t at) {
+        return static_cast<DWORD>(readWord(at)) |
+               static_cast<DWORD>(readWord(at + 2)) << 16;
+    };
+
+    const bool isCursor = readWord(2) == 2;
+    const size_t entry = 6 + 16 * static_cast<size_t>(index);
+    const DWORD bytes = readDword(entry + 8);
+    const DWORD offset = readDword(entry + 12);
+
+    frame.width = file[entry] ? file[entry] : 256;
+    frame.height = file[entry + 1] ? file[entry + 1] : 256;
+    // In .cur files these two fields are the hotspot; .ico frames have none.
+    frame.hotspotX = isCursor ? readWord(entry + 4) : 0;
+    frame.hotspotY = isCursor ? readWord(entry + 6) : 0;
+
+    frame.resource.resize(4 + bytes);
+    frame.resource[0] = static_cast<BYTE>(frame.hotspotX);
+    frame.resource[1] = static_cast<BYTE>(frame.hotspotX >> 8);
+    frame.resource[2] = static_cast<BYTE>(frame.hotspotY);
+    frame.resource[3] = static_cast<BYTE>(frame.hotspotY >> 8);
+    std::copy(file.begin() + offset, file.begin() + offset + bytes,
+              frame.resource.begin() + 4);
+    frame.preparedEntry = index;
+}
+
+// Creates a static cursor from the frame at the given size, with the hotspot
+// scaled to match.
+HCURSOR CreateStaticFrameCursor(StaticFrame& frame, int size) {
+    const int index = PickIconEntry(frame.file, size);
+    if (index < 0) {
+        return nullptr;
+    }
+    if (index != frame.preparedEntry) {
+        PrepareIconEntry(frame, index);
+    }
+
+    HCURSOR scaled = reinterpret_cast<HCURSOR>(CreateIconFromResourceEx(
+        frame.resource.data(), static_cast<DWORD>(frame.resource.size()),
+        FALSE, 0x00030000, size, size, LR_DEFAULTCOLOR));
+    if (!scaled) {
+        return nullptr;
+    }
+
+    // Set the hotspot explicitly instead of relying on how
+    // CreateIconFromResourceEx scales it, so the tip stays exactly in place.
+    ICONINFO info{};
+    HCURSOR cursor = nullptr;
+    if (GetIconInfo(scaled, &info)) {
+        info.fIcon = FALSE;
+        info.xHotspot = static_cast<DWORD>(
+            std::lround(static_cast<double>(frame.hotspotX) * size / frame.width));
+        info.yHotspot = static_cast<DWORD>(
+            std::lround(static_cast<double>(frame.hotspotY) * size / frame.height));
+        cursor = reinterpret_cast<HCURSOR>(CreateIconIndirect(&info));
+        if (info.hbmColor) {
+            DeleteObject(info.hbmColor);
+        }
+        if (info.hbmMask) {
+            DeleteObject(info.hbmMask);
+        }
+    }
+
+    if (cursor) {
+        DestroyCursor(scaled);
+        return cursor;
+    }
+    return scaled;
+}
+
+// pristineFallback, if given, is an owned copy of this cursor type's original
+// image, taken before any enlargement. It's the only safe fallback source:
+// the shared system cursor handle returned by LoadCursorW may already be
+// showing a previous frame's enlarged image by the time this runs.
+HCURSOR LoadCursorAtSize(const CursorType& type,
+                         PCWSTR schemePath,
+                         int size,
+                         HCURSOR pristineFallback) {
+    HCURSOR cursor = nullptr;
+
+    // 1. The scheme's own file. LoadImage picks the frame closest to the
+    //    requested size, so multi-size .cur files stay sharp.
+    if (schemePath) {
+        cursor = static_cast<HCURSOR>(LoadImageW(
+            nullptr, schemePath, IMAGE_CURSOR, size, size, LR_LOADFROMFILE));
+    }
+
+    // 2. The built-in cursor, for entries the scheme leaves empty.
+    if (!cursor) {
+        if (HMODULE user32 = GetModuleHandleW(L"user32.dll")) {
+            cursor = static_cast<HCURSOR>(LoadImageW(user32,
+                                                     MAKEINTRESOURCEW(type.id),
+                                                     IMAGE_CURSOR, size, size,
+                                                     LR_DEFAULTCOLOR));
+        }
+    }
+
+    // 3. Last resort: stretch the pristine copy taken before enlargement.
+    if (!cursor && pristineFallback) {
+        cursor = static_cast<HCURSOR>(
+            CopyImage(pristineFallback, IMAGE_CURSOR, size, size, 0));
+    }
+
+    return cursor;
+}
+
+void RestoreSystemCursors() {
+    // Reloads every system cursor from the registry, exactly like applying a
+    // scheme in Mouse Properties.
+    SystemParametersInfoW(SPI_SETCURSORS, 0, nullptr, 0);
+    Wh_SetIntValue(L"cursorsModified", 0);
+}
+
+// Size of the normal arrow's image as currently loaded (includes DPI scaling).
+// Windows applies the Accessibility pointer size on top of this when drawing.
+int GetNormalCursorSize() {
+    int size = 0;
+
+    ICONINFO info{};
+    if (HCURSOR arrow = LoadCursorW(nullptr, IDC_ARROW);
+        arrow && GetIconInfo(arrow, &info)) {
+        BITMAP bitmap{};
+        HBITMAP measured = info.hbmColor ? info.hbmColor : info.hbmMask;
+        if (measured && GetObjectW(measured, sizeof(bitmap), &bitmap)) {
+            size = bitmap.bmWidth;
+        }
+
+        if (info.hbmColor) {
+            DeleteObject(info.hbmColor);
+        }
+        if (info.hbmMask) {
+            DeleteObject(info.hbmMask);
+        }
+    }
+
+    if (size <= 0) {
+        size = GetSystemMetrics(SM_CXCURSOR);
+    }
+
+    return size > 0 ? size : 32;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Shake detection
+
+struct Sample {
+    ULONGLONG time;
+    LONG x;
+    LONG y;
+    double segment;  // Distance from the previous sample.
+};
+
+std::deque<Sample> g_samples;
+double g_pathLength;
+
+// Samples closer together than this are merged, which keeps the history small
+// even with 1000+ Hz mice.
+constexpr ULONGLONG kSampleSpacingMs = 4;
+
+ULONGLONG NowMs() {
+    static const LONGLONG frequency = [] {
+        LARGE_INTEGER value;
+        QueryPerformanceFrequency(&value);
+        return value.QuadPart;
+    }();
+
+    LARGE_INTEGER counter;
+    QueryPerformanceCounter(&counter);
+    return static_cast<ULONGLONG>(counter.QuadPart / (frequency / 1000));
+}
+
+double Distance(LONG x1, LONG y1, LONG x2, LONG y2) {
+    return std::hypot(static_cast<double>(x2 - x1),
+                      static_cast<double>(y2 - y1));
+}
+
+void ClearSamples() {
+    g_samples.clear();
+    g_pathLength = 0;
+}
+
+void AddSample(ULONGLONG now, POINT pt) {
+    if (g_samples.size() >= 2 &&
+        now - g_samples.back().time < kSampleSpacingMs) {
+        Sample& last = g_samples.back();
+        const Sample& previous = g_samples[g_samples.size() - 2];
+        g_pathLength -= last.segment;
+        last.x = pt.x;
+        last.y = pt.y;
+        last.segment = Distance(previous.x, previous.y, pt.x, pt.y);
+        g_pathLength += last.segment;
+    } else {
+        const double segment =
+            g_samples.empty() ? 0.0
+                              : Distance(g_samples.back().x,
+                                         g_samples.back().y, pt.x, pt.y);
+        g_samples.push_back({now, pt.x, pt.y, segment});
+        g_pathLength += segment;
+    }
+
+    // Forget movement older than the time window.
+    const ULONGLONG window = g_settings.shakeWindowMs;
+    while (g_samples.size() > 1 && now - g_samples.front().time > window) {
+        g_samples.pop_front();
+        // The segment leading into the new oldest sample is no longer inside
+        // the window.
+        g_pathLength -= g_samples.front().segment;
+        g_samples.front().segment = 0;
+    }
+
+    if (g_samples.size() <= 1) {
+        g_pathLength = 0;  // Also resets any floating-point drift.
+    }
+}
+
+// A shake is a long path that stays inside a small area: the path length has
+// to be several times the diagonal of the area's bounding box.
+bool IsShaking() {
+    if (g_samples.size() < 3 || g_pathLength < g_settings.shakeDistance) {
+        return false;
+    }
+
+    LONG minX = g_samples.front().x;
+    LONG maxX = minX;
+    LONG minY = g_samples.front().y;
+    LONG maxY = minY;
+    for (const Sample& sample : g_samples) {
+        minX = std::min(minX, sample.x);
+        maxX = std::max(maxX, sample.x);
+        minY = std::min(minY, sample.y);
+        maxY = std::max(maxY, sample.y);
+    }
+
+    const double diagonal = Distance(minX, minY, maxX, maxY);
+    return diagonal >= 1.0 &&
+           g_pathLength * 100.0 >= diagonal * g_settings.shakeRatioPercent;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Grow / hold / shrink animation
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
+#endif
+
+enum class Phase { Idle, Growing, Enlarged, Shrinking };
+
+constexpr size_t kCursorTypeCount = sizeof(kCursorTypes) / sizeof(kCursorTypes[0]);
+constexpr UINT WM_APP_SETTINGS_CHANGED = WM_APP + 1;
+
+// Pauses longer than this don't count towards the time spent shaking.
+constexpr ULONGLONG kShakeGapMs = 200;
+
+
+// Background writer of an animated cursor's frames; see StartFrameWriter.
+struct FrameWriter {
+    HANDLE thread = nullptr;
+    std::atomic<bool> cancel{false};
+    std::unique_ptr<std::atomic<bool>[]> ready;  // Per frame.
+    size_t count = 0;
+    size_t typeIndex = 0;
+    size_t startFrame = 0;
+    WCHAR aniPath[MAX_PATH]{};
+    AniIndex index;
+};
+
+// Per-type state, captured when an animation starts so that frames don't have
+// to touch the registry.
+struct CursorSource {
+    HCURSOR systemHandle;  // Unchanged when SetSystemCursor swaps the image.
+    HCURSOR pristineCopy;  // Owned copy of the original image; see LoadCursorAtSize.
+    bool pristineTried;
+    WCHAR path[MAX_PATH];
+    bool hasPath;
+    bool animated;
+    int appliedSize;
+    bool appliedStatic;     // The applied cursor is a static stand-in frame.
+    int appliedFrame;       // Which .ani frame the stand-in shows.
+    bool standInTried;      // The .ani index is read lazily, when first needed.
+    bool standInReady;
+    AniIndex aniIndex;
+    ULONGLONG aniStartMs;   // When the stand-in's animation clock started.
+    int loadedFrame;        // Which frame `staticFrame` holds (-1 = none).
+    StaticFrame staticFrame;
+    size_t lastStep;        // Stand-in step at the last loop-start check.
+    std::unique_ptr<FrameWriter> writer;  // See StartFrameWriter.
+    int firstReadyFrame;
+    bool resizeFailed;  // Last resize failed; treated as done until next shake.
+};
+
+CursorSource g_sources[kCursorTypeCount];
+
+HWND g_hwnd;
+HANDLE g_timer;  // Drives animation frames and the hold check.
+LONGLONG g_frameInterval100ns = 10'000'000 / 60;
+bool g_animating;  // Timer runs frames rather than waiting to shrink.
+
+Phase g_phase = Phase::Idle;
+int g_normalSize;
+int g_enlargedSize;  // Size of the first enlargement.
+int g_sizeCeiling;
+double g_currentSize;
+double g_tweenFrom;
+double g_tweenTo;
+ULONGLONG g_tweenStart;
+ULONGLONG g_tweenDuration;
+double g_tweenProgress;  // How far the tween is (0-1), see RenderTweenFrame.
+
+// Every grow and shrink shows at least this many steps. With a big pointer
+// size each step can take tens of milliseconds, and a purely time-based
+// animation would then jump straight to the end; this way it takes a little
+// longer instead. At normal speeds it has no effect.
+constexpr double kMinTweenSteps = 8;
+ULONGLONG g_lastShakeTime;
+ULONGLONG g_shakeTimeMs;  // Time spent shaking since the cursor started growing.
+ULONGLONG g_shrinkDoneMs; // When the shrink reached the normal size (0 = not yet).
+
+// Longest the restore waits for an animated stand-in's loop to come around.
+constexpr ULONGLONG kMaxLoopWaitMs = 5000;
+
+void CaptureCursorSources(int normalSize) {
+    for (size_t i = 0; i < kCursorTypeCount; i++) {
+        const CursorType& type = kCursorTypes[i];
+        CursorSource& source = g_sources[i];
+        source.systemHandle = LoadCursorW(nullptr, MAKEINTRESOURCEW(type.id));
+        // Taken lazily (see EnsurePristineCopy): copying all seventeen cursors
+        // up front delays the start of the animation, by over 100 ms with a
+        // big pointer size.
+        source.pristineCopy = nullptr;
+        source.pristineTried = false;
+        source.hasPath = GetSchemeCursorPath(type.registryName, source.path);
+        source.animated = source.hasPath ? IsAnimatedCursorFile(source.path)
+                                         : type.animatedByDefault;
+        source.appliedSize = normalSize;
+        source.appliedStatic = false;
+        source.appliedFrame = -1;
+        source.standInTried = false;
+        source.standInReady = false;
+        source.aniIndex = {};
+        source.loadedFrame = -1;
+        source.staticFrame = {};
+        source.lastStep = 0;
+        source.resizeFailed = false;
+    }
+}
+
+// Folder for the .ani frame files, in the mod's storage folder, with a
+// subfolder per Windows session so that users who are signed in at the same
+// time don't share files. Ends with a backslash; empty if it couldn't be
+// created, in which case frames are built in memory instead.
+WCHAR g_framesDir[MAX_PATH];
+
+bool InitFramesDir() {
+    g_framesDir[0] = L'\0';
+
+    WCHAR storage[MAX_PATH];
+    size_t length = Wh_GetModStoragePath(storage, MAX_PATH);
+    // Leave room for the subfolder and file names: swprintf_s ends the
+    // process rather than failing when the buffer is too small.
+    if (length == 0 || length + 40 >= MAX_PATH) {
+        return false;
+    }
+    if (storage[length - 1] == L'\\') {
+        storage[--length] = L'\0';
+    }
+    CreateDirectoryW(storage, nullptr);  // Usually exists already.
+
+    DWORD sessionId = 0;
+    ProcessIdToSessionId(GetCurrentProcessId(), &sessionId);
+    WCHAR dir[MAX_PATH];
+    if (swprintf_s(dir, L"%s\\frames-%lu\\", storage, sessionId) <= 0) {
+        return false;
+    }
+    if (!CreateDirectoryW(dir, nullptr) &&
+        GetLastError() != ERROR_ALREADY_EXISTS) {
+        return false;
+    }
+    lstrcpynW(g_framesDir, dir, MAX_PATH);
+    return true;
+}
+
+// Path of the file holding one .ani frame of one cursor type.
+bool GetFrameFilePath(size_t typeIndex, int frameIndex, WCHAR (&path)[MAX_PATH]) {
+    if (!g_framesDir[0]) {
+        return false;
+    }
+    return swprintf_s(path, L"%s%zu-%d.cur", g_framesDir, typeIndex,
+                      frameIndex) > 0;
+}
+
+// .ani frames are shown by loading them the same way cursors from the scheme
+// are loaded: from a file, with LoadImage. Cursors built in memory instead are
+// briefly drawn without the Accessibility pointer size scaling each time
+// they're applied, which makes them flicker between two sizes; cursors loaded
+// from a file don't.
+//
+// Each frame is written to its own file. Writing a new file is slow (the
+// file is typically scanned by antivirus software before it can be read), so
+// the first frame is written right away and the rest by a low-priority
+// background thread; until a frame is ready, the last ready one stays on
+// screen. The thread only writes files and never touches cursors. The files
+// are kept until the normal cursors are restored (GoIdle), since Windows may
+// read them again.
+
+bool WriteFrameFile(size_t typeIndex, int frameIndex,
+                    const std::vector<BYTE>& data) {
+    WCHAR path[MAX_PATH];
+    if (!GetFrameFilePath(typeIndex, frameIndex, path)) {
+        return false;
+    }
+    HANDLE file = CreateFileW(path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
+                              FILE_ATTRIBUTE_TEMPORARY, nullptr);
+    if (file == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+    DWORD written = 0;
+    const bool ok = WriteFile(file, data.data(),
+                              static_cast<DWORD>(data.size()), &written,
+                              nullptr) &&
+                    written == data.size();
+    CloseHandle(file);
+    if (!ok) {
+        DeleteFileW(path);
+    }
+    return ok;
+}
+
+DWORD WINAPI FrameWriterProc(LPVOID param) {
+    auto* writer = static_cast<FrameWriter*>(param);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+    std::vector<BYTE> data;
+    // In playback order from the first frame shown, so the frames needed
+    // soonest are ready first.
+    for (size_t n = 1; n < writer->count && !writer->cancel; n++) {
+        const size_t frame = (writer->startFrame + n) % writer->count;
+        if (ReadAniFrame(writer->aniPath, writer->index, frame, data) &&
+            IsValidIconFile(data) &&
+            WriteFrameFile(writer->typeIndex, static_cast<int>(frame), data)) {
+            writer->ready[frame] = true;
+        }
+    }
+    return 0;
+}
+
+// Writes the first frame and starts the thread that writes the others. Leaves
+// source.writer empty if even the first frame can't be written, in which case
+// frames are built in memory instead.
+void StartFrameWriter(CursorSource& source, int firstFrame) {
+    const size_t typeIndex = static_cast<size_t>(&source - g_sources);
+    const size_t count = source.aniIndex.frameOffsets.size();
+    if (firstFrame < 0 || static_cast<size_t>(firstFrame) >= count) {
+        return;
+    }
+
+    std::vector<BYTE> data;
+    if (!ReadAniFrame(source.path, source.aniIndex,
+                      static_cast<size_t>(firstFrame), data) ||
+        !IsValidIconFile(data) || !WriteFrameFile(typeIndex, firstFrame, data)) {
+        return;
+    }
+
+    auto writer = std::make_unique<FrameWriter>();
+    writer->ready = std::make_unique<std::atomic<bool>[]>(count);
+    writer->count = count;
+    writer->typeIndex = typeIndex;
+    writer->startFrame = static_cast<size_t>(firstFrame);
+    writer->ready[firstFrame] = true;
+    lstrcpynW(writer->aniPath, source.path, MAX_PATH);
+    writer->index = source.aniIndex;
+
+    source.writer = std::move(writer);
+    source.firstReadyFrame = firstFrame;
+}
+
+// Starts writing the remaining frames once a type is actually on screen, so
+// types that never appear only ever get their first frame written. If the
+// thread can't start, the first frame alone is used.
+void EnsureFrameWriterThread(CursorSource& source) {
+    if (source.writer && !source.writer->thread && source.writer->count > 1) {
+        source.writer->thread = CreateThread(nullptr, 0, FrameWriterProc,
+                                             source.writer.get(), 0, nullptr);
+    }
+}
+
+bool IsFrameReady(const CursorSource& source, int frameIndex) {
+    return source.writer && frameIndex >= 0 &&
+           static_cast<size_t>(frameIndex) < source.writer->count &&
+           source.writer->ready[frameIndex];
+}
+
+// The frame to show when `frameIndex` is due: that one if its file is ready,
+// otherwise the one already on screen (or the first one).
+int ResolveReadyFrame(const CursorSource& source, int frameIndex) {
+    if (!source.writer || IsFrameReady(source, frameIndex)) {
+        return frameIndex;
+    }
+    if (source.appliedStatic && IsFrameReady(source, source.appliedFrame)) {
+        return source.appliedFrame;
+    }
+    return source.firstReadyFrame;
+}
+
+// Stops the writer thread and deletes the files it wrote.
+void StopFrameWriter(CursorSource& source) {
+    if (!source.writer) {
+        return;
+    }
+    FrameWriter& writer = *source.writer;
+    writer.cancel = true;
+    if (writer.thread) {
+        WaitForSingleObject(writer.thread, INFINITE);  // At most one write.
+        CloseHandle(writer.thread);
+    }
+    for (size_t frame = 0; frame < writer.count; frame++) {
+        WCHAR path[MAX_PATH];
+        if (writer.ready[frame] &&
+            GetFrameFilePath(writer.typeIndex, static_cast<int>(frame), path)) {
+            DeleteFileW(path);
+        }
+    }
+    source.writer.reset();
+}
+
+// Removes frame files left behind by a run that ended without cleaning up
+// (crash or killed process).
+void DeleteStaleFrameFiles() {
+    if (!g_framesDir[0]) {
+        return;
+    }
+    WCHAR pattern[MAX_PATH];
+    if (swprintf_s(pattern, L"%s*.cur", g_framesDir) <= 0) {
+        return;
+    }
+    WIN32_FIND_DATAW found;
+    HANDLE search = FindFirstFileW(pattern, &found);
+    if (search == INVALID_HANDLE_VALUE) {
+        return;
+    }
+    do {
+        WCHAR path[MAX_PATH];
+        if (swprintf_s(path, L"%s%s", g_framesDir, found.cFileName) > 0) {
+            DeleteFileW(path);
+        }
+    } while (FindNextFileW(search, &found));
+    FindClose(search);
+}
+
+// The frame the stand-in for an animated cursor should show right now. The
+// stand-in keeps the animation running while the size changes: each step shows
+// the frame that's due at that moment, so only one frame is decoded per step.
+// Returns 0 if the .ani file can't be indexed (e.g. it fails to parse); the
+// stand-in is then a still image.
+int StandInFrameNow(CursorSource& source) {
+    if (!source.standInTried) {
+        source.standInTried = true;
+        source.standInReady = ReadAniIndex(source.path, source.aniIndex);
+        source.aniStartMs = NowMs();
+        source.loadedFrame = -1;
+        if (source.standInReady) {
+            StartFrameWriter(source,
+                             static_cast<int>(AniFrameAt(source.aniIndex, 0)));
+        }
+    }
+    if (!source.standInReady) {
+        return 0;
+    }
+    return static_cast<int>(
+        AniFrameAt(source.aniIndex, NowMs() - source.aniStartMs));
+}
+
+// Whether the stand-in's animation is back at the start of its loop: at its
+// first step, or wrapped around since the last check (a step can be shorter
+// than the time between checks).
+bool StandInAtLoopStart(CursorSource& source) {
+    const size_t step =
+        AniStepAt(source.aniIndex, NowMs() - source.aniStartMs);
+    const bool atStart = step == 0 || step < source.lastStep;
+    source.lastStep = step;
+    return atStart;
+}
+
+void ResetLoopStartCheck(CursorSource& source) {
+    if (source.standInReady) {
+        source.lastStep =
+            AniStepAt(source.aniIndex, NowMs() - source.aniStartMs);
+    }
+}
+
+// A static stand-in for an animated cursor at the given size: the given frame
+// of its .ani file, or the pristine copy stretched if that can't be read.
+HCURSOR LoadStandInAtSize(CursorSource& source, int size, int frameIndex) {
+    HCURSOR cursor = nullptr;
+    WCHAR path[MAX_PATH];
+    if (IsFrameReady(source, frameIndex) &&
+        GetFrameFilePath(static_cast<size_t>(&source - g_sources), frameIndex,
+                         path)) {
+        cursor = static_cast<HCURSOR>(LoadImageW(
+            nullptr, path, IMAGE_CURSOR, size, size, LR_LOADFROMFILE));
+        if (cursor) {
+            return cursor;
+        }
+    }
+    if (source.standInReady) {
+        if (source.loadedFrame != frameIndex) {
+            source.loadedFrame = -1;
+            source.staticFrame = {};
+            if (ReadAniFrame(source.path, source.aniIndex,
+                             static_cast<size_t>(frameIndex),
+                             source.staticFrame.file) &&
+                IsValidIconFile(source.staticFrame.file)) {
+                source.loadedFrame = frameIndex;
+            }
+        }
+        if (source.loadedFrame == frameIndex) {
+            cursor = CreateStaticFrameCursor(source.staticFrame, size);
+        }
+    }
+    if (!cursor && source.pristineCopy) {
+        cursor = static_cast<HCURSOR>(
+            CopyImage(source.pristineCopy, IMAGE_CURSOR, size, size, 0));
+    }
+    return cursor;
+}
+
+// Animated cursors are never loaded in full while the cursor is enlarged:
+// that decodes every frame of the .ani file (60+ in some themes), which takes
+// long enough to stall the animation and holds up the system's cursor
+// handling. Instead they get a single-frame stand-in that this mod animates
+// itself, advancing it to the frame that's due on every tick, so only one
+// frame is decoded per frame change. The real animated cursors come back when
+// the cursors are restored at the end (see FinishShrinkOnLoopStart).
+// The built-in animated cursors (no file in the scheme) are small resources
+// that load quickly, so they're loaded in full like static ones.
+bool UsesStandIn(const CursorSource& source) {
+    return source.animated && source.hasPath;
+}
+
+// The Accessibility pointer size setting (Settings > Accessibility > Mouse
+// pointer and touch > Size). Windows draws every cursor scaled by this factor
+// on top of its bitmap size: at size 8 a 64 px cursor bitmap is shown at
+// 4.5 x 64 = 288 px. It's 1 at the default size. Read once per shake.
+double g_pointerScale = 1.0;
+
+double ReadPointerScale() {
+    DWORD base = 0;
+    DWORD bytes = sizeof(base);
+    if (RegGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Cursors",
+                     L"CursorBaseSize", RRF_RT_REG_DWORD, nullptr, &base,
+                     &bytes) != ERROR_SUCCESS ||
+        base <= 32) {
+        return 1.0;
+    }
+    return std::min(base / 32.0, 16.0);
+}
+
+// Takes the copy of the original image right before this type is first
+// changed, so it's still guaranteed to be the original.
+void EnsurePristineCopy(CursorSource& source) {
+    if (source.pristineTried) {
+        return;
+    }
+    source.pristineTried = true;
+    source.pristineCopy =
+        source.systemHandle
+            ? static_cast<HCURSOR>(
+                  CopyImage(source.systemHandle, IMAGE_CURSOR, 0, 0, 0))
+            : nullptr;
+}
+
+// Returns whether the cursor's image was changed.
+bool SetCursorTypeSize(size_t index, int size) {
+    CursorSource& source = g_sources[index];
+    if (source.appliedSize != size || source.appliedStatic) {
+        EnsurePristineCopy(source);
+    }
+
+    if (!UsesStandIn(source)) {
+        if (source.appliedSize == size) {
+            return false;
+        }
+        HCURSOR cursor =
+            LoadCursorAtSize(kCursorTypes[index],
+                             source.hasPath ? source.path : nullptr, size,
+                             source.pristineCopy);
+        if (!cursor) {
+            source.resizeFailed = true;
+            return false;
+        }
+        // On success, the system takes ownership of the handle and destroys
+        // it.
+        if (SetSystemCursor(cursor, kCursorTypes[index].id)) {
+            source.appliedSize = size;
+            source.resizeFailed = false;
+            return true;
+        }
+        DestroyCursor(cursor);
+        source.resizeFailed = true;
+        return false;
+    }
+
+    // The original full cursor still animates on its own at its normal size.
+    if (source.appliedSize == size && !source.appliedStatic) {
+        return false;
+    }
+
+    const int frame = ResolveReadyFrame(source, StandInFrameNow(source));
+    if (source.appliedStatic && source.appliedSize == size &&
+        source.appliedFrame == frame) {
+        return false;  // Already showing this frame at this size.
+    }
+
+    HCURSOR cursor = LoadStandInAtSize(source, size, frame);
+    if (!cursor) {
+        source.resizeFailed = true;
+        return false;
+    }
+    if (SetSystemCursor(cursor, kCursorTypes[index].id)) {
+        source.appliedSize = size;
+        source.appliedStatic = true;
+        source.appliedFrame = frame;
+        source.resizeFailed = false;
+        return true;
+    }
+    DestroyCursor(cursor);
+    source.resizeFailed = true;
+    return false;
+}
+
+// When the mouse last moved (see OnRawMouseInput).
+ULONGLONG g_lastMoveMs;
+
+// Movement this recent redraws the cursor anyway.
+constexpr ULONGLONG kRecentMoveMs = 25;
+
+// Windows doesn't redraw the cursor on screen when SetSystemCursor changes its
+// image; it shows the new image the next time the mouse moves. Without this,
+// a cursor that's held still doesn't visibly shrink (or animate), and a cursor
+// that just switched type (e.g. arrow to text cursor) stays at its old size
+// until the mouse moves again. Setting the cursor to where it already is
+// makes Windows redraw it. It isn't needed while the mouse is moving, and
+// skipping it then avoids racing the user's own movement.
+void RedrawCursor() {
+    if (NowMs() - g_lastMoveMs < kRecentMoveMs) {
+        return;
+    }
+    POINT pt;
+    if (GetCursorPos(&pt)) {
+        SetCursorPos(pt.x, pt.y);
+    }
+}
+
+// Resizing only the cursor that's on screen means one file load per frame
+// instead of seventeen, which is what makes a smooth animation possible. For
+// an animated cursor this also advances it to the frame that's due.
+void ResizeVisibleCursor(int size) {
+    CURSORINFO info{.cbSize = sizeof(info)};
+    if (!GetCursorInfo(&info) || !info.hCursor) {
+        return;
+    }
+
+    for (size_t i = 0; i < kCursorTypeCount; i++) {
+        if (g_sources[i].systemHandle == info.hCursor) {
+            if (SetCursorTypeSize(i, size)) {
+                RedrawCursor();
+            }
+            EnsureFrameWriterThread(g_sources[i]);
+            return;
+        }
+    }
+}
+
+// How many cursor types that aren't on screen get resized per animation tick.
+constexpr int kOtherCursorsPerTick = 4;
+
+size_t g_nextOtherCursor;
+
+// Keeps the cursor types that aren't on screen close to the current size,
+// taking a few of them per tick in turn (resizing all seventeen every frame
+// would be too slow). Otherwise a type that appears mid-animation, e.g. the
+// arrow when moving off text, is shown for a moment at whatever size it had
+// last: the full enlarged size during the shrink, or the normal size while
+// enlarged.
+//
+// Each cursor change makes Windows rebuild the image at the pointer size, which
+// can take tens of milliseconds for a big cursor with a big pointer size, so
+// the work per tick is also limited by time (tickStart is when the tick began).
+constexpr ULONGLONG kTickBudgetMs = 8;
+
+void ResizeSomeOtherCursors(int size, ULONGLONG tickStart) {
+    CURSORINFO info{.cbSize = sizeof(info)};
+    const HCURSOR visible =
+        GetCursorInfo(&info) ? info.hCursor : nullptr;
+
+    int resized = 0;
+    for (size_t n = 0; n < kCursorTypeCount && resized < kOtherCursorsPerTick &&
+                       NowMs() - tickStart < kTickBudgetMs;
+         n++) {
+        const size_t i = g_nextOtherCursor;
+        g_nextOtherCursor = (g_nextOtherCursor + 1) % kCursorTypeCount;
+        // A type that failed to resize is skipped rather than retried every
+        // tick; it's tried again on the next shake.
+        if (g_sources[i].systemHandle == visible ||
+            g_sources[i].appliedSize == size || g_sources[i].resizeFailed) {
+            continue;
+        }
+        SetCursorTypeSize(i, size);
+        resized++;
+    }
+}
+
+// The visible cursor every tick, and the others a few at a time.
+void ResizeCursors(int size) {
+    const ULONGLONG tickStart = NowMs();
+    ResizeVisibleCursor(size);
+    ResizeSomeOtherCursors(size, tickStart);
+}
+
+bool AllCursorsAtSize(int size) {
+    for (const CursorSource& source : g_sources) {
+        if (source.appliedSize != size && !source.resizeFailed) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool HasAnimatedCursors() {
+    for (const CursorSource& source : g_sources) {
+        if (UsesStandIn(source)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ScheduleTimer(LONGLONG delay100ns) {
+    LARGE_INTEGER dueTime;
+    dueTime.QuadPart = -std::max<LONGLONG>(delay100ns, 1);  // Relative time.
+    SetWaitableTimer(g_timer, &dueTime, 0, nullptr, nullptr, FALSE);
+}
+
+ULONGLONG g_tickStartMs;  // When the current animation tick started.
+
+// The next animation tick, one frame after the current one started rather than
+// after its work is done, so the work doesn't lower the frame rate.
+void ScheduleNextFrame() {
+    const LONGLONG elapsed100ns =
+        static_cast<LONGLONG>(NowMs() - g_tickStartMs) * 10'000;
+    ScheduleTimer(g_frameInterval100ns - elapsed100ns);
+}
+
+void ScheduleHoldCheck(ULONGLONG now) {
+    const ULONGLONG holdMs = g_settings.holdMs;
+    const ULONGLONG elapsed = now - g_lastShakeTime;
+    const ULONGLONG remaining = elapsed < holdMs ? holdMs - elapsed : 0;
+    ScheduleTimer(static_cast<LONGLONG>(remaining) * 10'000);
+}
+
+struct MonitorMetrics {
+    LONGLONG frameInterval100ns;  // One frame per refresh.
+    int height;
+};
+
+// Refresh rate and height of the monitor the cursor is on. The height is in
+// cursor-bitmap pixels, not display pixels: Windows re-scales a loaded system
+// cursor again by the monitor's DPI when it draws it, so a bitmap loaded at
+// the monitor's raw pixel height would end up displaying larger than the
+// screen on a scaled-up monitor. Dividing by the DPI factor here keeps the
+// size limit accurate to what's actually shown on screen.
+MonitorMetrics GetCursorMonitorMetrics() {
+    int refreshRate = 60;
+    int height = 0;
+    double dpiScale = 1.0;
+
+    POINT pt;
+    if (GetCursorPos(&pt)) {
+        HMONITOR monitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+
+        MONITORINFOEXW monitorInfo{};
+        monitorInfo.cbSize = sizeof(monitorInfo);
+        if (GetMonitorInfoW(monitor,
+                            reinterpret_cast<LPMONITORINFO>(&monitorInfo))) {
+            height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+
+            DEVMODEW mode{};
+            mode.dmSize = sizeof(mode);
+            if (EnumDisplaySettingsW(monitorInfo.szDevice,
+                                     ENUM_CURRENT_SETTINGS, &mode) &&
+                mode.dmDisplayFrequency > 1) {
+                refreshRate = static_cast<int>(mode.dmDisplayFrequency);
+            }
+        }
+
+        UINT dpiX, dpiY;
+        if (SUCCEEDED(GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiX,
+                                       &dpiY)) &&
+            dpiX > 0) {
+            dpiScale = dpiX / 96.0;
+        }
+    }
+
+    refreshRate = std::clamp(refreshRate, 30, 360);
+    const int rawHeight = height > 0 ? height : 1080;
+    return {10'000'000LL / refreshRate,
+           static_cast<int>(std::lround(rawHeight / dpiScale))};
+}
+
+double EaseOutCubic(double t) {
+    const double u = 1.0 - t;
+    return 1.0 - u * u * u;
+}
+
+// The first enlargement plus extra growth while you keep shaking. The extra
+// part is logarithmic: every further step of the same size takes twice as long
+// as the previous one, so it keeps slowing down but never quite stops.
+double TargetSize() {
+    const double extra = g_settings.keepGrowingPercent / 100.0 *
+                         std::log2(1.0 + g_shakeTimeMs / 1000.0);
+    return std::min(g_enlargedSize * (1.0 + extra),
+                    static_cast<double>(g_sizeCeiling));
+}
+
+// Animates from the current size to `to`. The duration is for the full normal
+// <-> enlarged distance, so reversing halfway through takes half as long.
+void StartTween(double to, int fullDurationMs, ULONGLONG now) {
+    const double span = std::max(1, g_enlargedSize - g_normalSize);
+    const double fraction = std::min(1.0, std::abs(to - g_currentSize) / span);
+    g_shrinkDoneMs = 0;
+    g_tweenFrom = g_currentSize;
+    g_tweenTo = to;
+    g_tweenStart = now;
+    g_tweenDuration =
+        static_cast<ULONGLONG>(std::lround(fullDurationMs * fraction));
+    g_tweenProgress = 0;
+}
+
+void GoIdle() {
+    CancelWaitableTimer(g_timer);
+    RestoreSystemCursors();  // Exact original cursors, all types.
+    for (CursorSource& source : g_sources) {
+        if (source.pristineCopy) {
+            DestroyCursor(source.pristineCopy);
+            source.pristineCopy = nullptr;
+        }
+        source.pristineTried = false;
+        StopFrameWriter(source);  // The restored cursors no longer use them.
+        source.staticFrame = {};  // Frees the frame's memory.
+        source.aniIndex = {};
+        source.standInTried = false;
+        source.standInReady = false;
+        source.loadedFrame = -1;
+    }
+    g_phase = Phase::Idle;
+    g_animating = false;
+    g_shakeTimeMs = 0;
+}
+
+void ResetToIdle() {
+    if (g_phase != Phase::Idle) {
+        GoIdle();
+    }
+}
+
+// At the end of the shrink, the normal cursors are restored, and an animated
+// one restarts its animation from the beginning. If the cursor on screen is an
+// animated stand-in, keep it animating at the normal size until its loop comes
+// back to the start, so the restore doesn't make the animation jump. Returns
+// true once the cursors are restored.
+bool FinishShrinkOnLoopStart(ULONGLONG now) {
+    if (g_shrinkDoneMs == 0) {
+        g_shrinkDoneMs = now;
+        for (CursorSource& source : g_sources) {
+            ResetLoopStartCheck(source);
+        }
+    }
+
+    CURSORINFO info{.cbSize = sizeof(info)};
+    if (GetCursorInfo(&info) && info.hCursor) {
+        for (size_t i = 0; i < kCursorTypeCount; i++) {
+            CursorSource& source = g_sources[i];
+            if (source.systemHandle != info.hCursor) {
+                continue;
+            }
+            if (source.appliedStatic && source.standInReady &&
+                now - g_shrinkDoneMs < kMaxLoopWaitMs &&
+                !StandInAtLoopStart(source)) {
+                // The shrink only resized the visible cursor, so the other
+                // types are still enlarged. Bring them back now, so one that
+                // appears while waiting (e.g. the arrow when a busy app
+                // finishes) isn't shown big. Each type is resized once; after
+                // that it's skipped.
+                ResizeSomeOtherCursors(g_normalSize, now);
+                // Next frame, normal size.
+                if (SetCursorTypeSize(i, g_normalSize)) {
+                    RedrawCursor();
+                }
+                return false;
+            }
+            break;
+        }
+    }
+
+    GoIdle();
+    return true;
+}
+
+void RenderTweenFrame(ULONGLONG now) {
+    if (g_phase == Phase::Growing) {
+        g_tweenTo = TargetSize();  // Moves on while you keep shaking.
+    }
+
+    double t = g_tweenDuration == 0
+                   ? 1.0
+                   : std::min(1.0, static_cast<double>(now - g_tweenStart) /
+                                       g_tweenDuration);
+    if (g_tweenDuration != 0) {
+        t = std::min(t, g_tweenProgress + 1.0 / kMinTweenSteps);
+    }
+    g_tweenProgress = t;
+    g_currentSize = g_tweenFrom + (g_tweenTo - g_tweenFrom) * EaseOutCubic(t);
+
+    if (t >= 1.0) {
+        if (g_phase == Phase::Growing) {
+            // The other cursor types catch up over the next ticks (see
+            // ResizeCursors); doing them all at once can take a long time.
+            const int size = static_cast<int>(std::lround(g_currentSize));
+            ResizeCursors(size);
+            g_phase = Phase::Enlarged;
+            ScheduleNextFrame();
+        } else if (!FinishShrinkOnLoopStart(now)) {
+            ScheduleNextFrame();  // Still waiting.
+        }
+        return;
+    }
+
+    ResizeCursors(static_cast<int>(std::lround(g_currentSize)));
+    ScheduleNextFrame();
+}
+
+void StartShrinking(ULONGLONG now) {
+    g_phase = Phase::Shrinking;
+    g_animating = true;
+    StartTween(g_normalSize, g_settings.shrinkMs, now);
+    RenderTweenFrame(now);
+}
+
+// While waiting to shrink: with animated cursors in the scheme, tick every
+// frame so they keep animating; otherwise just wake up for the hold check.
+void ScheduleEnlargedWait(ULONGLONG now) {
+    if (HasAnimatedCursors() ||
+        !AllCursorsAtSize(static_cast<int>(std::lround(g_currentSize)))) {
+        ScheduleNextFrame();  // The hold is checked each tick.
+    } else {
+        ScheduleHoldCheck(now);
+    }
+}
+
+void OnTimerFired() {
+    const ULONGLONG now = NowMs();
+    g_tickStartMs = now;
+    switch (g_phase) {
+        case Phase::Growing:
+        case Phase::Shrinking:
+            RenderTweenFrame(now);
+            break;
+
+        case Phase::Enlarged:
+            if (!g_animating) {
+                // Hold check: shrink once you've stopped shaking long enough.
+                if (now - g_lastShakeTime >=
+                    static_cast<ULONGLONG>(g_settings.holdMs)) {
+                    StartShrinking(now);
+                } else {
+                    // Keeps an animated cursor on screen animating, and
+                    // catches up a cursor that just appeared (e.g. the busy
+                    // cursor when an app starts loading while the mouse is
+                    // still).
+                    ResizeCursors(
+                        static_cast<int>(std::lround(g_currentSize)));
+                    ScheduleEnlargedWait(now);
+                }
+            } else if (g_settings.keepGrowingPercent > 0 &&
+                       now - g_lastShakeTime <= kShakeGapMs) {
+                // Still shaking: keep growing.
+                g_currentSize = TargetSize();
+                ResizeCursors(static_cast<int>(std::lround(g_currentSize)));
+                ScheduleNextFrame();
+            } else {
+                // Stopped shaking: wait for the hold time, then shrink.
+                g_animating = false;
+                const int size = static_cast<int>(std::lround(g_currentSize));
+                // The other types catch up on the hold ticks.
+                ResizeCursors(size);
+                ScheduleEnlargedWait(now);
+            }
+            break;
+
+        case Phase::Idle:
+            break;
+    }
+}
+
+bool CanEnlargeNow() {
+    // Skip when the cursor is hidden (games, video playback) or suppressed
+    // (touch and pen input).
+    CURSORINFO info{.cbSize = sizeof(info)};
+    if (!GetCursorInfo(&info) || !(info.flags & CURSOR_SHOWING) ||
+        (info.flags & CURSOR_SUPPRESSED)) {
+        return false;
+    }
+
+    if (g_settings.disableInFullscreen) {
+        QUERY_USER_NOTIFICATION_STATE state;
+        if (SUCCEEDED(SHQueryUserNotificationState(&state)) &&
+            (state == QUNS_BUSY || state == QUNS_RUNNING_D3D_FULL_SCREEN ||
+             state == QUNS_PRESENTATION_MODE)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void OnShake(ULONGLONG now) {
+    switch (g_phase) {
+        case Phase::Idle: {
+            if (!CanEnlargeNow()) {
+                // Require a fresh shake instead of re-checking on every event.
+                ClearSamples();
+                return;
+            }
+
+            const MonitorMetrics monitor = GetCursorMonitorMetrics();
+            g_frameInterval100ns = monitor.frameInterval100ns;
+            g_pointerScale = ReadPointerScale();
+            // Sizes here are cursor bitmap sizes; Windows draws them
+            // g_pointerScale times bigger.
+            g_sizeCeiling = static_cast<int>(std::lround(
+                (g_settings.sizeLimit > 0 ? g_settings.sizeLimit
+                                          : monitor.height) /
+                g_pointerScale));
+            g_normalSize = GetNormalCursorSize();
+            g_enlargedSize =
+                std::min(g_normalSize * g_settings.scalePercent / 100,
+                         g_sizeCeiling);
+            if (g_enlargedSize <= g_normalSize) {
+                ClearSamples();
+                return;
+            }
+
+            Wh_Log(L"Shake detected, enlarging cursor %d -> %d px",
+                   g_normalSize, g_enlargedSize);
+
+            // Lets the next start restore the cursors if this process dies
+            // while they're enlarged.
+            Wh_SetIntValue(L"cursorsModified", 1);
+
+            CaptureCursorSources(g_normalSize);
+            g_shakeTimeMs = 0;
+            g_lastShakeTime = now;
+            g_currentSize = g_normalSize;
+            g_phase = Phase::Growing;
+            g_animating = true;
+            StartTween(TargetSize(), g_settings.growMs, now);
+            g_tickStartMs = now;
+            RenderTweenFrame(now);
+            break;
+        }
+
+        case Phase::Shrinking:
+            // Shaking again while shrinking: grow back to where it was.
+            g_lastShakeTime = now;
+            g_phase = Phase::Growing;
+            StartTween(TargetSize(), g_settings.growMs, now);
+            break;
+
+        case Phase::Growing:
+        case Phase::Enlarged:
+            if (now - g_lastShakeTime <= kShakeGapMs) {
+                g_shakeTimeMs += now - g_lastShakeTime;
+            }
+            g_lastShakeTime = now;
+
+            if (!g_animating) {
+                // Was waiting to shrink: start growing again right away.
+                g_animating = true;
+                ScheduleTimer(1);
+            }
+            break;
+    }
+}
+
+void OnRawMouseInput() {
+    POINT pt;
+    if (!GetCursorPos(&pt)) {
+        return;
+    }
+
+    // Clicks, wheel and sub-pixel movement don't move the cursor.
+    if (!g_samples.empty() && g_samples.back().x == pt.x &&
+        g_samples.back().y == pt.y) {
+        return;
+    }
+
+    const ULONGLONG now = NowMs();
+    g_lastMoveMs = now;
+    AddSample(now, pt);
+    if (IsShaking()) {
+        OnShake(now);
+    }
+
+    // While it's waiting to shrink, a cursor that just appeared (e.g. the text
+    // cursor when moving over text) catches up with the current size.
+    if (g_phase == Phase::Enlarged && !g_animating) {
+        ResizeVisibleCursor(static_cast<int>(std::lround(g_currentSize)));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Worker thread with a hidden top-level window
+// [CW-Beautify] 基底原为 message-only window；为接收会话结束广播
+// （WM_QUERYENDSESSION/WM_ENDSESSION）改为隐藏顶层窗口，
+// 见 WindowProc 与 CreateWindowExW 处的说明。
+
+constexpr WCHAR kWindowClassName[] = L"WindhawkShakeToFindCursor_" WH_MOD_ID;
+
+HANDLE g_workerThread;
+HANDLE g_workerReadyEvent;
+LPTOP_LEVEL_EXCEPTION_FILTER g_previousExceptionFilter;
+
+LRESULT CALLBACK WindowProc(HWND hwnd,
+                            UINT msg,
+                            WPARAM wParam,
+                            LPARAM lParam) {
+    switch (msg) {
+        case WM_INPUT:
+            OnRawMouseInput();
+            break;  // DefWindowProc still has to run to clean up the input.
+
+        case WM_APP_SETTINGS_CHANGED: {
+            std::unique_ptr<Settings> settings(
+                reinterpret_cast<Settings*>(lParam));
+            ResetToIdle();
+            g_settings = *settings;
+            ClearSamples();
+            return 0;
+        }
+
+        // [CW-Beautify] 吸收自 mac-magnifying-cursor（Jaali）：注销/关机（会话结束）
+        // 时还原系统光标。基底未处理这两个广播，只能依赖下次启动时的 cursorsModified
+        // 持久标记兜底；这里在会话结束前即时还原。注意：系统广播只发给顶层窗口，
+        // 因此本合并版把工作窗口创建为隐藏的顶层工具窗口（见下方 CreateWindowExW）。
+        case WM_QUERYENDSESSION:
+            return TRUE;  // 不阻止注销/关机。
+
+        case WM_ENDSESSION:
+            if (wParam) {
+                ResetToIdle();  // 还原光标（内部调用 SPI_SETCURSORS）并回到空闲态。
+            }
+            return 0;
+
+        case WM_CLOSE:
+            DestroyWindow(hwnd);
+            return 0;
+
+        case WM_DESTROY: {
+            ResetToIdle();
+            RAWINPUTDEVICE device{
+                .usUsagePage = 0x01,  // HID_USAGE_PAGE_GENERIC
+                .usUsage = 0x02,      // HID_USAGE_GENERIC_MOUSE
+                .dwFlags = RIDEV_REMOVE,
+                .hwndTarget = nullptr,
+            };
+            RegisterRawInputDevices(&device, 1, sizeof(device));
+            PostQuitMessage(0);
+            return 0;
+        }
+    }
+
+    return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
+
+DWORD WINAPI WorkerThreadProc(LPVOID) {
+    // Work in physical pixels regardless of the host process's DPI awareness.
+    SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+    HINSTANCE instance = GetModuleHandleW(nullptr);
+    WNDCLASSEXW windowClass{
+        .cbSize = sizeof(windowClass),
+        .lpfnWndProc = WindowProc,
+        .hInstance = instance,
+        .lpszClassName = kWindowClassName,
+    };
+    if (!RegisterClassExW(&windowClass)) {
+        Wh_Log(L"RegisterClassExW failed: %u", GetLastError());
+        SetEvent(g_workerReadyEvent);
+        return 1;
+    }
+
+    // [CW-Beautify] 基底原为 HWND_MESSAGE 消息专用窗口；合并版改为隐藏的顶层工具
+    // 窗口，以接收 WM_QUERYENDSESSION/WM_ENDSESSION 广播（吸收自 mac-magnifying-
+    // cursor 的会话结束保护，见 WindowProc）。窗口从不显示、大小为 0、不可激活，
+    // Raw Input 投递与消息循环行为不变。
+    HWND hwnd = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+                                kWindowClassName, L"", WS_POPUP, 0, 0, 0, 0,
+                                nullptr, nullptr, instance, nullptr);
+    if (!hwnd) {
+        Wh_Log(L"CreateWindowExW failed: %u", GetLastError());
+        UnregisterClassW(kWindowClassName, instance);
+        SetEvent(g_workerReadyEvent);
+        return 1;
+    }
+
+    // A high-resolution waitable timer paces the animation far more precisely
+    // than WM_TIMER, which is limited to ~15.6 ms steps.
+    g_timer = CreateWaitableTimerExW(nullptr, nullptr,
+                                     CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
+                                     TIMER_ALL_ACCESS);
+    if (!g_timer) {
+        g_timer = CreateWaitableTimerExW(nullptr, nullptr, 0, TIMER_ALL_ACCESS);
+    }
+    if (!g_timer) {
+        Wh_Log(L"CreateWaitableTimerExW failed: %u", GetLastError());
+        DestroyWindow(hwnd);
+        UnregisterClassW(kWindowClassName, instance);
+        SetEvent(g_workerReadyEvent);
+        return 1;
+    }
+
+    // Raw input is event-driven (nothing runs while the mouse is idle) and,
+    // unlike a low-level mouse hook, can never delay the mouse itself.
+    RAWINPUTDEVICE device{
+        .usUsagePage = 0x01,  // HID_USAGE_PAGE_GENERIC
+        .usUsage = 0x02,      // HID_USAGE_GENERIC_MOUSE
+        .dwFlags = RIDEV_INPUTSINK,
+        .hwndTarget = hwnd,
+    };
+    if (!RegisterRawInputDevices(&device, 1, sizeof(device))) {
+        Wh_Log(L"RegisterRawInputDevices failed: %u", GetLastError());
+        DestroyWindow(hwnd);
+        UnregisterClassW(kWindowClassName, instance);
+        SetEvent(g_workerReadyEvent);
+        return 1;
+    }
+
+    g_hwnd = hwnd;
+    SetEvent(g_workerReadyEvent);
+
+    // Message loop that also wakes up for the animation timer.
+    bool running = true;
+    while (running) {
+        const DWORD result = MsgWaitForMultipleObjectsEx(
+            1, &g_timer, INFINITE, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+        if (result == WAIT_OBJECT_0) {
+            OnTimerFired();
+        } else if (result != WAIT_OBJECT_0 + 1) {
+            Wh_Log(L"MsgWaitForMultipleObjectsEx failed: %u", GetLastError());
+            break;
+        }
+
+        // Also after a tick, so a busy timer can't hold back input and
+        // shutdown messages.
+        MSG msg;
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                running = false;
+                break;
+            }
+            DispatchMessageW(&msg);
+        }
+    }
+
+    if (IsWindow(hwnd)) {
+        DestroyWindow(hwnd);  // Only if the loop failed; restores the cursors.
+    }
+
+    CloseHandle(g_timer);
+    g_timer = nullptr;
+    UnregisterClassW(kWindowClassName, instance);
+    return 0;
+}
+
+LONG WINAPI RestoreCursorsOnCrash(EXCEPTION_POINTERS* exceptionInfo) {
+    SystemParametersInfoW(SPI_SETCURSORS, 0, nullptr, 0);
+    return g_previousExceptionFilter
+               ? g_previousExceptionFilter(exceptionInfo)
+               : EXCEPTION_CONTINUE_SEARCH;
+}
+
+BOOL WhTool_ModInit() {
+    Wh_Log(L">");
+
+    g_settings = LoadSettings();
+
+    // The previous run ended while the cursor was enlarged (crash or killed
+    // process), so put the normal cursors back first: they may still be
+    // loaded from frame files that are about to be deleted.
+    if (Wh_GetIntValue(L"cursorsModified", 0)) {
+        RestoreSystemCursors();
+    }
+
+    InitFramesDir();
+    DeleteStaleFrameFiles();
+
+    g_previousExceptionFilter =
+        SetUnhandledExceptionFilter(RestoreCursorsOnCrash);
+
+    g_workerReadyEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!g_workerReadyEvent) {
+        return FALSE;
+    }
+
+    g_workerThread =
+        CreateThread(nullptr, 0, WorkerThreadProc, nullptr, 0, nullptr);
+    if (!g_workerThread) {
+        return FALSE;
+    }
+
+    HANDLE handles[] = {g_workerReadyEvent, g_workerThread};
+    WaitForMultipleObjects(ARRAYSIZE(handles), handles, FALSE, INFINITE);
+    return g_hwnd != nullptr;
+}
+
+void WhTool_ModSettingsChanged() {
+    Wh_Log(L">");
+
+    // Settings are read here and handed over to the worker thread, which owns
+    // all the state.
+    auto settings = std::make_unique<Settings>(LoadSettings());
+    if (g_hwnd && PostMessageW(g_hwnd, WM_APP_SETTINGS_CHANGED, 0,
+                               reinterpret_cast<LPARAM>(settings.get()))) {
+        settings.release();
+    }
+}
+
+void WhTool_ModUninit() {
+    Wh_Log(L">");
+
+    if (g_hwnd) {
+        PostMessageW(g_hwnd, WM_CLOSE, 0, 0);
+    }
+
+    if (g_workerThread) {
+        WaitForSingleObject(g_workerThread, 5000);
+        CloseHandle(g_workerThread);
+        g_workerThread = nullptr;
+    }
+
+    if (g_workerReadyEvent) {
+        CloseHandle(g_workerReadyEvent);
+        g_workerReadyEvent = nullptr;
+    }
+
+    // Safety net in case the worker thread couldn't clean up in time.
+    if (Wh_GetIntValue(L"cursorsModified", 0)) {
+        RestoreSystemCursors();
+    }
+
+    SetUnhandledExceptionFilter(g_previousExceptionFilter);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Windhawk tool mod implementation for mods which don't need to inject to other
+// processes or hook other functions. Context:
+// https://github.com/ramensoftware/windhawk/wiki/Mods-as-tools:-Running-mods-in-a-dedicated-process
+//
+// The mod will load and run in a dedicated windhawk.exe process.
+//
+// Paste the code below as part of the mod code, and use these callbacks:
+// * WhTool_ModInit
+// * WhTool_ModSettingsChanged
+// * WhTool_ModUninit
+//
+// Currently, other callbacks are not supported.
+
+bool g_isToolModProcessLauncher;
+HANDLE g_toolModProcessMutex;
+
+void WINAPI EntryPoint_Hook() {
+    Wh_Log(L">");
+    ExitThread(0);
+}
+
+BOOL Wh_ModInit() {
+    DWORD sessionId;
+    if (ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) &&
+        sessionId == 0) {
+        return FALSE;
+    }
+
+    bool isExcluded = false;
+    bool isToolModProcess = false;
+    bool isCurrentToolModProcess = false;
+    int argc;
+    LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
+    if (!argv) {
+        Wh_Log(L"CommandLineToArgvW failed");
+        return FALSE;
+    }
+
+    for (int i = 1; i < argc; i++) {
+        if (wcscmp(argv[i], L"-service") == 0 ||
+            wcscmp(argv[i], L"-service-start") == 0 ||
+            wcscmp(argv[i], L"-service-stop") == 0) {
+            isExcluded = true;
+            break;
+        }
+    }
+
+    for (int i = 1; i < argc - 1; i++) {
+        if (wcscmp(argv[i], L"-tool-mod") == 0) {
+            isToolModProcess = true;
+            if (wcscmp(argv[i + 1], WH_MOD_ID) == 0) {
+                isCurrentToolModProcess = true;
+            }
+            break;
+        }
+    }
+
+    LocalFree(argv);
+
+    if (isExcluded) {
+        return FALSE;
+    }
+
+    if (isCurrentToolModProcess) {
+        g_toolModProcessMutex =
+            CreateMutex(nullptr, TRUE, L"windhawk-tool-mod_" WH_MOD_ID);
+        if (!g_toolModProcessMutex) {
+            Wh_Log(L"CreateMutex failed");
+            ExitProcess(1);
+        }
+
+        if (GetLastError() == ERROR_ALREADY_EXISTS) {
+            Wh_Log(L"Tool mod already running (%s)", WH_MOD_ID);
+            ExitProcess(1);
+        }
+
+        if (!WhTool_ModInit()) {
+            ExitProcess(1);
+        }
+
+        IMAGE_DOS_HEADER* dosHeader =
+            (IMAGE_DOS_HEADER*)GetModuleHandle(nullptr);
+        IMAGE_NT_HEADERS* ntHeaders =
+            (IMAGE_NT_HEADERS*)((BYTE*)dosHeader + dosHeader->e_lfanew);
+
+        DWORD entryPointRVA = ntHeaders->OptionalHeader.AddressOfEntryPoint;
+        void* entryPoint = (BYTE*)dosHeader + entryPointRVA;
+
+        Wh_SetFunctionHook(entryPoint, (void*)EntryPoint_Hook, nullptr);
+        return TRUE;
+    }
+
+    if (isToolModProcess) {
+        return FALSE;
+    }
+
+    g_isToolModProcessLauncher = true;
+    return TRUE;
+}
+
+void Wh_ModAfterInit() {
+    if (!g_isToolModProcessLauncher) {
+        return;
+    }
+
+    WCHAR currentProcessPath[MAX_PATH];
+    switch (GetModuleFileName(nullptr, currentProcessPath,
+                              ARRAYSIZE(currentProcessPath))) {
+        case 0:
+        case ARRAYSIZE(currentProcessPath):
+            Wh_Log(L"GetModuleFileName failed");
+            return;
+    }
+
+    WCHAR
+    commandLine[MAX_PATH + 2 +
+                (sizeof(L" -tool-mod \"" WH_MOD_ID "\"") / sizeof(WCHAR)) - 1];
+    swprintf_s(commandLine, L"\"%s\" -tool-mod \"%s\"", currentProcessPath,
+               WH_MOD_ID);
+
+    HMODULE kernelModule = GetModuleHandle(L"kernelbase.dll");
+    if (!kernelModule) {
+        kernelModule = GetModuleHandle(L"kernel32.dll");
+        if (!kernelModule) {
+            Wh_Log(L"No kernelbase.dll/kernel32.dll");
+            return;
+        }
+    }
+
+    using CreateProcessInternalW_t = BOOL(WINAPI*)(
+        HANDLE hUserToken, LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+        LPSECURITY_ATTRIBUTES lpProcessAttributes,
+        LPSECURITY_ATTRIBUTES lpThreadAttributes, WINBOOL bInheritHandles,
+        DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+        LPSTARTUPINFOW lpStartupInfo,
+        LPPROCESS_INFORMATION lpProcessInformation,
+        PHANDLE hRestrictedUserToken);
+    CreateProcessInternalW_t pCreateProcessInternalW =
+        (CreateProcessInternalW_t)GetProcAddress(kernelModule,
+                                                 "CreateProcessInternalW");
+    if (!pCreateProcessInternalW) {
+        Wh_Log(L"No CreateProcessInternalW");
+        return;
+    }
+
+    STARTUPINFO si{
+        .cb = sizeof(STARTUPINFO),
+        .dwFlags = STARTF_FORCEOFFFEEDBACK,
+    };
+    PROCESS_INFORMATION pi;
+    if (!pCreateProcessInternalW(nullptr, currentProcessPath, commandLine,
+                                 nullptr, nullptr, FALSE, NORMAL_PRIORITY_CLASS,
+                                 nullptr, nullptr, &si, &pi, nullptr)) {
+        Wh_Log(L"CreateProcess failed");
+        return;
+    }
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+}
+
+void Wh_ModSettingsChanged() {
+    if (g_isToolModProcessLauncher) {
+        return;
+    }
+
+    WhTool_ModSettingsChanged();
+}
+
+void Wh_ModUninit() {
+    if (g_isToolModProcessLauncher) {
+        return;
+    }
+
+    WhTool_ModUninit();
+    ExitProcess(0);
+}

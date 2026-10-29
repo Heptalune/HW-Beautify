@@ -3,7 +3,7 @@
 > CW-Beautify 整合包（GPL-3.0），作者 Heptalune（https://github.com/Heptalune/CW-Beautify）。
 > 各 mod 的原作者署名与许可证全部保留；本整合包以 GPL-3.0 发布。
 
-本版在 v2.1.0 的 25 模组基础上精简为 **20 个模组（17 核心 + 3 可选）**：按需求移除 5 个模组、合并 1 组任务栏模组、修复编译问题并新增 1 个社区模组。
+本版在 v2.1.0 的 25 模组基础上按需求精简与扩充：移除 5 个模组、合并 1 组任务栏模组、修复编译问题，并分两批新增 6 个社区模组；现有 **25 个模组（20 核心 + 5 可选）**。
 
 ## 移除（5 个）
 
@@ -33,13 +33,21 @@
   成立；当时失效的根因是系统级「启用 Peek」开关被关闭
   （`HKCU\Software\Microsoft\Windows\DWM\EnableAeroPeek = 0`），重新开启即可。
 
-## 新增（1 个，来自 Windhawk 官方模组社区，全中文本地化）
+## 新增（6 个，来自 Windhawk 官方模组社区，全中文本地化）
 
 | 新名 | 原版 | 原作者 | 版本 |
 |---|---|---|---|
 | CW-隐形窗口边框 | [Invisible Window Borders](https://windhawk.net/mods/invisible-borders) | Bo0ii | 1.0.0 → 1.0.1 |
+| CW-晃动找指针 | [Shake to Find Cursor](https://windhawk.net/mods/shake-to-find-cursor) + [macOS magnifying cursor](https://windhawk.net/mods/mac-magnifying-cursor) | Darius Vernelis / Jaali | 合并版 1.5.0 |
+| CW-任务栏缩略图即时预览 | [Instant Taskbar Thumbnail Previews](https://windhawk.net/mods/instant-taskbar-thumbnail-previews) | Alchemy | 1.1.0 → 1.1.1 |
+| CW-任务栏缩略图大小 | [Taskbar Thumbnail Size](https://windhawk.net/mods/taskbar-thumbnail-size) | m417z | 1.2.1 → 1.2.2 |
+| CW-快速启动 Dock | [Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock) | cheliks1123 | 1.1.0 → 1.1.1 |
+| CW-动态视频壁纸 | [Live Video Wallpaper](https://windhawk.net/mods/live-video-wallpaper) | AKS HAY | 1.1.1 → 1.1.2 |
 
-隐藏窗口四周边框、保留系统圆角。汉化仅改动元数据、说明与设置文案，代码逻辑与上游逐字节一致（MIT）。
+- 隐藏窗口四周边框、保留系统圆角。汉化仅改动元数据、说明与设置文案，代码逻辑与上游逐字节一致（MIT）。
+- **CW-晃动找指针**为合并模组：以 Shake to Find Cursor（Raw Input + 系统指针替换，无覆盖窗口、无拖尾、空闲零 CPU）为基底，吸收 macOS magnifying cursor 的优点，取长补短；两个指针模组不要同时开启。
+- CW-任务栏缩略图大小为 v2.1.0 周期退役模组的回归，基于上游当前版本重新汉化。
+- CW-快速启动 Dock 与 CW-动态视频壁纸为可选模组。
 
 ## 其他
 

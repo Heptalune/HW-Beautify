@@ -35,6 +35,11 @@ $expected = @{
     'local@cw-file-hover-info.wh.cpp'            = @{ id='cw-file-hover-info';            ver='1.1.3';  inc='explorer.exe' }
     'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.2';  inc='SystemSettings.exe' }
     'local@cw-invisible-borders.wh.cpp'          = @{ id='cw-invisible-borders';          ver='1.0.1';  inc='*' }
+    'local@cw-shake-find-cursor.wh.cpp'          = @{ id='cw-shake-find-cursor';          ver='1.5.0';  inc='windhawk.exe' }
+    'local@cw-instant-thumbnail-previews.wh.cpp' = @{ id='cw-instant-thumbnail-previews'; ver='1.1.1';  inc='explorer.exe' }
+    'local@cw-thumbnail-size.wh.cpp'             = @{ id='cw-thumbnail-size';             ver='1.2.2';  inc='explorer.exe' }
+    'optional\local@cw-quick-launch-dock.wh.cpp' = @{ id='cw-quick-launch-dock';          ver='1.1.1';  inc='windhawk.exe' }
+    'optional\local@cw-live-video-wallpaper.wh.cpp' = @{ id='cw-live-video-wallpaper';    ver='1.1.2';  inc='explorer.exe' }
     'optional\local@cw-windows-animations.wh.cpp'= @{ id='cw-windows-animations';         ver='1.6.0';  inc='*' }
     'optional\local@cw-alt-tab-flip-3d.wh.cpp'   = @{ id='cw-alt-tab-flip-3d';            ver='1.0.2';  inc='windhawk.exe' }
     'optional\local@cw-mac-island-dock.wh.cpp'   = @{ id='cw-mac-island-dock';            ver='2.1.1';  inc='windhawk.exe' }
@@ -79,6 +84,10 @@ files = [
  'local@cw-taskbar-autohide-when-maximized.wh.cpp',
  'local@cw-file-hover-info.wh.cpp','local@cw-settings-styler.wh.cpp',
  'local@cw-invisible-borders.wh.cpp',
+ 'local@cw-shake-find-cursor.wh.cpp','local@cw-instant-thumbnail-previews.wh.cpp',
+ 'local@cw-thumbnail-size.wh.cpp',
+ r'optional\local@cw-quick-launch-dock.wh.cpp',
+ r'optional\local@cw-live-video-wallpaper.wh.cpp',
  r'optional\local@cw-windows-animations.wh.cpp',
  r'optional\local@cw-alt-tab-flip-3d.wh.cpp',
  r'optional\local@cw-mac-island-dock.wh.cpp']
@@ -127,7 +136,7 @@ foreach ($dir in @($root, (Join-Path $root 'optional'))) {
     }
 }
 $scanned | Format-Table -AutoSize | Out-String | Write-Host
-Check "部署扫描恰好 20 个 mod" ($scanned.Count -eq 20) "实际 $($scanned.Count)"
+Check "部署扫描恰好 25 个 mod" ($scanned.Count -eq 25) "实际 $($scanned.Count)"
 Check "全部为 cw- id" (($scanned | Where-Object { $_.Id -notlike 'local@cw-*' }).Count -eq 0)
 Check "Include 全部可解析（非空）" (($scanned | Where-Object { -not $_.Include }).Count -eq 0)
 

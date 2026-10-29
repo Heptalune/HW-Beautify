@@ -22,6 +22,9 @@ common_files = [
     'local@cw-custom-context-menu.wh.cpp',
     'local@cw-taskbar-autohide-when-maximized.wh.cpp',
     'local@cw-invisible-borders.wh.cpp',
+    'local@cw-shake-find-cursor.wh.cpp',
+    'local@cw-instant-thumbnail-previews.wh.cpp',
+    'local@cw-thumbnail-size.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
     # 部署 / 卸载脚本
@@ -40,6 +43,8 @@ common_files = [
     'optional/local@cw-windows-animations.wh.cpp',
     'optional/local@cw-alt-tab-flip-3d.wh.cpp',
     'optional/local@cw-mac-island-dock.wh.cpp',
+    'optional/local@cw-quick-launch-dock.wh.cpp',
+    'optional/local@cw-live-video-wallpaper.wh.cpp',
     'optional/THIRD_PARTY_NOTICES.md',
 ]
 

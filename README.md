@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 20 个 mod（17 核心 + 3 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换回经典右键菜单。一共 25 个 mod（20 核心 + 5 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,7 +11,7 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-17 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
+20 个核心 mod 加 5 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。
 
 ### CW-任务栏美化
 
@@ -135,7 +135,43 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 让窗口四周边框隐形，同时保留系统圆角，窗口轮廓更干净。
 
-* 基于社区模组 [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)（作者 Bo0ii）汉化整合。
+* 基于 [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)（作者 Bo0ii）汉化整合。
+
+### CW-晃动找指针
+
+晃动鼠标（或在触摸板上快速来回滑动），指针会放大方便找到；停止晃动后恢复原样。
+
+* 以 Raw Input 监听鼠标：不轮询、指针空闲时零 CPU 占用，不会像低级鼠标钩子那样增加输入延迟。
+* 放大的是真正的系统指针：按当前指针方案重绘放大，保留样式与颜色，无覆盖窗口、无拖尾；.ani 动态指针也能平滑放大并继续播放。
+* 持续晃动时指针越晃越大（增速递减），可设尺寸上限；可设置在全屏应用和游戏中禁用。
+* 由 [Shake to Find Cursor](https://windhawk.net/mods/shake-to-find-cursor)（Darius Vernelis）与 [macOS magnifying cursor](https://windhawk.net/mods/mac-magnifying-cursor)（Jaali）两个模组取长补短合并汉化。
+
+### CW-任务栏缩略图即时预览
+
+控制任务栏缩略图预览的显示与关闭行为：悬停任务栏图标时预览立即出现，不用等系统延迟。
+
+* 基于 [Instant Taskbar Thumbnail Previews](https://windhawk.net/mods/instant-taskbar-thumbnail-previews)（作者 Alchemy，MIT）汉化。
+
+### CW-任务栏缩略图大小
+
+自定义 Windows 11 新版任务栏缩略预览的大小。
+
+* 默认按百分比缩放；也可开启绝对尺寸模式，按像素指定缩略图尺寸。
+* 基于 [Taskbar Thumbnail Size](https://windhawk.net/mods/taskbar-thumbnail-size)（作者 m417z，GPL-3.0）汉化。
+
+### CW-快速启动 Dock（可选）
+
+屏幕边缘的一条纤细动画 Dock：把快捷方式拖进去，或用「+」选择程序，单击即可启动。
+
+* 基于 [Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)（作者 cheliks1123）汉化。
+
+### CW-动态视频壁纸（可选）
+
+把本地 MP4 视频作为 Windows 桌面动态壁纸：Media Foundation + Direct3D 11 硬件加速渲染，CPU 占用低，保持流畅播放。
+
+* 内置实时性能 HUD（`Ctrl + Alt + D` 开关）：真实帧率、帧时间分位数（P95/P99）、显存/提交统计与管线各阶段耗时。
+* 智能遮挡检测：桌面被窗口完全覆盖时自动暂停渲染，前台切换零延迟响应。
+* 基于 [Live Video Wallpaper](https://windhawk.net/mods/live-video-wallpaper)（作者 AKS HAY，GPL-3.0）汉化。
 
 ### CW-窗口动画（可选）
 
@@ -227,4 +263,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 20 Windhawk mods (17 core + 3 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 25 Windhawk mods (20 core + 5 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names). Uninstall: `uninstall.bat`. License: GPL-3.0.

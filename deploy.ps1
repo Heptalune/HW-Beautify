@@ -349,7 +349,6 @@ $retiredMods = @(
     "local@cw-taskbar-dock-animation", "local@cw-taskbar-autohide-instant",
     "local@cw-explorer-info-bar", "local@cw-better-volume-mixer",
     "local@cw-file-operation-styler", "local@cw-taskbar-wheel-cycle",
-    "local@cw-thumbnail-size",
     # v2.2.0 移除：托盘系统图标调整、任务栏时钟自定义、任务栏歌词、
     # 半透明窗口、果冻窗口；弹性药丸并入任务栏动画。
     "local@cw-tray-system-icons", "local@cw-taskbar-clock-customization",
@@ -474,7 +473,8 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock")
+$optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
+                    "local@cw-quick-launch-dock", "local@cw-live-video-wallpaper")
 # 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
@@ -486,7 +486,9 @@ $coreModIds = @(
     "local@cw-aero-peek",
     "local@cw-taskbar-autohide-when-maximized",
     "local@cw-custom-context-menu",
-    "local@cw-invisible-borders"
+    "local@cw-invisible-borders",
+    "local@cw-shake-find-cursor", "local@cw-instant-thumbnail-previews",
+    "local@cw-thumbnail-size"
 )
 $preselected = @()
 if ($Optional) {
