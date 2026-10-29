@@ -1,10 +1,10 @@
 ﻿// ==WindhawkMod==
 // @id              cw-notificationcenter-acrylic
-// @name            CW-通知栏美化
-// @name:zh-CN      CW-通知栏美化
+// @name            CW-通知栏样式美化
+// @name:zh-CN      CW-通知栏样式美化
 // @description     Acrylic and transparent notification center, quick settings and calendar.
 // @description:zh-CN 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景。
-// @version         4.2.6
+// @version         4.2.7
 // @author          m417z, Heptalune
 // @github          https://github.com/m417z, https://github.com/Heptalune
 // @twitter         https://twitter.com/m417z
@@ -31,7 +31,7 @@
 
 > 原作者：**m417z**（[Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
-# CW-通知栏美化
+# CW-通知栏样式美化
 
 为 Windows 11 通知中心、快捷设置和日历面板提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Notification Center Styler。
 
@@ -66,6 +66,7 @@
 
 ## 更新日志
 
+- **4.2.7**：模组显示名由「CW-通知栏美化」改为「CW-通知栏样式美化」（统一「美化」→「样式美化」命名）；功能与设置项不变。
 
 
 

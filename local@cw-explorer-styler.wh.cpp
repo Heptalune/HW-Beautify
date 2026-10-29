@@ -1,10 +1,10 @@
 ﻿// ==WindhawkMod==
 // @id              cw-explorer-styler
-// @name            CW-文件管理器美化
-// @name:zh-CN      CW-文件管理器美化
+// @name            CW-文件管理器样式美化
+// @name:zh-CN      CW-文件管理器样式美化
 // @description     Translucent File Explorer with adjustable tint, transparent chrome, and glass desktop context menus.
 // @description:zh-CN 让 Windows 11 文件管理器整窗半透明模糊，色调可调，命令栏、地址栏、标签栏透明，并美化桌面与资源管理器的右键菜单。
-// @version         1.7.0
+// @version         1.7.1
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -47,7 +47,7 @@
 
 > 原作者：**m417z**（[Windows 11 File Explorer Styler](https://windhawk.net/mods/windows-11-file-explorer-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
-# CW-文件管理器美化
+# CW-文件管理器样式美化
 
 自定义 Windows 11 文件管理器的外观。默认的「CW 半透明」主题让整个窗口半透明模糊，色调颜色和不透明度可调，命令栏、地址栏、标签栏等 WinUI 区域背景透明；并可给桌面与资源管理器的现代右键菜单加上玻璃效果。基于 m417z 的 Windows 11 File Explorer Styler v1.7。
 
@@ -84,6 +84,7 @@
 
 ## 更新日志
 
+- **1.7.1**：模组显示名由「CW-文件管理器美化」改为「CW-文件管理器样式美化」（统一「美化」→「样式美化」命名）；功能与设置项不变。
 - **1.7.0**：新增「子菜单玻璃效果（实验性）」设置（默认关闭）：开启后右键菜单展开的
 二级面板也使用玻璃效果，恢复路径只处理仍存活的对象，尽力避免旧版排除子菜单时担心的
 卸载风险；若资源管理器出现不稳定，关闭该开关即可。

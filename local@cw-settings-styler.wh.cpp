@@ -1,10 +1,10 @@
 // ==WindhawkMod==
 // @id              cw-settings-styler
-// @name            CW-设置美化
-// @name:zh-CN      CW-设置美化
+// @name            CW-设置样式美化
+// @name:zh-CN      CW-设置样式美化
 // @description     Customize the Windows Settings app with themes contributed by others or create your own
 // @description:zh-CN 用社区主题或自定义样式定制 Windows 设置应用的外观。
-// @version         1.2.2
+// @version         1.2.3
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -28,7 +28,7 @@
 /*
 > 原作者：**m417z**（[Windows 11 Settings Styler](https://windhawk.net/mods/windows-11-settings-styler)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理。
 
-# CW-设置美化
+# CW-设置样式美化
 
 用社区主题或自定义样式定制 Windows 11 设置应用（Win+I）的外观。内置多款社区主题，选择即可应用；也可以编写控件样式、样式常量与资源变量，精细调整设置应用的各个元素。基于原版 Windows 11 Settings Styler v1.2.1 整合汉化。
 

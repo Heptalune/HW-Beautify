@@ -1,10 +1,10 @@
 ﻿// ==WindhawkMod==
 // @id              cw-taskbar-acrylic
-// @name            CW-任务栏美化
-// @name:zh-CN      CW-任务栏美化
+// @name            CW-任务栏样式美化
+// @name:zh-CN      CW-任务栏样式美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also controls taskbar height and icon size.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并整合任务栏高度与图标大小控制。
-// @version         4.3.1
+// @version         4.3.2
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -28,7 +28,7 @@
 
 > 原作者：**m417z**（[Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
-# CW-任务栏美化
+# CW-任务栏样式美化
 
 为 Windows 11 任务栏提供亚克力、模糊和透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Taskbar Styler v1.10。
 

@@ -72,18 +72,17 @@
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
-| CW-任务栏美化 | cw-taskbar-acrylic | 4.3.1 | m417z Taskbar Styler 深度修改，已整合任务栏高度与图标大小 |
-| CW-开始菜单美化 | cw-startmenu-acrylic | 4.1.13 | m417z Start Menu Styler 深度修改 |
-| CW-通知栏美化 | cw-notificationcenter-acrylic | 4.2.6 | m417z Notification Center Styler 深度修改 |
-| CW-文件管理器美化 | cw-explorer-styler | 1.7.0 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
+| CW-任务栏样式美化 | cw-taskbar-acrylic | 4.3.2 | m417z Taskbar Styler 深度修改，已整合任务栏高度与图标大小 |
+| CW-开始菜单样式美化 | cw-startmenu-acrylic | 4.1.14 | m417z Start Menu Styler 深度修改 |
+| CW-通知栏样式美化 | cw-notificationcenter-acrylic | 4.2.7 | m417z Notification Center Styler 深度修改 |
+| CW-文件管理器样式美化 | cw-explorer-styler | 1.7.1 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
 | CW-桌面双击隐藏图标 | cw-desktop-toggle-icons | 4.2.0 | Heptalune 原创；4.2.0 起改用系统「显示桌面图标」命令实现（状态与系统菜单同步） |
 | CW-任务栏音量控制 | cw-taskbar-volume-control | 1.4.2 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制；1.4.2 修复 x86 编译兼容 |
-| CW-任务栏动画 | cw-taskbar-animation | 2.2.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；设置键 autoHide.*/pill.* 隔离 |
+| CW-任务栏动画 | cw-taskbar-animation | 2.3.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；设置键 autoHide.*/pill.* 隔离 |
 | CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |
-| CW-经典右键菜单 | cw-classic-context-menu | 1.1.0 | m417z Classic context menu on Windows 11 汉化；1.1.0 起新增菜单风格切换设置 |
 | CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
 | CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
-| CW-设置美化 | cw-settings-styler | 1.2.2 | m417z Windows 11 Settings Styler 汉化 |
+| CW-设置样式美化 | cw-settings-styler | 1.2.3 | m417z Windows 11 Settings Styler 汉化 |
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
 | CW-显示桌面按钮预览 | cw-aero-peek | 1.0.3 | m417z Aero Peek on "Show desktop" button hover 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
@@ -92,10 +91,11 @@
 | CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis Shake to Find Cursor + Jaali macOS magnifying cursor 合并汉化（tool mod） |
 | CW-任务栏缩略图即时预览 | cw-instant-thumbnail-previews | 1.1.1 | Alchemy Instant Taskbar Thumbnail Previews (MIT) 汉化 |
 | CW-任务栏缩略图大小 | cw-thumbnail-size | 1.2.2 | m417z Taskbar Thumbnail Size 汉化（v2.1.0 周期退役后回归） |
+| CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.2.1 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；与 CW-自定义右键菜单 互斥 |
 | CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
 | CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化 |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
 | CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
 | CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；cw-thumbnail-size 同期退役、v2.2.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；cw-thumbnail-size 同期退役、v2.2.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。

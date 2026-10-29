@@ -15,7 +15,6 @@ common_files = [
     'local@cw-taskbar-volume-control.wh.cpp',
     'local@cw-taskbar-animation.wh.cpp',
     'local@cw-window-arrangement.wh.cpp',
-    'local@cw-classic-context-menu.wh.cpp',
     'local@cw-extension-no-warning.wh.cpp',
     'local@cw-alt-drag.wh.cpp',
     'local@cw-aero-peek.wh.cpp',
@@ -25,6 +24,7 @@ common_files = [
     'local@cw-shake-find-cursor.wh.cpp',
     'local@cw-instant-thumbnail-previews.wh.cpp',
     'local@cw-thumbnail-size.wh.cpp',
+    'local@cw-fluent-context-menu.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
     # 部署 / 卸载脚本

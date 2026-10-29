@@ -1,10 +1,10 @@
 ﻿// ==WindhawkMod==
 // @id              cw-startmenu-acrylic
-// @name            CW-开始菜单美化
-// @name:zh-CN      CW-开始菜单美化
+// @name            CW-开始菜单样式美化
+// @name:zh-CN      CW-开始菜单样式美化
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.1.13
+// @version         4.1.14
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         StartMenuExperienceHost.exe
@@ -30,7 +30,7 @@
 
 > 原作者：**m417z**（[Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler)，GPL-3.0）。本版由 Heptalune 修改与维护。
 
-# CW-开始菜单美化
+# CW-开始菜单样式美化
 
 为 Windows 11 开始菜单和搜索面板提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。基于 m417z 的 Windows 11 Start Menu Styler。
 
@@ -62,6 +62,7 @@
 
 ## 更新日志
 
+- **4.1.14**：模组显示名由「CW-开始菜单美化」改为「CW-开始菜单样式美化」（统一「美化」→「样式美化」命名）；功能与设置项不变。
 
 
 

@@ -354,6 +354,7 @@ $retiredMods = @(
     "local@cw-tray-system-icons", "local@cw-taskbar-clock-customization",
     "local@cw-taskbar-lyrics", "local@cw-translucent-windows",
     "local@cw-wobbly-windows", "local@cw-taskbar-elastic-pill",
+    "local@cw-classic-context-menu",
     # v2.1.0 后补移除：桌面时钟、文件大小
     "local@cw-desktop-clock", "local@cw-explorer-details-file-sizes",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
@@ -480,7 +481,7 @@ $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
     "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
     "local@cw-taskbar-animation", "local@cw-window-arrangement",
-    "local@cw-classic-context-menu", "local@cw-extension-no-warning",
+    "local@cw-extension-no-warning",
     "local@cw-file-hover-info", "local@cw-settings-styler",
     "local@cw-alt-drag",
     "local@cw-aero-peek",
@@ -488,7 +489,7 @@ $coreModIds = @(
     "local@cw-custom-context-menu",
     "local@cw-invisible-borders",
     "local@cw-shake-find-cursor", "local@cw-instant-thumbnail-previews",
-    "local@cw-thumbnail-size"
+    "local@cw-thumbnail-size", "local@cw-fluent-context-menu"
 )
 $preselected = @()
 if ($Optional) {
@@ -697,19 +698,59 @@ foreach ($file in $files) {
 
     if ($id -eq "local@cw-taskbar-animation") {
         $label = "Taskbar Animation"
-        # 图标动画（原 Dock 动画）
-        Set-RegValueIfMissing $settingsPath "AnimationType" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "MaxScale" 130 DWord $label
-        Set-RegValueIfMissing $settingsPath "EffectRadius" 100 DWord $label
-        Set-RegValueIfMissing $settingsPath "SpacingFactor" 50 DWord $label
-        Set-RegValueIfMissing $settingsPath "BounceDelay" 500 DWord $label
-        Set-RegValueIfMissing $settingsPath "FocusDuration" 150 DWord $label
-        Set-RegValueIfMissing $settingsPath "MirrorForTopTaskbar" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "DisableVerticalBounce" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "TaskbarLabelsMode" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "ExcludeSystemButtonsMode" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "LerpSpeed" 60 DWord $label
-        Set-RegValueIfMissing $settingsPath "DisableBounce" 0 DWord $label
+        # 2.3.0 把图标动画设置收进「任务栏图标动画」分组，键名加 iconAnim. 前缀。
+        # 旧扁平键的值迁移到新分组键（仅在新键缺失时写入，不覆盖用户已保存的值）。
+        $iconAnimKeyMap = [ordered]@{
+            "AnimationType" = "iconAnim.AnimationType"
+            "MaxScale" = "iconAnim.MaxScale"
+            "BounceAmplitude" = "iconAnim.BounceAmplitude"
+            "DisableAntiClipGuard" = "iconAnim.DisableAntiClipGuard"
+            "EffectRadius" = "iconAnim.EffectRadius"
+            "SpacingFactor" = "iconAnim.SpacingFactor"
+            "BounceDelay" = "iconAnim.BounceDelay"
+            "FocusDuration" = "iconAnim.FocusDuration"
+            "DisableVerticalBounce" = "iconAnim.DisableVerticalBounce"
+            "TaskbarLabelsMode" = "iconAnim.TaskbarLabelsMode"
+            "ExcludeSystemButtonsMode" = "iconAnim.ExcludeSystemButtonsMode"
+            "LerpSpeed" = "iconAnim.LerpSpeed"
+            "DisableBounce" = "iconAnim.DisableBounce"
+        }
+        if ($script:IniStoreMode) {
+            foreach ($oldKey in $iconAnimKeyMap.Keys) {
+                $oldVal = Get-IniValue $script:IniStorePath "Settings" $oldKey
+                if ($null -ne $oldVal) {
+                    Set-IniValueIfMissing $script:IniStorePath "Settings" $iconAnimKeyMap[$oldKey] $oldVal
+                }
+            }
+        } else {
+            $taKey = Open-HklmKey $settingsPath
+            try {
+                $taNames = @($taKey.GetValueNames())
+                foreach ($oldKey in $iconAnimKeyMap.Keys) {
+                    if ($taNames -contains $oldKey) {
+                        $kind = $taKey.GetValueKind($oldKey)
+                        $type = if ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord) { "DWord" } else { "String" }
+                        Set-RegValueIfMissing $settingsPath $iconAnimKeyMap[$oldKey] $taKey.GetValue($oldKey) $type $label
+                    }
+                }
+            } finally {
+                $taKey.Close()
+            }
+        }
+        # 任务栏图标动画（iconAnim.* 前缀，2.3.0 起收进分组）
+        Set-RegValueIfMissing $settingsPath "iconAnim.AnimationType" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.MaxScale" 130 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.BounceAmplitude" 100 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.DisableAntiClipGuard" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.EffectRadius" 100 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.SpacingFactor" 50 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.BounceDelay" 500 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.FocusDuration" 150 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.DisableVerticalBounce" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.TaskbarLabelsMode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.ExcludeSystemButtonsMode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.LerpSpeed" 60 DWord $label
+        Set-RegValueIfMissing $settingsPath "iconAnim.DisableBounce" 0 DWord $label
         # 任务栏秒显（autoHide.* 前缀，原独立模组的键）
         Set-RegValueIfMissing $settingsPath "autoHide.animationType" "slide" String $label
         Set-RegValueIfMissing $settingsPath "autoHide.showSpeedup" 400 DWord $label
@@ -745,6 +786,13 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "pill.BgGradientDirection" "horizontal" String $label
     }
 
+    if ($id -eq "local@cw-fluent-context-menu") {
+        $label = "Fluent Context Menu"
+        Set-RegValueIfMissing $settingsPath "menuStyle" "fluent" String $label
+        Set-RegValueIfMissing $settingsPath "CompactMode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "Transparent" 1 DWord $label
+    }
+
     if ($id -eq "local@cw-startmenu-acrylic") {
         $label = "StartMenu Acrylic"
         Set-RegValueIfMissing $settingsPath "width" 0 DWord $label
@@ -769,10 +817,6 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "SlidingAnimationSlowdown" 15 DWord $label
     }
 
-    if ($id -eq "local@cw-classic-context-menu") {
-        $label = "Classic Context Menu"
-        Set-RegValueIfMissing $settingsPath "overrideWithCtrl" 1 DWord $label
-    }
 
     if ($id -eq "local@cw-mac-island-dock") {
         # 可选模组（默认关闭）。种子只覆盖关键项；默认任务栏模式为 windows

@@ -4,7 +4,7 @@
 // @name:zh-CN        CW-任务栏动画
 // @description       macOS-style icon animations for the taskbar (updated fork with support for all taskbar positions and multi-monitor fixes), instant-show animations for the auto-hidden taskbar, and an animated elastic pill indicator for the active taskbar item.
 // @description:zh-CN 任务栏动画合集：图标悬停放大动画（支持所有任务栏位置和多显示器）、自动隐藏任务栏的即时显示动画，以及当前活动项的弹性药丸指示条。
-// @version           2.2.0
+// @version           2.3.0
 // @author            incconutwo (Plus fork), Ph0en1x-dev (original), Bo0ii, Lockframe, CW-Beautify
 // @github            https://github.com/incconutwo
 // @homepage          https://github.com/Bo0ii/windhawk-mods
@@ -35,13 +35,13 @@
 
 任务栏动画合集，包含三部分功能：
 
-1. **图标动画**（原 CW-任务栏 Dock 动画）：macOS 风格的任务栏图标悬停动画——悬停放大、相邻图标让位、空闲「呼吸」弹跳。
-2. **任务栏秒显**（原 CW-任务栏秒显）：配合系统「自动隐藏任务栏」使用，鼠标一碰屏幕边缘任务栏立即出现，出现/隐藏延迟与动画可自定义。
-3. **任务栏弹性药丸**（原 CW-任务栏弹性药丸）：把任务栏当前活动项的原生指示条换成一条带弹性动画的滑动「药丸」。
+1. **任务栏图标动画**（原 CW-任务栏 Dock 动画）：macOS 风格的任务栏图标悬停动画——悬停放大、相邻图标让位、空闲「呼吸」弹跳。
+2. **任务栏显示动画**（原 CW-任务栏秒显）：配合系统「自动隐藏任务栏」使用，鼠标一碰屏幕边缘任务栏立即出现，出现/隐藏延迟与动画可自定义。
+3. **任务栏指示条动画**（原 CW-任务栏弹性药丸）：把任务栏当前活动项的原生指示条换成一条带弹性动画的滑动「药丸」。
 
-> 图标动画需要 Windows 11 或更高版本；任务栏秒显支持 Windows 10 与 Windows 11；任务栏弹性药丸需要 Windows 11 的 XAML 任务栏。
+> 任务栏图标动画需要 Windows 11 或更高版本；任务栏显示动画支持 Windows 10 与 Windows 11；任务栏指示条动画需要 Windows 11 的 XAML 任务栏。
 
-## 功能一：图标动画（悬停放大）
+## 功能一：任务栏图标动画（悬停放大）
 
 - 悬停放大动画，三种动画曲线：余弦（平滑）、线性、指数（更灵敏）。
 - 相邻图标间距让位，灵敏度可调。
@@ -51,7 +51,7 @@
 - 可排除开始、搜索、任务视图、小组件等系统按钮。
 - CW 新增：**弹跳抬升幅度（%）**（空闲「呼吸」弹跳高度的倍率，50%-300%，默认 100）与**防裁剪保护**（默认开启，自动把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切）。
 
-## 功能二：任务栏秒显（自动隐藏即时显示）
+## 功能二：任务栏显示动画（自动隐藏即时显示）
 
 > 需先在系统设置中开启「自动隐藏任务栏」（设置 > 个性化 > 任务栏 > 任务栏行为）。本功能只优化自动隐藏时任务栏显示/隐藏的延迟与动画，不会代替你开启自动隐藏。
 
@@ -60,7 +60,7 @@
 - **动画类型**：无、滑动（加速版 Windows 滑动）、弹性（弹簧过冲振荡）、回弹、淡入淡出、滑动+淡入淡出（五次缓动，最顺滑）、轻微过冲。
 - **速度可控**：滑动模式按百分比加速；其余模式按时长（ms）控制；帧率可调，高刷屏可用 120。
 
-## 功能三：任务栏弹性药丸（活动项指示条）
+## 功能三：任务栏指示条动画（活动项指示条）
 
 > 仅支持 Windows 11 的 XAML 任务栏。启用后活动任务项的原生指示条由本模组的药丸呈现；停用或卸载模组时自动还原原生指示条与小圆点。
 
@@ -75,7 +75,7 @@
 
 ## 设置说明
 
-### 图标动画
+### 任务栏图标动画（设置页「任务栏图标动画」嵌套组）
 
 - **动画曲线**：0=余弦（平滑），1=线性，2=指数（更灵敏）。
 - **最大缩放（%）**：图标最大放大到多少，如 130 表示放大到 130%。
@@ -91,7 +91,7 @@
 - **禁用垂直「弹跳」**：禁用上下「呼吸」动画。
 - **禁用弹跳效果**：完全关闭空闲「呼吸」。
 
-### 任务栏秒显（设置页「任务栏秒显」嵌套组）
+### 任务栏显示动画（设置页「任务栏显示动画」嵌套组）
 
 - **动画类型（秒显）**：任务栏出现和消失的方式，默认「滑动」。
   - **无动画**：瞬间到位，不滑动也不淡入。
@@ -113,7 +113,7 @@
 
 提示：**滑动**模式用「显示/隐藏加速（%）」控制速度，其余模式用「显示/隐藏时长（ms）」控制快慢；帧率对所有动画类型生效。
 
-### 任务栏弹性药丸（设置页「任务栏弹性药丸」嵌套组）
+### 任务栏指示条动画（设置页「任务栏指示条动画」嵌套组）
 
 - **药丸尺寸（宽、高）**：滑动药丸的宽与高，像素，默认 "16, 3"。
 - **药丸边距（水平、底部）**：左边距（右侧对称）与下边距，像素，默认 "0, 5"。
@@ -134,19 +134,20 @@
 - **自定义药丸颜色**：十六进制色值，支持多色渐变与亮/暗分色，默认空。
 - **药丸渐变方向**：水平（默认）/ 垂直 / 两种对角线方向。
 
-## 同时使用三部分
+## 同时使用三部分功能
 
-三部分功能相互独立、可单独或同时启用：图标动画挂在 Taskbar.View.dll 的指针事件上，秒显挂在任务栏窗口的 SlideWindow 与显示/隐藏定时器上，弹性药丸挂在任务栏按钮的视觉状态更新上。自动隐藏的任务栏出现后，把鼠标移到任务栏上，图标悬停动画照常生效；弹性药丸与图标悬停放大也可同用。
+三部分功能相互独立、可单独或同时启用：任务栏图标动画挂在 Taskbar.View.dll 的指针事件上，任务栏显示动画挂在任务栏窗口的 SlideWindow 与显示/隐藏定时器上，任务栏指示条动画挂在任务栏按钮的视觉状态更新上。自动隐藏的任务栏出现后，把鼠标移到任务栏上，图标悬停动画照常生效；弹性药丸与图标悬停放大也可同用。
 
 ## 兼容性与已知问题
 
 - 仅注入 `explorer.exe`（x86-64）。
-- 图标动画：放大后的图标可能略显模糊；配合 CW-任务栏高度与图标大小做窄任务栏时，请把「最大缩放」保持在 130% 或以下，减少裁切（原作者建议）；不支持 StartAllBack（需要重写整个代码库，超出范围）。
-- 任务栏秒显：必须先在系统中开启「自动隐藏任务栏」才会生效；配合 ExplorerPatcher 的旧版任务栏时，请开启「在 Windows 11 上使用旧版任务栏」；个别情况下（空显示器、全屏程序）鼠标碰屏幕边缘任务栏可能不出现，可尝试开启「空显示器边沿检测」。
-- 任务栏弹性药丸：仅支持 Windows 11 的 XAML 任务栏（挂钩 Taskbar.View.dll / ExplorerExtensions.dll，跟踪系统按钮时另挂钩 SearchUx.UI.dll）；系统按钮（开始/任务视图/搜索）的药丸依赖对应系统组件的内部符号，Windows 更新后可能暂时失效，需等待上游适配；若其他模组也改动任务栏按钮的指示条或小圆点，视觉上可能相互叠加，建议据此调整药丸尺寸、边距与颜色。
+- 任务栏图标动画：放大后的图标可能略显模糊；配合 CW-任务栏高度与图标大小做窄任务栏时，请把「最大缩放」保持在 130% 或以下，减少裁切（原作者建议）；不支持 StartAllBack（需要重写整个代码库，超出范围）。
+- 任务栏显示动画：必须先在系统中开启「自动隐藏任务栏」才会生效；配合 ExplorerPatcher 的旧版任务栏时，请开启「在 Windows 11 上使用旧版任务栏」；个别情况下（空显示器、全屏程序）鼠标碰屏幕边缘任务栏可能不出现，可尝试开启「空显示器边沿检测」。
+- 任务栏指示条动画：仅支持 Windows 11 的 XAML 任务栏（挂钩 Taskbar.View.dll / ExplorerExtensions.dll，跟踪系统按钮时另挂钩 SearchUx.UI.dll）；系统按钮（开始/任务视图/搜索）的药丸依赖对应系统组件的内部符号，Windows 更新后可能暂时失效，需等待上游适配；若其他模组也改动任务栏按钮的指示条或小圆点，视觉上可能相互叠加，建议据此调整药丸尺寸、边距与颜色。
 
 ## 更新日志
 
+- **2.3.0（CW）**：设置页重组为三个可收起分组——原图标动画设置收进「任务栏图标动画」分组（键前缀 iconAnim.），「任务栏秒显」分组更名为「任务栏显示动画」，「任务栏弹性药丸」分组更名为「任务栏指示条动画」。键名与分组名变化只影响设置页归类，不改变动画行为。
 - **2.2.0（CW）**：「CW-任务栏弹性药丸」（Lockframe，Taskbar Elastic WinUI Pill）并入本模组。药丸代码置于 TaskbarElasticPill 命名空间，四组设置键（Pill.* / Animation.* / PointerInteractions.* / Colors.*）迁移为 pill. 前缀（设置页「任务栏弹性药丸」嵌套组）；药丸初始化失败时仅降级该功能，不影响其余功能。另修复 RunFromWindowThread 钩子回调在 x86 架构下的编译失败（改为等价 CALLBACK 函数，行为不变；2.1.0 存量问题，Windhawk 按注入进程架构编译所以未暴露）。
 - **2.1.0（CW）**：「CW-任务栏秒显」（Bo0ii，Taskbar Auto-Hide Instant Show）并入本模组，合并版更名 CW-任务栏动画。秒显代码置于 TaskbarAutoHide 命名空间，设置项迁移为 autoHide.* 前缀（设置页「任务栏秒显」嵌套组）；秒显初始化失败时仅降级该功能，不影响图标动画。
 - **2.0.2（CW）**：基于增强版 2.0.1 换底座；新增「弹跳抬升幅度」与「防裁剪保护」；中文界面完善。
@@ -167,181 +168,188 @@
 
 // ==WindhawkModSettings==
 /*
-- AnimationType: 0
-  $name: Animation Curve
-  $name:uk-UA: Крива анімації
-  $name:zh-CN: 动画曲线
-  $name:ja-JP: アニメーション曲線
-  $name:ko-KR: 애니메이션 곡선
-  $name:pt-BR: Curva de animação
-  $name:it-IT: Curva di animazione
-  $description: Choose the feel of the scaling (0 = Cosine (Smooth), 1 = Linear, 2 = Exponential (Snappy)
-  $description:uk-UA: Оберіть тип анімації (0 = Косинус (Плавно), 1 = Лінійна, 2 = Експоненціальна (Швидко)
-  $description:zh-CN: 选择缩放的动画感觉（0=余弦（平滑），1=线性，2=指数（更灵敏））
-  $description:ja-JP: 拡大縮小の動き方を選択（0=コサイン（滑らか）、1=線形、2=指数（キビキビ））
-  $description:ko-KR: 확대/축소 애니메이션 느낌 선택 (0=코사인(부드러움), 1=선형, 2=지수(빠릿함))
-  $description:pt-BR: Escolha o tipo de escala (0 = Cosseno (suave), 1 = Linear, 2 = Exponencial (rápido))
-  $description:it-IT: Scegli il tipo di scala (0 = Coseno (fluida), 1 = Lineare, 2 = Esponenziale (reattiva))
-- MaxScale: 130
-  $name: Maximum scale (%)
-  $name:uk-UA: Максимальний розмір (%)
-  $name:zh-CN: 最大缩放（%）
-  $name:ja-JP: 最大倍率（%）
-  $name:ko-KR: 최대 확대 비율(%)
-  $name:pt-BR: Escala máxima (%)
-  $name:it-IT: Scala massima (%)
-  $description: How large an icon can grow (e.g., 160 = +60%)
-  $description:uk-UA: Наскільки сильно іконка може збільшитись (напр., 160 = +60%)
-  $description:zh-CN: 图标最大可放大到多少（例如 160 = 增加 60%）
-  $description:ja-JP: "アイコンの最大拡大率（例: 160 = +60%）"
-  $description:ko-KR: "아이콘이 커질 수 있는 최대 크기 (예: 160 = +60%)"
-  $description:pt-BR: "Até quanto o ícone pode aumentar (ex.: 160 = +60%)"
-  $description:it-IT: "Quanto può ingrandirsi un’icona (es.: 160 = +60%)"
-- BounceAmplitude: 100
-  $name: Bounce amplitude (%)
-  $name:zh-CN: 弹跳抬升幅度（%）
-  $description: Multiplier for the idle breathing bounce height (100 = default, 200 = twice as high).
-  $description:zh-CN: 空闲“呼吸”弹跳高度的倍率（100=默认，200=两倍高度）。防裁剪保护开启时，超出任务栏上边缘的部分会被自动收住。
-- DisableAntiClipGuard: false
-  $name: Disable anti-clip guard
-  $name:zh-CN: 禁用防裁剪保护
-  $description: Automatically limits the bounce so icons are not flat-cut by the taskbar top edge.
-  $description:zh-CN: 自动把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切。默认开启；关闭后按原始幅度弹跳。
-- EffectRadius: 100
-  $name: Effect radius (px)
-  $name:uk-UA: Радіус ефекту (пкс)
-  $name:zh-CN: 效果半径（像素）
-  $name:ja-JP: 効果半径（px）
-  $name:ko-KR: 효과 반경(px)
-  $name:pt-BR: Raio do efeito (px)
-  $name:it-IT: Raggio dell’effetto (px)
-  $description: Distance from the cursor where the animation is applied
-  $description:uk-UA: Дистанція від курсора, на якій застосовується анімація
-  $description:zh-CN: 距离光标多远范围内应用动画
-  $description:ja-JP: カーソルからの距離に応じてアニメーションを適用します
-  $description:ko-KR: 커서로부터 애니메이션이 적용되는 거리
-  $description:pt-BR: Distância do cursor em que a animação é aplicada
-  $description:it-IT: Distanza dal cursore entro cui si applica l’animazione
-- SpacingFactor: 50
-  $name: Spacing sensitivity (%)
-  $name:uk-UA: Чутливість до проміжку (%)
-  $name:zh-CN: 间距灵敏度（%）
-  $name:ja-JP: 間隔の感度（%）
-  $name:ko-KR: 간격 민감도(%)
-  $name:pt-BR: Sensibilidade do espaçamento (%)
-  $name:it-IT: Sensibilità spaziatura (%)
-  $description: How much neighboring icons move apart during animation (default 50%)
-  $description:uk-UA: Наскільки сусідні іконки розсуваються під час анімації (за замовчуванням 50%)
-  $description:zh-CN: 动画时相邻图标拉开的程度（默认 50%）
-  $description:ja-JP: アニメーション中に隣のアイコンが離れる度合い（既定 50%）
-  $description:ko-KR: 애니메이션 중 인접 아이콘이 벌어지는 정도(기본 50%)
-  $description:pt-BR: Quanto os ícones vizinhos se afastam durante a animação (padrão 50%)
-  $description:it-IT: Quanto si allontanano le icone vicine durante l’animazione (predef. 50%)
-- BounceDelay: 500
-  $name: Bounce start delay (ms)
-  $name:uk-UA: Затримка початку "дихання" (мс)
-  $name:zh-CN: 弹跳开始延迟（毫秒）
-  $name:ja-JP: バウンス開始遅延（ms）
-  $name:ko-KR: 바운스 시작 지연(ms)
-  $name:pt-BR: Atraso para iniciar o bounce (ms)
-  $name:it-IT: Ritardo di inizio bounce (ms)
-  $description: How long to wait after the cursor stops before starting the idle "breathing" animation (default 500ms)
-  $description:uk-UA: Скільки чекати після зупинки курсора перед початком анімації "дихання" (за замовчуванням 500мс)
-  $description:zh-CN: 光标停止后等待多久开始“呼吸”动画（默认 500ms）
-  $description:ja-JP: カーソル停止後、待機時の「呼吸」アニメを開始するまでの遅延（既定 500ms）
-  $description:ko-KR: 커서가 멈춘 뒤 ‘호흡’ 애니메이션을 시작하기까지 대기 시간(기본 500ms)
-  $description:pt-BR: Quanto esperar após o cursor parar antes de iniciar a animação “respirar” (padrão 500ms)
-  $description:it-IT: Quanto attendere dopo che il cursore si ferma prima di avviare l’animazione “respiro” (predef. 500ms)
-- FocusDuration: 150
-  $name: Focus animation duration (ms)
-  $name:uk-UA: Тривалість анімації фокусу (мс)
-  $name:zh-CN: 聚焦动画时长（毫秒）
-  $name:ja-JP: フォーカスアニメ時間（ms）
-  $name:ko-KR: 포커스 애니메이션 지속 시간(ms)
-  $name:pt-BR: Duração da animação de foco (ms)
-  $name:it-IT: Durata animazione focus (ms)
-  $description: Duration of the fade-in and fade-out animation (default 150ms)
-  $description:uk-UA: Тривалість анімації плавного з'явлення та згасання (за замовчуванням 150мс)
-  $description:zh-CN: 淡入/淡出动画时长（默认 150ms）
-  $description:ja-JP: フェードイン/アウトの時間（既定 150ms）
-  $description:ko-KR: 페이드 인/아웃 애니메이션 지속 시간(기본 150ms)
-  $description:pt-BR: Duração do fade-in e fade-out (padrão 150ms)
-  $description:it-IT: Durata della dissolvenza in entrata/uscita (predef. 150ms)
-- DisableVerticalBounce: false
-  $name: Disable vertical "bounce" animation
-  $name:uk-UA: Вимкнути вертикальне "дихання"
-  $name:zh-CN: 禁用垂直“弹跳”动画
-  $name:ja-JP: 垂直バウンスを無効化
-  $name:ko-KR: 수직 바운스 애니메이션 비활성화
-  $name:pt-BR: Desativar bounce vertical
-  $name:it-IT: Disattiva bounce verticale
-  $description: Disables the up/down "breathing" animation. Useful for vertical taskbars.
-  $description:uk-UA: Вимикає анімацію "дихання" вгору/вниз. Корисно для вертикальних панелей.
-  $description:zh-CN: 禁用上下“呼吸”动画。对垂直任务栏有用。
-  $description:ja-JP: 上下の「呼吸」アニメを無効化します。縦型タスクバーに便利です。
-  $description:ko-KR: 위/아래 ‘호흡’ 애니메이션을 비활성화합니다. 세로 작업 표시줄에 유용합니다.
-  $description:pt-BR: Desativa a animação de “respirar” para cima/baixo. Útil para barras verticais.
-  $description:it-IT: Disattiva l’animazione “respiro” su/giù. Utile per barre verticali.
-- TaskbarLabelsMode: false
-  $name: Taskbar Labels Compatibility
-  $name:uk-UA: Сумісність із підписами (Labels)
-  $name:zh-CN: 任务栏标签兼容模式
-  $name:ja-JP: タスクバーラベル互換
-  $name:ko-KR: 작업 표시줄 라벨 호환
-  $name:pt-BR: Compatibilidade com rótulos
-  $name:it-IT: Compatibilità etichette
-  $description: Enable this if your taskbar shows window titles (rectangular icons) to fix animation centering.
-  $description:uk-UA: Увімкніть, якщо ваша панель завдань відображає назви вікон (прямокутні кнопки), щоб виправити центрування.
-  $description:zh-CN: 若任务栏显示窗口标题（矩形按钮），启用此项以修正动画居中。
-  $description:ja-JP: タスクバーにウィンドウ名（矩形ボタン）が表示される場合、中央揃えを修正するために有効化します。
-  $description:ko-KR: 작업 표시줄에 창 제목(직사각형 버튼)이 표시될 때 애니메이션 중앙 정렬을 수정합니다.
-  $description:pt-BR: Ative se a barra mostrar títulos de janelas (ícones retangulares) para corrigir o alinhamento.
-  $description:it-IT: Abilita se la barra mostra i titoli delle finestre (pulsanti rettangolari) per correggere la centratura.
-- ExcludeSystemButtonsMode: 0
-  $name: Exclude system buttons
-  $name:uk-UA: Ігнорувати системні кнопки
-  $name:zh-CN: 排除系统按钮
-  $name:ja-JP: システムボタンを除外
-  $name:ko-KR: 시스템 버튼 제외
-  $name:pt-BR: Excluir botões do sistema
-  $name:it-IT: Escludi pulsanti di sistema
-  $description: 0=Animate all, 1=Exclude Start, 2=Animate apps icons only
-  $description:uk-UA: 0=Анімація всього, 1=Без анімації Start, 2=Анімація тільки іконок застосунків
-  $description:zh-CN: 0=全部动画，1=排除开始，2=仅应用图标动画
-  $description:ja-JP: 0=すべてアニメ、1=スタート除外、2=アプリのみ
-  $description:ko-KR: 0=전체, 1=시작 제외, 2=앱만
-  $description:pt-BR: 0=Animar tudo, 1=Excluir Iniciar, 2=Somente apps
-  $description:it-IT: 0=Anima tutto, 1=Escludi Start, 2=Solo app
-- LerpSpeed: 60
-  $name: Smoothing (Lerp speed)
-  $name:uk-UA: Плавність (швидкість Lerp)
-  $name:zh-CN: 平滑度（Lerp 速度）
-  $name:ja-JP: スムージング（Lerp 速度）
-  $name:ko-KR: 부드러움(Lerp 속도)
-  $name:pt-BR: Suavização (velocidade do Lerp)
-  $name:it-IT: Smussamento (velocità Lerp)
-  $description: Higher = snappier, lower = smoother. 0 = disabled (direct)
-  $description:uk-UA: Більше = швидше, менше = плавніше. 0 = вимкнути (напряму)
-  $description:zh-CN: 越高越灵敏，越低越平滑。0=禁用（直接应用）
-  $description:ja-JP: 大きいほどキビキビ、小さいほど滑らか。0=無効（直接適用）
-  $description:ko-KR: 높을수록 빠릿함, 낮을수록 부드러움. 0=비활성화(직접)
-  $description:pt-BR: Maior = mais rápido, menor = mais suave. 0 = desativado (direto)
-  $description:it-IT: Più alto = più reattivo, più basso = più fluido. 0 = disattivato (diretto)
-- DisableBounce: false
-  $name: Disable bounce effect
-  $name:uk-UA: Вимкнути bounce ефект
-  $name:zh-CN: 禁用弹跳效果
-  $name:ja-JP: バウンス効果を無効化
-  $name:ko-KR: 바운스 효과 비활성화
-  $name:pt-BR: Desativar efeito bounce
-  $name:it-IT: Disattiva effetto bounce
-  $description: Disables the idle "breathing" bounce entirely
-  $description:uk-UA: Повністю вимикає bounce ("дихання")
-  $description:zh-CN: 完全禁用空闲时的“呼吸”弹跳
-  $description:ja-JP: 待機時の「呼吸」バウンスを完全に無効化します
-  $description:ko-KR: 대기 상태 ‘호흡’ 바운스를 완전히 비활성화합니다
-  $description:pt-BR: Desativa totalmente o bounce ocioso (“respirar”)
-  $description:it-IT: Disattiva completamente il bounce inattivo (“respiro”)
+- iconAnim:
+  - AnimationType: 0
+    $name: Animation Curve
+    $name:uk-UA: Крива анімації
+    $name:zh-CN: 动画曲线
+    $name:ja-JP: アニメーション曲線
+    $name:ko-KR: 애니메이션 곡선
+    $name:pt-BR: Curva de animação
+    $name:it-IT: Curva di animazione
+    $description: Choose the feel of the scaling (0 = Cosine (Smooth), 1 = Linear, 2 = Exponential (Snappy)
+    $description:uk-UA: Оберіть тип анімації (0 = Косинус (Плавно), 1 = Лінійна, 2 = Експоненціальна (Швидко)
+    $description:zh-CN: 选择缩放的动画感觉（0=余弦（平滑），1=线性，2=指数（更灵敏））
+    $description:ja-JP: 拡大縮小の動き方を選択（0=コサイン（滑らか）、1=線形、2=指数（キビキビ））
+    $description:ko-KR: 확대/축소 애니메이션 느낌 선택 (0=코사인(부드러움), 1=선형, 2=지수(빠릿함))
+    $description:pt-BR: Escolha o tipo de escala (0 = Cosseno (suave), 1 = Linear, 2 = Exponencial (rápido))
+    $description:it-IT: Scegli il tipo di scala (0 = Coseno (fluida), 1 = Lineare, 2 = Esponenziale (reattiva))
+  - MaxScale: 130
+    $name: Maximum scale (%)
+    $name:uk-UA: Максимальний розмір (%)
+    $name:zh-CN: 最大缩放（%）
+    $name:ja-JP: 最大倍率（%）
+    $name:ko-KR: 최대 확대 비율(%)
+    $name:pt-BR: Escala máxima (%)
+    $name:it-IT: Scala massima (%)
+    $description: How large an icon can grow (e.g., 160 = +60%)
+    $description:uk-UA: Наскільки сильно іконка може збільшитись (напр., 160 = +60%)
+    $description:zh-CN: 图标最大可放大到多少（例如 160 = 增加 60%）
+    $description:ja-JP: "アイコンの最大拡大率（例: 160 = +60%）"
+    $description:ko-KR: "아이콘이 커질 수 있는 최대 크기 (예: 160 = +60%)"
+    $description:pt-BR: "Até quanto o ícone pode aumentar (ex.: 160 = +60%)"
+    $description:it-IT: "Quanto può ingrandirsi un’icona (es.: 160 = +60%)"
+  - BounceAmplitude: 100
+    $name: Bounce amplitude (%)
+    $name:zh-CN: 弹跳抬升幅度（%）
+    $description: Multiplier for the idle breathing bounce height (100 = default, 200 = twice as high).
+    $description:zh-CN: 空闲“呼吸”弹跳高度的倍率（100=默认，200=两倍高度）。防裁剪保护开启时，超出任务栏上边缘的部分会被自动收住。
+  - DisableAntiClipGuard: false
+    $name: Disable anti-clip guard
+    $name:zh-CN: 禁用防裁剪保护
+    $description: Automatically limits the bounce so icons are not flat-cut by the taskbar top edge.
+    $description:zh-CN: 自动把弹跳限制在任务栏窗口内，避免图标被上边缘平口裁切。默认开启；关闭后按原始幅度弹跳。
+  - EffectRadius: 100
+    $name: Effect radius (px)
+    $name:uk-UA: Радіус ефекту (пкс)
+    $name:zh-CN: 效果半径（像素）
+    $name:ja-JP: 効果半径（px）
+    $name:ko-KR: 효과 반경(px)
+    $name:pt-BR: Raio do efeito (px)
+    $name:it-IT: Raggio dell’effetto (px)
+    $description: Distance from the cursor where the animation is applied
+    $description:uk-UA: Дистанція від курсора, на якій застосовується анімація
+    $description:zh-CN: 距离光标多远范围内应用动画
+    $description:ja-JP: カーソルからの距離に応じてアニメーションを適用します
+    $description:ko-KR: 커서로부터 애니메이션이 적용되는 거리
+    $description:pt-BR: Distância do cursor em que a animação é aplicada
+    $description:it-IT: Distanza dal cursore entro cui si applica l’animazione
+  - SpacingFactor: 50
+    $name: Spacing sensitivity (%)
+    $name:uk-UA: Чутливість до проміжку (%)
+    $name:zh-CN: 间距灵敏度（%）
+    $name:ja-JP: 間隔の感度（%）
+    $name:ko-KR: 간격 민감도(%)
+    $name:pt-BR: Sensibilidade do espaçamento (%)
+    $name:it-IT: Sensibilità spaziatura (%)
+    $description: How much neighboring icons move apart during animation (default 50%)
+    $description:uk-UA: Наскільки сусідні іконки розсуваються під час анімації (за замовчуванням 50%)
+    $description:zh-CN: 动画时相邻图标拉开的程度（默认 50%）
+    $description:ja-JP: アニメーション中に隣のアイコンが離れる度合い（既定 50%）
+    $description:ko-KR: 애니메이션 중 인접 아이콘이 벌어지는 정도(기본 50%)
+    $description:pt-BR: Quanto os ícones vizinhos se afastam durante a animação (padrão 50%)
+    $description:it-IT: Quanto si allontanano le icone vicine durante l’animazione (predef. 50%)
+  - BounceDelay: 500
+    $name: Bounce start delay (ms)
+    $name:uk-UA: Затримка початку "дихання" (мс)
+    $name:zh-CN: 弹跳开始延迟（毫秒）
+    $name:ja-JP: バウンス開始遅延（ms）
+    $name:ko-KR: 바운스 시작 지연(ms)
+    $name:pt-BR: Atraso para iniciar o bounce (ms)
+    $name:it-IT: Ritardo di inizio bounce (ms)
+    $description: How long to wait after the cursor stops before starting the idle "breathing" animation (default 500ms)
+    $description:uk-UA: Скільки чекати після зупинки курсора перед початком анімації "дихання" (за замовчуванням 500мс)
+    $description:zh-CN: 光标停止后等待多久开始“呼吸”动画（默认 500ms）
+    $description:ja-JP: カーソル停止後、待機時の「呼吸」アニメを開始するまでの遅延（既定 500ms）
+    $description:ko-KR: 커서가 멈춘 뒤 ‘호흡’ 애니메이션을 시작하기까지 대기 시간(기본 500ms)
+    $description:pt-BR: Quanto esperar após o cursor parar antes de iniciar a animação “respirar” (padrão 500ms)
+    $description:it-IT: Quanto attendere dopo che il cursore si ferma prima di avviare l’animazione “respiro” (predef. 500ms)
+  - FocusDuration: 150
+    $name: Focus animation duration (ms)
+    $name:uk-UA: Тривалість анімації фокусу (мс)
+    $name:zh-CN: 聚焦动画时长（毫秒）
+    $name:ja-JP: フォーカスアニメ時間（ms）
+    $name:ko-KR: 포커스 애니메이션 지속 시간(ms)
+    $name:pt-BR: Duração da animação de foco (ms)
+    $name:it-IT: Durata animazione focus (ms)
+    $description: Duration of the fade-in and fade-out animation (default 150ms)
+    $description:uk-UA: Тривалість анімації плавного з'явлення та згасання (за замовчуванням 150мс)
+    $description:zh-CN: 淡入/淡出动画时长（默认 150ms）
+    $description:ja-JP: フェードイン/アウトの時間（既定 150ms）
+    $description:ko-KR: 페이드 인/아웃 애니메이션 지속 시간(기본 150ms)
+    $description:pt-BR: Duração do fade-in e fade-out (padrão 150ms)
+    $description:it-IT: Durata della dissolvenza in entrata/uscita (predef. 150ms)
+  - DisableVerticalBounce: false
+    $name: Disable vertical "bounce" animation
+    $name:uk-UA: Вимкнути вертикальне "дихання"
+    $name:zh-CN: 禁用垂直“弹跳”动画
+    $name:ja-JP: 垂直バウンスを無効化
+    $name:ko-KR: 수직 바운스 애니메이션 비활성화
+    $name:pt-BR: Desativar bounce vertical
+    $name:it-IT: Disattiva bounce verticale
+    $description: Disables the up/down "breathing" animation. Useful for vertical taskbars.
+    $description:uk-UA: Вимикає анімацію "дихання" вгору/вниз. Корисно для вертикальних панелей.
+    $description:zh-CN: 禁用上下“呼吸”动画。对垂直任务栏有用。
+    $description:ja-JP: 上下の「呼吸」アニメを無効化します。縦型タスクバーに便利です。
+    $description:ko-KR: 위/아래 ‘호흡’ 애니메이션을 비활성화합니다. 세로 작업 표시줄에 유용합니다.
+    $description:pt-BR: Desativa a animação de “respirar” para cima/baixo. Útil para barras verticais.
+    $description:it-IT: Disattiva l’animazione “respiro” su/giù. Utile per barre verticali.
+  - TaskbarLabelsMode: false
+    $name: Taskbar Labels Compatibility
+    $name:uk-UA: Сумісність із підписами (Labels)
+    $name:zh-CN: 任务栏标签兼容模式
+    $name:ja-JP: タスクバーラベル互換
+    $name:ko-KR: 작업 표시줄 라벨 호환
+    $name:pt-BR: Compatibilidade com rótulos
+    $name:it-IT: Compatibilità etichette
+    $description: Enable this if your taskbar shows window titles (rectangular icons) to fix animation centering.
+    $description:uk-UA: Увімкніть, якщо ваша панель завдань відображає назви вікон (прямокутні кнопки), щоб виправити центрування.
+    $description:zh-CN: 若任务栏显示窗口标题（矩形按钮），启用此项以修正动画居中。
+    $description:ja-JP: タスクバーにウィンドウ名（矩形ボタン）が表示される場合、中央揃えを修正するために有効化します。
+    $description:ko-KR: 작업 표시줄에 창 제목(직사각형 버튼)이 표시될 때 애니메이션 중앙 정렬을 수정합니다.
+    $description:pt-BR: Ative se a barra mostrar títulos de janelas (ícones retangulares) para corrigir o alinhamento.
+    $description:it-IT: Abilita se la barra mostra i titoli delle finestre (pulsanti rettangolari) per correggere la centratura.
+  - ExcludeSystemButtonsMode: 0
+    $name: Exclude system buttons
+    $name:uk-UA: Ігнорувати системні кнопки
+    $name:zh-CN: 排除系统按钮
+    $name:ja-JP: システムボタンを除外
+    $name:ko-KR: 시스템 버튼 제외
+    $name:pt-BR: Excluir botões do sistema
+    $name:it-IT: Escludi pulsanti di sistema
+    $description: 0=Animate all, 1=Exclude Start, 2=Animate apps icons only
+    $description:uk-UA: 0=Анімація всього, 1=Без анімації Start, 2=Анімація тільки іконок застосунків
+    $description:zh-CN: 0=全部动画，1=排除开始，2=仅应用图标动画
+    $description:ja-JP: 0=すべてアニメ、1=スタート除外、2=アプリのみ
+    $description:ko-KR: 0=전체, 1=시작 제외, 2=앱만
+    $description:pt-BR: 0=Animar tudo, 1=Excluir Iniciar, 2=Somente apps
+    $description:it-IT: 0=Anima tutto, 1=Escludi Start, 2=Solo app
+  - LerpSpeed: 60
+    $name: Smoothing (Lerp speed)
+    $name:uk-UA: Плавність (швидкість Lerp)
+    $name:zh-CN: 平滑度（Lerp 速度）
+    $name:ja-JP: スムージング（Lerp 速度）
+    $name:ko-KR: 부드러움(Lerp 속도)
+    $name:pt-BR: Suavização (velocidade do Lerp)
+    $name:it-IT: Smussamento (velocità Lerp)
+    $description: Higher = snappier, lower = smoother. 0 = disabled (direct)
+    $description:uk-UA: Більше = швидше, менше = плавніше. 0 = вимкнути (напряму)
+    $description:zh-CN: 越高越灵敏，越低越平滑。0=禁用（直接应用）
+    $description:ja-JP: 大きいほどキビキビ、小さいほど滑らか。0=無効（直接適用）
+    $description:ko-KR: 높을수록 빠릿함, 낮을수록 부드러움. 0=비활성화(직접)
+    $description:pt-BR: Maior = mais rápido, menor = mais suave. 0 = desativado (direto)
+    $description:it-IT: Più alto = più reattivo, più basso = più fluido. 0 = disattivato (diretto)
+  - DisableBounce: false
+    $name: Disable bounce effect
+    $name:uk-UA: Вимкнути bounce ефект
+    $name:zh-CN: 禁用弹跳效果
+    $name:ja-JP: バウンス効果を無効化
+    $name:ko-KR: 바운스 효과 비활성화
+    $name:pt-BR: Desativar efeito bounce
+    $name:it-IT: Disattiva effetto bounce
+    $description: Disables the idle "breathing" bounce entirely
+    $description:uk-UA: Повністю вимикає bounce ("дихання")
+    $description:zh-CN: 完全禁用空闲时的“呼吸”弹跳
+    $description:ja-JP: 待機時の「呼吸」バウンスを完全に無効化します
+    $description:ko-KR: 대기 상태 ‘호흡’ 바운스를 완전히 비활성화합니다
+    $description:pt-BR: Desativa totalmente o bounce ocioso (“respirar”)
+    $description:it-IT: Disattiva completamente il bounce inattivo (“respiro”)
+  $name: Taskbar icon animation
+  $name:zh-CN: 任务栏图标动画
+  $description: >-
+    Icon hover scaling, neighbor spacing, and idle breathing bounce for
+    taskbar buttons.
+  $description:zh-CN: 任务栏图标的悬停放大、相邻让位与空闲呼吸弹跳动画。
 - autoHide:
   - animationType: slide
     $name: Animation type (auto-hide)
@@ -421,8 +429,8 @@
       swallows the mouse-edge event. Creates a background thread that polls
       the cursor position.
     $description:zh-CN: 鼠标悬停屏幕边缘但任务栏不出现时开启，例如该显示器上没有可见窗口，或全屏程序吞掉了鼠标边缘事件。开启后会创建一个后台线程轮询光标位置。
-  $name: Taskbar instant show (auto-hide)
-  $name:zh-CN: 任务栏秒显（自动隐藏即时显示）
+  $name: Taskbar show animation (auto-hide)
+  $name:zh-CN: 任务栏显示动画
   $description: >-
     Removes the delay before the auto-hidden taskbar appears and customizes
     its show animation.
@@ -545,8 +553,8 @@
     - vertical: 垂直
     - diagonal1: 对角线（左上到右下）
     - diagonal2: 对角线（左下到右上）
-  $name: Taskbar elastic pill
-  $name:zh-CN: 任务栏弹性药丸
+  $name: Taskbar indicator animation
+  $name:zh-CN: 任务栏指示条动画
   $description: >-
     Elastic sliding pill indicator for the active taskbar item, with
     animation styles, pointer interaction feedback, and color customization.
@@ -1816,7 +1824,7 @@ int WINAPI TaskbarFrame_OnPointerExited_Hook(void* pThis, void* pArgs) {
 }
 
 void LoadSettings() {
-    int rawScale = Wh_GetIntSetting(L"MaxScale");
+    int rawScale = Wh_GetIntSetting(L"iconAnim.MaxScale");
 
     if (rawScale < 101) {
         rawScale = 101;
@@ -1824,32 +1832,32 @@ void LoadSettings() {
         rawScale = 220;
     }
 
-    g_settings.animationType = Wh_GetIntSetting(L"AnimationType");
+    g_settings.animationType = Wh_GetIntSetting(L"iconAnim.AnimationType");
     g_settings.maxScale = (double)rawScale / 100.0;
 
-    g_settings.effectRadius = Wh_GetIntSetting(L"EffectRadius");
+    g_settings.effectRadius = Wh_GetIntSetting(L"iconAnim.EffectRadius");
     if (g_settings.effectRadius <= 0) g_settings.effectRadius = 100;
 
-    g_settings.spacingFactor = (double)Wh_GetIntSetting(L"SpacingFactor") / 100.0;
+    g_settings.spacingFactor = (double)Wh_GetIntSetting(L"iconAnim.SpacingFactor") / 100.0;
     if (g_settings.spacingFactor < 0.0) g_settings.spacingFactor = 0.5;
 
-    g_settings.bounceDelay = Wh_GetIntSetting(L"BounceDelay");
+    g_settings.bounceDelay = Wh_GetIntSetting(L"iconAnim.BounceDelay");
     if (g_settings.bounceDelay < 0) g_settings.bounceDelay = 100;
 
-    g_settings.focusDuration = (double)Wh_GetIntSetting(L"FocusDuration");
+    g_settings.focusDuration = (double)Wh_GetIntSetting(L"iconAnim.FocusDuration");
     if (g_settings.focusDuration <= 0) g_settings.focusDuration = 150.0;
 
-    g_settings.disableVerticalBounce = (bool)Wh_GetIntSetting(L"DisableVerticalBounce");
-    g_settings.taskbarLabelsMode = (bool)Wh_GetIntSetting(L"TaskbarLabelsMode");
-    g_settings.excludeSystemButtonsMode = Wh_GetIntSetting(L"ExcludeSystemButtonsMode");
+    g_settings.disableVerticalBounce = (bool)Wh_GetIntSetting(L"iconAnim.DisableVerticalBounce");
+    g_settings.taskbarLabelsMode = (bool)Wh_GetIntSetting(L"iconAnim.TaskbarLabelsMode");
+    g_settings.excludeSystemButtonsMode = Wh_GetIntSetting(L"iconAnim.ExcludeSystemButtonsMode");
 
-    g_settings.lerpSpeed = (double)Wh_GetIntSetting(L"LerpSpeed");
+    g_settings.lerpSpeed = (double)Wh_GetIntSetting(L"iconAnim.LerpSpeed");
     if (g_settings.lerpSpeed < 0) g_settings.lerpSpeed = 0;
     if (g_settings.lerpSpeed > 60) g_settings.lerpSpeed = 60;
 
-    g_settings.disableBounce = (bool)Wh_GetIntSetting(L"DisableBounce");
+    g_settings.disableBounce = (bool)Wh_GetIntSetting(L"iconAnim.DisableBounce");
 
-    double bounceAmp = (double)Wh_GetIntSetting(L"BounceAmplitude");
+    double bounceAmp = (double)Wh_GetIntSetting(L"iconAnim.BounceAmplitude");
     if (bounceAmp < 50.0) {
         bounceAmp = 50.0;
     } else if (bounceAmp > 300.0) {
@@ -1857,7 +1865,7 @@ void LoadSettings() {
     }
     g_settings.bounceAmplitude = bounceAmp / 100.0;
     g_settings.antiClipDisabled =
-        (bool)Wh_GetIntSetting(L"DisableAntiClipGuard");
+        (bool)Wh_GetIntSetting(L"iconAnim.DisableAntiClipGuard");
 
     Wh_Log(L"DockAnimation: Settings loaded.");
 }

@@ -52,6 +52,7 @@ foreach ($id in @(
     "local@cw-instant-thumbnail-previews",
     "local@cw-quick-launch-dock",
     "local@cw-live-video-wallpaper",
+    "local@cw-fluent-context-menu",
     "local@cw-explorer-info-bar",
     "local@cw-better-volume-mixer",
     "local@cw-file-operation-styler",

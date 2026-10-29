@@ -15,13 +15,13 @@
 ## 2. 元数据
 
 ```
-// @name              CW-任务栏美化
-// @name:zh-CN        CW-任务栏美化
+// @name              CW-任务栏样式美化
+// @name:zh-CN        CW-任务栏样式美化
 // @description       Acrylic taskbar with adjustable blur, opacity and color.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，模糊、不透明度和颜色可调。
 ```
 
-- `@name` 和 `@name:zh-CN` 都写成 `CW-<中文名>`（如 `CW-任务栏美化`），中文名 2–8 个字，不带英文括注。从社区引入的 mod 同时保留 `@name` 的其他语言行。
+- `@name` 和 `@name:zh-CN` 都写成 `CW-<中文名>`（如 `CW-任务栏样式美化`），中文名 2–8 个字，不带英文括注。从社区引入的 mod 同时保留 `@name` 的其他语言行。
 - `@description` 写一句英文，`@description:zh-CN` 写一句中文，以句号结尾。只说做什么，不写“高质量”“深度”“极致”等形容词，不写感叹号。
 - 基于他人 mod 的，在说明的“致谢与许可”里注明，不必写进 `@description`。
 

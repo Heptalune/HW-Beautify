@@ -18,26 +18,26 @@ foreach ($f in $psFiles) {
 
 Write-Host "`n=== 2. mod 清单与元数据一致性 ===" -ForegroundColor Cyan
 $expected = @{
-    'local@cw-taskbar-acrylic.wh.cpp'            = @{ id='cw-taskbar-acrylic';            ver='4.3.1';  inc='explorer.exe' }
-    'local@cw-startmenu-acrylic.wh.cpp'          = @{ id='cw-startmenu-acrylic';          ver='4.1.13'; inc='StartMenuExperienceHost.exe' }
-    'local@cw-notificationcenter-acrylic.wh.cpp' = @{ id='cw-notificationcenter-acrylic'; ver='4.2.6';  inc='ShellExperienceHost.exe' }
-    'local@cw-explorer-styler.wh.cpp'            = @{ id='cw-explorer-styler';            ver='1.7.0';  inc='explorer.exe' }
+    'local@cw-taskbar-acrylic.wh.cpp'            = @{ id='cw-taskbar-acrylic';            ver='4.3.2';  inc='explorer.exe' }
+    'local@cw-startmenu-acrylic.wh.cpp'          = @{ id='cw-startmenu-acrylic';          ver='4.1.14'; inc='StartMenuExperienceHost.exe' }
+    'local@cw-notificationcenter-acrylic.wh.cpp' = @{ id='cw-notificationcenter-acrylic'; ver='4.2.7';  inc='ShellExperienceHost.exe' }
+    'local@cw-explorer-styler.wh.cpp'            = @{ id='cw-explorer-styler';            ver='1.7.1';  inc='explorer.exe' }
     'local@cw-desktop-toggle-icons.wh.cpp'       = @{ id='cw-desktop-toggle-icons';       ver='4.2.0';  inc='explorer.exe' }
     'local@cw-taskbar-volume-control.wh.cpp'     = @{ id='cw-taskbar-volume-control';     ver='1.4.2';  inc='explorer.exe' }
-    'local@cw-taskbar-animation.wh.cpp'          = @{ id='cw-taskbar-animation';          ver='2.2.0';  inc='explorer.exe' }
+    'local@cw-taskbar-animation.wh.cpp'          = @{ id='cw-taskbar-animation';          ver='2.3.0';  inc='explorer.exe' }
     'local@cw-window-arrangement.wh.cpp'         = @{ id='cw-window-arrangement';         ver='1.0.3';  inc='*' }
-    'local@cw-classic-context-menu.wh.cpp'       = @{ id='cw-classic-context-menu';       ver='1.1.0';  inc='explorer.exe' }
     'local@cw-extension-no-warning.wh.cpp'       = @{ id='cw-extension-no-warning';       ver='1.0.2';  inc='explorer.exe'; noSettings=$true }
     'local@cw-alt-drag.wh.cpp'                   = @{ id='cw-alt-drag';                   ver='1.2';    inc='*' }
     'local@cw-aero-peek.wh.cpp'                  = @{ id='cw-aero-peek';                  ver='1.0.4';  inc='explorer.exe' }
     'local@cw-custom-context-menu.wh.cpp'        = @{ id='cw-custom-context-menu';        ver='1.1.3';  inc='explorer.exe' }
     'local@cw-taskbar-autohide-when-maximized.wh.cpp'      = @{ id='cw-taskbar-autohide-when-maximized'; ver='1.2.7'; inc='explorer.exe' }
     'local@cw-file-hover-info.wh.cpp'            = @{ id='cw-file-hover-info';            ver='1.1.3';  inc='explorer.exe' }
-    'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.2';  inc='SystemSettings.exe' }
+    'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.3';  inc='SystemSettings.exe' }
     'local@cw-invisible-borders.wh.cpp'          = @{ id='cw-invisible-borders';          ver='1.0.1';  inc='*' }
     'local@cw-shake-find-cursor.wh.cpp'          = @{ id='cw-shake-find-cursor';          ver='1.5.0';  inc='windhawk.exe' }
     'local@cw-instant-thumbnail-previews.wh.cpp' = @{ id='cw-instant-thumbnail-previews'; ver='1.1.1';  inc='explorer.exe' }
     'local@cw-thumbnail-size.wh.cpp'             = @{ id='cw-thumbnail-size';             ver='1.2.2';  inc='explorer.exe' }
+    'local@cw-fluent-context-menu.wh.cpp'        = @{ id='cw-fluent-context-menu';        ver='0.2.1';  inc='explorer.exe' }
     'optional\local@cw-quick-launch-dock.wh.cpp' = @{ id='cw-quick-launch-dock';          ver='1.1.1';  inc='windhawk.exe' }
     'optional\local@cw-live-video-wallpaper.wh.cpp' = @{ id='cw-live-video-wallpaper';    ver='1.1.2';  inc='explorer.exe' }
     'optional\local@cw-windows-animations.wh.cpp'= @{ id='cw-windows-animations';         ver='1.6.0';  inc='*' }
@@ -79,7 +79,6 @@ files = [
  'local@cw-desktop-toggle-icons.wh.cpp',
  'local@cw-taskbar-volume-control.wh.cpp','local@cw-taskbar-animation.wh.cpp',
  'local@cw-window-arrangement.wh.cpp',
- 'local@cw-classic-context-menu.wh.cpp',
  'local@cw-custom-context-menu.wh.cpp',
  'local@cw-taskbar-autohide-when-maximized.wh.cpp',
  'local@cw-file-hover-info.wh.cpp','local@cw-settings-styler.wh.cpp',
@@ -88,6 +87,7 @@ files = [
  'local@cw-thumbnail-size.wh.cpp',
  r'optional\local@cw-quick-launch-dock.wh.cpp',
  r'optional\local@cw-live-video-wallpaper.wh.cpp',
+ 'local@cw-fluent-context-menu.wh.cpp',
  r'optional\local@cw-windows-animations.wh.cpp',
  r'optional\local@cw-alt-tab-flip-3d.wh.cpp',
  r'optional\local@cw-mac-island-dock.wh.cpp']
@@ -146,14 +146,14 @@ Check "改名迁移映射（6 条 CW→cw）" (([regex]::Matches($dep, '"local@c
 Check "退役清理含被删模组" (($dep -match 'settings-styler-fork') -and ($dep -match 'cw-volume-per-app') -and ($dep -match 'cw-thumbnail-size'))
 Check "acrylic 含任务栏高度默认值种子" ($dep -match '"TaskbarHeight" 52')
 Check "volume-control 嵌套键种子" ($dep -match 'scrollAnywhereKeys\.shift')
-Check "dock-animation 默认值种子" ($dep -match '"BounceDelay" 500')
+Check "dock-animation 默认值种子" ($dep -match '"iconAnim.BounceDelay" 500')
 Check "volume-control 媒体设备切换种子" (($dep -match '"deviceSwitchPlaybackKey"') -and ($dep -match '"showDeviceSwitchToast"'))
 Check "v2.0 主题值迁移函数存在" ($dep -match 'Convert-LegacyThemeValues')
 Check "explorer-styler 种子用新主题名" ($dep -match '"theme" "CWTranslucent"')
 Check "音量模组 perApp 种子（合并验证）" ($dep -match '"perApp.volumeChangeStep" 10')
 Check "动画模组 pill 种子（合并验证）" (($dep -match '"pill.Dimensions" "16, 3"') -and ($dep -match '"pill.ColorMode" "accent"'))
 Check "audioswap/per-app 已入退役清单" (($dep -match '"local@cw-audioswap"') -and ($dep -match '"local@cw-volume-per-app"'))
-Check "新模组种子块存在" (($dep -match 'local@cw-classic-context-menu"\)') -and ($dep -match 'local@cw-taskbar-animation"\)') -and ($dep -match 'local@cw-mac-island-dock"\)'))
+Check "新模组种子块存在" (($dep -match 'local@cw-fluent-context-menu"\)') -and ($dep -match 'local@cw-taskbar-animation"\)') -and ($dep -match 'local@cw-mac-island-dock"\)'))
 Check "dwm.exe 残留包含项清理（果冻窗口已移除）" (($dep -match "'dwm\.exe' \}\) -join '\|'") -and (-not ($dep -match '\$dwmWanted')))
 Check "不覆盖用户值（Set-RegValueIfMissing）" ($dep -match 'Set-RegValueIfMissing')
 Check "deploy 不调用 clang/编译" (-not ($dep -match 'clang'))

@@ -729,10 +729,10 @@
 ## 2.76 模组名称中文规范与统一命名 (v4.1.0)
 已将 CW-Beautify 系列核心模组的显示名称统一规范，保留 CW-Beautify:  前缀并使用清晰标准的中文命名：
 1. local@cw-desktop-toggle-icons.wh.cpp -> **CW-Beautify: 桌面双击隐藏图标**
-2. local@cw-notificationcenter-acrylic.wh.cpp -> **CW-Beautify: 通知栏美化**
-3. local@windows-11-settings-styler-fork.wh.cpp -> **CW-Beautify: 设置美化**
-4. local@cw-startmenu-acrylic.wh.cpp -> **CW-Beautify: 开始菜单美化**
-5. local@cw-taskbar-acrylic.wh.cpp -> **CW-Beautify: 任务栏美化**
+2. local@cw-notificationcenter-acrylic.wh.cpp -> **CW-Beautify: 通知栏样式美化**
+3. local@windows-11-settings-styler-fork.wh.cpp -> **CW-Beautify: 设置样式美化**
+4. local@cw-startmenu-acrylic.wh.cpp -> **CW-Beautify: 开始菜单样式美化**
+5. local@cw-taskbar-acrylic.wh.cpp -> **CW-Beautify: 任务栏样式美化**
 6. local@macos-minimize-animation.wh.cpp -> **macOS 神奇效果最小化动画**
 
 
