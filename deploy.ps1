@@ -813,12 +813,12 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "autoHide.edgeDetection" 0 DWord $label
         # 任务栏窗口最大化自动隐藏（maxHide.* 前缀，2.4.0 起并入；原独立模组
         # CW-最大化自动隐藏任务栏 的设置不自动迁移，新功能默认关闭）
-        Set-RegValueIfMissing $settingsPath "maxHide.Enabled" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "maxHide.mode" "intersected" String $label
-        Set-RegValueIfMissing $settingsPath "maxHide.foregroundWindowOnly" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "maxHide.primaryMonitorOnly" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "maxHide.oldTaskbarOnWin11" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "maxHide.excludedPrograms" "" String $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.Enabled" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.mode" "intersected" String $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.foregroundWindowOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.primaryMonitorOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.oldTaskbarOnWin11" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.excludedPrograms" "" String $label
         # 任务栏弹性药丸（pill.* 前缀，2.2.0 起并入，原独立模组的键）
         Set-RegValueIfMissing $settingsPath "pill.Dimensions" "16, 3" String $label
         Set-RegValueIfMissing $settingsPath "pill.Margins" "0, 5" String $label

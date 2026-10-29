@@ -77,7 +77,7 @@
 | CW-通知栏样式美化 | cw-notificationcenter-acrylic | 4.2.7 | m417z Notification Center Styler 深度修改 |
 | CW-文件管理器样式美化 | cw-explorer-styler | 1.7.1 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
 | CW-任务栏音量控制 | cw-taskbar-volume-control | 1.5.0 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制（perApp.*）；1.5.0 设置页重组出「全局音量控制」分组（globalVolume.*） |
-| CW-任务栏动画 | cw-taskbar-animation | 2.4.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；2.4.0 并入最大化自动隐藏任务栏（maxHide.*，置于「任务栏显示动画」分组，默认关闭）；设置键 autoHide.*/pill.*/maxHide.* 隔离 |
+| CW-任务栏动画 | cw-taskbar-animation | 2.4.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；2.4.0 并入最大化自动隐藏任务栏（autoHide.maxHide.*，置于「任务栏显示动画」分组内的同名子分组，默认关闭）；设置键 autoHide.*/pill.*/autoHide.maxHide.* 隔离 |
 | CW-任务栏缩略图设置 | cw-taskbar-thumbnail-settings | 1.0.0 | Alchemy Instant Taskbar Thumbnail Previews (MIT) + m417z Taskbar Thumbnail Size 合并；instant.*/size.* 两个可收起分组；即时预览组需 Win11 24H2+（22H2/23H2 自动降级仅停用该组） |
 | CW-关于桌面的快捷设置 | cw-desktop-quick-settings | 1.0.0 | m417z Aero Peek + Heptalune 桌面双击隐藏图标 合并；peek.*/toggleIcons.* 两个可收起分组 |
 | CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |

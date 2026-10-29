@@ -164,7 +164,7 @@ Check "explorer-styler 种子用新主题名" ($dep -match '"theme" "CWTransluce
 Check "音量模组 perApp 种子（合并验证）" ($dep -match '"perApp.volumeChangeStep" 10')
 Check "音量模组 globalVolume 分组种子（1.5.0 验证）" (($dep -match '"globalVolume.volumeIndicator" "win11"') -and ($dep -match '"globalVolume.scrollAnywhereKeys.shift"'))
 Check "动画模组 pill 种子（合并验证）" (($dep -match '"pill.Dimensions" "16, 3"') -and ($dep -match '"pill.ColorMode" "accent"'))
-Check "动画模组 maxHide 种子（2.4.0 并入验证）" (($dep -match '"maxHide.Enabled" 0') -and ($dep -match '"maxHide.mode" "intersected"'))
+Check "动画模组 autoHide.maxHide 种子（2.4.0 并入验证）" (($dep -match '"autoHide.maxHide.Enabled" 0') -and ($dep -match '"autoHide.maxHide.mode" "intersected"'))
 Check "缩略图设置种子（v2.3.0 合并验证）" (($dep -match '"instant.delayMs" 1') -and ($dep -match '"size.size" 200'))
 Check "桌面快捷设置种子（v2.3.0 合并验证）" (($dep -match '"peek.hoverDelay" 500') -and ($dep -match '"toggleIcons.enableAutoHide" 1'))
 Check "v2.3.0 合并退役入清单" ((($dep -match '"local@cw-instant-thumbnail-previews"') -and ($dep -match '"local@cw-thumbnail-size"') -and ($dep -match '"local@cw-aero-peek"') -and ($dep -match '"local@cw-desktop-toggle-icons"') -and ($dep -match '"local@cw-taskbar-autohide-when-maximized"')))
