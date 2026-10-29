@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.4.2
+// @version         1.5.0
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -87,6 +87,8 @@ explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务�
 - 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
 
 ## 更新日志
+- **1.5.0**：设置页重组——模组最初的核心功能（滚动调音量、修饰键任意位置滚动、媒体设备快捷切换等）收进「全局音量控制」可收起分组，键名加 globalVolume. 前缀（与「分应用音量控制」分组并列；deploy 会自动迁移旧扁平键的值）。分组归类只影响设置页展示，功能行为与默认值完全不变。
+
 - **1.4.0**：分应用音量控制模组并入本模组（上游 Taskbar Volume Control Per-App，同为 m417z
   作品）：悬停任务栏按钮滚动调节对应应用自己的音量、Ctrl+点击切换该应用静音、调节时按钮旁
   弹出提示；其设置项迁移为本模组的 perApp.* 前缀（设置页「分应用音量控制」嵌套组），原独立
@@ -151,99 +153,106 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
 
 // ==WindhawkModSettings==
 /*
-- volumeIndicator: modern
-  $name: Volume control indicator
-  $name:zh-CN: 音量控制指示器
-  $description: The indicator style shown while scrolling.
-  $description:zh-CN: 滚动调节音量时显示的指示器样式。可选 Windows 11 / 10 / 7 风格，或不显示。
-  $options:
-  - win11: Windows 11
-  - modern: Windows 10
-  - classic: Windows 7
-  - none: 无
-- deviceSwitchPlaybackKey: "Ctrl+Alt+A"
-  $name: Quick switch media device
-  $name:zh-CN: 媒体（播放）设备快速切换
-  $description: Global hotkey that cycles the default playback device to the next one. Example. Ctrl+Alt+A. Use None to disable.
-  $description:zh-CN: 全局快捷键，按下后把默认播放（媒体输出）设备循环切到下一个。示例 Ctrl+Alt+A。设为 None 可关闭。
-- deviceSwitchCaptureKey: "None"
-  $name: Quick switch capture device
-  $name:zh-CN: 录音（采集）设备快速切换
-  $description: Global hotkey that cycles the default capture (microphone) device.
-  $description:zh-CN: 全局快捷键，按下后把默认录音（麦克风）设备循环切到下一个。默认关闭。
-- deviceCycleSkipInactive: "1"
-  $name: Skip inactive devices
-  $name:zh-CN: 跳过未激活的设备
-  $description: Inactive or disconnected devices are skipped when cycling.
-  $description:zh-CN: 循环切换时跳过未激活或已断开的设备。
-  $options:
-  - "1": 开启
-  - "0": 关闭
-- showDeviceSwitchToast: "1"
-  $name: Toast after device switch
-  $name:zh-CN: 切换后提示
-  $description: Briefly show the new device name at the bottom-left corner after a switch.
-  $description:zh-CN: 切换成功后在屏幕左下角短暂显示新设备名称。
-  $options:
-  - "1": 开启
-  - "0": 关闭
-- scrollArea: taskbar
-  $name: Scroll area
-  $name:zh-CN: 滚动区域
-  $description: The area where scrolling adjusts the volume.
-  $description:zh-CN: 滚动可以调节音量的区域。默认为整条任务栏。
-  $options:
-  - taskbar: 整条任务栏
-  - notification_area: 托盘区域
-  - taskbarWithoutNotificationArea: 除托盘外的任务栏
-  - none: 无（仅用附加滚动区域）
-- additionalScrollRegions: ""
-  $name: Additional scroll regions
-  $name:zh-CN: 附加滚动区域
+- globalVolume:
+  - volumeIndicator: modern
+    $name: Volume control indicator
+    $name:zh-CN: 音量控制指示器
+    $description: The indicator style shown while scrolling.
+    $description:zh-CN: 滚动调节音量时显示的指示器样式。可选 Windows 11 / 10 / 7 风格，或不显示。
+    $options:
+    - win11: Windows 11
+    - modern: Windows 10
+    - classic: Windows 7
+    - none: 无
+  - deviceSwitchPlaybackKey: "Ctrl+Alt+A"
+    $name: Quick switch media device
+    $name:zh-CN: 媒体（播放）设备快速切换
+    $description: Global hotkey that cycles the default playback device to the next one. Example. Ctrl+Alt+A. Use None to disable.
+    $description:zh-CN: 全局快捷键，按下后把默认播放（媒体输出）设备循环切到下一个。示例 Ctrl+Alt+A。设为 None 可关闭。
+  - deviceSwitchCaptureKey: "None"
+    $name: Quick switch capture device
+    $name:zh-CN: 录音（采集）设备快速切换
+    $description: Global hotkey that cycles the default capture (microphone) device.
+    $description:zh-CN: 全局快捷键，按下后把默认录音（麦克风）设备循环切到下一个。默认关闭。
+  - deviceCycleSkipInactive: "1"
+    $name: Skip inactive devices
+    $name:zh-CN: 跳过未激活的设备
+    $description: Inactive or disconnected devices are skipped when cycling.
+    $description:zh-CN: 循环切换时跳过未激活或已断开的设备。
+    $options:
+    - "1": 开启
+    - "0": 关闭
+  - showDeviceSwitchToast: "1"
+    $name: Toast after device switch
+    $name:zh-CN: 切换后提示
+    $description: Briefly show the new device name at the bottom-left corner after a switch.
+    $description:zh-CN: 切换成功后在屏幕左下角短暂显示新设备名称。
+    $options:
+    - "1": 开启
+    - "0": 关闭
+  - scrollArea: taskbar
+    $name: Scroll area
+    $name:zh-CN: 滚动区域
+    $description: The area where scrolling adjusts the volume.
+    $description:zh-CN: 滚动可以调节音量的区域。默认为整条任务栏。
+    $options:
+    - taskbar: 整条任务栏
+    - notification_area: 托盘区域
+    - taskbarWithoutNotificationArea: 除托盘外的任务栏
+    - none: 无（仅用附加滚动区域）
+  - additionalScrollRegions: ""
+    $name: Additional scroll regions
+    $name:zh-CN: 附加滚动区域
+    $description: >-
+      A comma-separated list of additional regions along the taskbar where
+      scrolling will control the system volume. Each region is a range like
+      "100-200" (pixels) or "20%-50%" (percentage of taskbar length).
+    $description:zh-CN: 逗号分隔的附加区域列表，滚动这些区域也会调节音量。每个区域是一段范围，如 "100-200"（像素）或 "20%-50%"（任务栏长度的百分比）。
+  - ctrlScrollVolumeChange: false
+    $name: Ctrl + Scroll to change volume
+    $name:zh-CN: Ctrl + 滚轮调音量
+    $description: >-
+      When enabled, scrolling the mouse wheel will only change the volume when
+      the Ctrl key is held down.
+    $description:zh-CN: 开启后，只有按住 Ctrl 键滚动滚轮才会改变音量。默认关闭。
+  - scrollAnywhereKeys:
+    - shift: false
+      $name: Shift key
+      $name:zh-CN: Shift 键
+    - ctrl: false
+      $name: Ctrl key
+      $name:zh-CN: Ctrl 键
+    - alt: false
+      $name: Alt key
+      $name:zh-CN: Alt 键
+    - win: false
+      $name: Win key
+      $name:zh-CN: Win 键
+    $name: Scroll anywhere modifier keys
+    $name:zh-CN: 任意位置滚动的修饰键
+    $description: >-
+      A combination of modifier keys that, when held, allow controlling the system
+      volume by scrolling the mouse wheel anywhere on the screen. Note that
+      scrolling won't work when the foreground window is of an elevated process
+      (such as Windhawk or Task Manager).
+    $description:zh-CN: 按住这组修饰键时，在屏幕任意位置滚动滚轮都能调节音量。注意：前台窗口属于提权进程（如 Windhawk 或任务管理器）时滚动无效。
+  - fullScreenScrolling: disabled
+    $name: Full screen scrolling
+    $name:zh-CN: 全屏时滚动
+    $description: >-
+      Scroll at the taskbar position to control the system volume, even when the
+      taskbar is covered by a full screen window.
+    $description:zh-CN: 任务栏被全屏窗口遮住时，在任务栏位置滚动仍可调节音量。默认关闭。
+    $options:
+    - disabled: 关闭
+    - withIndicator: 开启（带指示器）
+    - withoutIndicator: 开启（不带指示器）
+  $name: Global volume control
+  $name:zh-CN: 全局音量控制
   $description: >-
-    A comma-separated list of additional regions along the taskbar where
-    scrolling will control the system volume. Each region is a range like
-    "100-200" (pixels) or "20%-50%" (percentage of taskbar length).
-  $description:zh-CN: 逗号分隔的附加区域列表，滚动这些区域也会调节音量。每个区域是一段范围，如 "100-200"（像素）或 "20%-50%"（任务栏长度的百分比）。
-- ctrlScrollVolumeChange: false
-  $name: Ctrl + Scroll to change volume
-  $name:zh-CN: Ctrl + 滚轮调音量
-  $description: >-
-    When enabled, scrolling the mouse wheel will only change the volume when
-    the Ctrl key is held down.
-  $description:zh-CN: 开启后，只有按住 Ctrl 键滚动滚轮才会改变音量。默认关闭。
-- scrollAnywhereKeys:
-  - shift: false
-    $name: Shift key
-    $name:zh-CN: Shift 键
-  - ctrl: false
-    $name: Ctrl key
-    $name:zh-CN: Ctrl 键
-  - alt: false
-    $name: Alt key
-    $name:zh-CN: Alt 键
-  - win: false
-    $name: Win key
-    $name:zh-CN: Win 键
-  $name: Scroll anywhere modifier keys
-  $name:zh-CN: 任意位置滚动的修饰键
-  $description: >-
-    A combination of modifier keys that, when held, allow controlling the system
-    volume by scrolling the mouse wheel anywhere on the screen. Note that
-    scrolling won't work when the foreground window is of an elevated process
-    (such as Windhawk or Task Manager).
-  $description:zh-CN: 按住这组修饰键时，在屏幕任意位置滚动滚轮都能调节音量。注意：前台窗口属于提权进程（如 Windhawk 或任务管理器）时滚动无效。
-- fullScreenScrolling: disabled
-  $name: Full screen scrolling
-  $name:zh-CN: 全屏时滚动
-  $description: >-
-    Scroll at the taskbar position to control the system volume, even when the
-    taskbar is covered by a full screen window.
-  $description:zh-CN: 任务栏被全屏窗口遮住时，在任务栏位置滚动仍可调节音量。默认关闭。
-  $options:
-  - disabled: 关闭
-  - withIndicator: 开启（带指示器）
-  - withoutIndicator: 开启（不带指示器）
+    The original core features of this mod: scrolling volume control,
+    modifier-key anywhere scrolling, and media device hotkey switching.
+  $description:zh-CN: 模组最初始的核心功能：滚动调音量、修饰键任意位置滚动与播放/录音设备快捷切换。
 - perApp:
   - volumeChangeStep: 10
     $name: Volume change step (per-app)
@@ -1290,17 +1299,17 @@ static void ShowDevToast(const std::wstring& text) {
 }
 
 static void LoadDevSettings() {
-    PCWSTR s = Wh_GetStringSetting(L"deviceSwitchPlaybackKey");
+    PCWSTR s = Wh_GetStringSetting(L"globalVolume.deviceSwitchPlaybackKey");
     g_dev.hasPlay = ParseHotkey(s, g_dev.playMods, g_dev.playKey);
     Wh_FreeStringSetting(s);
-    s = Wh_GetStringSetting(L"deviceSwitchCaptureKey");
+    s = Wh_GetStringSetting(L"globalVolume.deviceSwitchCaptureKey");
     g_dev.hasCap = ParseHotkey(s, g_dev.capMods, g_dev.capKey);
     Wh_FreeStringSetting(s);
     // 字符串型设置：缺失/空串视为开启（与设置页默认值一致）
-    PCWSTR skip = Wh_GetStringSetting(L"deviceCycleSkipInactive");
+    PCWSTR skip = Wh_GetStringSetting(L"globalVolume.deviceCycleSkipInactive");
     g_dev.skipInactive = wcscmp(skip, L"0") != 0;
     Wh_FreeStringSetting(skip);
-    PCWSTR toast = Wh_GetStringSetting(L"showDeviceSwitchToast");
+    PCWSTR toast = Wh_GetStringSetting(L"globalVolume.showDeviceSwitchToast");
     g_dev.toast = wcscmp(toast, L"0") != 0;
     Wh_FreeStringSetting(toast);
 }
@@ -2421,7 +2430,7 @@ DWORD_PTR WINAPI ForceFocusBasedMouseWheelRouting_Hook(BOOL enabled) {
 }
 
 void LoadSettings() {
-    PCWSTR volumeIndicator = Wh_GetStringSetting(L"volumeIndicator");
+    PCWSTR volumeIndicator = Wh_GetStringSetting(L"globalVolume.volumeIndicator");
     g_settings.volumeIndicator = VolumeIndicator::Win11;
     if (wcscmp(volumeIndicator, L"modern") == 0) {
         g_settings.volumeIndicator = VolumeIndicator::Modern;
@@ -2437,7 +2446,7 @@ void LoadSettings() {
     }
     Wh_FreeStringSetting(volumeIndicator);
 
-    PCWSTR scrollArea = Wh_GetStringSetting(L"scrollArea");
+    PCWSTR scrollArea = Wh_GetStringSetting(L"globalVolume.scrollArea");
     g_settings.scrollArea = ScrollArea::taskbar;
     if (wcscmp(scrollArea, L"notification_area") == 0) {
         g_settings.scrollArea = ScrollArea::notificationArea;
@@ -2450,17 +2459,17 @@ void LoadSettings() {
 
     g_settings.middleClickToMute = Wh_GetIntSetting(L"middleClickToMute");
     g_settings.ctrlScrollVolumeChange =
-        Wh_GetIntSetting(L"ctrlScrollVolumeChange");
+        Wh_GetIntSetting(L"globalVolume.ctrlScrollVolumeChange");
     g_settings.scrollAnywhereKeys.shift =
-        Wh_GetIntSetting(L"scrollAnywhereKeys.shift");
+        Wh_GetIntSetting(L"globalVolume.scrollAnywhereKeys.shift");
     g_settings.scrollAnywhereKeys.ctrl =
-        Wh_GetIntSetting(L"scrollAnywhereKeys.ctrl");
+        Wh_GetIntSetting(L"globalVolume.scrollAnywhereKeys.ctrl");
     g_settings.scrollAnywhereKeys.alt =
-        Wh_GetIntSetting(L"scrollAnywhereKeys.alt");
+        Wh_GetIntSetting(L"globalVolume.scrollAnywhereKeys.alt");
     g_settings.scrollAnywhereKeys.win =
-        Wh_GetIntSetting(L"scrollAnywhereKeys.win");
+        Wh_GetIntSetting(L"globalVolume.scrollAnywhereKeys.win");
 
-    PCWSTR fullScreenScrolling = Wh_GetStringSetting(L"fullScreenScrolling");
+    PCWSTR fullScreenScrolling = Wh_GetStringSetting(L"globalVolume.fullScreenScrolling");
     g_settings.fullScreenScrolling = FullScreenScrolling::disabled;
     if (wcscmp(fullScreenScrolling, L"withIndicator") == 0) {
         g_settings.fullScreenScrolling = FullScreenScrolling::withIndicator;
@@ -2477,7 +2486,7 @@ void LoadSettings() {
 
     g_settings.additionalScrollRegions.clear();
     PCWSTR additionalScrollRegions =
-        Wh_GetStringSetting(L"additionalScrollRegions");
+        Wh_GetStringSetting(L"globalVolume.additionalScrollRegions");
     for (auto regionStr : SplitStringView(additionalScrollRegions, L",")) {
         regionStr = TrimStringView(regionStr);
         if (regionStr.empty()) {

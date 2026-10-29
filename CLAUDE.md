@@ -68,7 +68,7 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 当前模组清单（v2.2.0，25 个 = 20 核心 + 5 可选）
+## 当前模组清单（v2.3.0，32 个 = 23 核心 + 9 可选）
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
@@ -76,26 +76,35 @@
 | CW-开始菜单样式美化 | cw-startmenu-acrylic | 4.1.14 | m417z Start Menu Styler 深度修改 |
 | CW-通知栏样式美化 | cw-notificationcenter-acrylic | 4.2.7 | m417z Notification Center Styler 深度修改 |
 | CW-文件管理器样式美化 | cw-explorer-styler | 1.7.1 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
-| CW-桌面双击隐藏图标 | cw-desktop-toggle-icons | 4.2.0 | Heptalune 原创；4.2.0 起改用系统「显示桌面图标」命令实现（状态与系统菜单同步） |
-| CW-任务栏音量控制 | cw-taskbar-volume-control | 1.4.2 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制；1.4.2 修复 x86 编译兼容 |
-| CW-任务栏动画 | cw-taskbar-animation | 2.3.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；设置键 autoHide.*/pill.* 隔离 |
+| CW-任务栏音量控制 | cw-taskbar-volume-control | 1.5.0 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制（perApp.*）；1.5.0 设置页重组出「全局音量控制」分组（globalVolume.*） |
+| CW-任务栏动画 | cw-taskbar-animation | 2.4.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；2.4.0 并入最大化自动隐藏任务栏（maxHide.*，置于「任务栏显示动画」分组，默认关闭）；设置键 autoHide.*/pill.*/maxHide.* 隔离 |
+| CW-任务栏缩略图设置 | cw-taskbar-thumbnail-settings | 1.0.0 | Alchemy Instant Taskbar Thumbnail Previews (MIT) + m417z Taskbar Thumbnail Size 合并；instant.*/size.* 两个可收起分组；即时预览组需 Win11 24H2+（22H2/23H2 自动降级仅停用该组） |
+| CW-关于桌面的快捷设置 | cw-desktop-quick-settings | 1.0.0 | m417z Aero Peek + Heptalune 桌面双击隐藏图标 合并；peek.*/toggleIcons.* 两个可收起分组 |
 | CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |
 | CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
 | CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
 | CW-设置样式美化 | cw-settings-styler | 1.2.3 | m417z Windows 11 Settings Styler 汉化 |
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
-| CW-显示桌面按钮预览 | cw-aero-peek | 1.0.3 | m417z Aero Peek on "Show desktop" button hover 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
-| CW-最大化自动隐藏任务栏 | cw-taskbar-autohide-when-maximized | 1.2.7 | m417z Taskbar auto-hide when maximized 汉化 |
 | CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii Invisible Window Borders (MIT) 汉化 |
 | CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis Shake to Find Cursor + Jaali macOS magnifying cursor 合并汉化（tool mod） |
-| CW-任务栏缩略图即时预览 | cw-instant-thumbnail-previews | 1.1.1 | Alchemy Instant Taskbar Thumbnail Previews (MIT) 汉化 |
-| CW-任务栏缩略图大小 | cw-thumbnail-size | 1.2.2 | m417z Taskbar Thumbnail Size 汉化（v2.1.0 周期退役后回归） |
-| CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.2.1 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；与 CW-自定义右键菜单 互斥 |
-| CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
-| CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化 |
+| CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.2.1 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；**逆向类，绝不可公开分发**；与 CW-自定义右键菜单 互斥 |
+| CW-现代运行对话框 | cw-modern-run-dialog | 3.0.7 | caotu2k5 Modern Run Dialog UI 汉化（上游未标注许可，署名保留） |
+| CW-文件操作样式美化 | cw-file-operation-styler | 1.2.1 | digART File Operation Styler (GPL-3.0) 汉化（v2.1.0 周期移除后回归） |
+| CW-现代 Alt+Tab 切换器 | cw-overhauled-alt-tab | 1.3.1 | IMiloDev OverhauledWin Alt+Tab (MIT) 汉化；与 CW-窗口切换动画 二选一 |
+| CW-拖拽删除文件 | cw-drag-to-delete | 1.0.1 | iMAboud Drag to Delete (MIT) 汉化 |
+| CW-桌面框选淡出 | cw-desktop-marquee-fade | 1.0.1 | angel_lov Desktop Marquee Fade (MIT) 汉化 |
+| CW-桌面图标平滑自动隐藏 | cw-smooth-desktop-icons-autohide | 0.14.3 | HeyOkay Smooth Desktop Icons Auto-Hide (MIT) 汉化；与「关于桌面的快捷设置」双击隐藏 二选一 |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
 | CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
 | CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
+| CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
+| CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化 |
+| CW-指针残影拖尾（可选） | cw-pointer-afterimage | 1.2 | sidlikesgrapess Pointer Afterimage Motion Blur (Unlicense) 汉化 |
+| CW-MacOS 风格 Dock（可选） | cw-macos-style-dock | 1.1 | Zach Vaughn MacOS Style Dock (GPL-3.0) 汉化；与其他 Dock 类模组按需选用 |
+| CW-Windows 灵动岛（可选） | cw-dynamic-island-windows | 1.4.1 | Himanshu Dynamic Island for Windows (MIT) 汉化（tool mod）；与 CW-Mac 灵动岛与 Dock 不同作品、勿同开 |
+| CW-增强音量混合器（可选） | cw-better-volume-mixer | 1.6.1 | 0Allu Better Volume Mixer 汉化（tool mod；v2.1.0 周期移除后回归）；与音量控制分应用功能部分重叠按需选用 |
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；cw-thumbnail-size 同期退役、v2.2.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）。全部进了 deploy 的退役清理列表。
+公开性分类（可公开/不可公开/逆向）见 `docs/MOD_CLASSIFICATION.md`。
+
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；前两者 v2.3.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization/cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）、cw-instant-thumbnail-previews 与 cw-thumbnail-size（合并为 cw-taskbar-thumbnail-settings 1.0.0）、cw-aero-peek 与 cw-desktop-toggle-icons（合并为 cw-desktop-quick-settings 1.0.0）、cw-taskbar-autohide-when-maximized（并入 cw-taskbar-animation 2.4.0）。全部进了 deploy 的退役清理列表。

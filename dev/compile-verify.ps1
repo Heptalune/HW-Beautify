@@ -38,8 +38,7 @@ function Get-BaseArgs([string]$a) {
         '-DUNICODE', '-D_UNICODE',
         '-D__USE_MINGW_ANSI_STDIO=0',
         '-D_WIN32_WINNT=0x0A00', '-D_WIN32_IE=0x0A00', '-DNTDDI_VERSION=0x0A000008',
-        '-DWH_MOD', '-DWH_MOD_ID=L"cw-local-verify"',
-        '-include', 'windhawk_api.h',
+        '-DWH_MOD', '-include', 'windhawk_api.h',
         '-Wno-dllimport-static-field-def',
         '-Wno-missing-field-initializers',
         '-Wno-nonnull',
@@ -62,14 +61,30 @@ foreach ($a in $archList) {
     $baseArgs = Get-BaseArgs $a
     foreach ($src in $Source) {
         if (-not (Test-Path -LiteralPath $src)) { Write-Host "MISSING SOURCE: $src"; $results += [pscustomobject]@{ Src = $src; Arch = $a; Ok = $false }; if (-not $KeepGoing) { exit 2 }; continue }
+        # 尊重模组的 @architecture 声明：x86-64/amd64/x86_64 = 仅 64 位，
+        # 声明了单架构的模组跳过不适用的目标（引擎同样不会编译它们）。
+        $head = (Get-Content -LiteralPath $src -TotalCount 60) -join "`n"
+        $declared = if ($head -match '//\s*@architecture\s+(\S+)') { $Matches[1].ToLowerInvariant() } else { '' }
+        $x64Only = $declared -in @('x86-64', 'amd64', 'x86_64')
+        $x86Only = $declared -eq 'x86'
+        if (($a -eq 'x86' -and $x64Only) -or ($a -eq 'x64' -and $x86Only)) {
+            Write-Host ("[SKIP][{0}] {1}  (@architecture {2})" -f $a, [IO.Path]::GetFileNameWithoutExtension($src), $declared)
+            $results += [pscustomobject]@{ Src = $src; Arch = $a; Ok = $true }
+            continue
+        }
         $name = [IO.Path]::GetFileNameWithoutExtension($src)
+        # 按引擎行为传入 WH_MOD_ID / WH_MOD_VERSION（从元数据提取；引擎以命令行
+        # 宏注入同值。部分模组源码引用这两个宏，缺失会误报编译失败）。
+        $modId = if ($head -match '//\s*@id\s+(\S+)') { $Matches[1] } else { 'cw-local-verify' }
+        $modVer = if ($head -match '//\s*@version\s+(.+?)\s*$') { $Matches[1] } else { '0.0.0' }
+        $srcArgs = @("-DWH_MOD_ID=L`"$modId`"", "-DWH_MOD_VERSION=L`"$modVer`"")
         $out = Join-Path $OutDir "$name.$a.dll"
         # 提取 @compilerOptions（引擎行为：元数据里的链接库传给链接器）
         $co = (Select-String -LiteralPath $src -Pattern '^//\s*@compilerOptions\s+(.+)$' | Select-Object -First 1)
         $coArgs = @()
         if ($co) { $coArgs = $co.Matches[0].Groups[1].Value.Trim() -split '\s+' }
         $sw = [Diagnostics.Stopwatch]::StartNew()
-        $log = & $clang @baseArgs @coArgs -o $out $src $engineLib 2>&1
+        $log = & $clang @baseArgs @srcArgs @coArgs -o $out $src $engineLib 2>&1
         $code = $LASTEXITCODE
         $sw.Stop()
         $ok = ($code -eq 0) -and (Test-Path -LiteralPath $out)

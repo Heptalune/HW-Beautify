@@ -347,8 +347,12 @@ $retiredMods = @(
     "local@cw-taskbar-icon-size",
     "local@cw-audioswap", "local@cw-volume-per-app",
     "local@cw-taskbar-dock-animation", "local@cw-taskbar-autohide-instant",
-    "local@cw-explorer-info-bar", "local@cw-better-volume-mixer",
-    "local@cw-file-operation-styler", "local@cw-taskbar-wheel-cycle",
+    "local@cw-explorer-info-bar", "local@cw-taskbar-wheel-cycle",
+    # v2.3.0 合并退役：缩略图两模组并入任务栏缩略图设置、显示桌面按钮预览与
+    # 桌面双击隐藏图标并入关于桌面的快捷设置、最大化自动隐藏并入任务栏动画。
+    "local@cw-instant-thumbnail-previews", "local@cw-thumbnail-size",
+    "local@cw-aero-peek", "local@cw-desktop-toggle-icons",
+    "local@cw-taskbar-autohide-when-maximized",
     # v2.2.0 移除：托盘系统图标调整、任务栏时钟自定义、任务栏歌词、
     # 半透明窗口、果冻窗口；弹性药丸并入任务栏动画。
     "local@cw-tray-system-icons", "local@cw-taskbar-clock-customization",
@@ -358,6 +362,8 @@ $retiredMods = @(
     # v2.1.0 后补移除：桌面时钟、文件大小
     "local@cw-desktop-clock", "local@cw-explorer-details-file-sizes",
     "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
+    # 注：cw-better-volume-mixer 与 cw-file-operation-styler 在 v2.1.0 周期移除、
+    # v2.3.0 按用户要求重新整合回归，不再是退役模组。
 )
 foreach ($rMod in $retiredMods) {
     $legacyFile = Join-Path $modsSource "$rMod.wh.cpp"
@@ -475,21 +481,24 @@ if ($files.Count -eq 0) {
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
 $optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-                    "local@cw-quick-launch-dock", "local@cw-live-video-wallpaper")
+                    "local@cw-quick-launch-dock", "local@cw-live-video-wallpaper",
+                    "local@cw-pointer-afterimage", "local@cw-macos-style-dock",
+                    "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer")
 # 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
-    "local@cw-explorer-styler", "local@cw-desktop-toggle-icons", "local@cw-taskbar-volume-control",
+    "local@cw-explorer-styler", "local@cw-taskbar-volume-control",
     "local@cw-taskbar-animation", "local@cw-window-arrangement",
     "local@cw-extension-no-warning",
     "local@cw-file-hover-info", "local@cw-settings-styler",
     "local@cw-alt-drag",
-    "local@cw-aero-peek",
-    "local@cw-taskbar-autohide-when-maximized",
     "local@cw-custom-context-menu",
     "local@cw-invisible-borders",
-    "local@cw-shake-find-cursor", "local@cw-instant-thumbnail-previews",
-    "local@cw-thumbnail-size", "local@cw-fluent-context-menu"
+    "local@cw-shake-find-cursor", "local@cw-taskbar-thumbnail-settings",
+    "local@cw-desktop-quick-settings", "local@cw-fluent-context-menu",
+    "local@cw-modern-run-dialog", "local@cw-file-operation-styler",
+    "local@cw-overhauled-alt-tab", "local@cw-drag-to-delete",
+    "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide"
 )
 $preselected = @()
 if ($Optional) {
@@ -670,24 +679,64 @@ foreach ($file in $files) {
 
     if ($id -eq "local@cw-taskbar-volume-control") {
         $label = "Taskbar Volume Control"
-        Set-RegValueIfMissing $settingsPath "volumeIndicator" "win11" String $label
-        Set-RegValueIfMissing $settingsPath "scrollArea" "taskbar" String $label
-        Set-RegValueIfMissing $settingsPath "additionalScrollRegions" "" String $label
+        # 1.5.0 把最初的核心功能收进「全局音量控制」分组，键名加 globalVolume. 前缀。
+        # 旧扁平键的值迁移到新分组键（仅在新键缺失时写入，不覆盖用户已保存的值）。
+        $gvKeyMap = [ordered]@{
+            "volumeIndicator" = "globalVolume.volumeIndicator"
+            "scrollArea" = "globalVolume.scrollArea"
+            "additionalScrollRegions" = "globalVolume.additionalScrollRegions"
+            "ctrlScrollVolumeChange" = "globalVolume.ctrlScrollVolumeChange"
+            "scrollAnywhereKeys.shift" = "globalVolume.scrollAnywhereKeys.shift"
+            "scrollAnywhereKeys.ctrl" = "globalVolume.scrollAnywhereKeys.ctrl"
+            "scrollAnywhereKeys.alt" = "globalVolume.scrollAnywhereKeys.alt"
+            "scrollAnywhereKeys.win" = "globalVolume.scrollAnywhereKeys.win"
+            "fullScreenScrolling" = "globalVolume.fullScreenScrolling"
+            "deviceSwitchPlaybackKey" = "globalVolume.deviceSwitchPlaybackKey"
+            "deviceSwitchCaptureKey" = "globalVolume.deviceSwitchCaptureKey"
+            "deviceCycleSkipInactive" = "globalVolume.deviceCycleSkipInactive"
+            "showDeviceSwitchToast" = "globalVolume.showDeviceSwitchToast"
+        }
+        if ($script:IniStoreMode) {
+            foreach ($oldKey in $gvKeyMap.Keys) {
+                $oldVal = Get-IniValue $script:IniStorePath "Settings" $oldKey
+                if ($null -ne $oldVal) {
+                    Set-IniValueIfMissing $script:IniStorePath "Settings" $gvKeyMap[$oldKey] $oldVal
+                }
+            }
+        } else {
+            $vcKey = Open-HklmKey $settingsPath
+            try {
+                $vcNames = @($vcKey.GetValueNames())
+                foreach ($oldKey in $gvKeyMap.Keys) {
+                    if ($vcNames -contains $oldKey) {
+                        $kind = $vcKey.GetValueKind($oldKey)
+                        $type = if ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord) { "DWord" } else { "String" }
+                        Set-RegValueIfMissing $settingsPath $gvKeyMap[$oldKey] $vcKey.GetValue($oldKey) $type $label
+                    }
+                }
+            } finally {
+                $vcKey.Close()
+            }
+        }
+        # 全局音量控制（globalVolume.* 前缀，1.5.0 起收进可收起分组）
+        Set-RegValueIfMissing $settingsPath "globalVolume.volumeIndicator" "win11" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.scrollArea" "taskbar" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.additionalScrollRegions" "" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.ctrlScrollVolumeChange" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.scrollAnywhereKeys.shift" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.scrollAnywhereKeys.ctrl" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.scrollAnywhereKeys.alt" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.scrollAnywhereKeys.win" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.fullScreenScrolling" "disabled" String $label
+        # 1.3.4 起新增：媒体设备快速切换（1.5.0 起归入 globalVolume 分组）
+        Set-RegValueIfMissing $settingsPath "globalVolume.deviceSwitchPlaybackKey" "Ctrl+Alt+A" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.deviceSwitchCaptureKey" "None" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.deviceCycleSkipInactive" "1" String $label
+        Set-RegValueIfMissing $settingsPath "globalVolume.showDeviceSwitchToast" "1" String $label
+        # 隐藏兼容键（无设置页条目，键名保持扁平不变）
         Set-RegValueIfMissing $settingsPath "middleClickToMute" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "ctrlScrollVolumeChange" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.shift" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.ctrl" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.alt" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "scrollAnywhereKeys.win" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "fullScreenScrolling" "disabled" String $label
-        Set-RegValueIfMissing $settingsPath "noAutomaticMuteToggle" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "volumeChangeStep" 2 DWord $label
         Set-RegValueIfMissing $settingsPath "oldTaskbarOnWin11" 0 DWord $label
-        # 1.3.4 起新增：媒体设备快速切换
-        Set-RegValueIfMissing $settingsPath "deviceSwitchPlaybackKey" "Ctrl+Alt+A" String $label
-        Set-RegValueIfMissing $settingsPath "deviceSwitchCaptureKey" "None" String $label
-        Set-RegValueIfMissing $settingsPath "deviceCycleSkipInactive" "1" String $label
-        Set-RegValueIfMissing $settingsPath "showDeviceSwitchToast" "1" String $label
         # 1.4.0 起并入分应用音量控制（原独立模组的键迁移为 perApp.* 前缀）
         Set-RegValueIfMissing $settingsPath "perApp.volumeChangeStep" 10 DWord $label
         Set-RegValueIfMissing $settingsPath "perApp.ctrlClickToMute" 1 DWord $label
@@ -762,6 +811,14 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "autoHide.hideDelay" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.oldTaskbarOnWin11" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.edgeDetection" 0 DWord $label
+        # 任务栏窗口最大化自动隐藏（maxHide.* 前缀，2.4.0 起并入；原独立模组
+        # CW-最大化自动隐藏任务栏 的设置不自动迁移，新功能默认关闭）
+        Set-RegValueIfMissing $settingsPath "maxHide.Enabled" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.mode" "intersected" String $label
+        Set-RegValueIfMissing $settingsPath "maxHide.foregroundWindowOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.primaryMonitorOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.oldTaskbarOnWin11" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.excludedPrograms" "" String $label
         # 任务栏弹性药丸（pill.* 前缀，2.2.0 起并入，原独立模组的键）
         Set-RegValueIfMissing $settingsPath "pill.Dimensions" "16, 3" String $label
         Set-RegValueIfMissing $settingsPath "pill.Margins" "0, 5" String $label
@@ -791,6 +848,35 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "menuStyle" "fluent" String $label
         Set-RegValueIfMissing $settingsPath "CompactMode" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "Transparent" 1 DWord $label
+    }
+
+    if ($id -eq "local@cw-desktop-quick-settings") {
+        $label = "Desktop Quick Settings"
+        # v2.3.0 合并模组（原 CW-显示桌面按钮预览 + CW-桌面双击隐藏图标），
+        # 旧模组设置键分别迁移为 peek.* 与 toggleIcons.* 前缀。
+        Set-RegValueIfMissing $settingsPath "peek.hoverDelay" 500 DWord $label
+        Set-RegValueIfMissing $settingsPath "toggleIcons.enableAutoHide" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "toggleIcons.autoHideDelay" 5 DWord $label
+        Set-RegValueIfMissing $settingsPath "toggleIcons.showIconsOnAnyInput" 1 DWord $label
+    }
+
+    if ($id -eq "local@cw-taskbar-thumbnail-settings") {
+        $label = "Taskbar Thumbnail Settings"
+        # v2.3.0 合并模组（原 CW-任务栏缩略图即时预览 + CW-任务栏缩略图大小），
+        # 旧模组设置键分别迁移为 instant.* 与 size.* 前缀。
+        # 即时预览组仅 Windows 11 24H2+ 生效（22H2/23H2 自动降级关闭）。
+        Set-RegValueIfMissing $settingsPath "instant.delayMs" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "instant.closeDelayMs" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "instant.thumbnailRemovalDelayMs" 500 DWord $label
+        Set-RegValueIfMissing $settingsPath "instant.closeOnOutsideClick" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "instant.closeOnStartButtonHover" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.size" 200 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.useAbsoluteSize" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.minWidth" 180 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.minHeight" 120 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.maxWidth" 180 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.maxHeight" 120 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.preserveAspectRatio" 1 DWord $label
     }
 
     if ($id -eq "local@cw-startmenu-acrylic") {
@@ -991,7 +1077,7 @@ if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   [SUCCESS] CW-Beautify v2.1.0 一键部署完成！" "Green"
+Write-Status "   [SUCCESS] CW-Beautify v2.3.0 一键部署完成！" "Green"
 Write-Status "================================================" "Green"
 Write-Host ""
 Write-Host "后续说明与使用建议："
