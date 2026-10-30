@@ -1,7 +1,7 @@
 # CW-Beautify 模组分类清单（公开发布政策）
 
 > 本文档对整合包内全部模组按「公开性」分类，是发布与分发的政策依据。
-> 适用版本：v2.3.0（32 个模组 = 23 核心 + 9 可选）。
+> 适用版本：v2.4.0（32 个模组 = 21 核心 + 3 可选 + 8 DLC 额外内容；DLC 模组源码位于 dlc\ 目录，由 deploy-dlc.bat 单独安装）。
 > 政策制定：作者 Heptalune（2026-10-29）。
 
 ## ⚠️ 总政策
@@ -30,24 +30,24 @@
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z | GPL-3.0 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT | MIT |
 | CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii | MIT |
-| CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis + Jaali（合并） | 见模组源码头声明 |
+| CW-晃动找指针（DLC） | cw-shake-find-cursor | 1.5.0 | Darius Vernelis + Jaali（合并） | 见模组源码头声明 |
 | CW-任务栏缩略图设置 | cw-taskbar-thumbnail-settings | 1.0.0 | Alchemy + m417z（合并） | MIT |
 | CW-显示桌面按钮预览（并入快捷设置） | （peek.* 部分） | — | m417z | GPL-3.0 |
 | CW-现代运行对话框 | cw-modern-run-dialog | 3.0.7 | caotu2k5 | 见模组源码头声明 |
 | CW-文件操作样式美化 | cw-file-operation-styler | 1.2.1 | digART | 见模组源码头声明 |
-| CW-现代 Alt+Tab 切换器 | cw-overhauled-alt-tab | 1.3.1 | IMiloDev | 见模组源码头声明 |
+| CW-现代 Alt+Tab 切换器（DLC） | cw-overhauled-alt-tab | 1.3.1 | IMiloDev | 见模组源码头声明 |
 | CW-拖拽删除文件 | cw-drag-to-delete | 1.0.1 | iMAboud | 见模组源码头声明 |
 | CW-桌面框选淡出 | cw-desktop-marquee-fade | 1.0.1 | angel_lov | 见模组源码头声明 |
 | CW-桌面图标平滑自动隐藏 | cw-smooth-desktop-icons-autohide | 0.14.3 | HeyOkay | 见模组源码头声明 |
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag | MIT |
-| CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda | MIT |
-| CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda | GPL-3.0 |
-| CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 | 见模组源码头声明 |
+| CW-窗口切换动画（Vista 风格）（DLC） | cw-alt-tab-flip-3d | 1.0.2 | caliberda | MIT |
+| CW-Mac 灵动岛与 Dock（DLC） | cw-mac-island-dock | 2.1.1 | caliberda | GPL-3.0 |
+| CW-快速启动 Dock（DLC） | cw-quick-launch-dock | 1.1.1 | cheliks1123 | 见模组源码头声明 |
 | CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY | GPL-3.0 |
-| CW-指针残影拖尾（可选） | cw-pointer-afterimage | 1.2 | sidlikesgrapess | Unlicense |
+| CW-指针残影拖尾（DLC） | cw-pointer-afterimage | 1.2 | sidlikesgrapess | Unlicense |
 | CW-MacOS 风格 Dock（可选） | cw-macos-style-dock | 1.1 | Zach Vaughn | 见模组源码头声明 |
-| CW-Windows 灵动岛（可选） | cw-dynamic-island-windows | 1.4.1 | Himanshu | 见模组源码头声明 |
-| CW-增强音量混合器（可选） | cw-better-volume-mixer | 1.6.1 | 0Allu | 见模组源码头声明 |
+| CW-Windows 灵动岛（DLC） | cw-dynamic-island-windows | 1.4.1 | Himanshu | 见模组源码头声明 |
+| CW-增强音量混合器（DLC） | cw-better-volume-mixer | 1.6.1 | 0Allu | 见模组源码头声明 |
 
 ## 二类：本项目原创（可公开，版权归属作者本人）
 

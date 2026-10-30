@@ -59,23 +59,23 @@ $bootKey = $bootTime.ToString("yyyyMMddHHmmss")
 Write-Log "---- start (mode=$Mode, boot=$bootKey) ----"
 
 if ((Test-Path $marker) -and ((Get-Content $marker -ErrorAction SilentlyContinue) -eq $bootKey)) {
-    Write-Log "Already restarted explorer once this boot. Nothing to do."
+    Write-Log "本次开机已重启过 explorer，无需处理。"
     exit 0
 }
 
 $reasons = @()
 
 $explorer = Get-Process -Name explorer -ErrorAction SilentlyContinue
-if (-not $explorer) { $reasons += "explorer.exe not running" }
+if (-not $explorer) { $reasons += "explorer.exe 未在运行" }
 
 $tray = [CWWin]::FindWindow("Shell_TrayWnd", $null)
 if ($tray -eq [IntPtr]::Zero) {
-    $reasons += "Shell_TrayWnd missing"
+    $reasons += "未找到 Shell_TrayWnd（任务栏窗口）"
 } else {
     $res = [IntPtr]::Zero
     # SMTO_ABORTIFHUNG = 0x2, WM_NULL = 0
     $ok = [CWWin]::SendMessageTimeout($tray, 0, [IntPtr]::Zero, [IntPtr]::Zero, 2, 3000, [ref]$res)
-    if ($ok -eq [IntPtr]::Zero -or [CWWin]::IsHungAppWindow($tray)) { $reasons += "taskbar not responding" }
+    if ($ok -eq [IntPtr]::Zero -or [CWWin]::IsHungAppWindow($tray)) { $reasons += "任务栏无响应" }
     $notify = [CWWin]::FindWindowEx($tray, [IntPtr]::Zero, "TrayNotifyWnd", $null)
     Write-Log ("Shell_TrayWnd=0x{0:X} TrayNotifyWnd=0x{1:X}" -f $tray.ToInt64(), $notify.ToInt64())
 }
@@ -85,9 +85,9 @@ try {
         Where-Object { $_.Message -match 'explorer\.exe' }
     foreach ($c in $crashes) {
         $first = ($c.Message -split "`n" | Select-Object -First 3) -join ' | '
-        Write-Log ("explorer crash since boot @ {0}: {1}" -f $c.TimeCreated, $first.Trim())
+        Write-Log ("本次开机后 explorer 崩溃 @ {0}: {1}" -f $c.TimeCreated, $first.Trim())
     }
-    if ($crashes) { $reasons += "explorer.exe crashed $(@($crashes).Count)x since boot" }
+    if ($crashes) { $reasons += "本次开机后 explorer.exe 已崩溃 $(@($crashes).Count) 次" }
 } catch { }
 
 $blurDll = Get-Process -Name explorer -ErrorAction SilentlyContinue | ForEach-Object {
@@ -98,15 +98,15 @@ Write-Log ("ExplorerBlurMica loaded in explorer: {0}" -f [bool]$blurDll)
 if ($Mode -eq "restart") { $reasons += "mode=restart (unconditional)" }
 
 if ($reasons.Count -eq 0) {
-    Write-Log "Healthy. No restart."
+    Write-Log "状态良好，无需重启。"
     exit 0
 }
 
-Write-Log ("Restarting explorer once: " + ($reasons -join '; '))
+Write-Log ("正在重启一次 explorer: " + ($reasons -join '; '))
 Set-Content -Path $marker -Value $bootKey -Encoding ASCII
 Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 3
 if (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue)) {
     Start-Process explorer.exe
 }
-Write-Log "Explorer restarted."
+Write-Log "explorer 已重启。"

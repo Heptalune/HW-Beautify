@@ -641,7 +641,7 @@ from the **TranslucentTB** project.
       - Pills: "胶囊（Pills）"
       - Blob: "团块（Blob）"
       - Minecraft_Hotbar: "我的世界快捷栏（Minecraft Hotbar）"
-      - One_UI_8_5_variant_Dock: "One UI 8.5 - Dock"
+      - One_UI_8_5_variant_Dock: "One UI 8.5 - Dock 栏风格"
       - One_UI_8_5_variant_Taskbar: "One UI 8.5 - 任务栏（Taskbar）"
     - bgColorMode: "Default"
       $name: "Background color"

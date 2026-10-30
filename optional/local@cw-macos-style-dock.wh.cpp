@@ -1520,7 +1520,7 @@ void ShowTrashMenu(wux::FrameworkElement const& target) {
 void AcceptTrashDrag(wux::DragEventArgs const& e) {
     if (!e.DataView().Contains(wadt::StandardDataFormats::StorageItems())) return;
     e.AcceptedOperation(wadt::DataPackageOperation::Move);
-    if (auto ui = e.DragUIOverride()) ui.Caption(L"Move to Recycle Bin");
+    if (auto ui = e.DragUIOverride()) ui.Caption(L"移到回收站");
     e.Handled(true);
 }
 

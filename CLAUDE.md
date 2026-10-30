@@ -15,6 +15,9 @@
    - 必须将选择权、开启权、编译权完全交由用户在 Windhawk UI 界面中按需自行开启与确认编译。
    - 若用户此前已在 Windhawk 中手动调整过开关状态，重新部署时必须保留用户的现有状态。
    - 从旧版升级：v1.0.0 已完成更早一代旧 id 的迁移；v2.0.0 起负责把旧主题值（Zen* → CW*）迁移到新命名。
+   - DLC 额外内容（`dlc\` 目录的 8 个 tool mod）由 `deploy-dlc.ps1` / `deploy-dlc.bat` 单独安装管理，
+     主 deploy 不扫描 dlc\ 目录；deploy-dlc 遵循同一铁律（只装入、不编译、不开启、
+     保留用户已有开关状态、新装默认 Disabled = 1）。
 
 1b. **Windhawk 2.x 便携版实测坑（2026-10-28）**：
    - 2.0 便携版**没有 Windows 服务**：引擎跑在 `windhawk-mod.exe` / `windhawk.exe` 进程里。
@@ -68,7 +71,9 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 当前模组清单（v2.3.0，32 个 = 23 核心 + 9 可选）
+## 当前模组清单（v2.3.0，32 个 = 21 核心 + 3 可选 + 8 DLC 额外内容）
+
+核心模组（21 个，主部署装入、默认关闭）：
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
@@ -87,23 +92,37 @@
 | CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
 | CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii Invisible Window Borders (MIT) 汉化 |
-| CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis Shake to Find Cursor + Jaali macOS magnifying cursor 合并汉化（tool mod） |
 | CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.2.1 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；**逆向类，绝不可公开分发**；与 CW-自定义右键菜单 互斥 |
 | CW-现代运行对话框 | cw-modern-run-dialog | 3.0.7 | caotu2k5 Modern Run Dialog UI 汉化（上游未标注许可，署名保留） |
 | CW-文件操作样式美化 | cw-file-operation-styler | 1.2.1 | digART File Operation Styler (GPL-3.0) 汉化（v2.1.0 周期移除后回归） |
-| CW-现代 Alt+Tab 切换器 | cw-overhauled-alt-tab | 1.3.1 | IMiloDev OverhauledWin Alt+Tab (MIT) 汉化；与 CW-窗口切换动画 二选一 |
 | CW-拖拽删除文件 | cw-drag-to-delete | 1.0.1 | iMAboud Drag to Delete (MIT) 汉化 |
 | CW-桌面框选淡出 | cw-desktop-marquee-fade | 1.0.1 | angel_lov Desktop Marquee Fade (MIT) 汉化 |
 | CW-桌面图标平滑自动隐藏 | cw-smooth-desktop-icons-autohide | 0.14.3 | HeyOkay Smooth Desktop Icons Auto-Hide (MIT) 汉化；与「关于桌面的快捷设置」双击隐藏 二选一 |
+
+可选模组（3 个，随主部署装入 optional\ 目录、默认关闭）：
+
+| 模组 | id | 版本 | 来源 |
+|---|---|---|---|
 | CW-窗口动画（可选） | cw-windows-animations | 1.6.0 | ReDrag (MIT) + macOS Genie |
-| CW-窗口切换动画（Vista 风格）（可选） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
-| CW-Mac 灵动岛与 Dock（可选） | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
-| CW-快速启动 Dock（可选） | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
 | CW-动态视频壁纸（可选） | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化 |
-| CW-指针残影拖尾（可选） | cw-pointer-afterimage | 1.2 | sidlikesgrapess Pointer Afterimage Motion Blur (Unlicense) 汉化 |
 | CW-MacOS 风格 Dock（可选） | cw-macos-style-dock | 1.1 | Zach Vaughn MacOS Style Dock (GPL-3.0) 汉化；与其他 Dock 类模组按需选用 |
-| CW-Windows 灵动岛（可选） | cw-dynamic-island-windows | 1.4.1 | Himanshu Dynamic Island for Windows (MIT) 汉化（tool mod）；与 CW-Mac 灵动岛与 Dock 不同作品、勿同开 |
-| CW-增强音量混合器（可选） | cw-better-volume-mixer | 1.6.1 | 0Allu Better Volume Mixer 汉化（tool mod；v2.1.0 周期移除后回归）；与音量控制分应用功能部分重叠按需选用 |
+
+### DLC 额外内容（tool mod，引发 windhawk.exe 宿主进程，内存占用较高，自选安装）
+
+源码位于包内 `dlc\` 目录（8 个），由 `deploy-dlc.bat` / `deploy-dlc.ps1` 单独安装管理，主部署 deploy.ps1 不扫描 dlc\ 目录。
+以下模组的 @include 含 windhawk.exe，启用后会让 Windhawk 生成模组宿主进程 windhawk.exe，内存占用不可预计（较高），
+请按需自选安装与开启；deploy-dlc 与主套件铁律一致（只装入、不编译、不开启，保留用户已有开关状态）：
+
+| 模组 | id | 版本 | 来源 |
+|---|---|---|---|
+| CW-晃动找指针 | cw-shake-find-cursor | 1.5.0 | Darius Vernelis Shake to Find Cursor + Jaali macOS magnifying cursor 合并汉化（tool mod） |
+| CW-现代 Alt+Tab 切换器 | cw-overhauled-alt-tab | 1.3.1 | IMiloDev OverhauledWin Alt+Tab (MIT) 汉化；与 CW-窗口切换动画 二选一 |
+| CW-窗口切换动画（Vista 风格） | cw-alt-tab-flip-3d | 1.0.2 | caliberda Alt+Tab Flip 3D (MIT) 汉化 |
+| CW-Mac 灵动岛与 Dock | cw-mac-island-dock | 2.1.1 | caliberda Mac Island & Dock (GPL-3.0) 汉化 |
+| CW-快速启动 Dock | cw-quick-launch-dock | 1.1.1 | cheliks1123 Quick Launch Dock 汉化（tool mod） |
+| CW-指针残影拖尾 | cw-pointer-afterimage | 1.2 | sidlikesgrapess Pointer Afterimage Motion Blur (Unlicense) 汉化 |
+| CW-Windows 灵动岛 | cw-dynamic-island-windows | 1.4.1 | Himanshu Dynamic Island for Windows (MIT) 汉化（tool mod）；与 CW-Mac 灵动岛与 Dock 不同作品、勿同开 |
+| CW-增强音量混合器 | cw-better-volume-mixer | 1.6.1 | 0Allu Better Volume Mixer 汉化（tool mod；v2.1.0 周期移除后回归）；与音量控制分应用功能部分重叠按需选用 |
 
 公开性分类（可公开/不可公开/逆向）见 `docs/MOD_CLASSIFICATION.md`。
 

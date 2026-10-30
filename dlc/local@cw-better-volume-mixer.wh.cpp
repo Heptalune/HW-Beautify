@@ -1341,7 +1341,7 @@ std::wstring GetSessionDisplayName(IAudioSessionControl* control,
                                    bool systemSounds,
                                    std::wstring* processPath) {
     if (systemSounds) {
-        return L"System sounds";
+        return L"系统声音";
     }
 
     LPWSTR displayName = nullptr;
@@ -1357,18 +1357,18 @@ std::wstring GetSessionDisplayName(IAudioSessionControl* control,
         *processPath = GetProcessPath(processId);
     }
     std::wstring name = BaseNameWithoutExtension(*processPath);
-    return name.empty() ? L"Unknown application" : name;
+    return name.empty() ? L"未知应用" : name;
 }
 
 std::wstring ReadEndpointName(IMMDevice* device) {
     IPropertyStore* store = nullptr;
     if (FAILED(device->OpenPropertyStore(STGM_READ, &store)) || !store) {
-        return L"Default output";
+        return L"默认输出";
     }
 
     PROPVARIANT value;
     PropVariantInit(&value);
-    std::wstring result = L"Default output";
+    std::wstring result = L"默认输出";
     if (SUCCEEDED(store->GetValue(kDeviceFriendlyName, &value)) &&
         value.vt == VT_LPWSTR && value.pwszVal) {
         result = value.pwszVal;
@@ -3106,7 +3106,7 @@ void UpdateNameTooltip(HWND window, POINT point) {
     std::wstring text;
 
     if (PtInRect(&rect, point)) {
-        text = g_endpointName.empty() ? L"No output device" : g_endpointName;
+        text = g_endpointName.empty() ? L"无输出设备" : g_endpointName;
     } else if (PtInRect(&client, point)) {
         int row = RowFromPoint(point);
         if (row != DRAG_NONE) {
@@ -3760,7 +3760,7 @@ void RenderMixerContents(HDC dc, const RECT& client) {
     DrawLabel(dc, L"\uE7F5", deviceIconRect, g_symbolFont, IconColor(),
               DT_CENTER | DT_VCENTER | DT_SINGLELINE);
     RECT deviceNameRect = DeviceNameRect(client.right);
-    DrawLabel(dc, g_endpointName.empty() ? L"No output device" : g_endpointName,
+    DrawLabel(dc, g_endpointName.empty() ? L"无输出设备" : g_endpointName,
               deviceNameRect, g_bodyFont, g_theme.text,
               DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
     RECT arrowRect = {pickerRect.right - Scale(30), pickerRect.top,

@@ -257,7 +257,7 @@ Background:=<AcrylicBrush TintColor="$mainColor" TintOpacity="0.3" />
   - Translucent_Settings11: "半透明 设置11（Translucent Settings11）"
   - WindowGlass: "窗口玻璃（WindowGlass）"
   - OLED_variant_ModrinthGreen: "OLED（Modrinth 绿）"
-  - OLED_variant_SystemAscent: "OLED（System Ascent）"
+  - OLED_variant_SystemAscent: "OLED·系统攀升（System Ascent）"
   - Translucent_Seamless: "半透明 无缝（Translucent Seamless）"
 - styleConstants: [""]
   $name: Style constants

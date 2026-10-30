@@ -43,7 +43,7 @@ function Set-RegValueIfMissing ($path, $name, $value, $type, $label = "") {
     if ($script:IniStoreMode) {
         Set-IniValueIfMissing $script:IniStorePath "Settings" $name $value
         if ($label) {
-            Write-Status "         [Settings] Seeding $label $name -> $value" "Yellow"
+            Write-Status "         [Settings] 补种默认值 $label $name -> $value" "Yellow"
         }
         return
     }
@@ -51,7 +51,7 @@ function Set-RegValueIfMissing ($path, $name, $value, $type, $label = "") {
     try {
         if ($key.GetValueNames() -notcontains $name) {
             if ($label) {
-                Write-Status "         [Settings] Seeding $label $name -> $value" "Yellow"
+                Write-Status "         [Settings] 补种默认值 $label $name -> $value" "Yellow"
             }
             $kind = if ($type -eq "DWord") { [Microsoft.Win32.RegistryValueKind]::DWord } else { [Microsoft.Win32.RegistryValueKind]::String }
             if ($type -eq "DWord") { $value = [int]$value } else { $value = [string]$value }
@@ -135,7 +135,7 @@ function Convert-LegacyThemeValues ($path) {
             $v = [string]$key.GetValue($name)
             if ($v.Contains("Zen")) {
                 $key.SetValue($name, [string]($v -replace "Zen", "CW"), [Microsoft.Win32.RegistryValueKind]::String)
-                Write-Status "         [Settings] Migrated legacy theme value: $name" "Gray"
+                Write-Status "         [Settings] 已迁移旧主题值: $name" "Gray"
             }
         }
     } finally {
@@ -163,7 +163,7 @@ function Merge-ProcessList ($current, [string[]]$entries) {
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   CW-Beautify Direct Injection Engine v2.1.0" "Green"
+Write-Status "   CW-Beautify 一键部署引擎 v2.4.0" "Green"
 Write-Status "================================================" "Green"
 
 # 1. Enforce Administrator Privileges
@@ -201,7 +201,7 @@ function Find-WindhawkDir {
     return $null
 }
 
-Write-Status "Detecting Windhawk installation..."
+Write-Status "正在检测 Windhawk 安装位置..."
 $windhawkDir = Find-WindhawkDir
 
 # Not installed: run the Windhawk installer shipped in the package (if any), then detect again.
@@ -209,7 +209,6 @@ if (-not $windhawkDir) {
     $setup = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter "windhawk_setup*.exe" -ErrorAction SilentlyContinue) | Select-Object -First 1
     if ($setup) {
         Write-Status "未检测到 Windhawk，正在打开包内的安装程序 $($setup.Name)，请按提示装完后关闭安装窗口..." "Yellow"
-        Write-Status "Windhawk not found, launching the bundled installer $($setup.Name). Finish the setup to continue..." "Yellow"
         try { Start-Process -FilePath $setup.FullName -Wait } catch { Write-Status "无法启动安装程序: $($_.Exception.Message)" "Red" }
         Start-Sleep -Seconds 2
         $windhawkDir = Find-WindhawkDir
@@ -229,7 +228,7 @@ Write-Status "Windhawk Home: $windhawkDir" "DarkGreen"
 $windhawkData = if ($env:ProgramData) { Join-Path $env:ProgramData "Windhawk" } else { "C:\ProgramData\Windhawk" } # Standard default fallback
 $iniPath = Join-Path $windhawkDir "windhawk.ini"
 if (Test-Path $iniPath) {
-    Write-Status "Parsing windhawk.ini for active storage configuration..." "Gray"
+    Write-Status "正在解析 windhawk.ini 以确定存储配置..." "Gray"
     $ini = Get-Content -Path $iniPath
     
     # Parse Portable setting
@@ -278,7 +277,7 @@ if (Test-Path -LiteralPath $iniPath) {
 $engineModsDir = Join-Path $windhawkData "Engine\Mods"
 $engineWritableDir = Join-Path $windhawkData "Engine\ModsWritable"
 if ($isPortable) {
-    Write-Status "Portable Windhawk detected: mod state -> $engineModsDir\<id>.ini" "Yellow"
+    Write-Status "检测到便携版 Windhawk：模组状态 -> $engineModsDir\<id>.ini" "Yellow"
     # 注意：IniStoreMode 只在下面的逐模组部署循环内开启；引擎级设置（InjectIntoGames 等）始终走注册表
 }
 
@@ -315,7 +314,7 @@ Set-ItemProperty -Path $engineSettingsPath -Name "Include" -Value $cleanInclude 
 # Windhawk's own default is 0 (don't inject into games); only seeded.
 Set-RegValueIfMissing $engineSettingsPath "InjectIntoGames" 0 DWord
 
-Write-Status "Stopping Windhawk Service & UI..."
+Write-Status "正在停止 Windhawk 服务与界面..."
 # Windhawk 2.x 便携版没有 Windows 服务：引擎跑在 windhawk-mod.exe / windhawk.exe
 # 进程里。先用 -exit 优雅退出（会卸载会话 hive），再补杀全部相关进程，
 # 否则引擎在线检测到新复制的模组源码会把它们默认全部启用（v2.0 实测）。
@@ -326,10 +325,10 @@ if (Test-Path -LiteralPath $windhawkExitExe) {
 Stop-Process -Name windhawk, "windhawk-mod", "windhawk-ui", "windhawk-mod-elevated" -Force -ErrorAction SilentlyContinue
 Stop-Service -Name Windhawk -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 2
-Write-Status "Windhawk successfully stopped." "Green"
+Write-Status "Windhawk 已成功停止。" "Green"
 
 # 4. Copy and Inject Active Mods
-Write-Status "Scanning and deploying active mod files..."
+Write-Status "正在扫描并部署模组文件..."
 $modsSource = Join-Path $windhawkData "ModsSource"
 if (-not (Test-Path $modsSource)) {
     New-Item -ItemType Directory -Path $modsSource -Force | Out-Null
@@ -368,13 +367,13 @@ $retiredMods = @(
 foreach ($rMod in $retiredMods) {
     $legacyFile = Join-Path $modsSource "$rMod.wh.cpp"
     if (Test-Path $legacyFile) {
-        Write-Status "Removing retired mod source: $rMod" "Yellow"
+        Write-Status "正在移除退役模组源码: $rMod" "Yellow"
         Remove-Item -Path $legacyFile -Force -ErrorAction SilentlyContinue
     }
     # 便携版：状态在 ini，编译产物在 Engine\Mods 下
     foreach ($iniFile in @((Join-Path $engineModsDir "$rMod.ini"), (Join-Path $engineWritableDir "$rMod.ini"))) {
         if (Test-Path -LiteralPath $iniFile) {
-            Write-Status "Removing retired mod state: $(Split-Path -Leaf $iniFile)" "Yellow"
+            Write-Status "正在移除退役模组状态: $(Split-Path -Leaf $iniFile)" "Yellow"
             Remove-Item -LiteralPath $iniFile -Force -ErrorAction SilentlyContinue
         }
     }
@@ -390,7 +389,7 @@ foreach ($rMod in $retiredMods) {
 
 # Clean old mod files in portable leftovers if operating in standard mode
 if ($windhawkData -ne "$windhawkDir\AppData" -and (Test-Path "$windhawkDir\AppData\ModsSource")) {
-    Write-Status "Cleaning leftover ModsSource in portable folder..." "Yellow"
+    Write-Status "正在清理便携版目录残留的 ModsSource..." "Yellow"
     Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@macos-*" -Force -ErrorAction SilentlyContinue
     Remove-Item -Path "$windhawkDir\AppData\ModsSource\local@windows-11-settings-*" -Force -ErrorAction SilentlyContinue
 }
@@ -406,7 +405,7 @@ foreach ($oldId in $renameMap.Keys) {
     if ($isPortable) {
         $oldIni = Join-Path $engineModsDir "$oldId.ini"
         if (-not (Test-Path -LiteralPath $oldIni)) { continue }
-        Write-Status "Migrating (portable) $oldId -> $newId (settings and toggle state)" "Yellow"
+        Write-Status "正在迁移（便携版）$oldId -> $newId（设置与开关状态）" "Yellow"
         New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
         Copy-Item -LiteralPath $oldIni -Destination (Join-Path $backupDir "$oldId.ini.bak") -Force
         $newIni = Join-Path $engineModsDir "$newId.ini"
@@ -437,7 +436,7 @@ foreach ($oldId in $renameMap.Keys) {
     $oldKeyPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$oldId"
     $newKeyPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$newId"
     if (-not (Test-Path $oldKeyPath)) { continue }
-    Write-Status "Migrating $oldId -> $newId (settings and toggle state)" "Yellow"
+    Write-Status "正在迁移 $oldId -> $newId（设置与开关状态）" "Yellow"
     New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
     $oldReg = Get-Item $oldKeyPath
     New-Item -Path $newKeyPath -Force | Out-Null
@@ -480,10 +479,7 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@cw-windows-animations", "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-                    "local@cw-quick-launch-dock", "local@cw-live-video-wallpaper",
-                    "local@cw-pointer-afterimage", "local@cw-macos-style-dock",
-                    "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer")
+$optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpaper", "local@cw-macos-style-dock")
 # 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
@@ -494,11 +490,18 @@ $coreModIds = @(
     "local@cw-alt-drag",
     "local@cw-custom-context-menu",
     "local@cw-invisible-borders",
-    "local@cw-shake-find-cursor", "local@cw-taskbar-thumbnail-settings",
+    "local@cw-taskbar-thumbnail-settings",
     "local@cw-desktop-quick-settings", "local@cw-fluent-context-menu",
     "local@cw-modern-run-dialog", "local@cw-file-operation-styler",
-    "local@cw-overhauled-alt-tab", "local@cw-drag-to-delete",
+    "local@cw-drag-to-delete",
     "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide"
+)
+# DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
+$dlcModIds = @(
+    "local@cw-shake-find-cursor", "local@cw-overhauled-alt-tab",
+    "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
+    "local@cw-quick-launch-dock", "local@cw-pointer-afterimage",
+    "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer"
 )
 $preselected = @()
 if ($Optional) {
@@ -559,7 +562,7 @@ foreach ($file in $files) {
     
     Write-Status "         [Metadata] Version=$version | Arch=$arch | Include=$includeStr" "Gray"
     
-    Write-Status "         [State] Writing mod entry and default settings..." "Gray"
+    Write-Status "         [状态] 正在写入模组条目与默认设置..." "Gray"
     # Registry path under Windhawk Engine（标准版）；便携版写 <Data>\Engine\Mods\<id>.ini
     $regPath = "HKLM:\SOFTWARE\Windhawk\Engine\Mods\$id"
     $modIniPath = Join-Path $engineModsDir "$id.ini"
@@ -637,7 +640,7 @@ foreach ($file in $files) {
 
     if ($id -eq "local@cw-taskbar-acrylic") {
         $label = "Taskbar"
-        Write-Status "         [Settings] Checking saved taskbar settings..." "Gray"
+        Write-Status "         [设置] 正在检查已保存的任务栏设置..." "Gray"
         # 4.2.6 grouped the settings. Copy values saved under the old flat keys
         # to the grouped keys that are still missing; never overwrite.
         $taskbarKeyMap = [ordered]@{
@@ -904,20 +907,6 @@ foreach ($file in $files) {
     }
 
 
-    if ($id -eq "local@cw-mac-island-dock") {
-        # 可选模组（默认关闭）。种子只覆盖关键项；默认任务栏模式为 windows
-        # （不改动系统任务栏），想要 Dock 效果需在设置里选 dock。
-        $label = "Mac Island Dock"
-        Set-RegValueIfMissing $settingsPath "taskbarMode" "windows" String $label
-        Set-RegValueIfMissing $settingsPath "showIsland" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "hiding.autoHide" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "icons.magnification" 170 DWord $label
-        Set-RegValueIfMissing $settingsPath "dock.iconSize" 32 DWord $label
-        Set-RegValueIfMissing $settingsPath "dock.backgroundOpacity" 50 DWord $label
-        Set-RegValueIfMissing $settingsPath "animations.enabled" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "animations.speed" 125 DWord $label
-    }
-
     if ($id -eq "local@cw-file-hover-info") {
         $label = "File Hover Info"
         Set-RegValueIfMissing $settingsPath "delay" 450 DWord $label
@@ -993,29 +982,29 @@ foreach ($file in $files) {
 
     $modTimer.Stop()
     if ($modTimer.Elapsed.TotalSeconds -ge 3) {
-        Write-Status ("         [Done] {0:N1} s (slow step; please report this line if it keeps happening)" -f $modTimer.Elapsed.TotalSeconds) "Yellow"
+        Write-Status ("         [完成] {0:N1} 秒（较慢的步骤；若频繁出现请反馈此行）" -f $modTimer.Elapsed.TotalSeconds) "Yellow"
     }
 }
 $script:IniStoreMode = $false
-Write-Status "Active mods successfully registered into Windhawk Engine." "Green"
+Write-Status "全部模组已成功注册进 Windhawk 引擎。" "Green"
 
 # 4. UI Cache Regeneration (Refreshes installed list and Chinese metadata instantly)
 $cacheFile = Join-Path $windhawkData "userprofile.json"
 if (Test-Path $cacheFile) {
-    Write-Status "Clearing UI Cache (userprofile.json) to force metadata scan..." "Yellow"
+    Write-Status "正在清理 UI 缓存 (userprofile.json) 以强制重新扫描元数据..." "Yellow"
     Remove-Item -Path $cacheFile -Force
 }
 
 # 5. Restart Windhawk Service and UI
-Write-Status "Starting Windhawk Service (this can take up to a minute)..."
+Write-Status "正在启动 Windhawk 服务（可能需要一分钟）..."
 Start-Service -Name Windhawk -ErrorAction SilentlyContinue
 
 $exePath = Join-Path $windhawkDir "windhawk.exe"
 if (Test-Path $exePath) {
-    Write-Status "Launching Windhawk UI..."
+    Write-Status "正在启动 Windhawk 界面..."
     Start-Process -FilePath $exePath
 }
-Write-Status "Windhawk restarted successfully." "Green"
+Write-Status "Windhawk 已成功重启。" "Green"
 
 # Windhawk 2.x 部署后核验：真实开关状态在引擎会话 hive（Engine\Sessions\*.hiv）
 # 里，Engine\Mods\<id>.ini 的 Disabled 只是我们写的元数据，2.0 引擎不把它当开关。
@@ -1035,7 +1024,7 @@ if ($injLines.Count -gt 0) {
 # suspended in the background, so it keeps the old Start menu mod until it is
 # restarted. Windows relaunches it automatically the next time search opens.
 if (Get-Process -Name SearchHost -ErrorAction SilentlyContinue) {
-    Write-Status "Restarting the search page (SearchHost.exe) to load the Start menu mod..."
+    Write-Status "正在重启搜索页 (SearchHost.exe) 以加载开始菜单模组..."
     Stop-Process -Name SearchHost -Force -ErrorAction SilentlyContinue
 }
 
@@ -1045,12 +1034,12 @@ $cwTaskPath = "\CW-Beautify\"
 if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
     if (Get-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -ErrorAction SilentlyContinue) {
         Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Confirm:$false
-        Write-Status "Startup self-check task removed." "Green"
+        Write-Status "开机自检计划任务已移除。" "Green"
     }
     # 更名前的旧计划任务目录也一并清理
     if (Get-ScheduledTask -TaskName $cwTaskName -TaskPath "\CWDesktop\" -ErrorAction SilentlyContinue) {
         Unregister-ScheduledTask -TaskName $cwTaskName -TaskPath "\CWDesktop\" -Confirm:$false
-        Write-Status "Legacy startup self-check task (CWDesktop) removed." "Green"
+        Write-Status "更名前的旧开机自检计划任务 (CWDesktop) 已移除。" "Green"
     }
 } elseif ($StartupCheck -eq "check" -or $StartupCheck -eq "restart") {
     $checkSrc = Join-Path $PSScriptRoot "tools\CW-Beautify-StartupCheck.ps1"
@@ -1066,18 +1055,18 @@ if ($StartupCheck -eq "remove" -or $StartupCheck -eq "off") {
             $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Limited
             $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 2)
             Register-ScheduledTask -TaskName $cwTaskName -TaskPath $cwTaskPath -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
-            Write-Status "Startup self-check installed (mode=$StartupCheck). Log: $checkDir\startup-check.log" "Green"
-            Write-Status "Remove: deploy.ps1 -StartupCheck remove  (or Task Scheduler > CW-Beautify > StartupCheck)" "Gray"
+            Write-Status "开机自检已安装 (mode=$StartupCheck)。日志: $checkDir\startup-check.log" "Green"
+            Write-Status "移除方法: deploy.ps1 -StartupCheck remove（或任务计划程序 > CW-Beautify > StartupCheck）" "Gray"
         } catch {
-            Write-Status "Startup self-check install failed: $($_.Exception.Message)" "Red"
+            Write-Status "开机自检安装失败: $($_.Exception.Message)" "Red"
         }
     } else {
-        Write-Status "tools\CW-Beautify-StartupCheck.ps1 not found, skipping startup self-check." "Gray"
+        Write-Status "未找到 tools\CW-Beautify-StartupCheck.ps1，跳过开机自检安装。" "Gray"
     }
 }
 
 Write-Status "================================================" "Green"
-Write-Status "   [SUCCESS] CW-Beautify v2.3.0 一键部署完成！" "Green"
+Write-Status "   [SUCCESS] CW-Beautify v2.4.0 一键部署完成！" "Green"
 Write-Status "================================================" "Green"
 Write-Host ""
 Write-Host "后续说明与使用建议："

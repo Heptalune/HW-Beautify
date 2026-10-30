@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换成 Fluent 右键菜单，以及运行对话框、文件操作、桌面图标等一整套细节美化。一共 32 个 mod（23 核心 + 9 可选），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换成 Fluent 右键菜单，以及运行对话框、文件操作、桌面图标等一整套细节美化。一共 32 个 mod（21 核心 + 3 可选 + 8 DLC 额外内容），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,17 +11,19 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-23 个核心 mod 加 9 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。合并与整合模组的设置页均按功能拆分为**可收起的分组**。
+21 个核心 mod 加 3 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。合并与整合模组的设置页均按功能拆分为**可收起的分组**。
+
+另有 8 个 **DLC 额外内容**（见下方专节），由 `deploy-dlc.bat` 单独添加，不随主部署装入。
 
 ## 精选模组
 
-以下 5 个模组是本整合包中完成度与口碑俱佳的作品，单独拿出来推荐（均为社区开源作品，本整合包**仅做汉化与打包整合，未修改其功能逻辑**）：
+以下 5 个模组是本整合包中完成度与口碑俱佳的作品，单独拿出来推荐（均为社区开源作品，本整合包**仅做汉化与打包整合，未修改其功能逻辑**；其中 4 个属于 DLC 额外内容，需先运行 `deploy-dlc.bat` 添加）：
 
-* **CW-Mac 灵动岛与 Dock**：屏幕顶部 macOS 菜单栏风格的灵动岛 + 底部 Dock，一条模组给足 Mac 氛围（caliberda 作品）。
+* **CW-Mac 灵动岛与 Dock**（DLC）：屏幕顶部 macOS 菜单栏风格的灵动岛 + 底部 Dock，一条模组给足 Mac 氛围（caliberda 作品）。
 * **CW-动态视频壁纸**：Media Foundation + Direct3D 11 硬解的本地视频壁纸，自带性能 HUD 与智能遮挡暂停，CPU 占用极低（AKS HAY 作品）。
-* **CW-快速启动 Dock**：屏幕边缘的纤细启动条，拖入快捷方式单击即启，干净利落（cheliks1123 作品）。
-* **CW-晃动找指针**：晃动鼠标指针即放大，Raw Input 实现零轮询零 CPU，由 Shake to Find Cursor 与 macOS magnifying cursor 两个上游模组合并而成（合并打包 + 汉化，未改上游功能逻辑）。
-* **CW-窗口切换动画（Vista 风格）**：Alt+Tab 变 Vista Flip 3D 实时窗口堆栈，另有 20 多种切换样式（caliberda 作品）。
+* **CW-快速启动 Dock**（DLC）：屏幕边缘的纤细启动条，拖入快捷方式单击即启，干净利落（cheliks1123 作品）。
+* **CW-晃动找指针**（DLC）：晃动鼠标指针即放大，Raw Input 实现零轮询零 CPU，由 Shake to Find Cursor 与 macOS magnifying cursor 两个上游模组合并而成（合并打包 + 汉化，未改上游功能逻辑）。
+* **CW-窗口切换动画（Vista 风格）**（DLC）：Alt+Tab 变 Vista Flip 3D 实时窗口堆栈，另有 20 多种切换样式（caliberda 作品）。
 
 ### CW-任务栏样式美化
 
@@ -139,15 +141,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 * 基于 [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)（作者 Bo0ii）汉化整合。
 
-### CW-晃动找指针
-
-晃动鼠标（或在触摸板上快速来回滑动），指针会放大方便找到；停止晃动后恢复原样。
-
-* 以 Raw Input 监听鼠标：不轮询、指针空闲时零 CPU 占用，不会像低级鼠标钩子那样增加输入延迟。
-* 放大的是真正的系统指针：按当前指针方案重绘放大，保留样式与颜色，无覆盖窗口、无拖尾；.ani 动态指针也能平滑放大并继续播放。
-* 持续晃动时指针越晃越大（增速递减），可设尺寸上限；可设置在全屏应用和游戏中禁用。
-* 由 [Shake to Find Cursor](https://windhawk.net/mods/shake-to-find-cursor)（Darius Vernelis）与 [macOS magnifying cursor](https://windhawk.net/mods/mac-magnifying-cursor)（Jaali）两个模组取长补短合并汉化。
-
 ### CW-任务栏缩略图设置
 
 任务栏缩略图相关设置的合集模组（v2.3.0 起由「任务栏缩略图即时预览」与「任务栏缩略图大小」合并而成），设置分两个可收起分组：
@@ -172,14 +165,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * 进度环粗细、正文/摘要/百分比字号、页脚样式均可调。
 * 基于 [File Operation Styler](https://windhawk.net/mods/file-operation-styler)（作者 digART，GPL-3.0）汉化整合（v2.1.0 周期移除后回归）。
 
-### CW-现代 Alt+Tab 切换器
-
-把 Windows 原生 Alt+Tab 换成现代优雅的窗口切换器：卡片式布局、平滑动画、可选背景透明。
-
-* 缩放、动画速度与曲线（线性/回弹）、可见卡片数、卡片颜色与选中放大均可调。
-* 实验性图案波浪背景（点阵/方块、流速、密度等参数丰富）。
-* 基于 [OverhauledWin Alt+Tab](https://windhawk.net/mods/overhaulded-alt-tab)（作者 IMiloDev，MIT）汉化整合。**与 CW-窗口切换动画（Vista 风格）二选一**，不要同时开启。
-
 ### CW-拖拽删除文件
 
 把文件拖到屏幕上的悬浮目标即可移入回收站，大文件不用拖着找回收站图标。
@@ -203,12 +188,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * **与「CW-关于桌面的快捷设置」的「双击隐藏桌面图标」功能类似，二选一开启**：前者是绘制层的平滑淡入淡出，后者直接切换系统图标开关。
 * 基于 [Smooth Desktop Icons Auto-Hide](https://windhawk.net/mods/smooth-desktop-icons-auto-hide)（作者 HeyOkay，MIT）汉化整合。
 
-### CW-快速启动 Dock（可选）
-
-屏幕边缘的一条纤细动画 Dock：把快捷方式拖进去，或用「+」选择程序，单击即可启动。
-
-* 基于 [Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)（作者 cheliks1123）汉化。
-
 ### CW-动态视频壁纸（可选）
 
 把本地 MP4 视频作为 Windows 桌面动态壁纸：Media Foundation + Direct3D 11 硬件加速渲染，CPU 占用低，保持流畅播放。
@@ -224,27 +203,6 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * 11 种关闭动画、12 种最小化／还原／启动动画，每组可单独开关、选样式和时长。
 * 可按进程名排除指定程序，常见游戏和反作弊程序已默认排除。
 
-### CW-窗口切换动画（Vista 风格）（可选）
-
-把 Alt+Tab 换成 Windows Vista 风格的 Flip 3D 实时窗口堆栈，带流畅动画。
-
-* 另有 Cascade、Cover Flow、iTab 等 20 多种切换样式；背景支持壁纸模糊/实时桌面。
-
-### CW-Mac 灵动岛与 Dock（可选）
-
-屏幕顶部一条 macOS 菜单栏风格的灵动岛（时钟、控制中心、通知、媒体、托盘图标），底部可选 macOS 风格 Dock。
-
-* 默认不改动系统任务栏；想要 Dock 效果在设置里把「任务栏」选为「dock」。
-* 图标放大、弹跳、圆角、背景等均可调；与 CW-任务栏样式美化等同屏任务栏模组同用时需按其说明取舍。
-
-### CW-指针残影拖尾（可选）
-
-用鼠标指针自己的渐隐残影做出真实的运动模糊拖尾效果，移动越快拖尾越明显。
-
-* 拖尾长度、不透明度、最小触发速度可调；全屏应用与游戏中可自动暂停。
-* 与 CW-晃动找指针 方向不同（拖尾美化 vs 摇一摇放大指针），可同时使用。
-* 基于 [Pointer Afterimage Motion Blur](https://windhawk.net/mods/pointer-afterimage-motion-blur)（作者 sidlikesgrapess，Unlicense）汉化整合。
-
 ### CW-MacOS 风格 Dock（可选）
 
 把 Windows 11 任务栏变成带图标放大效果的 macOS 风格 Dock。
@@ -253,20 +211,70 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * **与 CW-快速启动 Dock、CW-Mac 灵动岛与 Dock 同为 Dock/任务栏改造类模组，按需选用不要同时开启**。
 * 基于 [MacOS Style Dock](https://windhawk.net/mods/macos-style-dock)（作者 Zach Vaughn，GPL-3.0）汉化整合。
 
-### CW-Windows 灵动岛（可选）
+## DLC 额外内容（自选安装）
 
-受 iPhone 灵动岛启发的悬浮胶囊（tool mod，挂在 Windhawk 进程）：响应媒体播放、音量/亮度调节、大小写锁定、电池、蓝牙、剪贴板、天气、下载进度等事件。
+DLC 是本套件的「额外内容包」，类比游戏的 DLC：**不在主部署范围内，需要单独添加，全部自选**。
+
+> ⚠️ **内存占用提醒**：以下 8 个模组都是「tool mod」（挂在 `windhawk.exe` 进程）。只要其中**任意一个**处于开启状态，Windhawk 就会启动一个模组宿主进程（windhawk.exe）来承载它们，**内存占用不可预计**（通常几十 MB 起步，视模组功能而定）。不开启任何 DLC 模组时，Windhawk 保持常驻约 2 MB 的轻量状态，不会有额外宿主进程。请按需选用，不用时保持关闭即可。
+
+添加方式：双击 **`deploy-dlc.bat`**（同样只装入、不编译、默认关闭、不影响主套件已保存的开关与设置）。已在 Windhawk 里的 DLC 模组重复添加是安全的；卸载主程序（`uninstall.bat`）会连同 DLC 一起清理。
+
+### CW-晃动找指针（DLC）
+
+晃动鼠标（或在触摸板上快速来回滑动），指针会放大方便找到；停止晃动后恢复原样。
+
+* 以 Raw Input 监听鼠标：不轮询、指针空闲时零 CPU 占用，不会像低级鼠标钩子那样增加输入延迟。
+* 放大的是真正的系统指针：按当前指针方案重绘放大，保留样式与颜色，无覆盖窗口、无拖尾；.ani 动态指针也能平滑放大并继续播放。
+* 由 [Shake to Find Cursor](https://windhawk.net/mods/shake-to-find-cursor)（Darius Vernelis）与 [macOS magnifying cursor](https://windhawk.net/mods/mac-magnifying-cursor)（Jaali）两个模组取长补短合并汉化。
+
+### CW-现代 Alt+Tab 切换器（DLC）
+
+把 Windows 原生 Alt+Tab 换成现代优雅的窗口切换器：卡片式布局、平滑动画、可选背景透明。
+
+* 缩放、动画速度与曲线（线性/回弹）、可见卡片数、卡片颜色与选中放大均可调；实验性图案波浪背景。
+* 基于 [OverhauledWin Alt+Tab](https://windhawk.net/mods/overhaulded-alt-tab)（作者 IMiloDev，MIT）汉化整合。**与 CW-窗口切换动画（Vista 风格）二选一**，不要同时开启。
+
+### CW-窗口切换动画（Vista 风格）（DLC）
+
+把 Alt+Tab 换成 Windows Vista 风格的 Flip 3D 实时窗口堆栈，带流畅动画。
+
+* 另有 Cascade、Cover Flow、iTab 等 20 多种切换样式；背景支持壁纸模糊/实时桌面。
+
+### CW-Mac 灵动岛与 Dock（DLC）
+
+屏幕顶部一条 macOS 菜单栏风格的灵动岛（时钟、控制中心、通知、媒体、托盘图标），底部可选 macOS 风格 Dock。
+
+* 默认不改动系统任务栏；想要 Dock 效果在设置里把「任务栏」选为「dock」。
+* 图标放大、弹跳、圆角、背景等均可调；与 CW-任务栏样式美化等同屏任务栏模组同用时需按其说明取舍。
+
+### CW-快速启动 Dock（DLC）
+
+屏幕边缘的一条纤细动画 Dock：把快捷方式拖进去，或用「+」选择程序，单击即可启动。
+
+* 基于 [Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)（作者 cheliks1123）汉化。
+
+### CW-指针残影拖尾（DLC）
+
+用鼠标指针自己的渐隐残影做出真实的运动模糊拖尾效果，移动越快拖尾越明显。
+
+* 拖尾长度、不透明度、最小触发速度可调；全屏应用与游戏中可自动暂停。
+* 与 CW-晃动找指针 方向不同（拖尾美化 vs 摇一摇放大指针），可同时使用。
+* 基于 [Pointer Afterimage Motion Blur](https://windhawk.net/mods/pointer-afterimage-motion-blur)（作者 sidlikesgrapess，Unlicense）汉化整合。
+
+### CW-Windows 灵动岛（DLC）
+
+受 iPhone 灵动岛启发的悬浮胶囊：响应媒体播放、音量/亮度调节、大小写锁定、电池、蓝牙、剪贴板、天气、下载进度等事件。
 
 * 7 大组 100 项设置：外观位置、动画性能、颜色主题、隐私指示器、功能模块、快捷键全覆盖；支持歌词与卡拉OK效果（可选开启）。
 * **与 CW-Mac 灵动岛与 Dock 为不同作者的不同作品，两者不要同时开启**。
 * 基于 [Dynamic Island for Windows](https://windhawk.net/mods/dynamic-island-for-windows)（作者 Himanshu，MIT）汉化整合。
 
-### CW-增强音量混合器（可选）
+### CW-增强音量混合器（DLC）
 
-在系统托盘提供可自定义的主音量与分应用音量混合器（tool mod，挂在 Windhawk 进程）。
+在系统托盘提供可自定义的主音量与分应用音量混合器。
 
 * **与 CW-任务栏音量控制 的「分应用音量控制」功能部分重叠，按需选用**。
-* 基于 [Better Volume Mixer](https://windhawk.net/mods/better-volume-mixer)（作者 0Allu）汉化整合（v2.1.0 周期移除后回归）。
+* 基于 [Better Volume Mixer](https://windhawk.net/mods/better-volume-mixer)（作者 0Allu，MIT）汉化整合（v2.1.0 周期移除后回归）。
 
 ## 下载
 
@@ -274,8 +282,8 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 
 | 文件 | 适合谁 |
 | --- | --- |
-| `CW-Beautify_OneKeyDeploy_v2.3.0.zip` | **大多数人选这个**。内含 Windhawk 安装器和全部 mod |
-| `CW-Beautify_OneKeyDeploy_v2.3.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
+| `CW-Beautify_OneKeyDeploy_v2.4.0.zip` | **大多数人选这个**。内含 Windhawk 安装器、主套件与 DLC |
+| `CW-Beautify_OneKeyDeploy_v2.4.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
 
 ## 安装
 
@@ -284,16 +292,19 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 1.  把压缩包**完整解压**到任意文件夹（路径有空格或中文都可以），不要在压缩软件里直接运行。
 2.  双击 **`deploy.bat`**，在权限提示里点「是」。没装 Windhawk 时，完整包会先打开包内的安装程序，装完自动继续；`_Online` 包请先从 windhawk.net 装好 Windhawk。
 3.  窗口显示「一键部署完成」后按任意键关闭。
-4.  打开 Windhawk →「已安装的 Mod」，以 `CW-` 开头的 mod **默认都是关闭的**。点进想用的 mod 打开开关，提示编译时按提示编译，几秒就好。
-5.  在每个 mod 的「设置」页调效果，保存后立即生效。全部调好后建议重启一次电脑。
+4.  **（自选）想要 DLC 额外内容**：再双击 **`deploy-dlc.bat`** 添加 8 个 tool mod（内存占用较高，见上方 DLC 专节说明）。不需要可跳过，完全不影响主套件。
+5.  打开 Windhawk →「已安装的 Mod」，以 `CW-` 开头的 mod **默认都是关闭的**。点进想用的 mod 打开开关，提示编译时按提示编译，几秒就好。
+6.  在每个 mod 的「设置」页调效果，保存后立即生效。全部调好后建议重启一次电脑。
 
-再次运行 `deploy.bat` 是安全的：已打开的 mod 保持打开，改过的设置不会被覆盖，只补上新增设置的默认值。
+再次运行 `deploy.bat` / `deploy-dlc.bat` 都是安全的：已打开的 mod 保持打开，改过的设置不会被覆盖，只补上新增设置的默认值。
 
 想在无人值守安装时直接打开可选 mod：`deploy.bat -Optional "windows-animations"`。
 
 ### 从旧版部署升级
 
 直接运行 `deploy.bat`。已开启的 mod 与已保存的设置都会保留（v2.0.0 会自动把旧主题名迁移到新命名，v2.3.0 会自动迁移音量控制与任务栏动画分组化后的旧设置键）；被移除的模组（缩略图即时预览、缩略图大小、显示桌面按钮预览、桌面双击隐藏图标、最大化自动隐藏任务栏（已并入对应合集模组），以及托盘系统图标调整、任务栏时钟自定义、任务栏歌词、半透明窗口、果冻窗口、经典右键菜单、任务栏弹性药丸（已并入任务栏动画）、桌面时钟、文件大小，和更早退役的模组）会被自动卸载。
+
+v2.4.0 起 8 个 tool mod（晃动找指针、现代 Alt+Tab 切换器、窗口切换动画 Vista、Mac 灵动岛与 Dock、快速启动 Dock、指针残影拖尾、Windows 灵动岛、增强音量混合器）拆分为 DLC：从 v2.3.x 升级后它们**不会**被主部署移除（已保存的开关与设置原样保留），但后续版本更新请运行 `deploy-dlc.bat` 来刷新它们。
 
 从 v4.1 升级的旧用户：先双击 **`tools/uninstall-ExplorerBlurMica.bat`**，再运行 `deploy.bat`。
 
@@ -319,8 +330,10 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 *   **滚动调音量没反应**：部分笔记本触控板不支持在任务栏上滚动，可改用「双指捏合」手势。
 *   **快捷键切换播放设备没反应**：确认快捷键没被其他程序占用（可在 Windhawk 日志里看到注册失败提示）；换成 Ctrl+Alt+Q 等组合试试。
 *   **Mac 灵动岛与「CW-任务栏样式美化」想一起用**：灵动岛的「任务栏」模式选「windowsApps」或「windows」，两者分别管上下两条，避免同时接管任务栏。
+*   **DLC 是什么 / 为什么单列**：8 个 DLC 模组都是 tool mod（挂在 windhawk.exe 进程），开启任意一个都会让 Windhawk 启动模组宿主进程，内存占用不可预计；主套件的 mod 都注入系统进程、无常驻宿主。所以 DLC 单独添加（`deploy-dlc.bat`）、默认关闭、按需开启。不开任何 DLC 模组就没有这个宿主进程。
+*   **升级后 DLC 模组还会更新吗**：会——运行 `deploy-dlc.bat` 即可刷新 DLC 模组；`uninstall.bat` 也会一并清理它们。
 
-问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.3.0.md`。
+问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.4.0.md`。
 
 ## 致谢与许可证
 
@@ -339,4 +352,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 32 Windhawk mods (23 core + 9 optional), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled). Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names, v2.3.0 migrates regrouped settings keys). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 32 Windhawk mods (21 core + 3 optional + 8 DLC), localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); the 8 tool mods (which host a windhawk.exe process with higher memory usage) are a self-contained "DLC" added via `deploy-dlc.bat`. Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names, v2.3.0 migrates regrouped settings keys). Uninstall: `uninstall.bat`. License: GPL-3.0.

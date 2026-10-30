@@ -1,5 +1,5 @@
 @echo off
-title CW-Beautify One-Key Deploy Bootstrapper
+title CW-Beautify 一键部署
 setlocal EnableDelayedExpansion
 
 cd /d "%~dp0"
@@ -43,7 +43,7 @@ cd /d "%~dp0"
 color 0B
 
 echo ============================================================
-echo   CW-Beautify One-Key Deploy (PowerShell Bootstrapper)
+echo   CW-Beautify 一键部署（PowerShell 启动器）
 echo ============================================================
 echo.
 
@@ -52,7 +52,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0deploy.ps1" %*
 if %errorLevel% neq 0 (
     color 0C
     echo.
-    echo [ERROR] Deployment failed! See errors above.
+    echo [错误] 部署失败！请查看上方的报错信息。
     echo.
     pause
     exit /b %errorLevel%

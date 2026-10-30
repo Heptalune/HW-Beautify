@@ -31,8 +31,9 @@ if (-not $isAdmin) {
 }
 
 # 2. The mods deploy.ps1 installs: every local@*.wh.cpp in this folder and in
-#    optional\, plus the fixed list below in case uninstall.ps1 is run from
-#    another folder. Retired ids from older packages are cleaned up too.
+#    optional\ and dlc\ (the DLC tool mods installed by deploy-dlc.ps1), plus
+#    the fixed list below in case uninstall.ps1 is run from another folder.
+#    Retired ids from older packages are cleaned up too.
 $modIds = New-Object System.Collections.Generic.List[string]
 foreach ($id in @(
     "local@cw-taskbar-acrylic",
@@ -80,6 +81,9 @@ foreach ($id in @(
     "local@cw-island-media",
     "local@cw-taskbar-icon-size",
     "local@cw-windows-animations",
+    "local@cw-overhauled-alt-tab",
+    "local@cw-pointer-afterimage",
+    "local@cw-dynamic-island-windows",
     "local@windows-11-settings-styler-fork",
     "local@wobbly-windows",
     "local@windows-animations",
@@ -88,7 +92,7 @@ foreach ($id in @(
     "taskbar-volume-control",
     "taskbar-dock-animation"
 )) { $modIds.Add($id) }
-foreach ($dir in @($PSScriptRoot, (Join-Path $PSScriptRoot "optional"))) {
+foreach ($dir in @($PSScriptRoot, (Join-Path $PSScriptRoot "optional"), (Join-Path $PSScriptRoot "dlc"))) {
     if (Test-Path -LiteralPath $dir) {
         foreach ($f in @(Get-ChildItem -LiteralPath $dir -Filter "local@*.wh.cpp" -ErrorAction SilentlyContinue)) {
             $id = $f.BaseName -replace '\.wh$', ''

@@ -4,6 +4,9 @@ CW-Beautify integrates and localizes Windhawk mods from the open-source communit
 CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版权与许可归各自作者所有，
 原样保留在每个 `.wh.cpp` 文件的头部声明中。整合包自身以 GPL-3.0 发布。
 
+> 自 v2.4.0 起套件分三档：核心（根目录）、可选（`optional\`）、DLC 额外内容（`dlc\`，
+> 8 个 tool mod，由 deploy-dlc.bat 单独安装）。下表中标注（DLC）的模组位于 `dlc\` 目录。
+
 ## 核心模组（部署即装入，默认关闭）
 
 | Mod | 上游 / 作者 | 许可 | 来源 |
