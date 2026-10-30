@@ -40,8 +40,6 @@ common_files = [
     'local@cw-centered-start-split-icons.wh.cpp',
     'local@cw-tray-system-icons.wh.cpp',
     'local@cw-explorer-details-better-file-sizes.wh.cpp',
-    'local@cw-desktop-marquee-fade.wh.cpp',
-    'local@cw-smooth-desktop-icons-autohide.wh.cpp',
     # 部署 / 卸载脚本（deploy-dlc 为 DLC 额外内容添加程序，与主部署分开运行）
     'deploy.bat',
     'deploy.ps1',
