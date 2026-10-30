@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏样式美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also controls taskbar height and icon size.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并整合任务栏高度与图标大小控制。
-// @version         4.3.2
+// @version         4.4.0
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -36,6 +36,8 @@
 
 - 背景颜色、模糊、不透明度、亮度预设，可与任意内置主题搭配。
 - 设置按区分组；「统一设置」开启时，托盘溢出面板和音量/亮度浮窗跟随任务栏背景，关闭后可单独调节。
+- 「任务栏尺寸与缩放」分组：任务栏高度、图标大小、按钮宽度单项微调，配合「等比缩放」一键整体缩放（包默认值 52/32/44/16/32）。
+- 可选「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，更好看到也更好点，悬停出桌面预览的行为不变。
 - 可选「最大化时加深背景」：某个显示器上有最大化窗口时，该显示器的任务栏改用更实的背景。
 - 文字颜色与其他 CW 模组共用同一套选项。
 - 可选任务栏空白处点击穿透，适合 Dock 风格主题。
@@ -45,6 +47,7 @@
 设置分为以下几个区：
 
 - **主题与文字**：主题、背景颜色、文字颜色。主题默认「自定义玻璃」，其余为原版内置的社区主题，括号内为原名，可在附录中查看截图。
+- **任务栏尺寸与缩放**：任务栏高度、图标大小、任务栏按钮宽度、小图标大小、小任务栏按钮宽度 5 个单项设置（包默认 52/32/44/16/32），以及「等比缩放」——按百分比把这几项一起缩放，单项值为基础。另有「显示桌面按钮全高」：把最右侧的「显示桌面」小竖条撑到与任务栏同高，竖条高度可跟随任务栏高度（-1，随等比缩放联动）或手动指定 0-200 像素；悬停该区域仍会显示桌面预览。
 - **任务栏背景**：模糊、不透明度、亮度。主要作用于「自定义玻璃」等使用通用背景的主题；液态玻璃使用自己的固定参数，这几项基本不起作用。
 - **统一设置**：默认开启，托盘溢出面板和音量/亮度浮窗跟随「任务栏背景」的三项，下方两个区被忽略。想单独调节时关闭。
 - **托盘溢出面板 / 音量/亮度浮窗**：分别对应托盘图标放不下时弹出的面板，以及调节音量、亮度时出现的滑条。仅在关闭「统一设置」后生效。
@@ -60,6 +63,7 @@
 - 原版主题按旧版任务栏编写，在 v1.10 基础上托盘区域的显示可能略有差异。
 
 ## 更新日志
+- **4.4.0**：新增「任务栏尺寸与缩放」分组：「等比缩放」从「主题与文字」移入该组（设置键 look.ProportionalScale 改为 size.ProportionalScale，旧键保存的值仍兼容，deploy 会自动迁移），并恢复任务栏高度/图标大小/任务栏按钮宽度/小图标大小/小任务栏按钮宽度 5 个单项设置（4.3.1 曾移除，键名加 size. 前缀，deploy 会自动迁移旧扁平键，行为与 4.3.0 一致：等比缩放以单项值为基础）；新增「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，悬停出桌面预览的行为不变，高度可跟随任务栏高度或手动指定（CW 汉化版新增/调整）。
 - **4.3.1**：设置精简：删除任务栏高度/图标大小/按钮宽度等 5 个单项设置，只保留「等比缩放」并移入「主题与文字」大类（设置键 look.ProportionalScale）；代码对缺失键回退到包默认值（52/32/44/16/32），任务栏高度不会塌陷（CW 汉化版调整）。
 - **4.3.0**：整合「CW-任务栏高度与图标大小」（m417z Taskbar height and icon size 1.3.x）：
 任务栏高度/图标大小/按钮宽度/等比缩放 6 项设置并入本模组设置区，原独立模组退役（功能不变）。
@@ -681,14 +685,18 @@ from the **TranslucentTB** project.
         - purple: "紫色"
         - pink: "粉色"
         - cyan: "青色"
+  $name: "Theme and text"
+  $name:zh-CN: "主题与文字"
+  $description: "Overall theme, background tint and text color."
+  $description:zh-CN: "整体主题、背景色调和文字颜色。"
+- size:
     - ProportionalScale: "100"
       $name: Proportional scale
       $name:zh-CN: 等比缩放
       $description: >-
-        Scales the taskbar height, icon size and button widths together
-        by this percentage. 100 means no extra scaling. Individual values
-        are no longer exposed; the system defaults are used as the base.
-      $description:zh-CN: 把任务栏高度、图标大小与按钮宽度一起按百分比等比缩放（基于包默认值 52/32/44/16/32），100 为不缩放。
+        Scales the taskbar height, icon size and button widths declared
+        below together by this percentage. 100 means no extra scaling.
+      $description:zh-CN: 把下方设置的任务栏高度、图标大小与按钮宽度一起按百分比等比缩放，100 为不缩放。与单项设置叠加生效。
       $options:
         - "80": "80%"
         - "90": "90%"
@@ -698,11 +706,63 @@ from the **TranslucentTB** project.
         - "150": "150%"
         - "175": "175%"
         - "200": "200%"
+    - TaskbarHeight: 52
+      $name: Taskbar height
+      $name:zh-CN: 任务栏高度
+      $description: >-
+        The height, in pixels, of the taskbar (Windows 11 default: 48)
+      $description:zh-CN: 任务栏的高度（像素）。Windows 11 默认 48。
+    - IconSize: 32
+      $name: Icon size
+      $name:zh-CN: 图标大小
+      $description: >-
+        The size, in pixels, of icons on the taskbar (Windows 11 default: 24)
+      $description:zh-CN: 任务栏图标的尺寸（像素）。Windows 11 默认 24。
+    - TaskbarButtonWidth: 44
+      $name: Taskbar button width
+      $name:zh-CN: 任务栏按钮宽度
+      $description: >-
+        The width, in pixels, of the taskbar buttons (Windows 11 default: 44)
+      $description:zh-CN: 任务栏按钮的宽度（像素）。Windows 11 默认 44。
+    - IconSizeSmall: 16
+      $name: Small icon size
+      $name:zh-CN: 小图标大小
+      $description: >-
+        The size, in pixels, of small icons on the taskbar (Windows 11 default: 16)
 
-  $name: "Theme and text"
-  $name:zh-CN: "主题与文字"
-  $description: "Overall theme, background tint and text color."
-  $description:zh-CN: "整体主题、背景色调和文字颜色。"
+        Used in newer Windows 11 builds with support for small taskbar icons (around
+        July 2025)
+      $description:zh-CN: 任务栏小图标的尺寸（像素）。Windows 11 默认 16。用于 2025 年 7 月前后起支持小任务栏图标的新版 Windows 11。
+    - TaskbarButtonWidthSmall: 32
+      $name: Small taskbar button width
+      $name:zh-CN: 小任务栏按钮宽度
+      $description: >-
+        The width, in pixels, of the small taskbar buttons (Windows 11 default: 32)
+
+        Used in newer Windows 11 builds with support for small taskbar icons (around
+        July 2025)
+      $description:zh-CN: 小任务栏按钮的宽度（像素）。Windows 11 默认 32。用于支持小任务栏图标的新版 Windows 11。
+    - ShowDesktopFullHeight: false
+      $name: Full-height Show desktop bar
+      $name:zh-CN: 显示桌面按钮全高
+      $description: >-
+        Stretch the small vertical "Show desktop" bar at the far right end of
+        the taskbar to the full taskbar height. Hovering the area still shows
+        the desktop preview (Aero Peek). Default: off.
+      $description:zh-CN: 把任务栏最右边的「显示桌面」小竖条撑到与任务栏同高，不再是小小一截。悬停该区域仍会显示桌面预览（Aero Peek）。默认关闭。
+    - ShowDesktopButtonHeight: -1
+      $name: Show desktop bar height
+      $name:zh-CN: 显示桌面竖条高度
+      $description: >-
+        Height of the "Show desktop" bar, in pixels. -1 follows the taskbar
+        height (it scales together with the proportional scale); 0-200 sets
+        an explicit height. Only used while "Full-height Show desktop bar"
+        is on.
+      $description:zh-CN: 「显示桌面」竖条的高度（像素）。-1 表示跟随任务栏高度（随等比缩放联动）；0-200 为手动指定。仅在开启「显示桌面按钮全高」后生效。
+  $name: "Taskbar size and scaling"
+  $name:zh-CN: "任务栏尺寸与缩放"
+  $description: "Taskbar height, icon and button sizes, proportional scaling, and the Show desktop bar."
+  $description:zh-CN: "任务栏高度、图标与按钮大小、等比缩放，以及「显示桌面」竖条。"
 - taskbar:
     - blurPreset: "30"
       $name: "Blur"
@@ -21669,6 +21729,22 @@ void CWApplyBrushPresets(StyleConstants& styleConstants) {
     }
 }
 
+// CW 4.4.0: snapshot of the "Taskbar size and scaling" group settings, filled
+// by TBIS_LoadSettings (further below) and read by CWAddExtraStyles while
+// building styles; the type is defined here because CWAddExtraStyles comes
+// first in this file.
+struct TBIS_Settings {
+    int taskbarHeight;
+    int iconSize;
+    int taskbarButtonWidth;
+    int iconSizeSmall;
+    int taskbarButtonWidthSmall;
+    bool showDesktopFullHeight;
+    int showDesktopButtonHeight;
+};
+// Defined in the TBIS section further below.
+extern TBIS_Settings TBIS_g_settings;
+
 // Called after the theme styles, before the user's control styles, so that
 // the user can still override these.
 void CWAddExtraStyles() {
@@ -21687,6 +21763,28 @@ void CWAddExtraStyles() {
                  {L"TextBlock", L"FontIcon", L"PathIcon", L"ContentPresenter"}) {
                 AddElementCustomizationRules(target, styles);
             }
+        }
+
+        // CW: 「显示桌面」小竖条撑到任务栏同高（消除默认的小小一截）。
+        // 只改 Rectangle#ShowDesktopPipe 这个视觉矩形的高度，输入热区仍在
+        // ShowDesktopStack/按钮上，悬停出桌面预览（Aero Peek）的行为不变。
+        // 样式在每次设置变更后随样式重建即时刷新；加在主题样式之后，可压过
+        // 主题里对竖条的固定高度，用户自定义样式仍可再覆盖。
+        if (TBIS_g_settings.showDesktopFullHeight) {
+            int pipeHeight = TBIS_g_settings.showDesktopButtonHeight;
+            if (pipeHeight < 0) {
+                // -1 (default): follow the computed taskbar height, which
+                // already includes the proportional scale.
+                pipeHeight = TBIS_g_settings.taskbarHeight;
+            } else if (pipeHeight > 200) {
+                pipeHeight = 200;
+            }
+            std::wstring pipeHeightStr = std::to_wstring(pipeHeight);
+            AddElementCustomizationRules(
+                L"Rectangle#ShowDesktopPipe",
+                {L"Height=" + pipeHeightStr,
+                 L"MinHeight=" + pipeHeightStr,
+                 L"VerticalAlignment=Center"});
         }
     } catch (...) {
         Wh_Log(L"Error %08X", winrt::to_hresult());
@@ -22771,13 +22869,7 @@ void LoadSettings() {
 
 using namespace winrt::Windows::UI::Xaml;
 
-struct {
-    int taskbarHeight;
-    int iconSize;
-    int taskbarButtonWidth;
-    int iconSizeSmall;
-    int taskbarButtonWidthSmall;
-} TBIS_g_settings;
+TBIS_Settings TBIS_g_settings;
 
 std::atomic<bool> g_systemTrayModuleHooked;
 std::atomic<bool> g_taskbarViewDllLoaded;
@@ -25029,26 +25121,36 @@ LRESULT WINAPI SendMessageTimeoutW_Hook(HWND hWnd,
 }
 
 void TBIS_LoadSettings() {
-    // CW 4.3.1: the individual height/icon/width settings were removed from
-    // the settings UI; Wh_GetIntSetting returns 0 for missing keys, so fall
-    // back to the package defaults to keep the taskbar from collapsing.
-    TBIS_g_settings.taskbarHeight = Wh_GetIntSetting(L"TaskbarHeight");
+    // CW 4.4.0: the individual height/icon/width settings are back, in the
+    // "Taskbar size and scaling" group (size.*). Wh_GetIntSetting returns 0
+    // for missing keys, so fall back to the package defaults to keep the
+    // taskbar from collapsing.
+    TBIS_g_settings.taskbarHeight = Wh_GetIntSetting(L"size.TaskbarHeight");
     if (TBIS_g_settings.taskbarHeight <= 0) TBIS_g_settings.taskbarHeight = 52;
-    TBIS_g_settings.iconSize = Wh_GetIntSetting(L"IconSize");
+    TBIS_g_settings.iconSize = Wh_GetIntSetting(L"size.IconSize");
     if (TBIS_g_settings.iconSize <= 0) TBIS_g_settings.iconSize = 32;
-    TBIS_g_settings.taskbarButtonWidth = Wh_GetIntSetting(L"TaskbarButtonWidth");
+    TBIS_g_settings.taskbarButtonWidth =
+        Wh_GetIntSetting(L"size.TaskbarButtonWidth");
     if (TBIS_g_settings.taskbarButtonWidth <= 0)
         TBIS_g_settings.taskbarButtonWidth = 44;
-    TBIS_g_settings.iconSizeSmall = Wh_GetIntSetting(L"IconSizeSmall");
+    TBIS_g_settings.iconSizeSmall = Wh_GetIntSetting(L"size.IconSizeSmall");
     if (TBIS_g_settings.iconSizeSmall <= 0) TBIS_g_settings.iconSizeSmall = 16;
     TBIS_g_settings.taskbarButtonWidthSmall =
-        Wh_GetIntSetting(L"TaskbarButtonWidthSmall");
+        Wh_GetIntSetting(L"size.TaskbarButtonWidthSmall");
     if (TBIS_g_settings.taskbarButtonWidthSmall <= 0)
         TBIS_g_settings.taskbarButtonWidthSmall = 32;
 
     // CW: 等比缩放——把任务栏高度、图标大小与按钮宽度一起按百分比缩放。
     // 未设置（0）与 100 都表示不缩放；范围限制在 50%-300%。
-    int scalePercent = Wh_GetIntSetting(L"look.ProportionalScale");
+    // CW 4.4.0: moved into the size group; fall back to the 4.3.1 grouped
+    // key and the 4.3.0 flat key for saves deploy hasn't migrated yet.
+    int scalePercent = Wh_GetIntSetting(L"size.ProportionalScale");
+    if (!scalePercent) {
+        scalePercent = Wh_GetIntSetting(L"look.ProportionalScale");
+    }
+    if (!scalePercent) {
+        scalePercent = Wh_GetIntSetting(L"ProportionalScale");
+    }
     if (scalePercent != 0 && scalePercent != 100) {
         if (scalePercent < 50) {
             scalePercent = 50;
@@ -25065,6 +25167,12 @@ void TBIS_LoadSettings() {
         TBIS_g_settings.taskbarButtonWidthSmall =
             MulDiv(TBIS_g_settings.taskbarButtonWidthSmall, scalePercent, 100);
     }
+
+    // CW 4.4.0: 「显示桌面」小竖条撑到任务栏同高。
+    TBIS_g_settings.showDesktopFullHeight =
+        Wh_GetIntSetting(L"size.ShowDesktopFullHeight") != 0;
+    TBIS_g_settings.showDesktopButtonHeight =
+        Wh_GetIntSetting(L"size.ShowDesktopButtonHeight");
 }
 
 HWND TBIS_FindCurrentProcessTaskbarWnd() {

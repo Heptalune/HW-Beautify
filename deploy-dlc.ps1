@@ -443,7 +443,7 @@ Write-Status "Windhawk 已成功重启。" "Green"
 # 里，Engine\Mods\<id>.ini 的 Disabled 只是我们写的元数据，2.0 引擎不把它当开关。
 # 这里检测是否有模组被注入；若有，提示用户到 UI 里确认开关。
 Start-Sleep -Seconds 15
-$injLines = @(tasklist /M windhawk-core.dll 2>$null | Where-Object { $_ -match '\.exe\s' })
+$injLines = @(tasklist /M windhawk.dll 2>$null | Where-Object { $_ -match '\.exe\s' })
 if ($injLines.Count -gt 0) {
     Write-Status "检测到 Windhawk 引擎已注入以下进程（Windhawk 2.x 可能把新装模组默认开启）：" "Yellow"
     $injLines | ForEach-Object { Write-Status "  $_" "Yellow" }

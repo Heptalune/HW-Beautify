@@ -1,5 +1,5 @@
 ========================================================================
-             CW-Beautify 一键部署包 v2.4.0
+             CW-Beautify 一键部署包 v2.5.0
 ========================================================================
 
 CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在
@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（21 核心 + 3 可选 + 8 DLC 额外内容；装好后默认全部关闭，在 Windhawk 里按需打开）
+包含的 Mod（32 核心 + 2 可选 + 6 DLC 额外内容；装好后默认全部关闭，在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
 _Online 版（已装好 Windhawk 的用户用）。合并/整合模组的设置页均按功能
@@ -15,13 +15,14 @@ _Online 版（已装好 Windhawk 的用户用）。合并/整合模组的设置�
 添加（见下方「DLC 额外内容」节）。
   CW-任务栏样式美化                 任务栏玻璃背景（默认自定义玻璃，可选液态玻璃等），
                                 Win+X 菜单、托盘溢出、音量浮窗一起美化；
-                                已整合任务栏高度与图标大小调整
+                                「任务栏尺寸与缩放」分组：高度/图标/按钮宽等
+                                5 项单项设置 + 等比缩放 + 显示桌面按钮全高
   CW-开始菜单样式美化               开始菜单与搜索页玻璃效果，可调尺寸
-  CW-通知栏样式美化                 通知中心、日历、快捷设置玻璃效果，浅色模式加白底
+  CW-通知栏样式美化               通知中心、日历、快捷设置玻璃效果，浅色模式加白底
   CW-文件管理器样式美化             文件管理器整窗半透明，右键菜单玻璃（测试中），
                                 取代 ExplorerBlurMica
-  CW-关于桌面的快捷设置         显示桌面按钮 Aero Peek 预览 + 双击桌面空白处
-                                隐藏/显示图标（闲置时可自动隐藏）——两模组合并
+  CW-关于桌面的快捷设置         显示桌面按钮 Aero Peek 预览 + 双击隐藏/显示图标
+                                + 图标平滑自动隐藏动画 + 桌面框选淡出（四合一）
   CW-任务栏音量控制             任务栏上滚动滚轮调音量，支持全屏与任意位置滚动；
                                 快捷键快速切换播放/录音设备；
                                 已并入分应用音量；设置分「全局音量控制」与
@@ -29,7 +30,8 @@ _Online 版（已装好 Windhawk 的用户用）。合并/整合模组的设置�
   CW-任务栏动画                 图标悬停放大动画 + 自动隐藏任务栏显示动画
                                 + 弹性指示条 + 窗口最大化时自动隐藏（四合一）
   CW-任务栏缩略图设置           缩略图即时预览（需 Win11 24H2+）+ 缩略图大小
-                                调节（两模组合并）
+                                调节 + 缩略图拖动排序（三组合并）；1.1.0 修复
+                                22H2 上无效果的问题
   CW-窗口滑动排列               拖动窗口自动吸附排列，配顺滑滑动动画
   CW-Fluent 右键菜单            桌面/左树 Fluent 风格右键菜单（原创，仅私有仓库）
   CW-关闭扩展名修改警告         改扩展名不再弹确认警告
@@ -38,18 +40,38 @@ _Online 版（已装好 Windhawk 的用户用）。合并/整合模组的设置�
   CW-文件悬停信息               悬停文件时显示大小、日期、图片尺寸等信息卡片
   CW-设置样式美化                   用社区主题或自定义样式美化 Windows 设置应用
   CW-隐形窗口边框               隐藏窗口边框、保留系统圆角
-  CW-任务栏缩略图设置           缩略图即时预览（需 Win11 24H2+）+ 缩略图大小
-                                调节（两模组合并）
   CW-现代运行对话框             「运行」对话框换现代 Fluent 风格（新增）
   CW-文件操作样式美化           文件操作进度窗换肤（新增，回归）
   CW-拖拽删除文件               文件拖到悬浮目标移入回收站（新增）
-  CW-桌面框选淡出               桌面框选矩形松开时平滑淡出（新增）
-  CW-桌面图标平滑自动隐藏       桌面图标自动隐藏带平滑动画（新增）
+  CW-任务栏按钮中键关闭         中键点击任务栏按钮直接关闭窗口（新增）
+  CW-任务栏时钟自定义           时钟深度定制：格式/新闻/天气/网速/
+                                性能指标/媒体信息（新增，回归）
+  CW-现代文件夹选择对话框       旧式「浏览文件夹」对话框换现代选择器，
+                                无需设置（新增）
+  CW-WinUI 右键菜单动画         经典右键菜单加 WinUI 风格滑入动画，
+                                与接管式菜单模组二选一（新增）
+  CW-文件管理器内容动画         资源管理器内容区切换的 WinUI 风格
+                                滑动动画（新增）
+  CW-去焦点虚线框               去除虚线焦点框，桌面更清爽（无设置，
+                                新增）
+  CW-开始菜单电源按钮           开始菜单一键电源按钮（关机/重启/睡眠
+                                等），仅 Win11（新增）
+  CW-登录注销关机音效           恢复 Win7 时代的登录/注销/关机音效
+                                （新增）
+  CW-双击返回上级               双击资源管理器空白处返回上一级（无
+                                设置，新增）
+  CW-隐藏桌面图标文字与箭头     隐藏图标文字（保留文件夹名）与快捷方式
+                                箭头（新增）
+  CW-开始按钮居中分流           开始按钮真居中+任务栏图标按屏幕中线
+                                左右分流，仅 Win11（新增）
+  CW-托盘系统图标调整           隐藏/灰化托盘系统图标与通知铃铛
+                                （新增，回归）
+  CW-文件大小列增强             「大小」列增强，CW 版新增后台文件夹
+                                大小计算（新增）
   CW-窗口动画（可选）           窗口关闭/最小化/还原/启动动画，含 macOS 神奇效果
   CW-动态视频壁纸（可选）       MP4 视频硬件加速动态壁纸，带性能 HUD（新增）
-  CW-MacOS 风格 Dock（可选）    任务栏变 macOS 风格 Dock，图标放大（新增）
 
-DLC 额外内容（8 个 tool mod，自选安装，deploy-dlc.bat 单独添加）
+DLC 额外内容（6 个 tool mod，自选安装，deploy-dlc.bat 单独添加）
 ========================================================================
 ⚠ 内存占用提醒：以下模组都挂在 windhawk.exe 模组宿主进程上，开启任意
   一个都会让 Windhawk 启动该宿主进程，内存占用不可预计（通常几十 MB 起
@@ -60,19 +82,17 @@ DLC 额外内容（8 个 tool mod，自选安装，deploy-dlc.bat 单独添加�
   CW-窗口切换动画               Vista 风格 Flip 3D 等 20 多种 Alt+Tab 切换样式
   CW-Mac 灵动岛与 Dock          顶部灵动岛 + 可选 macOS 风格 Dock
   CW-快速启动 Dock              屏幕边缘的纤细动画启动坞，单击启动程序（新增）
-  CW-指针残影拖尾               鼠标指针渐隐残影运动模糊拖尾（新增）
   CW-Windows 灵动岛             悬浮胶囊响应媒体/电池/剪贴板等事件（新增）
-  CW-增强音量混合器             托盘主音量与分应用音量混合器（新增，回归）
 
 安装步骤
 ========================================================================
 1. 把压缩包完整解压到任意文件夹（路径有空格、中文都可以）。
-2. 双击 deploy.bat，在权限提示里点「是」。
+2. 双击 deploy.bat（DLC 之外的全部模组由它安装），在权限提示里点「是」。
    - 如果电脑上还没装 Windhawk，并且包里带有 windhawk_setup.exe，
      脚本会先打开它，按提示装完后脚本会自动继续。
    - 只含 Mod 的 _Online 包不带安装程序，请先从 https://windhawk.net 安装 Windhawk。
 3. 窗口显示「一键部署完成」后按任意键关闭。
-4. （自选）想要 DLC 额外内容：再双击 deploy-dlc.bat 添加 8 个 tool mod
+4. （自选）想要 DLC 额外内容：再双击 deploy-dlc.bat 添加 6 个 tool mod
    （内存占用较高，见上方 DLC 节的提醒）。不需要可跳过。
 5. 打开 Windhawk →「已安装的 Mod」，点进想用的 mod 打开开关；
    提示需要编译时按提示编译（或在源码页点右上角「保存并编译」）。
@@ -83,16 +103,25 @@ DLC 额外内容（8 个 tool mod，自选安装，deploy-dlc.bat 单独添加�
 
 从旧版部署升级：直接运行 deploy.bat 即可。已开启的 mod 和已保存的设置
 都会保留（v2.0.0 起自动迁移旧主题命名，v2.3.0 起自动迁移音量控制与
-任务栏动画分组化后的旧设置键）。被移除的模组（缩略图即时预览、缩略图
-大小、显示桌面按钮预览、桌面双击隐藏图标、最大化自动隐藏任务栏——均已
-并入对应合集模组；以及托盘系统图标调整、任务栏时钟自定义、任务栏歌词、
-半透明窗口、果冻窗口、经典右键菜单、任务栏弹性药丸（已并入任务栏动画）、
-桌面时钟、文件大小，和更早退役的模组）会被自动卸载。
+任务栏动画分组化后的旧设置键，v2.5.0 起自动迁移任务栏尺寸分组化后的
+旧设置键）。被移除的模组（缩略图即时预览、缩略图大小、显示桌面按钮
+预览、桌面双击隐藏图标、最大化自动隐藏任务栏——均已并入对应合集模组；
+以及任务栏歌词、半透明窗口、果冻窗口、经典右键菜单、任务栏弹性药丸
+（已并入任务栏动画）、桌面时钟、文件大小——托盘系统图标调整与任务栏
+时钟自定义已于 v2.5.0 回归，和更早退役的模组）会被自动卸载。
 
 v2.4.0 起 8 个 tool mod（晃动找指针、现代 Alt+Tab 切换器、窗口切换动画、
 Mac 灵动岛与 Dock、快速启动 Dock、指针残影拖尾、Windows 灵动岛、增强
 音量混合器）拆分为 DLC 额外内容：从 v2.3.x 升级后它们不会被移除（开关
 与设置原样保留），但后续更新请运行 deploy-dlc.bat 刷新。
+
+v2.5.0 变化：新增 13 个核心模组；桌面框选淡出与桌面图标平滑自动隐藏
+并入「CW-关于桌面的快捷设置」（两个旧模组会被自动卸载，对应效果改在
+快捷设置里开启）；托盘系统图标调整与任务栏时钟自定义回归；任务栏样式
+美化 4.4.0 新增「任务栏尺寸与缩放」分组；任务栏缩略图设置 1.1.0 修复
+22H2 上无效果的问题并新增缩略图排序；Fluent 右键菜单 0.2.2 修复二级
+经典菜单图层问题。指针残影拖尾、增强音量混合器（DLC）与 MacOS 风格
+Dock（可选）按用户要求移除，会被自动卸载。
 
 从 v4.1 升级的旧用户：先双击 tools\uninstall-ExplorerBlurMica.bat，
 再运行 deploy.bat。
@@ -119,18 +148,18 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 文件说明
 ========================================================================
   deploy.bat / deploy.ps1         一键部署（把 mod 装进 Windhawk，不编译、不自动打开）
-  deploy-dlc.bat / deploy-dlc.ps1 DLC 额外内容添加（8 个 tool mod，自选安装）
+  deploy-dlc.bat / deploy-dlc.ps1 DLC 额外内容添加（6 个 tool mod，自选安装）
   uninstall.bat / uninstall.ps1   一键卸载（同时清理旧版条目与 DLC，不卸载 Windhawk）
   restart_explorer.bat            重启资源管理器
   local@*.wh.cpp                  各 mod 源码
-  optional\                       可选 mod（窗口动画、动态视频壁纸、
-                                  MacOS 风格 Dock）及第三方许可说明
-  dlc\                            DLC 额外内容（8 个 tool mod，内存占用较高）
+  optional\                       可选 mod（窗口动画、动态视频壁纸）及
+                                  第三方许可说明
+  dlc\                            DLC 额外内容（6 个 tool mod，内存占用较高）
   tools\uninstall-ExplorerBlurMica.bat  卸载旧版 ExplorerBlurMica（升级前运行）
   tools\CW-Beautify-StartupCheck.ps1    开机自检（可选，deploy.ps1 -StartupCheck check）
   windhawk_setup*.exe             Windhawk 官方安装程序（仅完整包）
   LICENSE                         GPL-3.0 许可证全文
-  CHANGELOG_CW-Beautify_v2.4.0.md 本版改动说明
+  CHANGELOG_CW-Beautify_v2.5.0.md 本版改动说明
   docs\MOD_CLASSIFICATION.md     模组公开性分类清单（可公开/不可公开/逆向）
 
 ========================================================================
@@ -140,11 +169,10 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
   请先运行 tools\uninstall-ExplorerBlurMica.bat 卸载。
 - CW-自定义右键菜单与 CW-Fluent 右键菜单二选一开启，不要同时使用。
 - CW-现代 Alt+Tab 切换器与 CW-窗口切换动画（Vista 风格）二选一，不要同开。
-- Dock/灵动岛类模组（CW-MacOS 风格 Dock、CW-快速启动 Dock、CW-Mac 灵动岛与
-  Dock、CW-Windows 灵动岛）按需选用，不要同时开启。
-- CW-桌面图标平滑自动隐藏与「CW-关于桌面的快捷设置」的双击隐藏图标 二选一。
+- Dock/灵动岛类模组（CW-快速启动 Dock、CW-Mac 灵动岛与 Dock、CW-Windows
+  灵动岛）按需选用，不要同时开启。
 - 「CW-任务栏缩略图设置」的即时预览分组需要 Windows 11 24H2 及以上，
-  22H2/23H2 上该组自动停用，缩略图大小照常生效。
+  22H2/23H2 上该组自动停用，缩略图大小与排序照常生效。
 - CW-任务栏动画的图标悬停放大：图标偶尔被任务栏裁切；建议最大缩放
   不超过 130%，或在「CW-任务栏样式美化」里加高任务栏。
 - CW-Mac 灵动岛与 Dock 默认不改动系统任务栏；想要 Dock 需在其设置里
@@ -168,9 +196,10 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-32 Windhawk mods (21 core + 3 optional + 8 DLC tool mods), localized into
-Simplified Chinese. Extract the zip, run deploy.bat as administrator, then
-enable the mods you want in Windhawk (all are installed disabled). The 8 DLC
-tool mods (which host a windhawk.exe process with higher memory usage) are
-added separately via deploy-dlc.bat. Upgrading keeps toggles and settings.
-Uninstall: run uninstall.bat. See README.md for details. License: GPL-3.0.
+40 Windhawk mods (32 core + 2 optional + 6 DLC tool mods) as of v2.5.0,
+localized into Simplified Chinese. Extract the zip, run deploy.bat as
+administrator, then enable the mods you want in Windhawk (all are installed
+disabled). The 6 DLC tool mods (which host a windhawk.exe process with higher
+memory usage) are added separately via deploy-dlc.bat. Upgrading keeps
+toggles and settings. Uninstall: run uninstall.bat. See README.md for
+details. License: GPL-3.0.

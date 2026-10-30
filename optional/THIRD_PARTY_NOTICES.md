@@ -5,7 +5,7 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 原样保留在每个 `.wh.cpp` 文件的头部声明中。整合包自身以 GPL-3.0 发布。
 
 > 自 v2.4.0 起套件分三档：核心（根目录）、可选（`optional\`）、DLC 额外内容（`dlc\`，
-> 8 个 tool mod，由 deploy-dlc.bat 单独安装）。下表中标注（DLC）的模组位于 `dlc\` 目录。
+> tool mod，由 deploy-dlc.bat 单独安装）。下表中标注（DLC）的模组位于 `dlc\` 目录。
 
 ## 核心模组（部署即装入，默认关闭）
 
@@ -34,6 +34,19 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-设置样式美化（cw-settings-styler） | m417z, Windows 11 Settings Styler；汉化 | GPL-3.0 | https://windhawk.net/mods/windows-11-settings-styler |
 | CW-窗口拖动（cw-alt-drag） | m417z, AltDrag；汉化 | GPL-3.0 | https://windhawk.net/mods/alt-drag |
 | CW-自定义右键菜单（cw-custom-context-menu） | BOLT, Custom Cached Context Menu；汉化 | MIT | https://windhawk.net/mods/custom-cached-context-menu |
+| CW-任务栏按钮中键关闭（cw-taskbar-button-click） | m417z, Taskbar Button Click（Middle click to close on the taskbar）；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-button-click |
+| CW-任务栏时钟自定义（cw-taskbar-clock-customization） | m417z, Taskbar Clock Customization；汉化（v2.2.0 移除后回归） | GPL-3.0 | https://windhawk.net/mods/taskbar-clock-customization |
+| CW-现代文件夹选择对话框（cw-modern-folder-picker） | aubymori, Modernize Folder Picker Dialog；汉化 | 未标注（按仓库惯例 MIT） | https://windhawk.net/mods/modernize-folder-picker-dialog |
+| CW-WinUI 右键菜单动画（cw-winui-context-menu-animation） | crazyboyybs, WinUI Context Menu Animation；汉化 | MIT | https://windhawk.net/mods/winui-context-menu-animation |
+| CW-文件管理器内容动画（cw-file-explorer-content-animation） | crazyboyybs, File Explorer WinUI-Like Content Animation；汉化 | MIT | https://windhawk.net/mods/file-explorer-content-animation |
+| CW-去焦点虚线框（cw-no-focus-rectangle） | ItsProfessional, No Focus Rectangle；汉化 | 未标注（按仓库惯例 MIT） | https://windhawk.net/mods/no-focus-rectangle |
+| CW-开始菜单电源按钮（cw-win11-power-buttons） | Hakuuyosei（灵弦）, Windows 11 Start Menu Power Buttons；汉化 | 未标注（按仓库惯例 MIT） | https://windhawk.net/mods/win11-power-buttons |
+| CW-登录注销关机音效（cw-logon-logoff-shutdown-sounds） | Toru the Red Fox, Logon, Logoff & Shutdown Sounds Restored；汉化 | 未标注（按仓库惯例 MIT） | https://windhawk.net/mods/logon-logoff-shutdown-sounds |
+| CW-双击返回上级（cw-explorer-double-click-up） | wrldspawn, Explorer Double Click Up；汉化 | GPL-3.0 | https://windhawk.net/mods/explorer-double-click-up |
+| CW-隐藏桌面图标文字与箭头（cw-hide-desktop-icon-text） | kivsak, Hide Desktop Icon Text and Shortcut Arrows；汉化 | 未标注（按仓库惯例 MIT） | https://windhawk.net/mods/hide-desktop-icon-text |
+| CW-开始按钮居中分流（cw-centered-start-split-icons） | rick, Taskbar Start Button Centered Origin；汉化 | GPL-3.0 | https://windhawk.net/mods/taskbar-centered-start-split-icons |
+| CW-托盘系统图标调整（cw-tray-system-icons） | m417z, Taskbar tray system icon tweaks；汉化（v2.2.0 移除后回归） | GPL-3.0 | https://windhawk.net/mods/taskbar-tray-system-icon-tweaks |
+| CW-文件大小列增强（cw-explorer-details-better-file-sizes） | m417z, Better file sizes in Explorer details；汉化 + CW 创新的后台文件夹大小计算（新增「不依赖 Everything」的计算通道） | GPL-3.0 | https://windhawk.net/mods/explorer-details-better-file-sizes |
 
 ## 可选模组（仅在部署时选择安装才启用）
 
@@ -44,10 +57,7 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 | CW-Mac 灵动岛与 Dock（cw-mac-island-dock） | caliberda, Mac Island & Dock；汉化 | GPL-3.0 | https://windhawk.net/mods/mac-island-dock |
 | CW-快速启动 Dock（cw-quick-launch-dock） | cheliks1123, Quick Launch Dock；汉化 | 未标注（版权归原作者） | https://windhawk.net/mods/quick-launch-dock |
 | CW-动态视频壁纸（cw-live-video-wallpaper） | AKS HAY, Live Video Wallpaper；汉化 | GPL-3.0 | https://windhawk.net/mods/live-video-wallpaper |
-| CW-指针残影拖尾（cw-pointer-afterimage） | sidlikesgrapess, Pointer Afterimage Motion Blur；汉化 | Unlicense | https://windhawk.net/mods/pointer-afterimage-motion-blur |
-| CW-MacOS 风格 Dock（cw-macos-style-dock） | Zach Vaughn, MacOS Style Dock；汉化（4 处 x86 兼容修复见文件头说明） | GPL-3.0 | https://windhawk.net/mods/macos-style-dock |
 | CW-Windows 灵动岛（cw-dynamic-island-windows） | Himanshu, Dynamic Island for Windows；汉化 | MIT | https://windhawk.net/mods/dynamic-island-for-windows |
-| CW-增强音量混合器（cw-better-volume-mixer） | 0Allu, Better Volume Mixer；汉化（v2.1.0 周期移除，v2.3.0 回归） | MIT | https://windhawk.net/mods/better-volume-mixer |
 
 ## 已移除 / 已合并
 
@@ -56,7 +66,8 @@ CW-Beautify 整合并汉化自开源社区的 Windhawk 模组；各 mod 的版�
 - Aero Peek on "Show desktop" button hover 与 CW-桌面双击隐藏图标：v2.3.0 起合并为 CW-关于桌面的快捷设置（声明见上表）。
 - Taskbar auto-hide when maximized：v2.3.0 起并入 CW-任务栏动画（声明见上表）。
 - Breeze Shell 右键菜单：曾短暂整合为 CW-右键菜单美化（Breeze Shell 0.2.0，AGPL-3.0），v2.0.0 前整体移除。
-- File Operation Styler 与 Better Volume Mixer：曾于 v2.1.0 周期移除，v2.3.0 起基于上游当前版本重新汉化回归。
+- File Operation Styler：曾于 v2.1.0 周期移除，v2.3.0 起基于上游当前版本重新汉化回归。
+- Pointer Afterimage Motion Blur（指针残影拖尾）、Better Volume Mixer（增强音量混合器）、MacOS Style Dock（MacOS 风格 Dock）：v2.3.0 引入，v2.5.0 按用户要求移除。
 
 Copyright of each mod remains with its author. See the license header inside each `.wh.cpp` file.
 每个 Mod 的版权归各自作者所有，许可见各 `.wh.cpp` 文件内的声明。

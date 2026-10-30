@@ -354,15 +354,20 @@ $retiredMods = @(
     "local@cw-taskbar-autohide-when-maximized",
     # v2.2.0 移除：托盘系统图标调整、任务栏时钟自定义、任务栏歌词、
     # 半透明窗口、果冻窗口；弹性药丸并入任务栏动画。
-    "local@cw-tray-system-icons", "local@cw-taskbar-clock-customization",
+    # v2.2.0 移除、v2.5.0 回归：托盘系统图标调整、任务栏时钟自定义（歌词仍退役）
     "local@cw-taskbar-lyrics", "local@cw-translucent-windows",
     "local@cw-wobbly-windows", "local@cw-taskbar-elastic-pill",
     "local@cw-classic-context-menu",
     # v2.1.0 后补移除：桌面时钟、文件大小
     "local@cw-desktop-clock", "local@cw-explorer-details-file-sizes",
-    "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation"
-    # 注：cw-better-volume-mixer 与 cw-file-operation-styler 在 v2.1.0 周期移除、
-    # v2.3.0 按用户要求重新整合回归，不再是退役模组。
+    "taskbar-icon-size", "taskbar-volume-control", "taskbar-dock-animation",
+    # v2.5.0 按用户要求移除：指针残影拖尾、增强音量混合器、MacOS 风格 Dock
+    "local@cw-pointer-afterimage", "local@cw-better-volume-mixer",
+    "local@cw-macos-style-dock",
+    # v2.5.0 合并退役：框选淡出与图标平滑自动隐藏并入关于桌面的快捷设置 1.1.0
+    "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide"
+    # 注：cw-file-operation-styler 在 v2.1.0 周期移除、v2.3.0 重新整合回归；
+    # cw-better-volume-mixer 曾于 v2.3.0 回归、v2.5.0 再次按用户要求移除。
 )
 foreach ($rMod in $retiredMods) {
     $legacyFile = Join-Path $modsSource "$rMod.wh.cpp"
@@ -479,7 +484,7 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpaper", "local@cw-macos-style-dock")
+$optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpaper")
 # 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
@@ -494,14 +499,19 @@ $coreModIds = @(
     "local@cw-desktop-quick-settings", "local@cw-fluent-context-menu",
     "local@cw-modern-run-dialog", "local@cw-file-operation-styler",
     "local@cw-drag-to-delete",
-    "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide"
+    "local@cw-taskbar-button-click", "local@cw-taskbar-clock-customization",
+    "local@cw-modern-folder-picker", "local@cw-winui-context-menu-animation",
+    "local@cw-file-explorer-content-animation", "local@cw-no-focus-rectangle",
+    "local@cw-win11-power-buttons", "local@cw-logon-logoff-shutdown-sounds",
+    "local@cw-explorer-double-click-up", "local@cw-hide-desktop-icon-text",
+    "local@cw-centered-start-split-icons", "local@cw-tray-system-icons",
+    "local@cw-explorer-details-better-file-sizes"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
 $dlcModIds = @(
     "local@cw-shake-find-cursor", "local@cw-overhauled-alt-tab",
     "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-    "local@cw-quick-launch-dock", "local@cw-pointer-afterimage",
-    "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer"
+    "local@cw-quick-launch-dock", "local@cw-dynamic-island-windows"
 )
 $preselected = @()
 if ($Optional) {
@@ -671,13 +681,50 @@ foreach ($file in $files) {
         }
         Set-RegValueIfMissing $settingsPath "look.theme" "TranslucentTaskbar" String $label
         Set-RegValueIfMissing $settingsPath "maximized.enabled" 0 DWord $label
-        # 4.3.0 起整合「CW-任务栏高度与图标大小」：以下值必须存在（代码直接读注册表值，
-        # 缺失会被当成 0，任务栏高度会变 0）
-        Set-RegValueIfMissing $settingsPath "TaskbarHeight" 52 DWord $label
-        Set-RegValueIfMissing $settingsPath "IconSize" 32 DWord $label
-        Set-RegValueIfMissing $settingsPath "TaskbarButtonWidth" 44 DWord $label
-        Set-RegValueIfMissing $settingsPath "IconSizeSmall" 16 DWord $label
-        Set-RegValueIfMissing $settingsPath "TaskbarButtonWidthSmall" 32 DWord $label
+        # 4.4.0 重组「任务栏尺寸与缩放」分组（size.* 前缀）：旧扁平键与
+        # look.ProportionalScale 的已存值迁移到新键（仅新键缺失时写入，不覆盖）。
+        $sizeKeyMap = [ordered]@{
+            "TaskbarHeight" = "size.TaskbarHeight"
+            "IconSize" = "size.IconSize"
+            "TaskbarButtonWidth" = "size.TaskbarButtonWidth"
+            "IconSizeSmall" = "size.IconSizeSmall"
+            "TaskbarButtonWidthSmall" = "size.TaskbarButtonWidthSmall"
+            "ProportionalScale" = "size.ProportionalScale"
+            "look.ProportionalScale" = "size.ProportionalScale"
+        }
+        if ($script:IniStoreMode) {
+            foreach ($oldKey in $sizeKeyMap.Keys) {
+                $oldVal = Get-IniValue $script:IniStorePath "Settings" $oldKey
+                if ($null -ne $oldVal) {
+                    Set-IniValueIfMissing $script:IniStorePath "Settings" $sizeKeyMap[$oldKey] $oldVal
+                }
+            }
+        } else {
+            $szKey = Open-HklmKey $settingsPath
+            try {
+                $szNames = @($szKey.GetValueNames())
+                foreach ($oldKey in $sizeKeyMap.Keys) {
+                    if ($szNames -contains $oldKey) {
+                        $kind = $szKey.GetValueKind($oldKey)
+                        $type = if ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord) { "DWord" } else { "String" }
+                        Set-RegValueIfMissing $settingsPath $sizeKeyMap[$oldKey] $szKey.GetValue($oldKey) $type $label
+                    }
+                }
+            } finally {
+                $szKey.Close()
+            }
+        }
+        # 4.3.0 起整合「CW-任务栏高度与图标大小」（4.4.0 起收进 size.* 分组）：
+        # 以下值必须存在（代码直接读注册表值，缺失会被当成 0，任务栏高度会变 0）
+        Set-RegValueIfMissing $settingsPath "size.TaskbarHeight" 52 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.IconSize" 32 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.TaskbarButtonWidth" 44 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.IconSizeSmall" 16 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.TaskbarButtonWidthSmall" 32 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.ProportionalScale" "100" String $label
+        # 4.4.0 新增：显示桌面按钮全高（-1 表示跟随任务栏高度）
+        Set-RegValueIfMissing $settingsPath "size.ShowDesktopFullHeight" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "size.ShowDesktopButtonHeight" -1 DWord $label
     }
 
     if ($id -eq "local@cw-taskbar-volume-control") {
@@ -861,6 +908,56 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "toggleIcons.enableAutoHide" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "toggleIcons.autoHideDelay" 5 DWord $label
         Set-RegValueIfMissing $settingsPath "toggleIcons.showIconsOnAnyInput" 1 DWord $label
+        # 1.1.0 起并入平滑自动隐藏（toggleIcons.smooth.* 子组）与桌面框选淡出（marquee.*）：
+        # 旧独立模组的键迁移到新前缀（仅新键缺失时写入，不覆盖用户已保存的值）。
+        $qsKeyMap = [ordered]@{
+            "autoHideEnabled" = "toggleIcons.smooth.autoHideEnabled"
+            "autoHideDelay" = "toggleIcons.smooth.autoHideDelay"
+            "animationDuration" = "toggleIcons.smooth.animationDuration"
+            "speed" = "marquee.speed"
+            "duration" = "marquee.duration"
+            "initial_alpha" = "marquee.initial_alpha"
+            "auto_calc_opacity" = "marquee.auto_calc_opacity"
+            "accelerate_if_covered" = "marquee.accelerate_if_covered"
+            "single_instance" = "marquee.single_instance"
+            "use_custom_color" = "marquee.use_custom_color"
+            "custom_fill_color" = "marquee.custom_fill_color"
+            "custom_border_color" = "marquee.custom_border_color"
+        }
+        if ($script:IniStoreMode) {
+            foreach ($oldKey in $qsKeyMap.Keys) {
+                $oldVal = Get-IniValue $script:IniStorePath "Settings" $oldKey
+                if ($null -ne $oldVal) {
+                    Set-IniValueIfMissing $script:IniStorePath "Settings" $qsKeyMap[$oldKey] $oldVal
+                }
+            }
+        } else {
+            $qsKey = Open-HklmKey $settingsPath
+            try {
+                $qsNames = @($qsKey.GetValueNames())
+                foreach ($oldKey in $qsKeyMap.Keys) {
+                    if ($qsNames -contains $oldKey) {
+                        $kind = $qsKey.GetValueKind($oldKey)
+                        $type = if ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord) { "DWord" } else { "String" }
+                        Set-RegValueIfMissing $settingsPath $qsKeyMap[$oldKey] $qsKey.GetValue($oldKey) $type $label
+                    }
+                }
+            } finally {
+                $qsKey.Close()
+            }
+        }
+        Set-RegValueIfMissing $settingsPath "toggleIcons.smooth.autoHideEnabled" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "toggleIcons.smooth.autoHideDelay" 5 DWord $label
+        Set-RegValueIfMissing $settingsPath "toggleIcons.smooth.animationDuration" 250 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.speed" 100 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.duration" 300 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.initial_alpha" 90 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.auto_calc_opacity" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.accelerate_if_covered" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.single_instance" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.use_custom_color" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "marquee.custom_fill_color" "8C8C8C" String $label
+        Set-RegValueIfMissing $settingsPath "marquee.custom_border_color" "B4B4B4" String $label
     }
 
     if ($id -eq "local@cw-taskbar-thumbnail-settings") {
@@ -1010,7 +1107,7 @@ Write-Status "Windhawk 已成功重启。" "Green"
 # 里，Engine\Mods\<id>.ini 的 Disabled 只是我们写的元数据，2.0 引擎不把它当开关。
 # 这里检测是否有模组被注入；若有，提示用户到 UI 里确认开关。
 Start-Sleep -Seconds 15
-$injLines = @(tasklist /M windhawk-core.dll 2>$null | Where-Object { $_ -match '\.exe\s' })
+$injLines = @(tasklist /M windhawk.dll 2>$null | Where-Object { $_ -match '\.exe\s' })
 if ($injLines.Count -gt 0) {
     Write-Status "检测到 Windhawk 引擎已注入以下进程（Windhawk 2.x 可能把新装模组默认开启）：" "Yellow"
     $injLines | ForEach-Object { Write-Status "  $_" "Yellow" }

@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-Fluent 右键菜单
 // @description     Replaces the desktop and Explorer folder-tree context menus with a Fluent (WinUI2 MenuFlyout, acrylic) menu. Clean-room reimplementation based on static analysis of FluentContextMenu v0.5.0.
 // @description:zh-CN 把桌面和资源管理器左树的右键菜单换成 Fluent（WinUI2 MenuFlyout、亚克力）菜单；基于对 FluentContextMenu v0.5.0 的静态逆向分析净室重写。
-// @version         0.2.1
+// @version         0.2.2
 // @author          Heptalune
 // @license         GPL-3.0
 // @include         explorer.exe
@@ -51,6 +51,11 @@
 
 - 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。
 - 菜单样式选「win10」时依赖对 Win11 XAML presenter 的拦截，系统更新后可能需要跟随适配。
+
+## 更新记录
+
+- **0.2.2**：修复点击 Win11 菜单「显示更多选项」后经典二级菜单的显示问题。此前该二级菜单会被本模组再次接管渲染成飞出菜单，而飞出窗口显示时未被提升 Z 序：资源管理器里菜单被主窗口遮挡（图层错误），桌面上则完全被盖住、看起来无响应或反应极慢。现在检测到 Win11 现代菜单正在收起（其 XAML 弹窗仍可见且覆盖菜单弹出点）时，直接放行原生 TrackPopupMenu，经典二级菜单在桌面与资源管理器两种宿主下都以前台顶层正常弹出、不经过本模组的飞出/消息泵逻辑；另为飞出菜单窗口显示时增加 Z 序提升兜底（TOPMOST→NOTOPMOST 弹跳，不激活窗口），保证任何残余接管路径下菜单也不会被宿主窗口遮挡。
+- **0.2.1**：随 CW-Beautify v2.2.0 收编的初始整合版本。
 
 ## 致谢与许可
 
@@ -793,6 +798,115 @@ static void TeardownXamlThread() {
     winrt::clear_factory_cache();
 }
 
+// ============================================================================
+// Win11 modern-menu passthrough ("Show more options" second-level menu)
+// ============================================================================
+
+// When the Win11 modern (XAML) menu is dismissed via its "Show more options"
+// item, the shell displays the classic Win32 menu by calling TrackPopupMenu
+// with the same owner window and the same flags (TPM_RETURNCMD) as a direct
+// classic right-click. If this mod intercepts that call, the second-level
+// menu is re-rendered as our flyout while the modern menu's window is still
+// tearing down, and the flyout window ends up beneath the host window
+// (Explorer: the menu renders under the window; desktop: it is covered
+// entirely, so the click seems to do nothing or react extremely slowly).
+// The classic second-level menu must pop up natively instead.
+//
+// Detection: the modern menu lives in a top-level XAML popup window of this
+// process ("Xaml_WindowedPopupClass"; newer builds use
+// "Microsoft.UI.Content.PopupWindowSiteBridge"). While it is being dismissed
+// in favor of the classic menu it is still visible and contains the point the
+// shell passed to TrackPopupMenu, whereas a direct classic right-click
+// (e.g. Shift+right-click) has no such window. Our own flyout popups belong
+// to the mod's XAML thread and are excluded.
+
+static bool IsModernMenuPopupWindow(HWND hwnd) {
+    if (!hwnd || !IsWindowVisible(hwnd)) {
+        return false;
+    }
+    DWORD pid = 0;
+    DWORD tid = GetWindowThreadProcessId(hwnd, &pid);
+    if (pid != GetCurrentProcessId() || (tid && tid == g_winuiThreadId)) {
+        return false;  // another process's window, or our own flyout popup
+    }
+    wchar_t cls[64]{};
+    if (!GetClassNameW(hwnd, cls, ARRAYSIZE(cls))) {
+        return false;
+    }
+    return wcscmp(cls, L"Xaml_WindowedPopupClass") == 0 ||
+           wcscmp(cls, L"Microsoft.UI.Content.PopupWindowSiteBridge") == 0;
+}
+
+struct ModernMenuHit {
+    POINT pt;
+    bool found;
+};
+
+// x86 rule: WINAPI callbacks must be explicit static functions, never
+// capture-less lambdas.
+static BOOL CALLBACK ModernMenuPopupEnumProc(HWND hwnd, LPARAM lParam) {
+    ModernMenuHit* hit = (ModernMenuHit*)lParam;
+    if (hit->found || !IsModernMenuPopupWindow(hwnd)) {
+        return TRUE;
+    }
+    RECT rc{};
+    if (GetWindowRect(hwnd, &rc)) {
+        RECT slack = rc;
+        InflateRect(&slack, 8, 8);
+        if (PtInRect(&slack, hit->pt)) {
+            hit->found = true;
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+// True while the Win11 modern menu window is still up (dismissing) around the
+// point at which the shell asked the classic menu to appear.
+static bool IsModernMenuDismissingAt(int x, int y) {
+    ModernMenuHit hit{{x, y}, false};
+    EnumWindows(ModernMenuPopupEnumProc, (LPARAM)&hit);
+    return hit.found;
+}
+
+// ---------------------------------------------------------------------------
+// Flyout Z-order hardening: XAML shows the flyout's popup window without
+// forcing it to the top of the Z-order. If the popup does not already sit
+// above the active window (first show after start, or a show racing the
+// modern menu's teardown in a missed-passthrough corner case), the menu
+// renders beneath the host window. Mirror the native menu behavior: raise the
+// popup to the top of the normal band via a TOPMOST -> NOTOPMOST bounce,
+// without activating it.
+// ---------------------------------------------------------------------------
+
+struct FlyoutPopupEnumState {
+    HWND popup;
+};
+
+static BOOL CALLBACK FlyoutPopupEnumProc(HWND hwnd, LPARAM lParam) {
+    FlyoutPopupEnumState* state = (FlyoutPopupEnumState*)lParam;
+    if (GetWindow(hwnd, GW_OWNER) == g_hostWnd && IsWindowVisible(hwnd)) {
+        state->popup = hwnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static void RaiseFlyoutPopupToTop() {
+    if (!g_hostWnd) {
+        return;
+    }
+    FlyoutPopupEnumState state{nullptr};
+    EnumWindows(FlyoutPopupEnumProc, (LPARAM)&state);
+    if (!state.popup) {
+        return;  // ownership model differs on this build; nothing to raise
+    }
+    SetWindowPos(state.popup, HWND_TOPMOST, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    SetWindowPos(state.popup, HWND_NOTOPMOST, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+}
+
 static void ShowFlyoutOnXamlThread(ShowRequest* request) {
     try {
         MenuFlyout flyout;
@@ -830,6 +944,7 @@ static void ShowFlyoutOnXamlThread(ShowRequest* request) {
 
         g_currentFlyout = flyout;
         flyout.ShowAt(root, winrt::Windows::Foundation::Point{xDip, yDip});
+        RaiseFlyoutPopupToTop();
     } catch (hresult_error const& e) {
         DebugLog(L"ShowFlyout FAIL: %s", e.message().c_str());
         if (request->doneEvent) {
@@ -1223,6 +1338,16 @@ static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
     }
     if (!isDesktop && !isTree) {
         HOOK_LOG(L"gate: class=%s not targeted", className);
+        return -1;
+    }
+
+    // "Show more options" (Win11 modern menu -> classic second-level menu):
+    // the shell reuses TrackPopupMenu with the same owner/flags as a direct
+    // classic right-click. Pass it through untouched so the native menu pops
+    // up foreground/topmost in both hosts (desktop and Explorer) without this
+    // mod's flyout, pump, or dismissal logic interfering with it.
+    if (IsModernMenuDismissingAt(x, y)) {
+        HOOK_LOG(L"gate: modern menu dismissing at (%d,%d), passthrough", x, y);
         return -1;
     }
 
