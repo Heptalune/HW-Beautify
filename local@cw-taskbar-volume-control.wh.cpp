@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.6.0
+// @version         1.6.2
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -93,6 +93,15 @@ explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务�
 - 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
 
 ## 更新日志
+- **1.6.2**：
+  - 修复「切换媒体设备后，提示永远显示 (未知设备)」的问题。根因在设备名读取（IMMDevice::OpenPropertyStore → IPropertyStore::GetValue(PKEY_Device_FriendlyName)）：Windows 的 MMDevice 端点属性存储对字符串属性实际返回 **VT_LPWSTR** 类型，而代码只接受 VT_BSTR——GetValue 本身成功，值却因类型不符被当作空值丢弃，于是永远落到「(未知设备)」占位文案。该缺陷自 1.3.4 加入设备切换功能时就已存在，只是 1.6.0 修复提示窗口从不显示的问题之前一直没被看到（切换本身始终正常）。现改为兼容 VT_LPWSTR / VT_BSTR 两种类型读取，FriendlyName 为空时回退 PKEY_Device_DeviceDesc（设备描述），两者都取不到才显示「(未知设备)」。
+  - 时序说明：提示中的设备名取自切换目标设备对象自身，在 IPolicyConfig::SetDefaultEndpoint 对 console 与 multimedia 两个角色均返回成功（同步确认）之后读取；目标设备的属性存储随设备对象即时可读，不依赖系统默认端点刷新，无需延迟重试。
+  - 核对：快捷键注册与切换、提示显示均在专用常驻线程上完成，该线程启动即调用 CoInitializeEx(STA)，COM 状态全程就绪。
+
+- **1.6.1**：
+  - 修复「整个模组在 explorer.exe 中失效」的问题（分应用音量、任务栏滚动调音量、中键静音同时失灵，直到重启资源管理器或重启电脑）。根因：中键静音与分应用音量依赖的 taskbar.dll / Taskbar.View.dll 符号需要引擎在目标进程内加载调试符号（msdia + PDB，其中 Taskbar.View.pdb 约 43MB），系统内存/提交压力大时这一步会瞬时失败（实测 explorer.exe 内 msdia 加载返回 ERROR_NOT_ENOUGH_MEMORY / 0x80070008，可复现）；而引擎会把这类失败按模组缓存最长 4 小时（开机加载场景），且本模组初始化遇到失败会直接整体放弃——三层叠加导致一次性失败被放大成长时间不可用。现改为：初始化中符号加载失败只降级对应功能（任务栏/托盘滚动调音量本就不依赖符号，不再被连坐拖垮），并转入后台自动重试（首次 30 秒后，指数退避、最长 30 分钟一次，持续 24 小时；重试用 Wh_FindFirstSymbol 直接解析符号，绕过引擎的失败节流缓存），环境恢复后无需重启即可自动恢复全部功能。
+  - 说明：该问题与「媒体设备快速切换」无关——切换默认播放设备不会影响音频会话枚举（模组每次调节都实时获取当前默认设备与其会话，无缓存）。
+
 - **1.6.0**：
   - 设置分组：媒体（播放）/录音（采集）设备快捷切换、跳过未激活的设备、切换后提示四项设置从「全局音量控制」分组移出，收进新的可收起分组「**切换媒体设备**」（键名改为 deviceSwitch.* 前缀；「全局音量控制」分组只保留滚动调音量相关设置，已保存的自定义值在 deploy 脚本同步迁移前会回落为默认值）。
   - 修复「切换后提示」从不显示的问题：toast 窗口此前创建时样式只有 WS_POPUP（未带 WS_VISIBLE），之后也从未调用 ShowWindow，窗口一直处于隐藏状态——计时与淡出逻辑其实都在正常运行，只是画在了一个看不见的窗口上；现改为分层属性设置完成后立即以 SW_SHOWNOACTIVATE 显示（不抢前台焦点），播放与录音设备切换共用该提示。
@@ -1014,6 +1023,10 @@ static const GUID CwIID_PolicyConfig = {
 static const PROPERTYKEY CwPKEY_FriendlyName = {
     {0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}},
     14};
+// PKEY_Device_DeviceDesc：同一 fmtid，pid 3（设备描述；FriendlyName 取不到时回退）
+static const PROPERTYKEY CwPKEY_DeviceDesc = {
+    {0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}},
+    3};
 
 struct CwDevSwitch {
     DWORD playMods = 0;
@@ -1122,12 +1135,26 @@ static std::wstring DevName(IMMDevice* dev) {
     if (dev) {
         IPropertyStore* ps = nullptr;
         if (SUCCEEDED(dev->OpenPropertyStore(STGM_READ, &ps)) && ps) {
-            PROPVARIANT pv{};
-            if (SUCCEEDED(ps->GetValue(CwPKEY_FriendlyName, &pv)) &&
-                pv.vt == VT_BSTR && pv.bstrVal) {
-                name = pv.bstrVal;
+            // 1.6.2 修复：MMDevice 端点属性存储（IMMDevice::OpenPropertyStore →
+            // IPropertyStore::GetValue）对字符串属性返回的是 VT_LPWSTR，而不是
+            // VT_BSTR（同仓库灵动岛模组读设备名即按 VT_LPWSTR 判定；Chrome 的
+            // core_audio_util_win.cc 也断言 VT_LPWSTR）。此前只接受 VT_BSTR，
+            // GetValue 明明成功、值却因类型不符被丢弃，提示永远回退到「(未知
+            // 设备)」。VT_BSTR 与 VT_LPWSTR 的字符串指针在 PROPVARIANT 联合体
+            // 中同址，统一按 pwszVal 读取即可；PropVariantClear 对两种类型分
+            // 别用 SysFreeString / CoTaskMemFree 释放，均正确。
+            const PROPERTYKEY keys[] = {CwPKEY_FriendlyName, CwPKEY_DeviceDesc};
+            for (const PROPERTYKEY& key : keys) {
+                PROPVARIANT pv{};
+                if (SUCCEEDED(ps->GetValue(key, &pv))) {
+                    if ((pv.vt == VT_LPWSTR || pv.vt == VT_BSTR) && pv.pwszVal) {
+                        name = pv.pwszVal;
+                    }
+                    PropVariantClear(&pv);
+                    if (!name.empty())
+                        break;
+                }
             }
-            PropVariantClear(&pv);
             ps->Release();
         }
     }
@@ -1223,6 +1250,10 @@ static void CycleDev(bool capture) {
             HRESULT hr2 = setDef(policy, targetId.c_str(), eMultimedia);
             if (SUCCEEDED(hr1) && SUCCEEDED(hr2)) {
                 switched = true;
+                // 设备名取自切换目标设备对象自身：IPolicyConfig::SetDefaultEndpoint
+                // 是同步调用（无回调），两个角色都返回成功即切换已确认；目标设备
+                // 的属性存储随设备对象即时可读，不依赖系统默认端点缓存刷新，
+                // 因此无需延迟重试。
                 std::wstring name = DevName(target);
                 Wh_Log(L"CW音量控制: %s设备已切换为 %s (%u/%u)",
                        capture ? L"录音" : L"播放", name.c_str(), next + 1, n);
@@ -2554,6 +2585,203 @@ int WINAPI VolumeSystemTrayIconDataModel_OnIconClicked_Hook(void* pThis,
     return VolumeSystemTrayIconDataModel_OnIconClicked_Original(pThis, param1);
 }
 
+// ============================================================================
+// Hook retry infrastructure (added in 1.6.1)
+//
+// Symbol resolution depends on the engine loading msdia and the module's PDB.
+// Under memory pressure this can fail transiently (observed: msdia
+// LoadLibraryEx failing with ERROR_NOT_ENOUGH_MEMORY in explorer.exe while
+// loading the large Taskbar.View.pdb). The engine caches such failures per
+// mod for up to 4 hours (startup loads), and this mod used to return FALSE
+// from Wh_ModInit on the system tray hook failure, which disabled the whole
+// mod until reboot. Hook failures are now non-fatal and retried in the
+// background until they succeed.
+// ============================================================================
+
+// A flat symbol hook descriptor for the direct resolution path below (the
+// WindhawkUtils::SYMBOL_HOOK fields aren't accessible, and every hook in this
+// mod matches a single symbol name).
+struct DirectSymbolHook {
+    PCWSTR symbol;
+    void** originalFunction;
+    void* hookFunction;
+    bool optional;
+};
+
+// Resolves symbols and queues hooks directly, without the engine's per-mod
+// symbol cache and its failure throttle (which would make retries no-op for
+// hours after a transient failure). Only used by the retry path; the normal
+// init path keeps using WindhawkUtils::HookSymbols so the engine cache and
+// online cache keep working as before.
+bool HookSymbolsDirect(HMODULE module,
+                       const DirectSymbolHook* symbolHooks,
+                       size_t symbolHooksCount) {
+    if (!module || !symbolHooks || symbolHooksCount == 0) {
+        return false;
+    }
+
+    WH_FIND_SYMBOL_OPTIONS options = {};
+    options.optionsSize = sizeof(options);
+    options.symbolServer = L"";  // Local PDBs only, no network.
+    options.noUndecoratedSymbols = FALSE;
+
+    WH_FIND_SYMBOL findSymbol;
+    HANDLE findHandle = Wh_FindFirstSymbol(module, &options, &findSymbol);
+    if (!findHandle) {
+        Wh_Log(L"Wh_FindFirstSymbol failed");
+        return false;
+    }
+
+    std::vector<bool> hookResolved(symbolHooksCount, false);
+    size_t unresolvedCount = symbolHooksCount;
+    bool allHooksSet = true;
+
+    do {
+        PCWSTR symbol = findSymbol.symbol;
+        if (!symbol || !*symbol) {
+            continue;
+        }
+
+        for (size_t i = 0; i < symbolHooksCount; i++) {
+            if (hookResolved[i] || wcscmp(symbolHooks[i].symbol, symbol) != 0) {
+                continue;
+            }
+
+            hookResolved[i] = true;
+            unresolvedCount--;
+
+            if (symbolHooks[i].hookFunction) {
+                if (!Wh_SetFunctionHook(findSymbol.address,
+                                        symbolHooks[i].hookFunction,
+                                        symbolHooks[i].originalFunction)) {
+                    allHooksSet = false;
+                }
+            } else if (symbolHooks[i].originalFunction) {
+                *symbolHooks[i].originalFunction = findSymbol.address;
+            }
+
+            if (unresolvedCount == 0) {
+                break;
+            }
+        }
+    } while (unresolvedCount > 0 && Wh_FindNextSymbol(findHandle, &findSymbol));
+
+    Wh_FindCloseSymbol(findHandle);
+
+    for (size_t i = 0; i < symbolHooksCount; i++) {
+        if (!hookResolved[i] && !symbolHooks[i].optional) {
+            Wh_Log(L"Symbol not found: %s", symbolHooks[i].symbol);
+            allHooksSet = false;
+        }
+    }
+
+    return allHooksSet;
+}
+
+std::atomic<bool> g_hookRetryNeeded{false};
+std::atomic<bool> g_hookRetryWorkerRunning{false};
+std::atomic<bool> g_hookRetryExit{false};
+HANDLE g_hookRetryWakeupEvent = nullptr;
+HANDLE g_hookRetryThreadHandle = nullptr;
+
+// Retry functions provided by the feature blocks below. Each returns true
+// when there's nothing left to do (feature disabled, already hooked, or
+// hooks succeeded), false when a retry is still needed.
+bool RetrySystemTrayHooks();
+bool RetryPerAppHooks();
+
+DWORD WINAPI HookRetryWorkerThreadProc(LPVOID) {
+    Wh_Log(L">");
+
+    constexpr unsigned int kFirstRetryIntervalMs = 30 * 1000;
+    constexpr unsigned int kMaxRetryIntervalMs = 30 * 60 * 1000;
+    constexpr ULONGLONG kGiveUpAfterMs = 24ULL * 60 * 60 * 1000;
+
+    unsigned int intervalMs = kFirstRetryIntervalMs;
+    ULONGLONG deadline = GetTickCount64() + kGiveUpAfterMs;
+
+    while (!g_hookRetryExit) {
+        DWORD waitResult = WaitForSingleObject(g_hookRetryWakeupEvent,
+                                               intervalMs);
+        if (g_hookRetryExit) {
+            break;
+        }
+
+        if (!g_hookRetryNeeded) {
+            break;
+        }
+
+        bool allOk = RetrySystemTrayHooks() && RetryPerAppHooks();
+        Wh_ApplyHookOperations();
+
+        if (allOk) {
+            Wh_Log(L"Symbol hooks recovered, stopping retry");
+            g_hookRetryNeeded = false;
+            break;
+        }
+
+        if (GetTickCount64() >= deadline) {
+            Wh_Log(L"Symbol hooks retry gave up");
+            g_hookRetryNeeded = false;
+            break;
+        }
+
+        intervalMs = std::min(intervalMs * 2, kMaxRetryIntervalMs);
+    }
+
+    // The thread handle is owned and closed by ShutdownHookRetryWorker, which
+    // waits on it: closing it here would race with the unload of this module.
+    g_hookRetryWorkerRunning = false;
+    return 0;
+}
+
+// Marks the current set of hooks as failed and makes sure the retry worker
+// is running. Safe to call from any thread and multiple times.
+void MarkHooksFailedForRetry() {
+    g_hookRetryNeeded = true;
+
+    if (!g_hookRetryWakeupEvent) {
+        HANDLE event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        if (event) {
+            HANDLE expected = nullptr;
+            HANDLE published = (HANDLE)InterlockedCompareExchangePointer(
+                (PVOID*)&g_hookRetryWakeupEvent, event, expected);
+            if (published) {
+                // Another thread published its event first.
+                CloseHandle(event);
+            }
+        }
+    }
+
+    if (!g_hookRetryWorkerRunning.exchange(true)) {
+        g_hookRetryExit = false;
+        g_hookRetryThreadHandle = CreateThread(
+            nullptr, 0, HookRetryWorkerThreadProc, nullptr, 0, nullptr);
+        if (!g_hookRetryThreadHandle) {
+            Wh_Log(L"Failed to create hook retry thread");
+            g_hookRetryWorkerRunning = false;
+        }
+    } else {
+        SetEvent(g_hookRetryWakeupEvent);
+    }
+}
+
+void ShutdownHookRetryWorker() {
+    g_hookRetryExit = true;
+    if (g_hookRetryWakeupEvent) {
+        SetEvent(g_hookRetryWakeupEvent);
+    }
+
+    // The worker might be in the middle of a symbol enumeration, which can
+    // take a while for large PDBs. Wait briefly and don't block unloading
+    // indefinitely.
+    if (g_hookRetryThreadHandle) {
+        WaitForSingleObject(g_hookRetryThreadHandle, 60000);
+        CloseHandle(g_hookRetryThreadHandle);
+        g_hookRetryThreadHandle = nullptr;
+    }
+}
+
 bool HookSystemTraySymbols(HMODULE module) {
     // In SystemTray.dll, the implementation function was inlined into the
     // produce<> COM thunk, so hook that.
@@ -2616,8 +2844,45 @@ void HandleLoadedModuleIfSystemTray(HMODULE module, LPCWSTR lpLibFileName) {
 
         if (HookSystemTraySymbols(module)) {
             Wh_ApplyHookOperations();
+        } else {
+            // Transient symbol load failures are retried in the background
+            // instead of disabling the feature until reboot.
+            g_systemTrayModuleHooked = false;
+            MarkHooksFailedForRetry();
         }
     }
+}
+
+// Retry version of the system tray hooking, used by the retry worker.
+// Returns true when there's nothing left to do or the hooks succeeded.
+bool RetrySystemTrayHooks() {
+    if (!ShouldHookSystemTraySymbols() || g_systemTrayModuleHooked) {
+        return true;
+    }
+
+    HMODULE module = GetSystemTrayModuleHandle();
+    if (!module) {
+        return false;
+    }
+
+    // Keep in sync with HookSystemTraySymbols. Both name variants are listed
+    // (SystemTray.dll and Taskbar.View.dll); at most one of them exists, and
+    // both are optional, so the existing one is used.
+    static const DirectSymbolHook symbolHooks[] = {
+        {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::SystemTray::implementation::VolumeSystemTrayIconDataModel,struct winrt::SystemTray::IIconDataModel>::OnIconClicked(void *))",
+         (void**)&VolumeSystemTrayIconDataModel_OnIconClicked_Original,
+         (void*)VolumeSystemTrayIconDataModel_OnIconClicked_Hook, true},
+        {LR"(public: void __cdecl winrt::SystemTray::implementation::VolumeSystemTrayIconDataModel::OnIconClicked(struct winrt::SystemTray::IconClickedEventArgs const &))",
+         (void**)&VolumeSystemTrayIconDataModel_OnIconClicked_Original,
+         (void*)VolumeSystemTrayIconDataModel_OnIconClicked_Hook, true},
+    };
+
+    if (!HookSymbolsDirect(module, symbolHooks, ARRAYSIZE(symbolHooks))) {
+        return false;
+    }
+
+    g_systemTrayModuleHooked = true;
+    return true;
 }
 
 bool IsExplorerPatcherModule(HMODULE module) {
@@ -3017,6 +3282,12 @@ struct {
 } g_settings;
 
 std::atomic<bool> g_taskbarViewDllLoaded;
+
+// Track which per-app symbol hook sets succeeded, so the retry worker (see
+// the hook retry infrastructure at the top of the file) knows what to redo
+// after a transient symbol load failure (1.6.1).
+std::atomic<bool> g_perAppTaskbarDllHooksOk{false};
+std::atomic<bool> g_perAppViewHooksOk{false};
 
 IMMDeviceEnumerator* g_pDeviceEnumerator;
 
@@ -4192,7 +4463,7 @@ void LoadSettings() {
         Wh_GetIntSetting(L"perApp.noAutomaticMuteToggle");
 }
 
-bool HookTaskbarViewDllSymbols(HMODULE module) {
+bool HookTaskbarViewDllSymbols(HMODULE module, bool direct = false) {
     // Taskbar.View.dll
     WindhawkUtils::SYMBOL_HOOK symbolHooks[] = {
         {
@@ -4238,10 +4509,47 @@ bool HookTaskbarViewDllSymbols(HMODULE module) {
         },
     };
 
+    // direct: resolve without the engine's symbol cache and failure throttle
+    // (used by the retry worker after a transient symbol load failure).
+    if (direct) {
+        // Keep in sync with symbolHooks above.
+        static const DirectSymbolHook directHooks[] = {
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListButton,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnPointerWheelChanged(void *))",
+             (void**)&TaskListButton_OnPointerWheelChanged_Original,
+             (void*)TaskListButton_OnPointerWheelChanged_Hook, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListButton,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnPointerExited(void *))",
+             (void**)&TaskListButton_OnPointerExited_Original,
+             (void*)TaskListButton_OnPointerExited_Hook, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListButton,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnPointerMoved(void *))",
+             (void**)&TaskListButton_OnPointerMoved_Original,
+             (void*)TaskListButton_OnPointerMoved_Hook, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListButton,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnPointerPressed(void *))",
+             (void**)&TaskListButton_OnPointerPressed_Original,
+             (void*)TaskListButton_OnPointerPressed_Hook, false},
+            {LR"(struct winrt::Taskbar::TaskListWindowViewModel __cdecl TryGetItemFromContainer<struct winrt::Taskbar::TaskListWindowViewModel>(struct winrt::Windows::UI::Xaml::UIElement const &))",
+             (void**)&TryGetItemFromContainer_TaskListWindowViewModel_Original,
+             nullptr, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListWindowViewModel,struct winrt::Taskbar::ITaskListWindowViewModel>::get_TaskItem(void * *))",
+             (void**)&TaskListWindowViewModel_get_TaskItem_Original,
+             nullptr, false},
+            {LR"(struct winrt::Taskbar::TaskListGroupViewModel __cdecl TryGetItemFromContainer<struct winrt::Taskbar::TaskListGroupViewModel>(struct winrt::Windows::UI::Xaml::UIElement const &))",
+             (void**)&TryGetItemFromContainer_TaskListGroupViewModel_Original,
+             nullptr, false},
+            {LR"(public: bool __cdecl winrt::Taskbar::implementation::TaskListGroupViewModel::IsMultiWindow(void)const )",
+             (void**)&TaskListGroupViewModel_IsMultiWindow_Original,
+             nullptr, false},
+            {LR"(public: __cdecl winrt::impl::consume_WindowsUdk_UI_Shell_ITaskGroup<struct winrt::WindowsUdk::UI::Shell::ITaskGroup>::IsRunning(void)const )",
+             (void**)&ITaskGroup_IsRunning_Original,
+             (void*)ITaskGroup_IsRunning_Hook, false},
+        };
+
+        return HookSymbolsDirect(module, directHooks, ARRAYSIZE(directHooks));
+    }
+
     return HookSymbols(module, symbolHooks, ARRAYSIZE(symbolHooks));
 }
 
-bool HookTaskbarDllSymbols() {
+bool HookTaskbarDllSymbols(bool direct = false) {
     HMODULE module =
         LoadLibraryEx(L"taskbar.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (!module) {
@@ -4285,6 +4593,31 @@ bool HookTaskbarDllSymbols() {
         },
     };
 
+    if (direct) {
+        // Keep in sync with taskbarDllHooks above.
+        static const DirectSymbolHook directHooks[] = {
+            {LR"(public: virtual int __cdecl CTaskGroup::GetNumItems(void))",
+             (void**)&CTaskGroup_GetNumItems, nullptr, false},
+            {LR"(public: virtual struct HWND__ * __cdecl CWindowTaskItem::GetWindow(void))",
+             (void**)&CWindowTaskItem_GetWindow, nullptr, false},
+            {LR"(public: virtual struct HWND__ * __cdecl CImmersiveTaskItem::GetAppWindow(void))",
+             (void**)&CImmersiveTaskItem_GetAppWindow, nullptr, false},
+            {LR"(const CImmersiveTaskItem::`vftable')",
+             (void**)&CImmersiveTaskItem_vftable, nullptr, false},
+            {LR"(const CImmersiveTaskItem::`vftable'{for `ITaskItem'})",
+             (void**)&CImmersiveTaskItem_vftable_ITaskItem, nullptr, false},
+            {LR"(public: virtual long __cdecl CTaskListWnd::HandleClick(struct ITaskGroup *,struct ITaskItem *,struct winrt::Windows::System::LauncherOptions const &))",
+             (void**)&CTaskListWnd_HandleClick_Original,
+             (void*)CTaskListWnd_HandleClick_Hook, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::WindowsUdk::UI::Shell::implementation::TaskItem,struct winrt::WindowsUdk::UI::Shell::ITaskItem>::ReportClicked(void *))",
+             (void**)&TaskItem_ReportClicked_Original, nullptr, false},
+            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::WindowsUdk::UI::Shell::implementation::TaskGroup,struct winrt::WindowsUdk::UI::Shell::ITaskGroup>::ReportClicked(void *))",
+             (void**)&TaskGroup_ReportClicked_Original, nullptr, false},
+        };
+
+        return HookSymbolsDirect(module, directHooks, ARRAYSIZE(directHooks));
+    }
+
     return HookSymbols(module, taskbarDllHooks, ARRAYSIZE(taskbarDllHooks));
 }
 
@@ -4303,7 +4636,13 @@ void HandleLoadedModuleIfTaskbarView(HMODULE module, LPCWSTR lpLibFileName) {
         Wh_Log(L"Loaded %s", lpLibFileName);
 
         if (HookTaskbarViewDllSymbols(module)) {
+            g_perAppViewHooksOk = true;
             Wh_ApplyHookOperations();
+        } else {
+            // Transient symbol load failures are retried in the background
+            // instead of disabling the feature until reboot.
+            g_taskbarViewDllLoaded = false;
+            MarkHooksFailedForRetry();
         }
     }
 }
@@ -4327,14 +4666,20 @@ BOOL Init() {
     LoadSettings();
 
     if (!HookTaskbarDllSymbols()) {
+        Wh_Log(L"Per-app taskbar.dll hooks failed, will retry");
+        MarkHooksFailedForRetry();
         return FALSE;
     }
+    g_perAppTaskbarDllHooksOk = true;
 
     if (HMODULE taskbarViewModule = GetTaskbarViewModuleHandle()) {
-        g_taskbarViewDllLoaded = true;
         if (!HookTaskbarViewDllSymbols(taskbarViewModule)) {
+            Wh_Log(L"Per-app Taskbar.View.dll hooks failed, will retry");
+            MarkHooksFailedForRetry();
             return FALSE;
         }
+        g_taskbarViewDllLoaded = true;
+        g_perAppViewHooksOk = true;
     } else {
         Wh_Log(L"Taskbar view module not loaded yet");
     }
@@ -4358,11 +4703,48 @@ void AfterInit() {
                 Wh_Log(L"Got Taskbar.View.dll");
 
                 if (HookTaskbarViewDllSymbols(taskbarViewModule)) {
+                    g_perAppViewHooksOk = true;
                     Wh_ApplyHookOperations();
+                } else {
+                    g_taskbarViewDllLoaded = false;
+                    MarkHooksFailedForRetry();
                 }
             }
         }
     }
+}
+
+// Retry version of the per-app hooking, used by the retry worker. Returns
+// true when there's nothing left to do or the hooks succeeded.
+bool RetryHooksForRetryWorker() {
+    if (!g_perAppTaskbarDllHooksOk) {
+        if (!HookTaskbarDllSymbols(/*direct=*/true)) {
+            return false;
+        }
+        g_perAppTaskbarDllHooksOk = true;
+        Wh_Log(L"Per-app taskbar.dll hooks recovered");
+    }
+
+    if (!g_perAppViewHooksOk) {
+        HMODULE module = GetTaskbarViewModuleHandle();
+        if (!module) {
+            // The module should be loaded in explorer by now; if it really
+            // isn't (e.g. Windows 10), retrying is harmless but futile, and
+            // the worker gives up after its deadline.
+            return false;
+        }
+
+        if (!HookTaskbarViewDllSymbols(module, /*direct=*/true)) {
+            return false;
+        }
+
+        g_perAppViewHooksOk = true;
+        if (!g_taskbarViewDllLoaded.exchange(true)) {
+            Wh_Log(L"Per-app Taskbar.View.dll hooks recovered");
+        }
+    }
+
+    return true;
 }
 
 void WINAPI UninitFromTaskbarThread(void* parameter) {
@@ -4372,6 +4754,8 @@ void WINAPI UninitFromTaskbarThread(void* parameter) {
 
 void Uninit() {
     Wh_Log(L">");
+
+    ShutdownHookRetryWorker();
 
     HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd();
     if (hTaskbarWnd) {
@@ -4386,6 +4770,12 @@ void SettingsChanged() {
 }
 
 }  // namespace PerAppVolume
+
+// Defined here to be able to use the PerAppVolume namespace. See the hook
+// retry infrastructure near the top of the file.
+bool RetryPerAppHooks() {
+    return PerAppVolume::RetryHooksForRetryWorker();
+}
 
 BOOL Wh_ModInit() {
     Wh_Log(L">");
@@ -4467,9 +4857,14 @@ BOOL Wh_ModInit() {
 
     if (ShouldHookSystemTraySymbols()) {
         if (HMODULE systemTrayModule = GetSystemTrayModuleHandle()) {
-            g_systemTrayModuleHooked = true;
-            if (!HookSystemTraySymbols(systemTrayModule)) {
-                return FALSE;
+            if (HookSystemTraySymbols(systemTrayModule)) {
+                g_systemTrayModuleHooked = true;
+            } else {
+                // 1.6.1: 符号加载失败（如内存紧张时引擎加载 msdia/PDB 失败，
+                // ERROR_NOT_ENOUGH_MEMORY）不再让整个模组失效，只降级中键
+                // 静音并转入后台重试。滚动调音量、分应用音量等功能不受影响。
+                Wh_Log(L"System tray hooks failed, will retry");
+                MarkHooksFailedForRetry();
             }
         } else {
             Wh_Log(L"System tray module not loaded yet");

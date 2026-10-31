@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-Fluent 右键菜单
 // @description     Replaces the desktop and Explorer folder-tree context menus with a Fluent (WinUI2 MenuFlyout, acrylic) menu. Clean-room reimplementation based on static analysis of FluentContextMenu v0.5.0.
 // @description:zh-CN 把桌面和资源管理器左树的右键菜单换成 Fluent（WinUI2 MenuFlyout、亚克力）菜单；基于对 FluentContextMenu v0.5.0 的静态逆向分析净室重写。
-// @version         0.3.0
+// @version         0.3.1
 // @author          Heptalune
 // @license         GPL-3.0
 // @include         explorer.exe
@@ -28,10 +28,11 @@
 ## 功能
 
 - **只接管桌面 + 资源管理器左树**：其他窗口的右键菜单不受影响。
-- **三种菜单样式**（设置里随时切换）：
-  - **Win 11（Fluent）**：本模组的 Fluent 飞出菜单，渲染 shell 交给 `TrackPopupMenu` 的菜单数据（Win11 现代菜单 presenter 不干预）；
-  - **Win 10（Fluent）**：先拦截 Win11 现代菜单 presenter（强制 shell 走经典菜单构建链，与「Win 10 经典」同机制），再用本模组的 Fluent 管线渲染完整经典条目集——「经典内容 + Fluent 皮」（亚克力/圆角）；
-  - **Win 10 经典**：委托系统原生弹出完整经典菜单。0.2.x 时代经典菜单曾出现条目比原生少的问题（第三方 shell 扩展缺失），现按服务 GUID 拦截 presenter（不再受 Windows 更新变更查询 IID 影响，如 KB5052093 曾改过 IID），保证弹出的始终是带全部条目（含 WinRAR、Bandizip 等第三方扩展）的经典菜单；弹出的菜单由系统原生渲染，不经过本模组的 Fluent 管线。
+- **四种菜单样式**（设置里随时切换）：
+  - **Win 11（Fluent）**：本模组的 Fluent 飞出菜单，渲染 shell 交给 `TrackPopupMenu` 的菜单数据（Win11 现代菜单 presenter 不干预）——模组渲染，适合想要亚克力/圆角 Fluent 外观的场景；
+  - **Win 10（Fluent）**：先拦截 Win11 现代菜单 presenter（强制 shell 走经典菜单构建链，与「Win 10 经典」同机制），再用本模组的 Fluent 管线渲染完整经典条目集——「经典内容 + Fluent 皮」（亚克力/圆角）——模组渲染，适合既要完整第三方扩展条目又要 Fluent 外观的场景；
+  - **Win 10 经典**：委托系统原生弹出完整经典菜单。0.2.x 时代经典菜单曾出现条目比原生少的问题（第三方 shell 扩展缺失），现按服务 GUID 拦截 presenter（不再受 Windows 更新变更查询 IID 影响，如 KB5052093 曾改过 IID），保证弹出的始终是带全部条目（含 WinRAR、Bandizip 等第三方扩展）的经典菜单；弹出的菜单由系统原生渲染，不经过本模组的 Fluent 管线——完整条目原生弹出，适合想要原汁原味经典菜单的场景；
+  - **Win 11 原生**：不改动——Win11 现代菜单原样直通，本模组不接管、不渲染（presenter 拦截与菜单拦截在最外层短路放行，等同 0.2.x 的「Win11 原生（直通）」），适合不想让本模组碰右键菜单、仅保留随时切回其他样式能力的场景。
 - **亚克力背景 + 跟随系统深浅色**：MenuFlyout 使用 AcrylicBrush，主题跟随系统（仅 Fluent 两种样式）。
 - **紧凑模式**：更小的内边距与字号（仅 Fluent 两种样式生效）。
 - **完整保留 shell 行为**：菜单生命周期消息完整重放，shell 状态机不受影响；图标优先使用 shell 预渲染位图。
@@ -54,12 +55,13 @@
 ## 已知事项
 
 - 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。经典样式下每次弹出会记录放行的条目数，presenter 拦截会记录被拦的查询 IID，可与真实右键对比核对条目完整性。
-- 0.2.x 的「Win11 原生（直通）」选项已从设置列表移除；此前保存的 `win11` 值仍按直通处理，在设置里切换到任一样式后即被覆盖。
+- 「Win 11 原生」样式自 0.3.1 起恢复（0.3.0 曾从设置列表移除，即 0.2.x 的「Win11 原生（直通）」），新键值 `native`；期间保存的旧键值 `win11` 仍自动按该样式处理，在设置里重新选择后即被覆盖为 `native`。
 - 菜单样式选经典两种之一时依赖对 Win11 XAML presenter 的拦截（按服务 GUID 匹配，不依赖具体 IID），系统更新后理论上无需跟随适配；若行为异常请查看日志中 `presenter:` 行。
 - 「Win 10（Fluent）」与「Win 11（Fluent）」在当前 Windows 11 22H2 上渲染内容一致（`TrackPopupMenu` 携带的 HMENU 本就是完整经典条目集），两者差异在数据源保障：前者先拦截 presenter，确保数据始终来自经典菜单构建链（对未来改动现代菜单数据模型的系统更新更稳健）。
 
 ## 更新记录
 
+- **0.3.1**：恢复「Win 11 原生」样式选项（0.3.0 曾移除，新键值 `native`）：Win11 现代菜单完全原样直通——不接管、不渲染，`TrackPopupMenu` 拦截与 presenter 拦截（`IUnknown_QueryService` / `ShouldShowMiniMenu`，均无条件安装）在拦截体最前面短路放行，行为等同 0.2.x 的「Win11 原生（直通）」；经典委托门控（`IsClassicMenuStyle`）仍只对 Win 10 两种样式生效，旧键值 `win11` 自动映射到 `native`。
 - **0.3.0**：菜单样式重组为三选项：原「Fluent 样式（本 mod）」改名「Win 11（Fluent）」；新增「Win 10（Fluent）」——拦截 Win11 现代菜单 presenter 拿到完整经典条目集后由本模组 Fluent 管线（亚克力/圆角）自绘，即「经典内容 + Fluent 皮」；「Win 10 经典」落实完整委托：presenter 查询改按服务 GUID 拦截（不再受 KB 更新变更 IID 影响，修复 0.2.x 下经典菜单可能缺失 WinRAR/Bandizip 等第三方 shell 扩展条目的问题），TrackPopupMenu 原生放行由系统弹出完整经典菜单，桌面与资源管理器两种宿主一致，并新增放行条目数日志便于核对。「Win11 原生（直通）」选项从设置列表移除（历史保存值仍兼容处理）。
 - **0.2.2**：修复点击 Win11 菜单「显示更多选项」后经典二级菜单的显示问题。此前该二级菜单会被本模组再次接管渲染成飞出菜单，而飞出窗口显示时未被提升 Z 序：资源管理器里菜单被主窗口遮挡（图层错误），桌面上则完全被盖住、看起来无响应或反应极慢。现在检测到 Win11 现代菜单正在收起（其 XAML 弹窗仍可见且覆盖菜单弹出点）时，直接放行原生 TrackPopupMenu，经典二级菜单在桌面与资源管理器两种宿主下都以前台顶层正常弹出、不经过本模组的飞出/消息泵逻辑；另为飞出菜单窗口显示时增加 Z 序提升兜底（TOPMOST→NOTOPMOST 弹跳，不激活窗口），保证任何残余接管路径下菜单也不会被宿主窗口遮挡。
 - **0.2.1**：随 CW-Beautify v2.2.0 收编的初始整合版本。
@@ -82,12 +84,16 @@
     classic menu item set (the Win11 modern menu presenter is blocked first,
     same mechanism as win10) rendered by this mod's Fluent pipeline; win10 =
     Win 10 classic: delegate to the native classic menu with the complete item
-    set (third-party shell extensions included), popped up by the shell itself.
-  $description:zh-CN: fluent=Win 11(Fluent):本模组的 Fluent 飞出菜单,渲染 shell 交给 TrackPopupMenu 的菜单数据;win10fluent=Win 10(Fluent):完整经典菜单条目集由本模组 Fluent 管线渲染(先拦截 Win11 现代菜单 presenter,与 win10 同机制);win10=Win 10 经典:委托系统原生弹出完整经典菜单(条目完整,含第三方 shell 扩展)。
+    set (third-party shell extensions included), popped up by the shell itself;
+    native = Win 11 native: the Windows 11 modern menu is passed through
+    completely untouched — no interception, no rendering (the mod takes no
+    action at all).
+  $description:zh-CN: fluent=Win 11(Fluent):本模组的 Fluent 飞出菜单,渲染 shell 交给 TrackPopupMenu 的菜单数据;win10fluent=Win 10(Fluent):完整经典菜单条目集由本模组 Fluent 管线渲染(先拦截 Win11 现代菜单 presenter,与 win10 同机制);win10=Win 10 经典:委托系统原生弹出完整经典菜单(条目完整,含第三方 shell 扩展);native=Win 11 原生:Win11 现代菜单原样直通,本模组不接管、不渲染。
   $options:
   - fluent: Win 11（Fluent）
   - win10fluent: Win 10（Fluent）
   - win10: Win 10 经典
+  - native: Win 11 原生
 - CompactMode: false
   $name: Compact mode
   $name:zh-CN: 紧凑模式
@@ -182,8 +188,10 @@ static volatile LONG g_hookLogCount = 0;
 
 enum MenuStyle {
     MENU_STYLE_FLUENT = 0,       // Win 11 (Fluent): mod flyout, modern presenter left alone
-    MENU_STYLE_WIN11 = 1,        // deprecated: pass through to the native menu (kept for
-                                 // settings saved before 0.3.0; hidden from the options list)
+    MENU_STYLE_NATIVE = 1,       // Win 11 native: full pass-through — the Win11 modern menu
+                                 // is not intercepted or rendered anywhere (restored as a
+                                 // selectable style in 0.3.1; the pre-0.3.0 "win11" value
+                                 // maps here too)
     MENU_STYLE_WIN10 = 2,        // Win 10 classic: presenter blocked + native classic menu
     MENU_STYLE_WIN10_FLUENT = 3, // Win 10 (Fluent): presenter blocked + mod flyout
 };
@@ -198,8 +206,12 @@ void LoadSettings() {
     PCWSTR style = Wh_GetStringSetting(L"menuStyle");
     if (wcscmp(style, L"win10fluent") == 0) {
         g_settings.menuStyle = MENU_STYLE_WIN10_FLUENT;
-    } else if (wcscmp(style, L"win11") == 0) {
-        g_settings.menuStyle = MENU_STYLE_WIN11;
+    } else if (wcscmp(style, L"native") == 0 ||
+               // "win11" was the pre-0.3.0 passthrough option, removed from
+               // the list in 0.3.0 and restored as "native" in 0.3.1; keep
+               // accepting the old value for settings saved in between.
+               wcscmp(style, L"win11") == 0) {
+        g_settings.menuStyle = MENU_STYLE_NATIVE;
     } else if (wcscmp(style, L"win10") == 0) {
         g_settings.menuStyle = MENU_STYLE_WIN10;
     } else {
@@ -214,13 +226,16 @@ void LoadSettings() {
 // Classic menu styles: the Win11 modern menu presenter is blocked so the shell
 // builds and shows the classic Win32 menu chain (the only path that aggregates
 // third-party shell extension items like WinRAR/Bandizip), and the tree pane's
-// Win11 mini menu is off.
+// Win11 mini menu is off. Only win10 / win10fluent qualify — native must never
+// block the presenter (the hooks short-circuit for it before this check).
 static bool IsClassicMenuStyle() {
     return g_settings.menuStyle == MENU_STYLE_WIN10 ||
            g_settings.menuStyle == MENU_STYLE_WIN10_FLUENT;
 }
 
-// Fluent-rendered styles: this mod's XAML flyout replaces the menu.
+// Fluent-rendered styles: this mod's XAML flyout replaces the menu. Native is
+// neither flyout nor classic: the TrackPopupMenu hooks pass it straight
+// through at the outermost layer and ShowFluentMenuInternal never runs.
 static bool IsFlyoutMenuStyle() {
     return g_settings.menuStyle == MENU_STYLE_FLUENT ||
            g_settings.menuStyle == MENU_STYLE_WIN10_FLUENT;
@@ -254,6 +269,14 @@ HRESULT WINAPI IUnknown_QueryService_Hook(IUnknown* punk,
                                           const GUID& guidService,
                                           const IID& riid,
                                           void** ppvOut) {
+    // native style: the Win11 modern menu is left completely alone — the
+    // presenter query is never touched. Explicit outermost short-circuit (the
+    // hook is installed unconditionally); IsClassicMenuStyle() below already
+    // excludes native, this keeps the guarantee independent of it.
+    if (g_settings.menuStyle == MENU_STYLE_NATIVE) {
+        return IUnknown_QueryService_Original(punk, guidService, riid, ppvOut);
+    }
+
     if (IsClassicMenuStyle()) {
         // From shell32.dll, CDefView::TryGetContextMenuPresenter.
         constexpr GUID guidServiceTarget = {
@@ -281,6 +304,11 @@ using CNscTree_ShouldShowMiniMenu_t = bool(WINAPI*)(void* pThis, void* param1);
 CNscTree_ShouldShowMiniMenu_t CNscTree_ShouldShowMiniMenu_Original;
 
 bool WINAPI CNscTree_ShouldShowMiniMenu_Hook(void* pThis, void* param1) {
+    // native style: leave the tree pane's Win11 mini menu alone (same explicit
+    // outermost short-circuit as the IUnknown_QueryService hook).
+    if (g_settings.menuStyle == MENU_STYLE_NATIVE) {
+        return CNscTree_ShouldShowMiniMenu_Original(pThis, param1);
+    }
     if (IsClassicMenuStyle()) {
         return false;
     }
@@ -1341,16 +1369,17 @@ static void DumpMenuLevel(HMENU menu, const char* tag) {
 static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
                                   HWND hwnd) {
     // Style gate. Two styles render the flyout (fluent / win10fluent); the
-    // others pass the original TrackPopupMenu through. In the classic style
-    // (win10) the Win11 XAML presenter is blocked above (IUnknown_QueryService
-    // hook), so this TrackPopupMenu call carries the full classic menu — the
-    // chain that aggregates third-party shell extension items (WinRAR,
-    // Bandizip, ...) which the modern menu hides behind "Show more options".
-    // Handing it to the original function therefore pops up the complete
-    // native classic menu, rendered entirely by the shell (requirement:
-    // "Win 10 classic = delegate to the full native classic menu chain").
-    // The item count is logged so a real right-click can be verified against
-    // the log.
+    // others pass the original TrackPopupMenu through. native never reaches
+    // this point — it short-circuits inside the TrackPopupMenu hooks before
+    // any interception work happens. In the classic style (win10) the Win11
+    // XAML presenter is blocked above (IUnknown_QueryService hook), so this
+    // TrackPopupMenu call carries the full classic menu — the chain that
+    // aggregates third-party shell extension items (WinRAR, Bandizip, ...)
+    // which the modern menu hides behind "Show more options". Handing it to
+    // the original function therefore pops up the complete native classic
+    // menu, rendered entirely by the shell (requirement: "Win 10 classic =
+    // delegate to the full native classic menu chain"). The item count is
+    // logged so a real right-click can be verified against the log.
     if (!IsFlyoutMenuStyle()) {
         if (g_settings.menuStyle == MENU_STYLE_WIN10) {
             HOOK_LOG(L"gate: style=classic passthrough, items=%d",
@@ -1501,6 +1530,13 @@ static TrackPopupMenuEx_t TrackPopupMenuEx_Original;
 static BOOL WINAPI TrackPopupMenu_Hook(HMENU menu, UINT flags, int x, int y,
                                        int reserved, HWND hwnd,
                                        const RECT* rect) {
+    // native style: full pass-through at the outermost layer — no snapshot,
+    // no flyout, no pump, no logging; the mod is completely inert for menus
+    // (the pre-0.3.0 "win11" passthrough semantics).
+    if (g_settings.menuStyle == MENU_STYLE_NATIVE) {
+        return TrackPopupMenu_Original(menu, flags, x, y, reserved, hwnd,
+                                       rect);
+    }
     wchar_t cls[64] = L"";
     if (hwnd) {
         GetClassNameW(hwnd, cls, 64);
@@ -1518,6 +1554,11 @@ static BOOL WINAPI TrackPopupMenu_Hook(HMENU menu, UINT flags, int x, int y,
 
 static BOOL WINAPI TrackPopupMenuEx_Hook(HMENU menu, UINT flags, int x, int y,
                                          HWND hwnd, const RECT* rect) {
+    // native style: full pass-through at the outermost layer (see
+    // TrackPopupMenu_Hook).
+    if (g_settings.menuStyle == MENU_STYLE_NATIVE) {
+        return TrackPopupMenuEx_Original(menu, flags, x, y, hwnd, rect);
+    }
     HOOK_LOG(L"TrackPopupMenuEx called: hwnd=%p flags=0x%X", hwnd, flags);
     int id = ShowFluentMenuInternal(menu, flags, x, y, hwnd);
     if (id >= 0) {

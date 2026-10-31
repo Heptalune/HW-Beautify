@@ -372,7 +372,14 @@ $retiredMods = @(
     "local@cw-taskbar-thumbnail-settings", "local@cw-hide-desktop-icon-text",
     "local@cw-alt-drag", "local@cw-window-arrangement", "local@cw-invisible-borders",
     "local@cw-taskbar-clock-customization", "local@cw-tray-system-icons",
-    "local@cw-modern-folder-picker", "local@cw-modern-run-dialog"
+    "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
+    # v2.7.0：去焦点虚线框与 Windows 灵动岛按用户要求剔除；六模组并入更好的Windows（小细节）、
+    # 文件操作样式美化并入现代化的Windows
+    "local@cw-no-focus-rectangle", "dlc-local@cw-dynamic-island-windows",
+    "local@cw-extension-no-warning", "local@cw-explorer-double-click-up",
+    "local@cw-win11-power-buttons", "local@cw-drag-to-delete",
+    "local@cw-logon-logoff-shutdown-sounds", "local@cw-window-optimizer",
+    "local@cw-file-operation-styler"
     # 注：cw-file-operation-styler 在 v2.1.0 周期移除、v2.3.0 重新整合回归；
     # cw-better-volume-mixer 曾于 v2.3.0 回归、v2.5.0 再次按用户要求移除。
 )
@@ -496,17 +503,16 @@ $optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpape
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
     "local@cw-explorer-styler", "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-animation", "local@cw-window-optimizer",
-    "local@cw-extension-no-warning",
-    "local@cw-custom-context-menu", "local@cw-fluent-context-menu",
-    "local@cw-file-hover-info", "local@cw-settings-styler",
-    "local@cw-modernized",
-    "local@cw-drag-to-delete", "local@cw-taskbar-button-click",
-    "local@cw-explorer-double-click-up", "local@cw-file-operation-styler",
-    "local@cw-no-focus-rectangle", "local@cw-win11-power-buttons",
-    "local@cw-logon-logoff-shutdown-sounds",
-    "local@cw-desktop-quick-settings", "local@cw-centered-start-split-icons",
-    "local@cw-tray-area-settings", "local@cw-explorer-details-better-file-sizes"
+    "local@cw-taskbar-animation", "local@cw-taskbar-button-click",
+    "local@cw-taskbar-count-badges", "local@cw-taskbar-labels", "local@cw-taskbar-system-info",
+    "local@cw-tray-area-settings", "local@cw-centered-start-split-icons",
+    "local@cw-desktop-quick-settings", "local@cw-desktop-icon-size-fix",
+    "local@cw-explorer-details-better-file-sizes", "local@cw-explorer-info-bar-plus",
+    "local@cw-file-explorer-content-animation", "local@cw-file-hover-info",
+    "local@cw-disk-usage-bar-customizer", "local@cw-desktop-audio-visualizer-plus",
+    "local@cw-fluent-context-menu", "local@cw-custom-context-menu",
+    "local@cw-winui-context-menu-animation", "local@cw-modernized",
+    "local@cw-resource-redirect", "local@cw-settings-styler"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
 $dlcModIds = @(
@@ -864,14 +870,44 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "autoHide.hideDelay" 1 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.oldTaskbarOnWin11" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "autoHide.edgeDetection" 0 DWord $label
-        # 任务栏窗口最大化自动隐藏（maxHide.* 前缀，2.4.0 起并入；原独立模组
-        # CW-最大化自动隐藏任务栏 的设置不自动迁移，新功能默认关闭）
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.Enabled" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.mode" "intersected" String $label
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.foregroundWindowOnly" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.primaryMonitorOnly" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.oldTaskbarOnWin11" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "autoHide.maxHide.excludedPrograms" "" String $label
+        # 任务栏窗口最大化自动隐藏（2.4.2 起单独成组；2.4.0-2.4.1 的
+        # autoHide.maxHide.* 键迁移为 maxHide.*，仅新键缺失时写入）
+        $mhKeyMap = [ordered]@{
+            "autoHide.maxHide.Enabled" = "maxHide.Enabled"
+            "autoHide.maxHide.mode" = "maxHide.mode"
+            "autoHide.maxHide.foregroundWindowOnly" = "maxHide.foregroundWindowOnly"
+            "autoHide.maxHide.primaryMonitorOnly" = "maxHide.primaryMonitorOnly"
+            "autoHide.maxHide.oldTaskbarOnWin11" = "maxHide.oldTaskbarOnWin11"
+            "autoHide.maxHide.excludedPrograms" = "maxHide.excludedPrograms"
+        }
+        if ($script:IniStoreMode) {
+            foreach ($oldKey in $mhKeyMap.Keys) {
+                $oldVal = Get-IniValue $script:IniStorePath "Settings" $oldKey
+                if ($null -ne $oldVal) {
+                    Set-IniValueIfMissing $script:IniStorePath "Settings" $mhKeyMap[$oldKey] $oldVal
+                }
+            }
+        } else {
+            $mhKey = Open-HklmKey $settingsPath
+            try {
+                $mhNames = @($mhKey.GetValueNames())
+                foreach ($oldKey in $mhKeyMap.Keys) {
+                    if ($mhNames -contains $oldKey) {
+                        $kind = $mhKey.GetValueKind($oldKey)
+                        $type = if ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord) { "DWord" } else { "String" }
+                        Set-RegValueIfMissing $settingsPath $mhKeyMap[$oldKey] $mhKey.GetValue($oldKey) $type $label
+                    }
+                }
+            } finally {
+                $mhKey.Close()
+            }
+        }
+        Set-RegValueIfMissing $settingsPath "maxHide.Enabled" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.mode" "intersected" String $label
+        Set-RegValueIfMissing $settingsPath "maxHide.foregroundWindowOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.primaryMonitorOnly" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.oldTaskbarOnWin11" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "maxHide.excludedPrograms" "" String $label
         # 任务栏弹性药丸（pill.* 前缀，2.2.0 起并入，原独立模组的键）
         Set-RegValueIfMissing $settingsPath "pill.Dimensions" "16, 3" String $label
         Set-RegValueIfMissing $settingsPath "pill.Margins" "0, 5" String $label
@@ -903,14 +939,29 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "Transparent" 1 DWord $label
     }
 
-    if ($id -eq "local@cw-win11-power-buttons") {
-        $label = "Win11 Power Buttons"
-        Set-RegValueIfMissing $settingsPath "enableShutdown" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableRestart" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableSignout" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableSleep" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableHibernate" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "enableLock" 0 DWord $label
+    # v2.7.0 大合并：更好的Windows（小细节）新增功能组种子（enable 开关与关键项；
+    # 2.4.0 起 maxHide.* 单独成组迁移见 taskbar-animation 块）
+    if ($id -eq "local@cw-desktop-quick-settings") {
+        $label = "Better Windows Details"
+        Set-RegValueIfMissing $settingsPath "extWarn.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "dblUp.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableShutdown" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableRestart" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableSignout" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableSleep" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableHibernate" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "powerBtn.enableLock" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "dragDel.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "sndLog.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "sndLog.xpmode" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "sndLog.hookonsessionchange" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.enable" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.altDrag.enable" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.altDrag.moveTrigger.alt" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.winArrange.enable" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.winArrange.SnapWindowsWhenDragging" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "winOpt.invisBorders.enable" 1 DWord $label
     }
 
     if ($id -eq "local@cw-desktop-quick-settings") {

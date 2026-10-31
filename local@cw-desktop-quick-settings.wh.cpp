@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-更好的Windows（小细节）
 // @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, double-click to go up in File Explorer, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
 // @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；双击资源管理器空白处返回上级；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
-// @version         2.0.0
+// @version         2.0.1
 // @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, wrldspawn, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
@@ -197,6 +197,7 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 
 ## 变更记录
 
+- **2.0.1**：修复纯净化图标「隐藏 UAC 管理员盾牌」开启后，管理员权限快捷方式图标左下角（原盾牌位置）残留小方框轮廓的问题。实测根因：机器上遗留的注册表 Shell Icons 重定向（如 `29/77 → imageres.dll,197`）会在 explorer 图标缓存重建时把该"空"图标重新回填进 SIID_SHIELD 的系统图像槽位，而 imageres,197 并非全空——各尺寸帧都残留少量底部阴影像素（48px 约 142 个、96px 约 588 个），绘制出来即小方框；初始化的一次性图像列表补丁覆盖不了回填。现新增盾牌槽位回填校验：桌面绘制期按 1s 节流检查各系统图像列表中 SIID_SHIELD 槽位是否仍为自建全透明图标（32bpp 全零 alpha 校验），发现回填立即整体重新打补丁并重绘桌面；空白图标本体无改动（自建 32bpp 全零 alpha + 全 1 掩码的 CreateIconIndirect 全透明图标，`ImageList_ReplaceIcon` 与 `SHGetStockIconInfo` 替换两处统一使用，按目标图像列表实际尺寸各建一份、钩子用缓存复用）。
 - **2.0.0**：模组更名「CW-更好的Windows（小细节）」（id 与文件名保持 cw-desktop-quick-settings 不变），定位升级为 Windows 细节功能大合集。并入六个独立模组，成为四个既有分组之外的新分组：`extWarn.*`「扩展名警告」（上游 m417z Turn off change file extension warning 1.0.1，GPL-3.0，总开关默认关闭）、`dblUp.*`「双击返回上级」（上游 wrldspawn Explorer Double Click Up 1.0.1，GPL-3.0，总开关默认关闭，CreateWindowExW 钩子并入共享钩子分发）、`powerBtn.*`「开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2，MIT 惯例，总开关默认关闭，总开关关闭时恢复原生电源按钮）、`dragDel.*`「拖拽删除」（上游 iMAboud Drag to Delete 1.0.0，MIT，总开关默认关闭）、`sndLog.*`「登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3，MIT 惯例，总开关默认关闭）与 `winOpt.*`「窗口优化」（原 CW-窗口优化 1.1.0 整体并入，两级嵌套分组：组级总开关 + altDrag.* / winArrange.* / invisBorders.* 三个子分组，键名结构不变）。为覆盖窗口优化的跨进程钩子，`@include` 由 explorer.exe 改为 `*` 并排除 windhawk.exe / windhawk-ui.exe / devenv.exe，各分组按进程门控（桌面八组仅 explorer、电源按钮按 StartMenuExperienceHost/explorer 分流、窗口优化全进程）；移除 `@architecture x86-64` 单架构声明，x86 与 x64 双架构编译（并入代码已按本包铁律复核/修复无捕获 lambda 直传 stdcall 回调问题）。原六个独立模组源码文件移除，由本模组统一提供；旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
 - **1.4.0**：四个功能分组各新增「启用本组功能」总开关（组内第一项、默认开启）：`peek.enable`、`toggleIcons.enable`、`marquee.enable`、`purity.enable`。实现为运行时短路 + 分组级挂接管理：预览与框选在触发入口直通原逻辑，桌面图标隐藏按开关动态挂接/摘除桌面窗口子类，纯净化按开关跳过或还原图像列表补丁；全部沿用各分组现有的设置变更重载路径，切换即时生效、无需重启资源管理器。
 - **1.3.0**：并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak，MIT 惯例，汉化版 1.6.0），成为第四个可收起分组「纯净化图标」（Purity）：隐藏桌面图标文字（保留文件夹名）、移除快捷方式小箭头，并可选择性隐藏 UAC 管理员盾牌角标（默认关闭）。设置项迁移为 `purity.hideText` / `purity.hideArrows` / `purity.hideShields`；原模组的 CreateWindowExW 钩子并入文件末尾的共享钩子统一分发。
@@ -3740,6 +3741,10 @@ void SmoothIconsNotifySettingsChanged() {
 //     槽位与 SIID_SHIELD 图像项原位替换为空白图标；另挂钩 SHGetFileInfoW
 //     （剥离 SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX，拦截提取期合成——Win11
 //     桌面可见盾牌的关键层）与 SHGetStockIconInfo（SIID_SHIELD 直接返回空白）。
+//   • 盾牌槽位回填校验（2.0.1）：explorer 图标缓存会按注册表 Shell Icons 重定向
+//     把“非全空”的空图标（如 imageres,197，各尺寸残留底部阴影像素）重新回填进
+//     SIID_SHIELD 槽位，表现为管理员快捷方式左下角残留小方框；桌面绘制期按 1s
+//     节流校验槽位内容，发现回填即整体重新打补丁（详见校验函数注释）。
 //   • 初始化时序（上游 2.5.0 实测结论，原样保留）：SHChangeNotify 必须先于
 //     图像列表补丁（通知会重建图像列表，先打补丁会被整体丢弃）。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3756,6 +3761,9 @@ static struct {
 // 桌面文件夹显示名缓存（隐藏文字时用于保留文件夹名）。
 static std::unordered_set<std::wstring> PurityFolderNames;
 static DWORD PurityLastUpdateTick = 0;
+
+// 盾牌槽位回填校验的节流时钟（桌面 WM_PAINT 内 1s 一次，见校验函数注释）。
+static DWORD PurityLastShieldVerifyTick = 0;
 
 // SHGetStockIconInfo 钩子用的空白盾牌图标缓存：[0] = 标准尺寸，[1] = 小尺寸。
 // 在初始化/设置重载时按需预创建（避免在钩子内懒初始化产生线程竞争）。
@@ -3848,14 +3856,23 @@ static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
 // Subclass
 // ---------------------------------------------------------------------------
 
+static void PurityOnDesktopPaintShieldVerify(HWND hWnd);
+
 static LRESULT CALLBACK PurityDesktopListSubclass(HWND hWnd, UINT uMsg, WPARAM wParam,
                                                   LPARAM lParam, DWORD_PTR dwRefData) {
-    if (uMsg == WM_PAINT && PuritySettings.enable && PuritySettings.hideText) {
-        PurityUpdateFolderCache();
-        PurityIsDrawingDesktop = true;
-        LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
-        PurityIsDrawingDesktop = false;
-        return res;
+    if (uMsg == WM_PAINT && PuritySettings.enable) {
+        // 盾牌槽位回填校验（hideShields 开启时；1s 节流，详见校验函数注释）。
+        // 放在 DefSubclassProc 之前，让本帧绘制尽量用上重新置空后的槽位内容。
+        if (PuritySettings.hideShields) {
+            PurityOnDesktopPaintShieldVerify(hWnd);
+        }
+        if (PuritySettings.hideText) {
+            PurityUpdateFolderCache();
+            PurityIsDrawingDesktop = true;
+            LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
+            PurityIsDrawingDesktop = false;
+            return res;
+        }
     }
 
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -3935,6 +3952,10 @@ static HICON PurityCreateTransparentIcon(int cx, int cy) {
     return hIcon;
 }
 
+// 系统图像列表接口 IID（IImageList），打补丁与回填校验共用。
+static const GUID PurityIidImageList =
+    {0x46eb5926, 0x582e, 0x4017, {0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x09, 0x50}};
+
 // 把箭头/盾牌的 overlay 槽位与 SIID_SHIELD 系统图像项替换为空白图标。
 // 机制说明（上游 1.6.0 调研结论）：
 //  - 箭头：overlay 槽位由 SHGetIconOverlayIndex(nullptr, IDO_SHGIOI_LINK) 解析，
@@ -3943,6 +3964,8 @@ static HICON PurityCreateTransparentIcon(int cx, int cy) {
 //    表中，可置空对应槽位；同时把 SIID_SHIELD 在系统图像列表中的图像项原位替换
 //    为空白（ReplaceIcon 保持索引不变）。但 Win11 桌面可见的盾牌主要来自提取期
 //    合成（见下方 SHGetFileInfoW 钩子），本函数与其配合使用。
+//  - 2.0.1 补充：一次性补丁会被 explorer 图标缓存按注册表 Shell Icons 重定向的
+//    回填覆盖（详见下方回填校验段），需配合桌面绘制期的节流校验保持持久。
 static void PurityPatchOverlayImageLists() {
     HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
     if (!hShell32) return;
@@ -3990,9 +4013,6 @@ static void PurityPatchOverlayImageLists() {
         return;
     }
 
-    static const GUID PurityIidImageList =
-        {0x46eb5926, 0x582e, 0x4017, {0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x09, 0x50}};
-
     const int sizes[] = { 1, 0, 2, 3, 4 }; // SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE, SHIL_SYSSMALL, SHIL_JUMBO
     for (int shil : sizes) {
         IImageList* piml = nullptr;
@@ -4028,6 +4048,112 @@ static void PurityPatchOverlayImageLists() {
             }
         }
         piml->Release();
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 盾牌槽位回填校验（hideShields 持久性保障，2.0.1 新增）
+// 实测（Win11 22621 + 机器上遗留的注册表 Shell Icons 重定向 29/77 →
+// imageres.dll,197）：初始化补丁把 SIID_SHIELD 的系统图像槽位替换为自建全透明
+// 图标后，explorer 的图标缓存会在后续列表重建/槽位回填时按重定向把“空图标”
+// 重新装入该槽位。而这类经典“空”图标并非全空——imageres,197 各尺寸帧都残留
+// 少量底部阴影像素（48px 实测约 142 个、96px 约 588 个），绘制出来就是管理员
+// 快捷方式图标左下角的小方框轮廓。一次性补丁覆盖不了回填，故在桌面绘制期
+// 节流校验槽位内容，发现回填即整体重新打补丁（补丁幂等：重新解析索引、
+// 重新置空、重新挂 overlay 槽位）。
+// ---------------------------------------------------------------------------
+
+// 判断图像列表指定索引的图像是否“真全透明”（无任何可见像素）。
+// GetIcon 失败时按空白处理：无法证明有内容时不触发重打补丁。
+static bool PurityImageListEntryIsBlank(IImageList* piml, int index) {
+    HICON hIcon = nullptr;
+    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
+
+    bool blank = true;
+    ICONINFO ii = {};
+    if (GetIconInfo(hIcon, &ii)) {
+        BITMAP bm = {};
+        if (ii.hbmColor && GetObject(ii.hbmColor, sizeof(bm), &bm) &&
+            bm.bmWidth > 0 && bm.bmHeight > 0 && bm.bmBitsPixel >= 24) {
+            BITMAPINFO bi = {};
+            bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            bi.bmiHeader.biWidth = bm.bmWidth;
+            bi.bmiHeader.biHeight = -bm.bmHeight;
+            bi.bmiHeader.biPlanes = 1;
+            bi.bmiHeader.biBitCount = 32;
+            bi.bmiHeader.biCompression = BI_RGB;
+            std::vector<BYTE> bits((size_t)bm.bmWidth * bm.bmHeight * 4);
+            HDC hdc = GetDC(nullptr);
+            if (GetDIBits(hdc, ii.hbmColor, 0, bm.bmHeight, bits.data(), &bi, DIB_RGB_COLORS)) {
+                // 自建全透明图标全部像素 alpha=0；回填的系统图标（盾牌本体或
+                // imageres,197 一类“空”图标）至少有少量 alpha>0 的像素。
+                // 阈值取 8：可抓住 16px 下约 14 像素的残影，同时不受压缩噪声影响。
+                int content = 0;
+                if (bm.bmBitsPixel == 32) {
+                    for (size_t i = 3; i < bits.size(); i += 4) {
+                        if (bits[i] != 0 && ++content > 8) break;
+                    }
+                } else {
+                    for (size_t i = 0; i + 2 < bits.size(); i += 4) {
+                        if ((bits[i] | bits[i + 1] | bits[i + 2]) != 0 && ++content > 8) break;
+                    }
+                }
+                blank = content <= 8;
+            }
+            ReleaseDC(nullptr, hdc);
+        }
+        if (ii.hbmColor) DeleteObject(ii.hbmColor);
+        if (ii.hbmMask) DeleteObject(ii.hbmMask);
+    }
+    DestroyIcon(hIcon);
+    return blank;
+}
+
+// 任一系统图像列表的 SIID_SHIELD 槽位出现可见内容即返回 true（需要重新补丁）。
+static bool PurityShieldSlotRefilled() {
+    HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
+    if (!hShell32) return false;
+    auto pSHGetImageList = (HRESULT(WINAPI*)(int, REFIID, void**))
+        GetProcAddress(hShell32, "SHGetImageList");
+    if (!pSHGetImageList) return false;
+
+    int shieldSysIdxLarge = -1;
+    int shieldSysIdxSmall = -1;
+    SHSTOCKICONINFO sii = {};
+    sii.cbSize = sizeof(sii);
+    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
+        shieldSysIdxLarge = sii.iSysImageIndex;
+    }
+    SHSTOCKICONINFO siiSmall = {};
+    siiSmall.cbSize = sizeof(siiSmall);
+    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON, &siiSmall))) {
+        shieldSysIdxSmall = siiSmall.iSysImageIndex;
+    }
+    if (shieldSysIdxLarge < 0 && shieldSysIdxSmall < 0) return false;
+
+    const int sizes[] = { 1, 0, 2, 3, 4 }; // 与 PurityPatchOverlayImageLists 相同集合
+    for (int shil : sizes) {
+        IImageList* piml = nullptr;
+        if (FAILED(pSHGetImageList(shil, PurityIidImageList, (void**)&piml)) || !piml) continue;
+        bool isSmallList = (shil == 1 || shil == 3);
+        int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
+        bool blank = shieldSysIdx < 0 || PurityImageListEntryIsBlank(piml, shieldSysIdx);
+        piml->Release();
+        if (!blank) return true;
+    }
+    return false;
+}
+
+// 桌面绘制期的节流校验入口（1s 一次；发现回填即重新打补丁并触发重绘）。
+static void PurityOnDesktopPaintShieldVerify(HWND hWnd) {
+    DWORD now = GetTickCount();
+    if (PurityLastShieldVerifyTick != 0 && now - PurityLastShieldVerifyTick < 1000) return;
+    PurityLastShieldVerifyTick = now;
+    if (PurityShieldSlotRefilled()) {
+        PurityPatchOverlayImageLists();
+        // 触发一次重绘，让重新置空后的槽位内容立即可见（下一帧校验为空白，
+        // 不会形成循环）。
+        InvalidateRect(hWnd, nullptr, TRUE);
     }
 }
 

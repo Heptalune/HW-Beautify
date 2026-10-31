@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-UAC 提示管理
 // @description     Manages Windows UAC elevation behavior: prompt level plus a RunAsInvoker whitelist, with an all-Chinese settings UI. Configures documented system policy values; it does not intercept UAC prompts.
 // @description:zh-CN 管理 Windows「用户帐户控制（UAC）」的提权行为配置：提权提示档位 + RunAsInvoker 提权白名单，纯中文设置界面。管理系统的 UAC 提权配置，不拦截 UAC 弹窗。
-// @version         1.0.0
+// @version         1.0.1
 // @author          Heptalune
 // @include         windhawk.exe
 // @compilerOptions -ladvapi32 -lshell32
@@ -127,7 +127,7 @@ CW-Beautify 整合包（作者 Heptalune）**原创**模组。
 
 // ==WindhawkModSettings==
 /*
-- operatingMode: 0
+- operatingMode: "0"
   $name: Operating Mode
   $name:zh-CN: 工作模式
   $description: >-
@@ -152,7 +152,7 @@ CW-Beautify 整合包（作者 Heptalune）**原创**模组。
   - 0: 无操作（默认）
   - 1: 应用配置
   - 2: 恢复系统默认
-- uacLevel: 0
+- uacLevel: "0"
   $name: Elevation Prompt Level
   $name:zh-CN: 提权提示档位
   $description: >-
@@ -321,8 +321,12 @@ std::wstring NormalizePath(PCWSTR input) {
 
 ModSettings LoadSettings() {
     ModSettings settings;
-    settings.operatingMode = Wh_GetIntSetting(L"operatingMode");
-    settings.uacLevel = Wh_GetIntSetting(L"uacLevel");
+    PCWSTR operatingModeStr = Wh_GetStringSetting(L"operatingMode");
+    settings.operatingMode = _wtoi(operatingModeStr);
+    Wh_FreeStringSetting(operatingModeStr);
+    PCWSTR uacLevelStr = Wh_GetStringSetting(L"uacLevel");
+    settings.uacLevel = _wtoi(uacLevelStr);
+    Wh_FreeStringSetting(uacLevelStr);
     settings.whitelistEnabled = Wh_GetIntSetting(L"whitelistEnabled") != 0;
 
     for (int index = 0;; index++) {

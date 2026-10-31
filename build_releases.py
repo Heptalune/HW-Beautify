@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-# CW-Beautify v2.6.0 打包清单
+# CW-Beautify v2.7.0 打包清单
 # 模组构成：21 核心 + 3 可选 + 8 DLC 额外内容（tool mod）= 32 个
 # 用法：在本目录（源码根）执行 python build_releases.py，
 # 生成的 zip 复制到 上一级的「发布包」目录发布。
@@ -14,24 +14,24 @@ common_files = [
     'local@cw-explorer-styler.wh.cpp',
     'local@cw-taskbar-volume-control.wh.cpp',
     'local@cw-taskbar-animation.wh.cpp',
-    'local@cw-extension-no-warning.wh.cpp',
     'local@cw-custom-context-menu.wh.cpp',
     'local@cw-desktop-quick-settings.wh.cpp',
     'local@cw-fluent-context-menu.wh.cpp',
+    'local@cw-explorer-info-bar-plus.wh.cpp',
+    'local@cw-disk-usage-bar-customizer.wh.cpp',
+    'local@cw-taskbar-count-badges.wh.cpp',
+    'local@cw-taskbar-system-info.wh.cpp',
+    'local@cw-taskbar-labels.wh.cpp',
+    'local@cw-resource-redirect.wh.cpp',
+    'local@cw-desktop-audio-visualizer-plus.wh.cpp',
+    'local@cw-desktop-icon-size-fix.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
-    'local@cw-file-operation-styler.wh.cpp',
-    'local@cw-drag-to-delete.wh.cpp',
-    'local@cw-window-optimizer.wh.cpp',
     'local@cw-tray-area-settings.wh.cpp',
     'local@cw-modernized.wh.cpp',
     'local@cw-taskbar-button-click.wh.cpp',
     'local@cw-winui-context-menu-animation.wh.cpp',
     'local@cw-file-explorer-content-animation.wh.cpp',
-    'local@cw-no-focus-rectangle.wh.cpp',
-    'local@cw-win11-power-buttons.wh.cpp',
-    'local@cw-logon-logoff-shutdown-sounds.wh.cpp',
-    'local@cw-explorer-double-click-up.wh.cpp',
     'local@cw-centered-start-split-icons.wh.cpp',
     'local@cw-explorer-details-better-file-sizes.wh.cpp',
     # 部署 / 卸载脚本（deploy-dlc 为 DLC 额外内容添加程序，与主部署分开运行）
@@ -47,10 +47,14 @@ common_files = [
     'CHANGELOG_CW-Beautify_v2.5.0.md',
     'CHANGELOG_CW-Beautify_v2.5.1.md',
     'CHANGELOG_CW-Beautify_v2.6.0.md',
+    'CHANGELOG_CW-Beautify_v2.7.0.md',
     'README.md',
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
     'tools/CW-Beautify-StartupCheck.ps1',  # optional, installed only with -StartupCheck
+    'tools/UAC-白名单管理.ps1',
+    'deploy-gui.bat',
+    'deploy-gui.ps1',
     # 可选 mod（3 个，仅在部署时选择安装才启用）
     'optional/local@cw-windows-animations.wh.cpp',
     'optional/local@cw-live-video-wallpaper.wh.cpp',
@@ -58,20 +62,20 @@ common_files = [
     # DLC 额外内容（8 个 tool mod，引发 windhawk.exe 宿主进程、内存占用较高，
     # 由 deploy-dlc.ps1 单独安装、用户自选安装，主部署不扫描 dlc\ 目录）
     'dlc/local@cw-shake-find-cursor.wh.cpp',
-    'dlc/local@cw-overhauled-alt-tab.wh.cpp',
     'dlc/local@cw-alt-tab-flip-3d.wh.cpp',
     'dlc/local@cw-mac-island-dock.wh.cpp',
     'dlc/local@cw-quick-launch-dock.wh.cpp',
-    'dlc/local@cw-dynamic-island-windows.wh.cpp',
+    'dlc/local@cw-tray-hover-expand.wh.cpp',
+    'dlc/local@cw-uac-prompt-manager.wh.cpp',
 ]
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.6.0.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.6.0_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.7.0.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.7.0_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：
-#   'CW-Beautify_OneKeyDeploy_v2.6.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
+#   'CW-Beautify_OneKeyDeploy_v2.7.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
 
 for zip_name, file_list in releases.items():
     print(f"正在创建 {zip_name}...")

@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-自定义右键菜单
 // @description     Instantly-opening cached Explorer context menu that is fully customizable: themes, layout, colors, animations, rules, and custom commands.
 // @description:zh-CN 把资源管理器右键菜单换成自绘的即时打开菜单，主题、布局、颜色、动画、规则全面可自定义。
-// @version         1.1.3
+// @version         1.1.4
 // @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lole32 -lshlwapi -luuid -lcomctl32 -ladvapi32 -lgdi32 -luxtheme -lversion -ld3d11 -ld2d1 -ldwrite -ldcomp
@@ -14,7 +14,8 @@
 // ==/WindhawkMod==
 
 // CW-Beautify 整合说明：汉化元数据、说明与设置文案；v1.1.3 起自绘菜单的核心骨架标签
-// 也已全部汉化（见下第 1 条），其余代码逻辑与上游 1.1.1 一致。
+// 也已全部汉化（见下第 1 条）；v1.1.4 起新增本地修复逻辑——第三方扩展菜单标题乱码
+// 修复与缓存坏条目自愈（见更新日志 1.1.4），其余代码逻辑与上游 1.1.1 一致。
 // 原版 mod：https://windhawk.net/mods/custom-cached-context-menu
 //
 // 设置外汉化说明（用户可见英文清单）：除 Windhawk 设置界面外，本模组在自绘菜单与生成的
@@ -139,6 +140,7 @@
 
 ## 更新日志
 
+- **1.1.4**：修复第三方 shell 扩展菜单标题乱码（例如右键 .md 文件时出现的「⋯ 籭村吣闠窎"」一类）：此类扩展经 ANSI 菜单接口写入的标题实为 UTF-8 字节，被系统按当前代码页（中文系统为 GBK）解码成乱码宽字符，模组捕获后写进缓存，导致每次打开都复现。现做两层修复——① 标题进入缓存的入口做双重转换修复（宽字符 → 系统 ANSI 字节 → 按 UTF-8 严格重解码；每步强校验，校验不过一律保留原文，绝不二次损坏）；② 缓存读取自愈：旧缓存里的乱码标题自动修复并写回，含替换符（U+FFFD）或私用区字符的坏条目整条丢弃，下次打开该菜单时按现有机制重新捕获。普通命令项与带子菜单的扩展标题走同一条捕获路径，一并修复。**更新后重启资源管理器即可生效**，旧缓存无需手动清除；若该扩展的标题在原生菜单（停用本模组）里同样是乱码，则乱码来自扩展自身，需向其开发者反馈。
 - **1.1.3**：右键菜单里的内建英文文字全部汉化（打开、打开方式、剪切、复制、粘贴、重命名、删除、创建快捷方式、发送到、复制文件地址、属性、刷新、查看、排序方式、分组依据、升序/降序、新建、新建文件夹、显示设置、个性化、显示经典菜单、更多选项、菜单设置… 等约 60 处），并同步更新了对应的匹配逻辑（「发送到」子菜单识别、「更多选项」子菜单默认标签与 menu.ini 示例等），菜单行为不变。**更新后请在模组设置里执行一次清除缓存，或重启资源管理器**，让新文字与重新构建的菜单立即生效；若「更多选项」子菜单标签未变化，说明设置里保存过旧默认值 More options，重置该项即可。菜单内设置界面（外观编辑器）的文案暂仍为英文。
 
 ## 致谢与许可
@@ -13932,6 +13934,174 @@ std::wstring CacheFilePath() {
     return std::wstring(storagePath) + L"\\menu-cache.bin";
 }
 
+// ===========================================================================
+// [CMO:Mojibake] 第三方扩展标题乱码修复（CW-Beautify 本地新增，上游无此逻辑）。
+// 背景：部分 shell 扩展经 ANSI 菜单接口（AppendMenuA/InsertMenuA 等）写入标题，
+// 其 ANSI 串里装的却是 UTF-8 字节；shell 用 CP_ACP（中文系统为 GBK/936）把字节
+// 解码成宽字符后，HMENU 里得到的就是乱码标题。模组经 GetMenuStringW 原样捕获
+// 并写进缓存（缓存本身按 UTF-16 原样序列化，无编码转换），于是每次打开都复现。
+// 修复分两层：捕获入口规范化（NormalizeCapturedLabel，见 BuildItemsFromHMenu）
+// 与缓存读取自愈（RepairOrDetectBadLabels，见 Cache::Load，老版本写入的坏条目
+// 无需手动清缓存即可修复/重建）。
+// ===========================================================================
+
+// 替换符（U+FFFD）与私用区（U+E000-U+F8FF）字符不可能出现在正常菜单标题里，
+// 命中即视为坏条目（触发丢弃重建）。
+bool LabelHasBadChars(const std::wstring& text) {
+    for (wchar_t c : text) {
+        if (c == 0xFFFD || (c >= 0xE000 && c <= 0xF8FF)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+namespace {
+
+// 修复结果必须全部落在「可信菜单文字」范围内才采纳：ASCII、拉丁/希腊/西里尔
+// 字母、常用标点、中日韩文字与全角形式。控制符、代理区、符号区、未分配平面
+// 等一律拒绝——宁可保留乱码原文，也不二次损坏。
+bool RepairedLabelLooksClean(const std::wstring& text) {
+    for (wchar_t c : text) {
+        const bool ok = c == L'\t' || (c >= 0x20 && c <= 0x7E) ||
+                        (c >= 0x00A0 && c <= 0x024F) ||
+                        (c >= 0x0370 && c <= 0x04FF) ||
+                        (c >= 0x2000 && c <= 0x206F) ||
+                        (c >= 0x2160 && c <= 0x217F) ||
+                        (c >= 0x2460 && c <= 0x24FF) ||
+                        (c >= 0x3000 && c <= 0x30FF) ||
+                        (c >= 0x3400 && c <= 0x4DBF) ||
+                        (c >= 0x4E00 && c <= 0x9FFF) ||
+                        (c >= 0xAC00 && c <= 0xD7AF) ||
+                        (c >= 0xF900 && c <= 0xFAFF) ||
+                        (c >= 0xFF00 && c <= 0xFFEF);
+        if (!ok) {
+            return false;
+        }
+    }
+    return true;
+}
+
+}  // namespace
+
+// 双重转换修复「UTF-8 字节被按系统 ANSI 解码」类乱码：先把宽字符转回 ANSI
+// 字节（还原出原始 UTF-8 字节流），再按 UTF-8 严格重解码。每一步都强校验，
+// 正常标题不可能被改写：宽→ANSI 不允许 best-fit/'?' 默认替换且必须能原样
+// 解码回原文（无损往返）；字节流必须是合法 UTF-8；结果必须通过上面的
+// 「可信菜单文字」校验且与原文不同。任一条件不满足即放弃，保留原文。
+bool TryRepairUtf8Mojibake(const std::wstring& text, std::wstring& repaired) {
+    if (text.size() < 2 || text.size() > kMaxStringChars) {
+        return false;
+    }
+    bool hasNonAscii = false;
+    for (wchar_t c : text) {
+        if (c >= 0x80) {
+            hasNonAscii = true;
+            break;
+        }
+    }
+    if (!hasNonAscii) {
+        return false;  // 纯 ASCII 无需修复
+    }
+
+    // 第 1 步：宽 → ANSI 字节（WC_NO_BEST_FIT_CHARS + 默认字符检测，出现
+    // 任何替代映射说明该宽文本不是从 ANSI 字节原样解码而来）。
+    const int byteCount =
+        WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, text.c_str(),
+                            static_cast<int>(text.size()), nullptr, 0, nullptr,
+                            nullptr);
+    if (byteCount <= 1) {
+        return false;
+    }
+    std::string ansi(static_cast<size_t>(byteCount), '\0');
+    BOOL usedDefaultChar = FALSE;
+    if (WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, text.c_str(),
+                            static_cast<int>(text.size()), ansi.data(), byteCount,
+                            nullptr, &usedDefaultChar) != byteCount ||
+        usedDefaultChar) {
+        return false;
+    }
+
+    // 第 2 步：ANSI 字节必须能原样解码回原文（无损往返校验）。
+    const int backCount =
+        MultiByteToWideChar(CP_ACP, 0, ansi.data(), byteCount, nullptr, 0);
+    if (backCount != static_cast<int>(text.size())) {
+        return false;
+    }
+    std::wstring roundTrip(static_cast<size_t>(backCount), L'\0');
+    if (MultiByteToWideChar(CP_ACP, 0, ansi.data(), byteCount, roundTrip.data(),
+                            backCount) != backCount ||
+        roundTrip != text) {
+        return false;
+    }
+
+    bool hasHighByte = false;
+    for (char b : ansi) {
+        if (static_cast<uint8_t>(b) >= 0x80) {
+            hasHighByte = true;
+            break;
+        }
+    }
+    if (!hasHighByte) {
+        return false;  // 字节流是纯 ASCII，没有可重解码的内容
+    }
+
+    // 第 3 步：按 UTF-8 严格重解码（MB_ERR_INVALID_CHARS，非法序列即放弃）。
+    const int wideCount = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+                                              ansi.data(), byteCount, nullptr, 0);
+    if (wideCount <= 0) {
+        return false;
+    }
+    std::wstring candidate(static_cast<size_t>(wideCount), L'\0');
+    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, ansi.data(), byteCount,
+                            candidate.data(), wideCount) != wideCount) {
+        return false;
+    }
+
+    // 第 4 步：结果必须不同且干净才采纳。
+    if (candidate == text || !RepairedLabelLooksClean(candidate)) {
+        return false;
+    }
+    repaired = std::move(candidate);
+    return true;
+}
+
+// 标题进缓存的统一入口规范化：尝试乱码修复，证据不足时保留原文。
+void NormalizeCapturedLabel(std::wstring& label) {
+    std::wstring repaired;
+    if (TryRepairUtf8Mojibake(label, repaired)) {
+        if (g_settings->debugLogging) {
+            Wh_Log(L"Repaired mojibake label '%s' -> '%s'", label.c_str(),
+                   repaired.c_str());
+        }
+        label = std::move(repaired);
+    }
+}
+
+// 缓存读取自愈：就地修复旧版本捕获的乱码标题，并报告是否存在坏字符
+// （替换符/私用区）。返回 true 时由调用者把整个缓存条目（模型）丢弃，
+// 下次打开该上下文即缓存未命中，走现有的重新捕获机制重建。
+bool RepairOrDetectBadLabels(std::vector<MenuItem>& items, bool& repairedAny) {
+    bool bad = false;
+    for (MenuItem& item : items) {
+        if (item.kind != ItemKind::Separator) {
+            const std::wstring original = item.label;
+            NormalizeCapturedLabel(item.label);
+            if (item.label != original) {
+                repairedAny = true;
+            }
+            if (LabelHasBadChars(item.label)) {
+                bad = true;
+            }
+        }
+        if (!item.children.empty() &&
+            RepairOrDetectBadLabels(item.children, repairedAny)) {
+            bad = true;
+        }
+    }
+    return bad;
+}
+
 namespace {
 
 void WriteU8(std::vector<uint8_t>& out, uint8_t value) {
@@ -14287,7 +14457,33 @@ public:
         if (!DeserializeModels(data, models)) {
             return false;
         }
+
+        // [CMO:Mojibake] 缓存读取自愈：就地修复旧版本捕获的乱码标题；含坏
+        // 字符（替换符/私用区）的条目整条丢弃，其签名下次打开即缓存未命中，
+        // 沿用现有发现机制重新捕获重建。
+        const size_t loadedCount = models.size();
+        bool repairedAny = false;
+        size_t healthyCount = 0;
+        for (size_t i = 0; i < models.size(); ++i) {
+            MenuModel model = std::move(models[i]);
+            if (RepairOrDetectBadLabels(model.items, repairedAny)) {
+                Wh_Log(L"Dropped cache entry with corrupt labels (scope=%d key=%s)",
+                       static_cast<int>(model.sig.scope), model.sig.typeKey.c_str());
+                continue;
+            }
+            models[healthyCount++] = std::move(model);
+        }
+        models.resize(healthyCount);
+        if (loadedCount > 0 && healthyCount == 0) {
+            // 所有条目都坏了：按缓存损坏处理（调用方会删除缓存文件并重建）。
+            return false;
+        }
+
         ReplaceAll(std::move(models));
+        if (repairedAny) {
+            // 立即把修复后的标签写回，避免本次会话崩溃导致修复丢失。
+            Save(path);
+        }
         return true;
     }
 
@@ -15674,6 +15870,10 @@ void BuildItemsFromHMenu(HMENU menu, UINT idCmdFirst, IContextMenu* context,
                                                ARRAYSIZE(labelBuffer), MF_BYPOSITION);
         if (labelLength > 0) {
             item.label.assign(labelBuffer, static_cast<size_t>(labelLength));
+            // 标题进入缓存的统一入口：修复「UTF-8 字节被 shell 按 CP_ACP 解码」
+            // 的第三方扩展乱码标题。子菜单父项与普通命令项都在这里取标题，
+            // 子项经下方 hSubMenu 递归同样走到这里，一并覆盖。
+            NormalizeCapturedLabel(item.label);
         }
 
         if (info.hbmpItem && IsSentinelMenuBitmap(info.hbmpItem)) {

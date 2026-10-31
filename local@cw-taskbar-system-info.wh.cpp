@@ -358,6 +358,8 @@ Windhawk 日志记录来源切换、适配器选择、计数器恢复、放置�
 - 本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：汉化元数据、说明与全部设置文案；代码与上游 1.9.0 逐字节一致，仅两类最小兼容修复（源码处均有 `CW-Beautify` 标注）：10 处无捕获 lambda 传 WINAPI/stdcall 回调改为显式 `static ... CALLBACK` 函数（x86 编译兼容）；1 处 `IID_PPV_ARGS` 展开改写以绕过 Windhawk 2.0 工具链延迟模板解析下的 `IUnknown` 二义问题（语义完全等价）。
 */
 
+// ==/WindhawkModReadme==
+
 // ==WindhawkModSettings==
 /*
 - width: 410

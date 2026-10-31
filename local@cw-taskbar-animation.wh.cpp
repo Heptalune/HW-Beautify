@@ -4,7 +4,7 @@
 // @name:zh-CN        CW-任务栏动画
 // @description       macOS-style icon animations for the taskbar (updated fork with support for all taskbar positions and multi-monitor fixes), instant-show animations for the auto-hidden taskbar, auto-hiding the taskbar only when a window is maximized, and an animated elastic pill indicator for the active taskbar item.
 // @description:zh-CN 任务栏动画合集：图标悬停放大动画（支持所有任务栏位置和多显示器）、自动隐藏任务栏的即时显示动画、窗口最大化时才自动隐藏任务栏，以及当前活动项的弹性指示条。
-// @version           2.4.1
+// @version           2.4.2
 // @author            incconutwo (Plus fork), Ph0en1x-dev (original), Bo0ii, Lockframe, m417z, CW-Beautify
 // @github            https://github.com/incconutwo
 // @homepage          https://github.com/Bo0ii/windhawk-mods
@@ -69,7 +69,7 @@
 
 ### 窗口最大化时自动隐藏任务栏（2.4.0 并入的子功能）
 
-> 来自原独立模组 CW-最大化自动隐藏任务栏（上游 Taskbar auto-hide when maximized，原作者 m417z，GPL-3.0）。该子功能默认关闭，需在设置页「任务栏显示动画」分组中开启「窗口最大化时自动隐藏任务栏（总开关）」后生效。
+> 来自原独立模组 CW-最大化自动隐藏任务栏（上游 Taskbar auto-hide when maximized，原作者 m417z，GPL-3.0）。该子功能默认关闭，需在设置页「窗口最大化时自动隐藏任务栏」分组中开启「窗口最大化时自动隐藏任务栏（总开关）」后生效（2.4.2 起该分组独立于「任务栏显示动画」，键路径也由 autoHide.maxHide.* 迁移为 maxHide.*）。
 
 Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，想看时间或托盘图标就得把鼠标贴到屏幕边缘。本子功能换一种思路：平时任务栏保持可见，只有当窗口最大化、全屏或与任务栏相交时才自动隐藏，给铺满屏幕的窗口让位。
 
@@ -77,7 +77,7 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 - **全屏让位**：视频、游戏等全屏窗口下任务栏照常隐藏。
 - **排除程序**：可将监控、看板类应用加入排除列表，其窗口不再触发隐藏。
 - **多显示器**：主屏与副屏任务栏都生效，也可设为仅主显示器应用该行为。
-- **兼容旧任务栏**：支持 Windows 10 与 Windows 11 任务栏，兼容 ExplorerPatcher 等旧版任务栏工具（需同时开启本分组「在 Windows 11 上使用旧版任务栏」与本子功能的「自定义 Windows 11 旧版任务栏」）。
+- **兼容旧任务栏**：支持 Windows 10 与 Windows 11 任务栏，兼容 ExplorerPatcher 等旧版任务栏工具（需同时开启「任务栏显示动画」分组的「在 Windows 11 上使用旧版任务栏」与本分组「窗口最大化时自动隐藏任务栏」的「自定义 Windows 11 旧版任务栏」）。
 - **自动还原**：功能启用期间会自动保持系统「自动隐藏任务栏」开关为开启，并阻止其被关闭（这是实现前提）；关闭子功能或卸载模组后自动还原。
 - **与秒显的关系**：本子功能改变的是系统自动隐藏状态的启用与否与「此刻该不该显示」的判定，秒显只优化任务栏出现/隐藏的延迟与动画——机制不同层、直接共存；本功能触发的隐藏/显示经由的定时器会应用秒显的「隐藏/出现延迟 ms」（默认 1ms，无感知）。
 
@@ -133,14 +133,19 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 - **隐藏延迟 ms（秒显）**：鼠标离开后任务栏开始隐藏前的延迟，Windows 默认 500，设为 1 即立即。默认 1。
 - **在 Windows 11 上使用旧版任务栏（秒显）**：使用 ExplorerPatcher 等工具在 Windows 11 上恢复 Windows 10 任务栏时开启。
 - **空显示器边沿检测（秒显）**：鼠标悬停屏幕边缘但任务栏不出现时开启（例如该显示器上没有可见窗口，或全屏程序吞掉了鼠标边缘事件）；会创建一个后台线程轮询光标位置。
+
+提示：**滑动**模式用「显示/隐藏加速（%）」控制速度，其余模式用「显示/隐藏时长（ms）」控制快慢；帧率对所有动画类型生效。
+
+### 窗口最大化时自动隐藏任务栏（设置页「窗口最大化时自动隐藏任务栏」嵌套组）
+
+> 2.4.0 并入的子功能，2.4.2 起独立为顶层分组（设置键路径由 autoHide.maxHide.* 迁移为 maxHide.*）；从旧版本升级后需在此分组重新确认开关与选项。
+
 - **窗口最大化时自动隐藏任务栏（总开关，最大化隐藏）**：默认关闭。开启后并入的「最大化自动隐藏」子功能生效——平时任务栏保持可见，仅当窗口最大化、全屏或与任务栏相交时才自动隐藏；功能启用期间会自动保持系统「自动隐藏任务栏」开关为开启。
 - **模式（最大化隐藏）**：默认「窗口最大化或与任务栏相交时自动隐藏」；可改为「仅窗口最大化时自动隐藏」或「从不自动隐藏」。
 - **仅应用于前台窗口（最大化隐藏）**：默认关闭；开启后仅根据前台窗口判断是否隐藏任务栏，避免后台窗口误触发。
 - **排除的程序（最大化隐藏）**：这些程序的窗口不会触发自动隐藏。条目可以是进程名、完整路径或应用 ID（AUMID），例如 mspaint.exe、C:\Windows\System32\notepad.exe、Microsoft.WindowsCalculator_8wekyb3d8bbwe!App。
 - **仅主显示器（最大化隐藏）**：默认关闭；开启后仅主屏任务栏应用该行为，副屏沿用系统默认的自动隐藏行为。
 - **自定义 Windows 11 旧版任务栏（最大化隐藏）**：默认关闭；使用 ExplorerPatcher 等工具在 Windows 11 上启用旧版任务栏时开启。
-
-提示：**滑动**模式用「显示/隐藏加速（%）」控制速度，其余模式用「显示/隐藏时长（ms）」控制快慢；帧率对所有动画类型生效。
 
 ### 任务栏指示条动画（设置页「任务栏指示条动画」嵌套组）
 
@@ -177,6 +182,7 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 
 ## 更新日志
 
+- **2.4.2（CW）**：设置页调整——「窗口最大化时自动隐藏任务栏」从「任务栏显示动画」分组的嵌套子组拆出，独立为顶层可收起分组「窗口最大化时自动隐藏任务栏」（排在「任务栏显示动画」之后、「任务栏指示条动画」之前）；设置键路径由 autoHide.maxHide.* 迁移为 maxHide.*（如 maxHide.Enabled、maxHide.mode），代码读取点同步更新。仅影响设置页归类与键路径，功能行为与默认值不变；从旧版本升级后，原 autoHide.maxHide.* 下已保存的设置不会自动迁移，需在新分组中重新确认开关与选项。
 - **2.4.1（CW）**：两项「实测失效」修复与设置文案改名。其一，任务栏指示条（弹性药丸）完全无效——运行时字节级取证确认根因是引擎符号缓存/解析链路异常（引擎下载的 Taskbar.View.pdb/Taskbar.pdb 内部 age 与本机 DLL 调试目录要求不匹配，dbghelp 拒载，任何新符号解析一律失败；图标动画的指针钩子因早前已入缓存而幸存，指示条的 TaskListButton::UpdateVisualStates 等新符号解析失败、钩子从未挂上）。模组侧补齐自愈能力：符号解析失败改为响明日志且不再让初始化永久失败，后续模块加载事件与每次设置变更都会重试解析并应用钩子（同 CW-任务栏缩略图设置 1.1.1 模式），延迟加载钩子也不再先置位标志后解析（旧写法解析失败会卡死重试标志）。其二，图标动画的空闲弹跳（及悬停缩放）失效——取证确认本 Windows 构建上 XAML 不再把指针移动路由进 TaskbarFrame::OnPointerMoved 虚重写（钩子字节级生效却永不触发，渲染循环因此不启动）；新增指针追踪兜底：借道 TaskListButton::UpdateVisualStates 钩子找到 Taskbar.TaskbarFrame 后，用 AddHandler(..., handledEventsToo=true) 订阅 PointerMoved/PointerExited（事件在按钮层被标记 Handled 也能收到），与虚重写路径互为冗余、均幂等；另修复 TaskbarFrame 重建后同地址弱引用已死的旧上下文永久吞掉指针事件的问题（自动清除重注册）。其三，设置页「任务栏指示条动画」组全部 zh-CN 显示文案中的「药丸」统一改为「指示条」（键名 pill.* 与英文原文不动，分组名本就正确）。
 - **2.4.0（CW）**：「CW-最大化自动隐藏任务栏」（上游 Taskbar auto-hide when maximized，原作者 m417z，1.2.7 汉化版）并入本模组，作为「任务栏显示动画」的子功能「窗口最大化时自动隐藏任务栏」。代码置于 TaskbarMaxHide 命名空间，设置项迁移为 maxHide.* 前缀（设置页「任务栏显示动画」嵌套组），并新增总开关 maxHide.Enabled（默认关闭——并入后不改变现有用户开启动画模组时的默认行为，开启后才接管系统自动隐藏状态）；EnumWindows/EnumThreadWindows/SetTimer 三处无捕获 lambda 回调改为显式 CALLBACK 函数保证 x86 编译；初始化失败时仅降级该功能，不影响其余功能。
 - **2.3.0（CW）**：设置页重组为三个可收起分组——原图标动画设置收进「任务栏图标动画」分组（键前缀 iconAnim.），「任务栏秒显」分组更名为「任务栏显示动画」，「任务栏弹性药丸」分组更名为「任务栏指示条动画」。键名与分组名变化只影响设置页归类，不改变动画行为。
@@ -462,71 +468,78 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
       swallows the mouse-edge event. Creates a background thread that polls
       the cursor position.
     $description:zh-CN: 鼠标悬停屏幕边缘但任务栏不出现时开启，例如该显示器上没有可见窗口，或全屏程序吞掉了鼠标边缘事件。开启后会创建一个后台线程轮询光标位置。
-  - maxHide:
-    - Enabled: false
-      $name: Auto-hide when a window is maximized (max-hide)
-      $name:zh-CN: 窗口最大化时自动隐藏任务栏（总开关）
-      $description: >-
-        Master switch of the merged sub-feature (originally the standalone mod
-        "Taskbar auto-hide when maximized"). Keeps the taskbar visible normally
-        and auto-hides it only when a window is maximized, fullscreen, or
-        intersects the taskbar. While enabled, the mod keeps the system
-        "Auto-hide taskbar" setting turned on and restores it when disabled.
-        Off by default so merging does not change existing behavior.
-      $description:zh-CN: >-
-        并入子功能（原独立模组「最大化自动隐藏任务栏」）的总开关，默认关闭。开启后任务栏
-        平时保持可见，仅当窗口最大化、全屏或与任务栏相交时才自动隐藏；功能启用期间会
-        自动保持系统「自动隐藏任务栏」开关为开启，关闭该开关或卸载模组后还原。
-    - mode: intersected
-      $name: Mode (max-hide)
-      $name:zh-CN: 模式（最大化隐藏）
-      $options:
-        - intersected: 窗口最大化或与任务栏相交时自动隐藏
-        - maximized: 仅窗口最大化时自动隐藏
-        - never: 从不自动隐藏
-    - foregroundWindowOnly: false
-      $name: Apply only to foreground window (max-hide)
-      $name:zh-CN: 仅应用于前台窗口（最大化隐藏）
-      $description: >-
-        Enable this option to apply the auto-hide taskbar feature only to the
-        selected window.
-      $description:zh-CN: 开启后，仅根据前台窗口应用自动隐藏任务栏特性。
-    - excludedPrograms: [""]
-      $name: Excluded programs (max-hide)
-      $name:zh-CN: 排除的程序（最大化隐藏）
-      $description: >-
-        The taskbar won't auto-hide due to windows of these programs being maximized
-        or intersecting the taskbar.
-
-        Entries can be process names, paths or application IDs, for example:
-
-        mspaint.exe
-
-        C:\Windows\System32\notepad.exe
-
-        Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
-      $description:zh-CN: 这些程序的窗口最大化或与任务栏相交时，不会导致任务栏自动隐藏。条目可以是进程名、完整路径或应用 ID（AUMID），例如 mspaint.exe、C:\Windows\System32\notepad.exe、Microsoft.WindowsCalculator_8wekyb3d8bbwe!App。
-    - primaryMonitorOnly: false
-      $name: Primary monitor only (max-hide)
-      $name:zh-CN: 仅主显示器（最大化隐藏）
-      $description: >-
-        Apply the mod's behavior only to the primary monitor taskbar. Secondary
-        monitors will use Windows' default auto-hide behavior.
-      $description:zh-CN: 仅对主显示器的任务栏应用本模组的行为，副显示器沿用系统默认的自动隐藏行为。
-    - oldTaskbarOnWin11: false
-      $name: Customize the old taskbar on Windows 11 (max-hide)
-      $name:zh-CN: 自定义 Windows 11 旧版任务栏（最大化隐藏）
-      $description: >-
-        Enable this option to customize the old taskbar on Windows 11 (if using
-        ExplorerPatcher or a similar tool).
-      $description:zh-CN: 开启后可自定义 Windows 11 的旧版任务栏（如使用 ExplorerPatcher 或类似工具时）。
   $name: Taskbar show animation (auto-hide)
   $name:zh-CN: 任务栏显示动画
   $description: >-
     Removes the delay before the auto-hidden taskbar appears and customizes
-    its show animation. Also includes the merged auto-hide-when-maximized
-    sub-feature (maxHide.* keys).
-  $description:zh-CN: 去掉自动隐藏任务栏的显示延迟并自定义出现动画；另含并入的「窗口最大化时自动隐藏任务栏」子功能（maxHide.* 键）。
+    its show animation.
+  $description:zh-CN: 去掉自动隐藏任务栏的显示延迟并自定义出现动画。
+- maxHide:
+  - Enabled: false
+    $name: Auto-hide when a window is maximized (max-hide)
+    $name:zh-CN: 窗口最大化时自动隐藏任务栏（总开关）
+    $description: >-
+      Master switch of the merged sub-feature (originally the standalone mod
+      "Taskbar auto-hide when maximized"). Keeps the taskbar visible normally
+      and auto-hides it only when a window is maximized, fullscreen, or
+      intersects the taskbar. While enabled, the mod keeps the system
+      "Auto-hide taskbar" setting turned on and restores it when disabled.
+      Off by default so merging does not change existing behavior.
+    $description:zh-CN: >-
+      并入子功能（原独立模组「最大化自动隐藏任务栏」）的总开关，默认关闭。开启后任务栏
+      平时保持可见，仅当窗口最大化、全屏或与任务栏相交时才自动隐藏；功能启用期间会
+      自动保持系统「自动隐藏任务栏」开关为开启，关闭该开关或卸载模组后还原。
+  - mode: intersected
+    $name: Mode (max-hide)
+    $name:zh-CN: 模式（最大化隐藏）
+    $options:
+      - intersected: 窗口最大化或与任务栏相交时自动隐藏
+      - maximized: 仅窗口最大化时自动隐藏
+      - never: 从不自动隐藏
+  - foregroundWindowOnly: false
+    $name: Apply only to foreground window (max-hide)
+    $name:zh-CN: 仅应用于前台窗口（最大化隐藏）
+    $description: >-
+      Enable this option to apply the auto-hide taskbar feature only to the
+      selected window.
+    $description:zh-CN: 开启后，仅根据前台窗口应用自动隐藏任务栏特性。
+  - excludedPrograms: [""]
+    $name: Excluded programs (max-hide)
+    $name:zh-CN: 排除的程序（最大化隐藏）
+    $description: >-
+      The taskbar won't auto-hide due to windows of these programs being maximized
+      or intersecting the taskbar.
+
+      Entries can be process names, paths or application IDs, for example:
+
+      mspaint.exe
+
+      C:\Windows\System32\notepad.exe
+
+      Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+    $description:zh-CN: 这些程序的窗口最大化或与任务栏相交时，不会导致任务栏自动隐藏。条目可以是进程名、完整路径或应用 ID（AUMID），例如 mspaint.exe、C:\Windows\System32\notepad.exe、Microsoft.WindowsCalculator_8wekyb3d8bbwe!App。
+  - primaryMonitorOnly: false
+    $name: Primary monitor only (max-hide)
+    $name:zh-CN: 仅主显示器（最大化隐藏）
+    $description: >-
+      Apply the mod's behavior only to the primary monitor taskbar. Secondary
+      monitors will use Windows' default auto-hide behavior.
+    $description:zh-CN: 仅对主显示器的任务栏应用本模组的行为，副显示器沿用系统默认的自动隐藏行为。
+  - oldTaskbarOnWin11: false
+    $name: Customize the old taskbar on Windows 11 (max-hide)
+    $name:zh-CN: 自定义 Windows 11 旧版任务栏（最大化隐藏）
+    $description: >-
+      Enable this option to customize the old taskbar on Windows 11 (if using
+      ExplorerPatcher or a similar tool).
+    $description:zh-CN: 开启后可自定义 Windows 11 的旧版任务栏（如使用 ExplorerPatcher 或类似工具时）。
+  $name: Auto-hide the taskbar when a window is maximized
+  $name:zh-CN: 窗口最大化时自动隐藏任务栏
+  $description: >-
+    Auto-hides the taskbar only when a window is maximized, fullscreen, or
+    intersects the taskbar; the taskbar stays visible otherwise. Merged
+    standalone sub-feature (originally the mod "Taskbar auto-hide when
+    maximized"), off by default.
+  $description:zh-CN: 仅当窗口最大化、全屏或与任务栏相交时才自动隐藏任务栏，平时保持可见（并入的独立子功能，原模组「最大化自动隐藏任务栏」，默认关闭）。
 - pill:
   - Dimensions: "16, 3"
     $name: Pill Dimensions (Width, Height)
@@ -4467,9 +4480,9 @@ bool HookTaskbarSymbols() {
 }
 
 void LoadSettings() {
-    g_settings.enabled = Wh_GetIntSetting(L"autoHide.maxHide.Enabled") != 0;
+    g_settings.enabled = Wh_GetIntSetting(L"maxHide.Enabled") != 0;
 
-    PCWSTR mode = Wh_GetStringSetting(L"autoHide.maxHide.mode");
+    PCWSTR mode = Wh_GetStringSetting(L"maxHide.mode");
     g_settings.mode = Mode::intersected;
     if (wcscmp(mode, L"maximized") == 0) {
         g_settings.mode = Mode::maximized;
@@ -4479,12 +4492,12 @@ void LoadSettings() {
     Wh_FreeStringSetting(mode);
 
     g_settings.foregroundWindowOnly =
-        Wh_GetIntSetting(L"autoHide.maxHide.foregroundWindowOnly");
+        Wh_GetIntSetting(L"maxHide.foregroundWindowOnly");
 
     g_settings.excludedPrograms.clear();
 
     for (int i = 0;; i++) {
-        PCWSTR program = Wh_GetStringSetting(L"autoHide.maxHide.excludedPrograms[%d]", i);
+        PCWSTR program = Wh_GetStringSetting(L"maxHide.excludedPrograms[%d]", i);
 
         bool hasProgram = *program;
         if (hasProgram) {
@@ -4504,8 +4517,8 @@ void LoadSettings() {
         }
     }
 
-    g_settings.primaryMonitorOnly = Wh_GetIntSetting(L"autoHide.maxHide.primaryMonitorOnly");
-    g_settings.oldTaskbarOnWin11 = Wh_GetIntSetting(L"autoHide.maxHide.oldTaskbarOnWin11");
+    g_settings.primaryMonitorOnly = Wh_GetIntSetting(L"maxHide.primaryMonitorOnly");
+    g_settings.oldTaskbarOnWin11 = Wh_GetIntSetting(L"maxHide.oldTaskbarOnWin11");
 }
 
 BOOL Init() {
@@ -4516,7 +4529,7 @@ BOOL Init() {
     // 总开关默认关闭：并入后不改变现有用户开启动画模组时的默认行为。
     // 只有开启 maxHide.Enabled 后才安装钩子并接管系统自动隐藏状态。
     if (!g_settings.enabled) {
-        Wh_Log(L"autoHide.maxHide.Enabled is off, skipping init");
+        Wh_Log(L"maxHide.Enabled is off, skipping init");
         return TRUE;
     }
 
