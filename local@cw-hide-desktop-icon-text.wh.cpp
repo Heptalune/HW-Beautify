@@ -94,7 +94,9 @@
 - hide_shields: false
   $name: Hide UAC shield badges
   $name:zh-CN: 隐藏 UAC 管理员盾牌
-  $description: Removes the UAC administrator shield badge from icons (applies to the whole Explorer session). Note: the shield indicates which programs run as administrator.
+  $description: >-
+    Removes the UAC administrator shield badge from icons (applies to the whole
+    Explorer session). The shield indicates which programs run as administrator.
   $description:zh-CN: 移除图标上的 UAC 管理员盾牌角标（作用于整个资源管理器会话）。注意：盾牌是管理员权限的可视提醒，隐藏后无法从桌面直观分辨哪些程序以管理员身份运行。
 */
 // ==/WindhawkModSettings==
