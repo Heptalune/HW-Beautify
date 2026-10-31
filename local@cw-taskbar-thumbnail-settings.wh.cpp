@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏缩略图设置
 // @description     Customize Windows 11 taskbar thumbnail previews: show/close timing (instant previews), size, and reordering.
 // @description:zh-CN 自定义 Windows 11 任务栏缩略图预览的显示/关闭时机（即时预览）、大小与拖动排序，三组设置独立开关。
-// @version         1.1.0
+// @version         1.1.1
 // @author          Alchemy (Instant Taskbar Thumbnail Previews), m417z (Taskbar Thumbnail Size, Taskbar Thumbnail Reorder)
 // @include         explorer.exe
 // @architecture    x86-64
@@ -43,6 +43,24 @@
 // 修复：任一模块加载事件兜底重试 size 组（含 instant 组 24H2 兜底）、设置变更
 // 时同步重试 size 组、所有失败路径改为响亮记日志；size 与即时预览两组恢复
 // 自愈能力，22H2 上 size 生效、24H2 上 instant+size 都生效。
+//
+// 1.1.1 修复（2026-10-31，用户反馈 1.1.0「还是无效，300% 也无变化」）：
+// 再次运行时取证（explorer.exe 模块枚举 + 函数头内存字节比对）确认：引擎里
+// 该模组实际处于禁用状态（Sessions 会话 hive 的 disabled 标志），模组 DLL
+// 根本没有注入 explorer.exe，此前「10/10 钩子已激活」的验证结论有误。真正
+// 的失效链是「引擎侧禁用」叠加「历史运行中 size 组解析一次失败后被 init 失败
+// 路径放大」。1.1.1 修复两点：
+// 1. Wh_ModInit 中 size 组解析失败不再让整个模组初始化失败（上游行为）——
+//    整模组失败会连带停用 reorder 组，并且让 Wh_ModAfterInit / 设置变更 /
+//    后续模块加载这三条自愈重试路径全部失效。改为响亮记日志并交给自愈路径。
+// 2. Wh_ApplyHookOperations 失败（例如 loader lock 下）时重置
+//    g_thumbSizeViewModuleHandled，使后续模块加载事件可以重试，而不是把
+//    「已解析」标志卡死在 true 上让 size 组永久沉没。
+// 另把绝对像素模式的 maxWidth/maxHeight 默认值从上游的 180/120 改为 0
+// （不限制），避免用户开启绝对像素模式后缩略图仍被 180x120 上限钳回、
+// 造成「调了也没变化」的观感；百分比模式本就不受 min/max 影响（见
+// ThumbSize_GetScaledThumbnailSize_Hook：useAbsoluteSize 为假时仅按
+// size.size 百分比缩放，min/max 完全不参与）。
 //
 // 相对上游的代码改动：
 // 1. 【构建门槛降级】上游即时预览模组在 build < 26100 时整个模组初始化失败；
@@ -103,6 +121,7 @@
 
 ## 更新日志
 
+- **1.1.1（2026-10-31）**：修复「开关显示开启但完全无效果」的问题：运行时取证确认模组在引擎里实际处于禁用状态（模组 DLL 未注入 explorer.exe），以及历史运行中 size 组符号解析失败会让整个模组初始化失败、连带停用其他功能组并堵死全部自动重试路径。1.1.1 起 size 组初始化失败只记日志并交给自动重试（模块加载事件 / 设置变更），钩子应用失败也不再卡死重试标志；另将「绝对像素模式」的默认最大宽/高从上游的 180/120 改为 0（不限制），避免开启绝对模式后被小尺寸上限钳回。
 - **1.1.0（2026-10-31）**：修复 Windows 11 22H2 上「开启后没有效果」的问题（延迟加载钩子转换失败后不再静默失效，改为自动重试自愈，见下）；并入 m417z Taskbar Thumbnail Reorder 1.1.5 的全部功能（新增「缩略图排序」分组，reorder.* 键，上游署名与许可保留）。
 - **1.0.0（2026-10-30）**：由 Instant Taskbar Thumbnail Previews（MIT）与 Taskbar Thumbnail Size（GPL-3.0）合并而成，即时预览组在 22H2/23H2 自动降级停用、大小组照常生效。
 
@@ -115,6 +134,10 @@
 ## 1.1.0 修复说明（22H2 无效果问题）
 
 1.0.0 在部分系统上出现过「模组已启用、DLL 已注入 explorer.exe，但缩略图大小毫无变化」的情况：Taskbar.View.dll 在模组初始化之后才被加载，大小组依赖 LoadLibraryExW 钩子的一次性延迟转换，一旦该转换被错过或失败（例如钩子应用在 loader lock 下失败），大小功能会静默失效且没有任何重试。1.1.0 起改为自动自愈：任何后续模块加载事件、以及每次设置变更，都会重试尚未挂上的大小组钩子（即时预览组同样获得兜底重试），并在引擎日志中明确记录失败原因。若此前遇到「开了没效果」，更新后无需重启，调整一次任意设置（或重开模组开关）即可触发自愈。
+
+## 1.1.1 修复说明（开关开启却完全无效果）
+
+1.1.0 的用户仍反馈「无效果」。本轮运行时取证（枚举 explorer.exe 已加载模块、逐字节比对 Taskbar.View.dll 目标函数头的内存与磁盘内容）确认了两件事：其一，模组在引擎里实际处于**禁用**状态，模组 DLL 根本没有注入 explorer.exe——界面开关状态与引擎实际状态可能不一致，重装后请务必以「模组 DLL 是否出现在 explorer.exe 模块列表」为准；其二，历史运行中若 size 组符号解析失败，旧版会让整个模组初始化失败，连带停用排序组并堵死全部自动重试路径。1.1.1 起：size 组初始化失败只记日志并交给自动重试（后续模块加载事件 / 每次设置变更），钩子应用失败也不再卡死重试标志。另将「绝对像素模式」的默认最大宽/高改为 0（不限制），避免开启绝对模式后被上游默认的 180x120 上限钳回。
 
 ## 缩略图即时预览（instant.*）
 
@@ -145,7 +168,7 @@
 - **缩略图大小（百分比）**（size.size）：相对原尺寸的百分比，仅在未开启绝对像素模式时使用。**CW 版默认值调整：默认 200（上游为 150），以便更明显地感知效果；语义不变，可改回。**
 - **使用绝对像素模式**（size.useAbsoluteSize）：开启后使用下方最小/最大像素限制，而不是按百分比缩放；同时会移除系统对缩略图的最大宽度限制，像素值才能真正生效。
 - **最小宽度 / 最小高度（像素）**（size.minWidth / size.minHeight）：缩略图最小尺寸，默认 180 / 120；仅绝对像素模式下生效，设为 0 表示不限制。
-- **最大宽度 / 最大高度（像素）**（size.maxWidth / size.maxHeight）：缩略图最大尺寸，默认 180 / 120；仅绝对像素模式下生效，设为 0 表示不限制。
+- **最大宽度 / 最大高度（像素）**（size.maxWidth / size.maxHeight）：缩略图最大尺寸，仅绝对像素模式下生效，设为 0 表示不限制。**CW 版默认值调整为 0（不限制，上游为 180 / 120），避免开启绝对像素模式后缩略图仍被小尺寸上限钳回。**
 - **保持宽高比**（size.preserveAspectRatio）：在满足最大限制的前提下强制保持缩略图的原始宽高比（等比缩放），最小限制则尽量满足；最大与最小限制冲突时以最大限制优先。
 
 对于旧版 Windows，可以通过注册表调整任务栏缩略图大小：
@@ -243,20 +266,30 @@
       Minimum thumbnail height in pixels. Only used when absolute sizing is
       enabled. Set to 0 to disable.
     $description:zh-CN: 缩略图的最小高度（像素）。仅在使用绝对像素模式时生效，设为 0 表示不限制。
-  - maxWidth: 180
+  - maxWidth: 0
     $name: Maximum width (pixels)
     $name:zh-CN: 最大宽度（像素）
     $description: >-
       Maximum thumbnail width in pixels. Only used when absolute sizing is
-      enabled. Set to 0 to disable.
-    $description:zh-CN: 缩略图的最大宽度（像素）。仅在使用绝对像素模式时生效，设为 0 表示不限制。
-  - maxHeight: 120
+      enabled. Set to 0 to disable. CW version default is 0 (unlimited,
+      upstream default 180) so that enabling absolute sizing does not clamp
+      thumbnails back to the small default ceiling.
+    $description:zh-CN: >-
+      缩略图的最大宽度（像素）。仅在使用绝对像素模式时生效，设为 0 表示不限制。
+      CW 版默认值调整为 0（不限制，上游为 180），避免开启绝对像素模式后缩略图
+      仍被小尺寸上限钳回。
+  - maxHeight: 0
     $name: Maximum height (pixels)
     $name:zh-CN: 最大高度（像素）
     $description: >-
       Maximum thumbnail height in pixels. Only used when absolute sizing is
-      enabled. Set to 0 to disable.
-    $description:zh-CN: 缩略图的最大高度（像素）。仅在使用绝对像素模式时生效，设为 0 表示不限制。
+      enabled. Set to 0 to disable. CW version default is 0 (unlimited,
+      upstream default 120) so that enabling absolute sizing does not clamp
+      thumbnails back to the small default ceiling.
+    $description:zh-CN: >-
+      缩略图的最大高度（像素）。仅在使用绝对像素模式时生效，设为 0 表示不限制。
+      CW 版默认值调整为 0（不限制，上游为 120），避免开启绝对像素模式后缩略图
+      仍被小尺寸上限钳回。
   - preserveAspectRatio: true
     $name: Preserve aspect ratio
     $name:zh-CN: 保持宽高比
@@ -615,6 +648,7 @@ bool ThumbSizeResolveSymbols(HMODULE module) {
         return false;
     }
 
+    Wh_Log(L"ThumbSize: symbols resolved, hooks queued");
     return true;
 }
 
@@ -665,6 +699,11 @@ void HandleLoadedModuleForThumbSize(HMODULE module) {
     if (ThumbSizeResolveSymbols(module)) {
         if (!Wh_ApplyHookOperations()) {
             Wh_Log(L"ThumbSize: failed to apply hook operations");
+            // CW merge fix (1.1.1): reset the handled flag so a later
+            // module load event can retry. It would otherwise stay set and
+            // the size group would remain dead until the mod is reloaded.
+            g_thumbSizeViewModuleHandled.store(false,
+                                               std::memory_order_release);
         }
     } else {
         Wh_Log(L"ThumbSize: symbol resolution failed, will retry on the "
@@ -3957,10 +3996,15 @@ BOOL Wh_ModInit() {
 
     HMODULE taskbarViewModule = GetTaskbarViewModuleHandle();
     if (taskbarViewModule) {
-        // Core size feature: mandatory hooks, failure fails init (upstream
-        // behavior).
+        // Core size feature. CW merge change (1.1.1): upstream failed the
+        // whole mod init when these mandatory hooks couldn't resolve. That
+        // also disabled the reorder group and prevented every self-heal
+        // path below (Wh_ModAfterInit, Wh_ModSettingsChanged, and later
+        // module load events) from ever running. Log loudly instead and
+        // let those paths retry.
         if (!ThumbSizeResolveSymbols(taskbarViewModule)) {
-            return FALSE;
+            Wh_Log(L"ThumbSize: init-time hooking failed, will retry on "
+                   L"later module loads and settings changes");
         }
 
         // Instant features: best effort, all hooks optional.
@@ -4032,6 +4076,10 @@ void Wh_ModAfterInit() {
     if (hooksQueued) {
         if (!Wh_ApplyHookOperations()) {
             Wh_Log(L"Failed to apply late hooks");
+            // CW merge fix (1.1.1): let later retries re-arm the size
+            // group instead of leaving it marked as handled.
+            g_thumbSizeViewModuleHandled.store(false,
+                                               std::memory_order_release);
         }
     }
 
@@ -4076,6 +4124,10 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
     if (hooksQueued) {
         if (!Wh_ApplyHookOperations()) {
             Wh_Log(L"Failed to apply hooks after settings change");
+            // CW merge fix (1.1.1): let later retries re-arm the size
+            // group instead of leaving it marked as handled.
+            g_thumbSizeViewModuleHandled.store(false,
+                                               std::memory_order_release);
         }
     }
 

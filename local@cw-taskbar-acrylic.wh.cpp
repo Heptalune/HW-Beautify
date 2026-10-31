@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏样式美化
 // @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also controls taskbar height and icon size.
 // @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并整合任务栏高度与图标大小控制。
-// @version         4.4.0
+// @version         4.4.1
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -63,6 +63,7 @@
 - 原版主题按旧版任务栏编写，在 v1.10 基础上托盘区域的显示可能略有差异。
 
 ## 更新日志
+- **4.4.1**：修复「显示桌面按钮全高」开启后无效的问题。原因：竖条（Rectangle#ShowDesktopPipe）的尺寸由 ShowDesktopStack/IconView 模板的 CommonStates 状态机掌控，原实现用普通规则在元素创建时一次性写入 Height/MinHeight，元素创建后的首次 GoToState 会把状态里的尺寸值重新盖回去，一次性赋值随即失效（上游 Aero Peek 议题 #854 中普通写法「被无视」、@CommonStates 写法生效为同一现象）。修复镜像两处成熟实现：样式目标改为 Rectangle#ShowDesktopPipe@CommonStates（上游 SunValley 主题 Height=500 的全高写法，样式进入视觉状态桶后模组会在每次状态切换后重新断言）；属性改用 MinHeight+MaxHeight（镜像 tray-system-icons 模组 showDesktopButtonWidth 的 MinWidth+MaxWidth 技法，Min/Max 在布局层优先于 Height，状态机与悬停动画碰不到，模板若用 MaxHeight 钉死竖条也一并覆盖）。功能行为不变：默认跟随任务栏高度，0-200 手动指定，悬停预览行为不受影响（CW 汉化版修复）。
 - **4.4.0**：新增「任务栏尺寸与缩放」分组：「等比缩放」从「主题与文字」移入该组（设置键 look.ProportionalScale 改为 size.ProportionalScale，旧键保存的值仍兼容，deploy 会自动迁移），并恢复任务栏高度/图标大小/任务栏按钮宽度/小图标大小/小任务栏按钮宽度 5 个单项设置（4.3.1 曾移除，键名加 size. 前缀，deploy 会自动迁移旧扁平键，行为与 4.3.0 一致：等比缩放以单项值为基础）；新增「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，悬停出桌面预览的行为不变，高度可跟随任务栏高度或手动指定（CW 汉化版新增/调整）。
 - **4.3.1**：设置精简：删除任务栏高度/图标大小/按钮宽度等 5 个单项设置，只保留「等比缩放」并移入「主题与文字」大类（设置键 look.ProportionalScale）；代码对缺失键回退到包默认值（52/32/44/16/32），任务栏高度不会塌陷（CW 汉化版调整）。
 - **4.3.0**：整合「CW-任务栏高度与图标大小」（m417z Taskbar height and icon size 1.3.x）：
@@ -21768,8 +21769,24 @@ void CWAddExtraStyles() {
         // CW: 「显示桌面」小竖条撑到任务栏同高（消除默认的小小一截）。
         // 只改 Rectangle#ShowDesktopPipe 这个视觉矩形的高度，输入热区仍在
         // ShowDesktopStack/按钮上，悬停出桌面预览（Aero Peek）的行为不变。
+        //
+        // 4.4.1 修复「开启后无效」：竖条的尺寸由 ShowDesktopStack/IconView
+        // 模板的 CommonStates 状态机掌控。原实现用普通规则在元素创建时一次性
+        // 写入 Height/MinHeight，元素创建后的首次 GoToState 会把状态里的尺寸
+        // 值（以及可能存在的 MaxHeight 钉死值）重新盖回来，一次性赋值随即被
+        // 抵消——上游 Aero Peek 议题 #854 里普通写法被“无视”、@CommonStates
+        // 写法生效，是同一现象（上游 SunValley 主题 Height=500 也走
+        // @CommonStates）。修复镜像两处成熟实现：
+        //   1. 目标加 @CommonStates：样式落入视觉状态桶，模组会注册
+        //      CurrentStateChanged，每次状态切换（含首次）之后重新断言；
+        //   2. 属性改用 MinHeight+MaxHeight（镜像 tray-system-icons 模组
+        //      showDesktopButtonWidth 的 MinWidth+MaxWidth 技法）：Min/Max 在
+        //      布局层优先于 Height，状态机与悬停动画都碰不到 Min/Max，无需
+        //      跟 Height 抢值；模板若用 MaxHeight 钉死竖条也一并被覆盖。
+        // 即便个别系统上竖条自身不带 CommonStates 状态组（@ 桶退化为普通
+        // 桶），Min/Max 一次性写入后也没有任何状态值能再抵消它。
         // 样式在每次设置变更后随样式重建即时刷新；加在主题样式之后，可压过
-        // 主题里对竖条的固定高度，用户自定义样式仍可再覆盖。
+        // 主题里对竖条的固定尺寸，用户自定义样式仍可再覆盖。
         if (TBIS_g_settings.showDesktopFullHeight) {
             int pipeHeight = TBIS_g_settings.showDesktopButtonHeight;
             if (pipeHeight < 0) {
@@ -21781,9 +21798,9 @@ void CWAddExtraStyles() {
             }
             std::wstring pipeHeightStr = std::to_wstring(pipeHeight);
             AddElementCustomizationRules(
-                L"Rectangle#ShowDesktopPipe",
-                {L"Height=" + pipeHeightStr,
-                 L"MinHeight=" + pipeHeightStr,
+                L"Rectangle#ShowDesktopPipe@CommonStates",
+                {L"MinHeight=" + pipeHeightStr,
+                 L"MaxHeight=" + pipeHeightStr,
                  L"VerticalAlignment=Center"});
         }
     } catch (...) {

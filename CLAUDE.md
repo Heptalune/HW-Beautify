@@ -72,6 +72,22 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
+## 用户预置启用清单（2026-10-31 起，长期有效）
+
+重新编译/部署全部模组后，以下 17 个模组**自动启用**，其余保持禁用；用户后续手动改动开关时以用户最新状态为准：
+
+cw-extension-no-warning（关闭扩展名修改警告）、cw-explorer-double-click-up（双击返回上级）、
+cw-taskbar-volume-control（任务栏音量控制）、cw-taskbar-animation（任务栏动画）、
+cw-taskbar-button-click（任务栏按钮中键关闭）、cw-taskbar-acrylic（任务栏样式美化）、
+cw-desktop-quick-settings（关于桌面的快捷设置）、cw-startmenu-acrylic（开始菜单样式美化）、
+cw-drag-to-delete（拖拽删除文件）、cw-file-hover-info（文件悬停信息）、
+cw-explorer-details-better-file-sizes（文件大小列增强）、cw-shake-find-cursor（晃动找指针，DLC）、
+cw-windows-animations（窗口动画，可选）、cw-window-arrangement（窗口滑动排列）、
+cw-alt-drag（窗口拖动）、cw-invisible-borders（隐形窗口边框）、cw-notificationcenter-acrylic（通知栏样式美化）。
+
+操作方式：全部模组 `windhawk-cli mod install --file <源码> --disabled` 编译并禁用后，
+对本清单逐个执行 `windhawk-cli --app-root <便携根> --yes mod enable <id>`。
+
 ## 当前模组清单（v2.5.0，40 个 = 32 核心 + 2 可选 + 6 DLC 额外内容）
 
 核心模组（32 个，主部署装入、默认关闭）：

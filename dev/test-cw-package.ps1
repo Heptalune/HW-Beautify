@@ -18,7 +18,7 @@ foreach ($f in $psFiles) {
 
 Write-Host "`n=== 2. mod 清单与元数据一致性 ===" -ForegroundColor Cyan
 $expected = @{
-    'local@cw-taskbar-acrylic.wh.cpp'            = @{ id='cw-taskbar-acrylic';            ver='4.4.0';  inc='explorer.exe' }
+    'local@cw-taskbar-acrylic.wh.cpp'            = @{ id='cw-taskbar-acrylic';            ver='4.4.1';  inc='explorer.exe' }
     'local@cw-startmenu-acrylic.wh.cpp'          = @{ id='cw-startmenu-acrylic';          ver='4.1.14'; inc='StartMenuExperienceHost.exe' }
     'local@cw-notificationcenter-acrylic.wh.cpp' = @{ id='cw-notificationcenter-acrylic'; ver='4.2.7';  inc='ShellExperienceHost.exe' }
     'local@cw-explorer-styler.wh.cpp'            = @{ id='cw-explorer-styler';            ver='1.7.1';  inc='explorer.exe' }
@@ -30,8 +30,8 @@ $expected = @{
     'local@cw-custom-context-menu.wh.cpp'        = @{ id='cw-custom-context-menu';        ver='1.1.3';  inc='explorer.exe' }
     'local@cw-invisible-borders.wh.cpp'          = @{ id='cw-invisible-borders';          ver='1.0.1';  inc='*' }
     'dlc\local@cw-shake-find-cursor.wh.cpp'      = @{ id='cw-shake-find-cursor';          ver='1.5.0';  inc='windhawk.exe' }
-    'local@cw-taskbar-thumbnail-settings.wh.cpp' = @{ id='cw-taskbar-thumbnail-settings'; ver='1.1.0';  inc='explorer.exe' }
-    'local@cw-desktop-quick-settings.wh.cpp'     = @{ id='cw-desktop-quick-settings';     ver='1.1.0';  inc='explorer.exe' }
+    'local@cw-taskbar-thumbnail-settings.wh.cpp' = @{ id='cw-taskbar-thumbnail-settings'; ver='1.1.1';  inc='explorer.exe' }
+    'local@cw-desktop-quick-settings.wh.cpp'     = @{ id='cw-desktop-quick-settings';     ver='1.2.0';  inc='explorer.exe' }
     'local@cw-fluent-context-menu.wh.cpp'        = @{ id='cw-fluent-context-menu';        ver='0.2.2';  inc='explorer.exe' }
     'local@cw-file-hover-info.wh.cpp'            = @{ id='cw-file-hover-info';            ver='1.1.3';  inc='explorer.exe' }
     'local@cw-settings-styler.wh.cpp'            = @{ id='cw-settings-styler';            ver='1.2.3';  inc='SystemSettings.exe' }
@@ -53,8 +53,8 @@ $expected = @{
     'local@cw-win11-power-buttons.wh.cpp'       = @{ id='cw-win11-power-buttons';        ver='1.0.3';  inc='StartMenuExperienceHost.exe' }
     'local@cw-explorer-double-click-up.wh.cpp'  = @{ id='cw-explorer-double-click-up';   ver='1.0.2';  inc='explorer.exe'; noSettings=$true }
     'local@cw-logon-logoff-shutdown-sounds.wh.cpp' = @{ id='cw-logon-logoff-shutdown-sounds'; ver='1.0.4'; inc='explorer.exe' }
-    'local@cw-hide-desktop-icon-text.wh.cpp'    = @{ id='cw-hide-desktop-icon-text';     ver='1.5.1';  inc='explorer.exe' }
-    'local@cw-centered-start-split-icons.wh.cpp' = @{ id='cw-centered-start-split-icons'; ver='1.0.1';  inc='explorer.exe' }
+    'local@cw-hide-desktop-icon-text.wh.cpp'    = @{ id='cw-hide-desktop-icon-text';     ver='1.6.0';  inc='explorer.exe' }
+    'local@cw-centered-start-split-icons.wh.cpp' = @{ id='cw-centered-start-split-icons'; ver='2.0.0';  inc='explorer.exe' }
     'local@cw-tray-system-icons.wh.cpp'         = @{ id='cw-tray-system-icons';          ver='1.3.2';  inc='explorer.exe' }
     'local@cw-explorer-details-better-file-sizes.wh.cpp' = @{ id='cw-explorer-details-better-file-sizes'; ver='1.7'; inc='*' }
     'dlc\local@cw-dynamic-island-windows.wh.cpp' = @{ id='cw-dynamic-island-windows';     ver='1.4.1';  inc='windhawk.exe' }
@@ -216,7 +216,7 @@ $badOnly = $badRefs | Where-Object { $ln = ($_ -split ':')[0]; $allowedIn -notco
 Check "脚本中旧 id 仅存在于 deploy/uninstall 的清理与迁移逻辑" ($badOnly.Count -eq 0) ($badOnly | Select-Object -First 2)
 
 Write-Host "`n=== 7. 包文件完整性 ===" -ForegroundColor Cyan
-foreach ($must in @('deploy.bat','deploy-dlc.bat','deploy.ps1','deploy-dlc.ps1','uninstall.bat','uninstall.ps1','restart_explorer.bat','build_releases.py','README.md','Readme.txt','LICENSE','CHANGELOG_CW_v1.0.0.md','CHANGELOG_CW-Beautify_v2.0.0.md','CHANGELOG_CW-Beautify_v2.2.0.md','CHANGELOG_CW-Beautify_v2.3.0.md','CHANGELOG_CW-Beautify_v2.4.0.md','CLAUDE.md','docs\MOD_STYLE_GUIDE.md','docs\MOD_CLASSIFICATION.md','optional\THIRD_PARTY_NOTICES.md','tools\uninstall-ExplorerBlurMica.bat','tools\CW-Beautify-StartupCheck.ps1')) {
+foreach ($must in @('deploy.bat','deploy-dlc.bat','deploy.ps1','deploy-dlc.ps1','uninstall.bat','uninstall.ps1','restart_explorer.bat','build_releases.py','README.md','Readme.txt','LICENSE','CHANGELOG_CW_v1.0.0.md','CHANGELOG_CW-Beautify_v2.0.0.md','CHANGELOG_CW-Beautify_v2.2.0.md','CHANGELOG_CW-Beautify_v2.3.0.md','CHANGELOG_CW-Beautify_v2.4.0.md','CHANGELOG_CW-Beautify_v2.5.0.md','CHANGELOG_CW-Beautify_v2.5.1.md','CLAUDE.md','docs\MOD_STYLE_GUIDE.md','docs\MOD_CLASSIFICATION.md','optional\THIRD_PARTY_NOTICES.md','tools\uninstall-ExplorerBlurMica.bat','tools\CW-Beautify-StartupCheck.ps1')) {
     Check "存在 $must" (Test-Path (Join-Path $root $must))
 }
 foreach ($gone in @('local@windows-11-settings-styler-fork.wh.cpp','optional\local@wobbly-windows.wh.cpp','tools\ai-status','THIRD_PARTY_NOTICES-taskbar-lyrics.md','tools\CWDesktop-StartupCheck.ps1','community-src','local@cw-taskbar-icon-size.wh.cpp','local@cw-dynamic-island.wh.cpp','local@cw-island-media.wh.cpp','optional\cw-rightmenu','local@cw-rightmenu.wh.cpp','local@cw-audioswap.wh.cpp','local@cw-volume-per-app.wh.cpp','local@cw-taskbar-lyrics.wh.cpp','local@cw-translucent-windows.wh.cpp','local@cw-taskbar-elastic-pill.wh.cpp','local@cw-taskbar-dock-animation.wh.cpp','local@cw-taskbar-autohide-instant.wh.cpp','local@cw-aero-peek.wh.cpp','local@cw-desktop-toggle-icons.wh.cpp','local@cw-taskbar-autohide-when-maximized.wh.cpp','local@cw-instant-thumbnail-previews.wh.cpp','local@cw-thumbnail-size.wh.cpp','.github\workflows\build_zen_status.yml')) {
