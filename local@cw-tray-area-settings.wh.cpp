@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-托盘区域设置
 // @description     Custom taskbar clock (date/time formats, news feed, weather, performance metrics, media player info), tray system icon tweaks (hide/grayscale, "Show desktop" button width), and a full-height "Show desktop" bar.
 // @description:zh-CN 任务栏托盘区域三合一设置：时钟深度定制（日期时间格式、新闻、天气、性能指标、媒体信息）、托盘系统图标隐藏与灰化（含「显示桌面」按钮宽度）、显示桌面按钮全高。
-// @version         1.0.0
+// @version         1.1.0
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -215,6 +215,10 @@ _系统性能指标_
 - 托盘系统图标段与显示桌面按钮段：仅 Windows 11；Windows 10 上这两段自动跳过，时钟段照常工作。
 - **Recall、Studio Effects 等图标仅 Windows 11 存在**：系统上没有对应图标时，相关开关不会有任何效果，属于正常现象。
 - 停用或卸载模组后，被隐藏的图标会恢复显示，「显示桌面」竖条恢复原尺寸。
+
+## 变更记录
+
+- **1.1.0**：两个融合分组各新增「启用本组功能」总开关（组内第一项、默认开启，时钟段为基础功能不设开关）：`trayIcons.enable`（托盘系统图标调整，关闭后不再隐藏/灰化任何托盘图标、「显示桌面」按钮宽度恢复默认）、`showDesktop.enable`（显示桌面按钮调整，关闭后竖条立即恢复默认高度）。实现为运行时短路：各图标应用入口与竖条高度应用入口按开关跳过，已应用的调整由现有的设置变更重载路径（ApplySettings 还原 + 重新应用）即时还原，切换即时生效、无需重启资源管理器；开关开启时行为与 1.0.0 完全一致。
 
 ## 致谢与许可
 
@@ -723,6 +727,17 @@ _系统性能指标_
     ExplorerPatcher or a similar tool).
   $description:zh-CN: 使用 ExplorerPatcher 或类似工具时，开启此选项以自定义 Windows 11 的旧版任务栏。
 - trayIcons:
+    - enable: true
+      $name: Enable this feature group
+      $name:zh-CN: 启用本组功能
+      $description: >-
+        Master switch for the tray system icon tweaks. When turned off, no
+        icon is hidden or grayscaled and the "Show desktop" button width is
+        left at its default; previously applied tweaks are restored at once.
+      $description:zh-CN: >-
+        「托盘系统图标」分组总开关。关闭后不再隐藏/灰化任何托盘系统图标，
+        「显示桌面」按钮宽度恢复默认，已应用的调整立即还原；重新开启立即
+        恢复。
     - hideVolumeIcon: false
       $name: Hide volume icon
       $name:zh-CN: 隐藏音量图标
@@ -817,6 +832,15 @@ _系统性能指标_
   $description:zh-CN: >-
     隐藏或灰化托盘系统图标，并可调整「显示桌面」按钮宽度。仅支持 Windows 11。
 - showDesktop:
+    - enable: true
+      $name: Enable this feature group
+      $name:zh-CN: 启用本组功能
+      $description: >-
+        Master switch for the "Show desktop" bar adjustments. When turned
+        off, the bar returns to its default height at once.
+      $description:zh-CN: >-
+        「显示桌面按钮」分组总开关。关闭后「显示桌面」竖条立即恢复系统默认
+        高度（不再全高拉伸）；重新开启立即恢复。
     - FullHeight: false
       $name: Full-height Show desktop bar
       $name:zh-CN: 显示桌面按钮全高
@@ -6848,6 +6872,7 @@ namespace ShowDesktopBtn {
 using GetDpiForWindow_t = UINT(WINAPI*)(HWND hwnd);
 GetDpiForWindow_t pGetDpiForWindow;
 
+bool g_enabled = true;  // 分组总开关（showDesktop.enable），关闭时本组功能完全不生效
 bool g_fullHeight = false;
 int g_buttonHeight = -1;
 
@@ -6923,6 +6948,7 @@ struct PipeHeightState {
 std::vector<PipeHeightState> g_pipeHeightStates;
 
 void LoadSettings() {
+    g_enabled = Wh_GetIntSetting(L"showDesktop.enable") != 0;
     g_fullHeight = Wh_GetIntSetting(L"showDesktop.FullHeight") != 0;
     g_buttonHeight = Wh_GetIntSetting(L"showDesktop.ButtonHeight");
 }
@@ -6962,6 +6988,13 @@ void ApplyStyle(FrameworkElement pipeElement) {
     std::erase_if(g_pipeHeightStates, [](const PipeHeightState& s) {
         return !s.element.get();
     });
+
+    // 分组总开关关闭：还原全部高度覆盖并保持惰性（运行时短路，随设置重载
+    // 即时生效；还原逻辑与托盘图标段 ApplySettings 的还原路径一致）。
+    if (!g_enabled) {
+        RestoreAll();
+        return;
+    }
 
     if (!pipeElement || !g_fullHeight) {
         return;
@@ -7043,6 +7076,7 @@ enum class TrayIcons_HideBellIcon {
 };
 
 struct {
+    bool enable;  // 分组总开关（trayIcons.enable），关闭时本组功能完全不生效
     bool hideVolumeIcon;
     bool hideNetworkIcon;
     bool hideBatteryIcon;
@@ -7430,6 +7464,12 @@ TrayIcons_SystemTrayIconIdent TrayIcons_IdentifySystemTrayIconFromText(std::wstr
 }
 
 void TrayIcons_ApplyMainStackIconViewStyle(FrameworkElement notifyIconViewElement) {
+    // 分组总开关关闭：跳过应用（已应用的调整由托盘图标段 ApplySettings 的
+    // 还原路径统一还原；运行时短路，随设置重载即时生效）。
+    if (!TrayIcons_g_settings.enable) {
+        return;
+    }
+
     FrameworkElement systemTrayTextIconContent = nullptr;
 
     FrameworkElement child = notifyIconViewElement;
@@ -7536,6 +7576,11 @@ void TrayIcons_ApplyMainStackIconViewStyle(FrameworkElement notifyIconViewElemen
 
 void TrayIcons_ApplyNonActivatableStackIconViewStyle(
     FrameworkElement notifyIconViewElement) {
+    // 分组总开关关闭：跳过应用（同主栈图标，还原由 ApplySettings 负责）。
+    if (!TrayIcons_g_settings.enable) {
+        return;
+    }
+
     FrameworkElement child = notifyIconViewElement;
     bool hide = false;
     if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
@@ -7785,6 +7830,11 @@ void TrayIcons_UpdateControlCenterButtonStackPanel(FrameworkElement stackPanel) 
 }
 
 void TrayIcons_ApplyControlCenterButtonIconStyle(FrameworkElement systemTrayIconElement) {
+    // 分组总开关关闭：跳过应用（同主栈图标，还原由 ApplySettings 负责）。
+    if (!TrayIcons_g_settings.enable) {
+        return;
+    }
+
     FrameworkElement contentGrid = nullptr;
 
     FrameworkElement child = systemTrayIconElement;
@@ -7930,6 +7980,12 @@ void TrayIcons_ApplyBellIconStyleWithRetry(FrameworkElement systemTrayIconElemen
 }
 
 void TrayIcons_ApplyBellIconStyle(FrameworkElement systemTrayIconElement) {
+    // 分组总开关关闭：跳过应用（同主栈图标，还原由 ApplySettings 负责；
+    // 重试包装会正常走完既有次数，无副作用）。
+    if (!TrayIcons_g_settings.enable) {
+        return;
+    }
+
     FrameworkElement containerGrid =
         TrayIcons_FindChildByName(systemTrayIconElement, L"ContainerGrid");
     if (!containerGrid) {
@@ -8095,20 +8151,25 @@ void TrayIcons_ApplyShowDesktopStyle(FrameworkElement systemTrayIconElement) {
         return !s.element.get();
     });
 
-    int width = TrayIcons_g_settings.showDesktopButtonWidth;
-    Wh_Log(L"Show desktop button, width=%d", width);
-
-    TrayIcons_OverrideShowDesktopWidth(systemTrayIconElement, width);
-    TrayIcons_OverrideShowDesktopWidth(showDesktopStack, width);
-
     // The container grid has an explicit width, which keeps its content at the
     // default size regardless of the width of the icon view.
     auto containerGrid =
         TrayIcons_FindChildByName(systemTrayIconElement, L"ContainerGrid");
-    if (containerGrid) {
-        TrayIcons_OverrideShowDesktopWidth(containerGrid, width);
-    } else {
-        Wh_Log(L"Failed to get ContainerGrid");
+
+    // 分组总开关关闭（trayIcons.enable）：跳过「显示桌面」按钮宽度的应用，
+    // 已应用的宽度覆盖由托盘图标段 ApplySettings 的还原路径统一还原。
+    int width = TrayIcons_g_settings.showDesktopButtonWidth;
+    if (TrayIcons_g_settings.enable) {
+        Wh_Log(L"Show desktop button, width=%d", width);
+
+        TrayIcons_OverrideShowDesktopWidth(systemTrayIconElement, width);
+        TrayIcons_OverrideShowDesktopWidth(showDesktopStack, width);
+
+        if (containerGrid) {
+            TrayIcons_OverrideShowDesktopWidth(containerGrid, width);
+        } else {
+            Wh_Log(L"Failed to get ContainerGrid");
+        }
     }
 
     // CW-Beautify: 「显示桌面」竖条全高（showDesktop.FullHeight，ShowDesktopBtn
@@ -8590,6 +8651,7 @@ bool TrayIcons_RunFromWindowThread(HWND hWnd,
 // CW-Beautify v1.0.0：设置键加 trayIcons. 前缀收进「托盘系统图标」分组，
 // 代码读取同步（其余逻辑不变）。
 void TrayIcons_LoadSettings() {
+    TrayIcons_g_settings.enable = Wh_GetIntSetting(L"trayIcons.enable") != 0;
     TrayIcons_g_settings.hideVolumeIcon = Wh_GetIntSetting(L"trayIcons.hideVolumeIcon");
     TrayIcons_g_settings.hideNetworkIcon = Wh_GetIntSetting(L"trayIcons.hideNetworkIcon");
     TrayIcons_g_settings.hideBatteryIcon = Wh_GetIntSetting(L"trayIcons.hideBatteryIcon");

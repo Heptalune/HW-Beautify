@@ -1,19 +1,22 @@
 // ==WindhawkMod==
 // @id              cw-desktop-quick-settings
-// @name            CW-关于桌面的快捷设置
-// @name:zh-CN      CW-关于桌面的快捷设置
-// @description     Aero Peek when hovering the "Show Desktop" button, desktop icon hiding through the system "Show desktop icons" toggle (double-click / idle auto-hide, optional smooth fade transition), a fade-out for the desktop marquee selection, and desktop icon purification (hide icon text labels, shortcut arrows and UAC shield badges)
-// @description:zh-CN 桌面快捷开关与显示合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）。
-// @version         1.3.0
-// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak
+// @name            CW-更好的Windows（小细节）
+// @name:zh-CN      CW-更好的Windows（小细节）
+// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, double-click to go up in File Explorer, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
+// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；双击资源管理器空白处返回上级；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
+// @version         2.0.0
+// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, wrldspawn, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
-// @include         explorer.exe
-// @architecture    x86-64
-// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm
+// @include         *
+// @exclude         devenv.exe
+// @exclude         windhawk.exe
+// @exclude         windhawk-ui.exe
+// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm -lwtsapi32 -lpowrprof -lgdiplus -ldwmapi -lcomdlg32 -Wl,--export-all-symbols
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：本模组由以下五个功能合并而成：
+// CW-Beautify 整合说明：本模组由以下十个功能合并而成（显示名 CW-更好的Windows
+// （小细节），模组 id 与文件名保持 cw-desktop-quick-settings 不变）：
 //   1.「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4，GPL-3.0）；
 //   2.「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；
 //   3.「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade 1.0.0，MIT，
@@ -22,138 +25,216 @@
 //      0.14.2，MIT，https://windhawk.net/mods/smooth-desktop-icons-auto-hide）；
 //   5.「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and
 //      Shortcut Arrows 1.6.0，MIT 惯例，
-//      https://windhawk.net/mods/hide-desktop-icon-text）。
-// 各部分代码分别以 Peek*/ToggleIcons*/Marquee*/SmoothIcons*/Purity* 前缀隔离
-// 全局符号与函数，独立初始化与卸载。
+//      https://windhawk.net/mods/hide-desktop-icon-text）；
+//   6.「CW-关闭扩展名修改警告」（上游 m417z Turn off change file extension
+//      warning 1.0.1，GPL-3.0，
+//      https://windhawk.net/mods/extension-change-no-warning）；
+//   7.「CW-双击返回上级」（上游 wrldspawn Explorer Double Click Up 1.0.1，
+//      GPL-3.0，https://windhawk.net/mods/explorer-double-click-up）；
+//   8.「CW-开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu
+//      Power Buttons 1.0.2，MIT 惯例，
+//      https://windhawk.net/mods/win11-power-buttons）；
+//   9.「CW-拖拽删除文件」（上游 iMAboud Drag to Delete 1.0.0，MIT，
+//      https://windhawk.net/mods/drag-to-delete）；
+//  10.「CW-登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown
+//      Sounds Restored 1.0.3，MIT 惯例，
+//      https://windhawk.net/mods/logon-logoff-shutdown-sounds）；
+//  11.「CW-窗口优化」（m417z AltDrag + m417z Slick Window Arrangement +
+//      Bo0ii Invisible Window Borders 三合一，见下方 WinOpt 段说明）。
+// 各部分代码分别以 Peek*/ToggleIcons*/SmoothIcons*/Marquee*/Purity*/ExtWarn*/
+// DblUp*/PowerBtn*/DragDel*/SndLog* 前缀隔离全局符号与函数；窗口优化三段沿用
+// 其内部结构收进 WinOpt 命名空间（内含 AltDrag / WinArrange / InvisBorders
+// 三个子命名空间），独立初始化与卸载。
 // 1.2.0 起（按用户要求）：第 4 项不再作为独立隐藏机制——其闲置自动隐藏、
 // 单击/拖入显示、双击立即隐藏等触发逻辑全部移除，只保留其绘制技术（对桌面
 // SysListView32 绘制过程的接管与 alpha 混合）作为纯动画绘制器（SmoothIcons*
 // 段）；桌面图标的隐藏机制只有系统「显示桌面图标」开关一种（ToggleIcons），
 // 本模组每次触发切换时在其上叠加一次淡出/淡入过渡动画。
-// 设置键为 peek.*、toggleIcons.*（动画设置为组内顶层的 toggleIcons.animate /
-// toggleIcons.animationDuration）、marquee.* 与 purity.* 前缀。
-// ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 CreateWindowExW，由文件末尾的
-// 共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
+// 设置键为 peek.*、toggleIcons.*、marquee.*、purity.*、extWarn.*、dblUp.*、
+// powerBtn.*、dragDel.*、sndLog.* 与 winOpt.*（两级嵌套：winOpt 组内嵌
+// altDrag.*/winArrange.*/invisBorders.* 三个子分组）前缀。
+// ToggleIcons、SmoothIcons、Purity 与 DblUp 都需要挂钩 CreateWindowExW，由
+// 文件末尾的共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
+// 2.0.0 起进程门控（@include 为 * 全进程注入，@exclude windhawk.exe /
+// windhawk-ui.exe / devenv.exe）：
+//   • Peek / ToggleIcons（含 SmoothIcons 动画）/ Marquee / Purity / ExtWarn /
+//     DblUp / DragDel / SndLog 只在 explorer.exe 中启用（合并入口按进程名判
+//     定，其余进程完全不初始化这些段）；
+//   • PowerBtn（开始菜单电源按钮）按 StartMenuExperienceHost.exe（开始菜单
+//     UI 注入）与 explorer.exe（隐藏代理窗口执行电源动作）分流，其余进程
+//     不启用；
+//   • WinOpt（窗口优化）段全进程启用（窗口拖动的跨进程钩子需要），原
+//     devenv.exe 排除保留在元数据 @exclude 中。
 
 // ==WindhawkModReadme==
 /*
-# CW-关于桌面的快捷设置
+# CW-更好的Windows（小细节）
 
-桌面快捷开关与显示合集，把原来多个独立模组合并为一个：悬停任务栏「显示桌面」按钮时的 Aero Peek 桌面速览、双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）、桌面框选矩形的淡出动画，以及桌面图标纯净化（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）。直接运行在 `explorer.exe` 中，不需要额外的后台程序。
+Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「双击返回上级」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」「窗口优化」六个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余四个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
 
-## 功能一：显示桌面按钮预览（Aero Peek）
+## 功能组一览
 
-把鼠标悬停在任务栏最右侧的「显示桌面」按钮上，即可显示所有窗口的 Aero Peek 速览（窗口变透明、露出桌面的玻璃效果），移开鼠标后恢复原样——找回 Windows 11 之前的经典体验。
+| # | 分组 | 设置键前缀 | 总开关默认 | 一句话说明 | 来源（原作者） |
+|---|------|-----------|-----------|-----------|---------------|
+| 1 | 显示桌面按钮预览 | `peek.*` | 开 | 悬停任务栏「显示桌面」按钮显示 Aero Peek 桌面速览 | m417z（GPL-3.0） |
+| 2 | 桌面图标隐藏设置 | `toggleIcons.*` | 开 | 双击桌面空白处/闲置自动隐藏图标（系统开关方式，可选平滑过渡动画） | Heptalune 原创 + HeyOkay 绘制技术（MIT） |
+| 3 | 桌面框选淡出 | `marquee.*` | 开 | 桌面框选矩形松开后平滑淡出 | angel_lov（MIT） |
+| 4 | 纯净化图标 | `purity.*` | 开 | 隐藏图标文字、快捷方式箭头与 UAC 盾牌角标 | kivsak（MIT 惯例） |
+| 5 | 扩展名警告 | `extWarn.*` | **关** | 重命名修改扩展名时不再弹出确认警告 | m417z（GPL-3.0） |
+| 6 | 双击返回上级 | `dblUp.*` | **关** | 双击资源管理器空白处返回上一级文件夹 | wrldspawn（GPL-3.0） |
+| 7 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
+| 8 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
+| 9 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
+| 10 | 窗口优化 | `winOpt.*` | **关** | Alt+拖动任意移动/调整窗口、滑动排列吸附、隐形窗口边框（三个子分组） | m417z（GPL-3.0）×2、Bo0ii（MIT） |
 
-也可以随时按 `Win+,`（Win 键 + 逗号键）触发同样的 Aero Peek 效果。
+## 分组 1：显示桌面按钮预览（peek.*）
 
-仅支持 Windows 11。Windows 7~10 系统自带该行为，无需本模组。
+把鼠标悬停在任务栏最右侧的「显示桌面」按钮上，达到设定的延迟后显示所有窗口的 Aero Peek 速览（窗口变透明边框、露出桌面），移开鼠标立即恢复；也可以随时按 `Win+,` 触发同样的效果。找回 Windows 11 之前的经典体验。
 
-**生效前提：系统需开启「启用 Peek」**。若在「性能选项 → 视觉效果」里取消了「启用 Peek」（对应注册表 `HKCU\Software\Microsoft\Windows\DWM\EnableAeroPeek` 为 0），Windows 会阻止悬停「显示桌面」按钮时的桌面速览，本功能也无法生效（`Win+,` 快捷键同样受其控制）。功能"失效"时请先检查这个系统开关。
+**生效前提：系统需开启「启用 Peek」**。若在「性能选项 → 视觉效果」里取消了「启用 Peek」（注册表 `HKCU\Software\Microsoft\Windows\DWM\EnableAeroPeek` 为 0），Windows 会阻止桌面速览，本功能也无法生效。功能"失效"时请先检查这个系统开关。
 
-![演示图](https://i.imgur.com/TsJX013.gif)
+仅支持 Windows 11（Windows 7~10 系统自带该行为）。自动在 SystemTray.dll、Taskbar.View.dll、ExplorerExtensions.dll 中定位目标，兼容近期的 Windows 11 版本；悬停时小幅移动不中断计时，超过系统拖动阈值才重新计时，避免误触发。
 
-功能细节：
+## 分组 2：桌面图标隐藏设置（toggleIcons.*）
 
-- **悬停触发 Aero Peek**：悬停任务栏最右侧的「显示桌面」按钮，达到设定的延迟后显示桌面速览（所有窗口变透明边框，露出桌面）；移开鼠标立即恢复。
-- **移动容错**：悬停时鼠标小幅移动不会中断计时；移动距离超过系统拖动阈值才重新计时，避免误触发。
-- **适配新旧任务栏实现**：自动在 SystemTray.dll、Taskbar.View.dll、ExplorerExtensions.dll 中定位目标，兼容近期的 Windows 11 版本。
+双击桌面空白处即可显示或隐藏桌面图标，也可以在系统闲置一段时间后自动隐藏；每次切换可叠加一次平滑的淡出/淡入过渡动画。隐藏机制是系统「显示桌面图标」开关（与右键菜单 → 查看 → 显示桌面图标 是同一个开关）：菜单勾选状态、系统持久化与实际显示永远同步，不打乱图标排列，资源管理器重启、插拔显示器后自动重新挂接。
 
-## 功能二：双击隐藏桌面图标（系统开关方式）
+- **闲置时自动隐藏图标（系统开关方式）**（默认开）+ **自动隐藏延迟**（3-60 秒，默认 5）：检测全局键盘和鼠标输入；全屏应用（视频/游戏/演示）时暂停自动隐藏。
+- **任意输入时恢复图标**（默认开）：仅恢复由自动隐藏的图标，双击手动隐藏的不受影响。
+- **切换时平滑动画**（默认开）+ **动画时长**（50-1000 毫秒，默认 250）：本模组触发的每次切换播放一次淡出/淡入过渡——隐藏方向图标先平滑淡出、动画结束后才执行系统切换；显示方向系统切换立即生效、图标再从透明平滑淡入。关闭后切换瞬间完成。
 
-双击桌面空白处即可显示或隐藏桌面图标，也可以在系统闲置一段时间后自动隐藏；每次切换还可以播放一次平滑的淡出/淡入过渡动画（见下方「切换时平滑动画」）。如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」。
+如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」。想让任务栏也在闲置时淡出，可配合任务栏类 mod 使用。
 
-功能细节：
+## 分组 3：桌面框选淡出（marquee.*）
 
-- 双击桌面空白处切换图标显示；双击文件、文件夹或快捷方式时照常打开。
-- 系统闲置达到设定时长后自动隐藏图标，检测的是全局键盘和鼠标输入。
-- 自动隐藏后任意输入即可恢复；双击手动隐藏的图标不会被自动恢复。
-- 资源管理器重启、插拔显示器后自动重新挂接。
-- 通过系统「显示桌面图标」命令实现切换（与右键菜单 → 查看 → 显示桌面图标 是同一个开关）：菜单勾选状态、系统持久化与实际显示永远同步，不打乱图标排列。
-- **切换时平滑动画**（默认开启）：本模组触发的每次切换（双击、闲置自动隐藏、任意输入恢复）都会播放一次淡出/淡入过渡——隐藏方向图标先平滑淡出、动画结束后才执行系统切换；显示方向系统切换立即生效、图标再从透明平滑淡入。关闭后切换瞬间完成（纯系统开关方式）。动画时长可在设置中调整（50-1000 毫秒）。
+在桌面按住鼠标拖动框选图标后，松开鼠标按钮的瞬间，框选矩形以平滑动画优雅淡出，而非凭空消失。动画速度（50-500%）、时长（100-2000 毫秒）、起始不透明度、自动计算不透明度、被遮挡时 4 倍速淡出、单实例模式与自定义填充/边框颜色（HEX）均可在组内调节。
 
-兼容性与已知问题：
-
-- 适用于 Windows 11，注入 `explorer.exe`。
-- 如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」（勾选为显示、取消勾选为隐藏）。状态由系统管理并持久化；本模组的双击/闲置切换与该状态完全同步，资源管理器重启后保持不变。
-- 如果想让任务栏也在闲置时淡出，可以配合任务栏类 mod 使用。
-
-## 功能三：桌面框选淡出
-
-由独立模组「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT）并入。在桌面按住鼠标拖动框选图标后，松开鼠标按钮的瞬间，框选矩形不再凭空消失，而是以平滑的动画优雅淡出——让 Windows 桌面观感更精致、更现代。
-
-![效果预览](https://i.imgur.com/oH4fh6O.gif)
-
-功能细节：
-
-- **平滑淡出效果**：松开鼠标后框选矩形淡出消散，而非瞬间蒸发。
-- **高度可定制**：动画速度与时长均可通过模组设置调节。
-- **智能自动透明度**：根据速度与时长自动计算起始透明度，让动画始终自然。
-- **智能加速**：动画播放期间若有其他窗口来到前台，自动以 4 倍速淡出，不挡视线。
-- **单实例模式**：防止动画互相重叠，同一时间只有一个框选矩形在淡出。
-- **自定义淡出颜色**：可覆盖淡出覆盖层的填充与边框颜色。只影响淡出覆盖层——系统全局的选区颜色绝不会被改动。
-
-兼容性与注意事项：
-
-- Windows 10 / Windows 11；仅在持有桌面（Shell）的 explorer 实例中生效，以 /factory、-Embedding 等参数启动的实例会自动跳过，不会重复安装钩子。
+- 仅在持有桌面（Shell）的 explorer 实例中生效，以 /factory、-Embedding 等参数启动的实例自动跳过。
 - 依赖桌面经典的 Progman/WorkerW → SHELLDLL_DefView → SysListView32 结构；使用壁纸引擎等替换桌面视图的工具时可能不生效。
-- 在桌面图标上按下鼠标（命中图标）时不会触发淡出动画，仅在空白处框选时触发。
+- 在桌面图标上按下鼠标（命中图标）时不会触发淡出，仅在空白处框选时触发。
 - 「使用自定义颜色」只作用于淡出覆盖层，拖动过程中的实时框选矩形仍为系统配色。
-- 卸载或停用本模组时会等待动画线程退出并清理全部覆盖层窗口，正常情况无残留。
 
-## 功能四：纯净化图标（隐藏文字/箭头/盾牌）
+## 分组 4：纯净化图标（purity.*）
 
-由独立模组「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例）并入。隐藏桌面图标的文字标签（文件夹名保留显示），实时移除桌面快捷方式图标上的标准小箭头，并可选移除 UAC 管理员盾牌角标，让桌面更加清爽。
+隐藏桌面图标的文字标签（**隐藏桌面图标文字**，默认开；文件夹名保留显示），实时移除快捷方式小箭头（**移除快捷方式箭头**，默认开），并可选移除 UAC 管理员盾牌角标（**隐藏 UAC 管理员盾牌**，默认关）。
 
-功能细节：
+- 箭头的移除作用于整个资源管理器会话（箭头覆盖层位于共享的系统图标列表中），关闭该功能或停用模组后要等图标缓存刷新才恢复。
+- **安全提示**：UAC 盾牌是「该程序需要管理员权限」的可视提醒，隐藏后无法从桌面直观分辨哪些程序会以管理员身份运行，请在知情的前提下开启；资源管理器窗口里的盾牌角标也会一并隐藏。
+- 与「桌面图标隐藏设置」的分工：本分组只负责图标**显示样式**的纯净化（文字/箭头/盾牌的显隐）；「桌面图标隐藏设置」负责图标的**整体隐藏与恢复**，两者互不冲突，可同时开启搭配使用。
 
-- **隐藏图标文字**：隐藏桌面文件与快捷方式的文字标签，文件夹名称保留显示。
-- **移除快捷方式箭头**：实时移除快捷方式小箭头覆盖图标，无需注册表修改或管理员权限。
-- **隐藏 UAC 管理员盾牌**（默认关闭）：移除需要管理员权限的程序及其快捷方式图标上的蓝黄色盾牌角标，同样无需注册表修改或管理员权限。
+## 分组 5：扩展名警告（extWarn.*，默认关闭）
 
-注意事项：
+重命名文件并修改扩展名时，Windows 默认会弹出「如果改变文件扩展名，可能会导致文件不可用」的确认警告。开启本分组后不再弹出该警告，重命名一步生效。
 
-- 快捷方式箭头的移除作用于整个资源管理器会话（箭头覆盖层位于共享的系统图标列表中）。
-- 关闭该功能或停用模组后，箭头要等资源管理器重启或图标缓存刷新后才会恢复。
-- **安全提示**：UAC 盾牌是「该程序需要管理员权限」的可视提醒。隐藏盾牌后，将无法从桌面图标上直观分辨哪些程序会以管理员身份运行，请在知情的前提下开启；关闭该功能或停用模组后，盾牌要等资源管理器重启或图标缓存刷新后才会恢复。
-- 隐藏 UAC 盾牌同样作用于整个资源管理器进程（系统图标列表与图标合成路径为进程内共享），资源管理器窗口里的盾牌角标也会被隐藏；个别经 SHGetFileInfo 获取「带覆盖图标」的界面可能一并失去覆盖合成。
-- 已知限制：文件夹判定通过比对绘制的文字与实际桌面文件夹名称实现，若某个「文件」与桌面上的某个「文件夹」完全同名，该文件的文字标签同样会被保留。
-- 与「桌面图标隐藏设置」的分工：本功能只负责图标**显示样式**的纯净化（文字/箭头/盾牌的显隐）；「桌面图标隐藏设置」负责图标的**整体隐藏与恢复**。两者管理维度不同、互不冲突，可以同时开启搭配使用（例如：图标整体显示时由本功能隐藏文字与箭头，需要时再用双击一键整体隐藏图标）。
+- **精准拦截**：仅当弹窗特征与该警告完全匹配（shell32 的特定提示资源与「感叹号 + 是/否」按钮样式）时才自动确认，其余任何消息弹窗均不受影响。
+- 兼容新旧版 Windows：除经典的 ShellMessageBoxW 外，也覆盖 2025 年 4 月前后新版系统加入的 ShellMessageBoxInternal 弹窗路径。
+- **默认关闭的原因**：该警告是防止误改扩展名导致文件无法打开的系统安全提醒；开启即屏蔽确认弹窗，请知悉风险后显式开启，随时可关闭恢复系统默认行为。
 
-## 设置说明
+## 分组 6：双击返回上级（dblUp.*，默认关闭）
 
-设置页分为「显示桌面按钮预览」「桌面图标隐藏设置」「桌面框选淡出」与「纯净化图标」四个可收起分组，各分组内设置项的详细说明见设置界面提示文字。「桌面图标隐藏设置」分组内的隐藏机制只有系统「显示桌面图标」开关一种，「切换时平滑动画」与「动画时长」为其可选的过渡效果；「纯净化图标」分组负责桌面图标显示样式的纯净化（隐藏文字/箭头/盾牌），与图标的整体隐藏互不影响。
+开启后，在文件资源管理器内容区的空白处（未命中任何文件或文件夹时）双击鼠标左键，即返回上一级目录；双击文件、文件夹或快捷方式时行为不变。
+
+- **新旧视图双适配**：同时适配经典列表视图（SysListView32）与 Windows 11 默认的 DirectUI 视图（通过 UIAutomation 识别 UIItemsView / UIGroupItem 的空白区域）。
+- **多标签页互不干扰**：按每个标签页各自的 ShellTabWindowClass 定位其浏览器实例，多标签页、多窗口下均可正确返回所在目录的上一级。
+- 已知限制：分组视图的组标题未做特殊处理（上游代码标注 FIXME）。
+
+## 分组 7：开始菜单电源按钮（powerBtn.*，默认关闭）
+
+在 Windows 11 开始菜单导航窗格中原生电源按钮的位置注入一排图标按钮，替换默认的电源按钮二级弹出菜单：点击图标直接执行关机、重启、注销、睡眠、休眠或锁定。
+
+- **按钮与排序**（`powerBtn.buttons` 数组）与 **6 个逐按钮启用开关**（`powerBtn.enableShutdown` 等，关机/重启/注销/睡眠默认启用、休眠/锁定默认关闭）取交集决定显示：只有既列入数组、又开启对应启用开关的按钮才会显示，排序按数组顺序。
+- **对齐方式**：按钮组支持左对齐、居中、右对齐；**执行前确认**（默认关）：可开启确认对话框防误触。
+- **中英文自适应**：按钮提示与确认对话框按系统界面语言自动显示中文或英文。
+- **工作原理**：模组同时注入 StartMenuExperienceHost.exe 与 explorer.exe——按钮注入在开始菜单进程完成；由于开始菜单进程运行在受限的 AppContainer 沙箱中，实际的电源动作由 explorer.exe 中的隐藏代理窗口代为执行。
+- 仅支持 Windows 11（依赖 Win11 开始菜单的 XAML 结构与 Segoe Fluent Icons 图标字体）。
+
+## 分组 8：拖拽删除（dragDel.*，默认关闭）
+
+开启后，在文件资源管理器或桌面拖动文件时，屏幕顶部会浮现一个悬浮的垃圾桶目标；把文件拖到目标圆形判定范围内松手，文件即被移入回收站，支持一次拖放多个文件。拖动结束后悬浮目标自动隐藏。
+
+- **误入不误删**：只有松手位置落在垃圾桶判定范围（圆形区域加边缘余量）内才生效，拖到其他任何位置松手都是正常取消。
+- **误删防护**：删除走系统回收站通道（FOF_ALLOWUNDO），误删后可随时从回收站还原；删除为静默执行（不弹确认框、不显示进度窗口），若文件过大无法进回收站，系统仍会弹出「将彻底删除」的警告，不会无声永久删除。
+- **DPI 适配**：按显示器实际缩放比例渲染图标与窗口，多显示器环境下跟随拖动所在的显示器；带弹性缩放动画，不获取焦点、无任务栏按钮。
+- **默认关闭的原因**：该功能会把拖放直接变成删除动作，为避免误删请显式开启。
+
+## 分组 9：登录注销关机音效（sndLog.*，默认关闭）
+
+恢复 Windows 7 时代的登录、注销与关机音效（Windows 8 起系统不再播放）。在 explorer.exe 中随桌面进程触发：
+
+- **登录音效**：进入桌面时播放「Windows 登录」音效；每个系统登录会话只播一次（会话易失注册表键去重），explorer 中途重启也不会重复播放。**XP 启动行为**（`sndLog.xpmode`，默认关）开启后登录时改播「Windows 启动」音效，重现 XP 式开机音乐。
+- **注销与关机音效**：注销/重启/关机时播放「Windows 注销」或「退出 Windows」音效，并等待播放完成后再继续结束会话（标记为关键性结束的强制关机不受影响）。
+- **锁定/解锁音效**：默认挂钩 CTray::_OnSessionChange（`sndLog.hookonsessionchange`，默认开），锁定计算机时播放注销音效、解锁返回桌面时播放登录音效，与 Win7 行为一致；仅当使用 ExplorerEx 等移植自 XP/Server 2003 的 explorer 时才需要关闭。
+- **使用前提（重要）**：请先在声音方案中为「Windows 登录」「Windows 注销」「退出 Windows」（开启 XP 模式还含「Windows 启动」）等事件配置 .wav 音效（控制面板 → 声音 →「声音」选项卡，或使用 [Shutdown-Logoff-Logon-Sound-Hacks.zip](https://www.howtogeek.com/wp-content/uploads/2016/09/Shutdown-Logoff-Logon-Sound-Hacks.zip) 恢复声音事件）；事件未配置音效时静默跳过、不回放默认音。若开启 XP 启动行为，建议取消勾选「播放 Windows 启动声音」以免登录前提前播放。
+- 与其他恢复/接管登录注销关机声音的模组或工具同时启用可能重复播放，请按需二选一。
+
+## 分组 10：窗口优化（winOpt.*，默认关闭）
+
+窗口操作三合一，组内保留三个子分组（`winOpt.altDrag.*` / `winOpt.winArrange.*` / `winOpt.invisBorders.*`），各子分组第一项同样为「启用本组功能」开关（子分组默认开启，但整个「窗口优化」分组默认关闭）。本分组生效于所有进程（窗口拖动的钩子需要跨进程工作），Windhawk 模组设置「高级」选项卡的自定义进程排除列表依旧有效。
+
+### 窗口拖动（Alt+拖动）（winOpt.altDrag.*）
+
+按住移动触发键（默认 Alt + 左键）在窗口任意位置拖动即可移动窗口；按住调整触发键（默认 Alt + 右键）拖动即可调整大小——跟随鼠标的边或角是最靠近起拖位置的那条。走标题栏拖动的同一套系统流程，吸附、DWM 动画、最大化窗口处理一应俱全；未超过延迟或拖动阈值的短按会原样作为点击交还给程序。鼠标键、修饰键与按住延迟（毫秒）均可单独设置，「拖动无标题栏的窗口」（默认关）可选拖动弹出菜单、工具提示、气泡。灵感来自 [Stefan Sundin 的原版 AltDrag 工具](https://stefansundin.github.io/altdrag/)。
+
+### 窗口排列（winOpt.winArrange.*）
+
+窗口松手后带着惯性顺滑滑动减速停止，拖动与滑动过程中靠近其他窗口或屏幕工作区边缘时自动吸附对齐（**拖动窗口时吸附**、**滑动时吸附窗口**，默认开）；按住「临时禁用吸附的按键」（默认 Alt）可临时绕过吸附；**吸附距离**（默认 25，按窗口 DPI 缩放）、**滑动减速**（默认 15，1-99，越小滑动越久）可调。吸附与滑动都保证窗口标题栏留在屏幕工作区内；窗口滑过屏幕边缘会反弹，也能顺势滑到相邻显示器。
+
+### 隐形窗口边框（winOpt.invisBorders.*）
+
+将窗口边框设为隐形（DWMWA_COLOR_NONE），同时完整保留系统窗口圆角效果。**应用到特殊窗口**（默认关）可同时作用于对话框等特殊窗口。需要 DWM 处于启用状态，Windows 10（1809+）/ Windows 11 可用。
+
+### 与桌面功能的配合
+
+任务栏、桌面（Progman/WorkerW）窗口被窗口拖动排除，不会干扰本模组其余桌面分组；「窗口排列」默认按住 Alt 临时禁用吸附，与「窗口拖动（Alt+拖动）」的默认触发键重叠——按住 Alt 拖动时窗口不会吸附，想边拖边吸附可改掉其中一方的按键。
+
+## 进程生效范围
+
+本模组注入所有进程（`@include *`，排除 windhawk.exe、windhawk-ui.exe 与 devenv.exe），各分组按需门控：
+
+- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、纯净化图标、扩展名警告、双击返回上级、拖拽删除、登录注销关机音效；
+- **explorer.exe + StartMenuExperienceHost.exe 分流**：开始菜单电源按钮（按钮注入在开始菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
+- **全进程生效**：窗口优化（含三个子分组）。
+
+## 变更记录
+
+- **2.0.0**：模组更名「CW-更好的Windows（小细节）」（id 与文件名保持 cw-desktop-quick-settings 不变），定位升级为 Windows 细节功能大合集。并入六个独立模组，成为四个既有分组之外的新分组：`extWarn.*`「扩展名警告」（上游 m417z Turn off change file extension warning 1.0.1，GPL-3.0，总开关默认关闭）、`dblUp.*`「双击返回上级」（上游 wrldspawn Explorer Double Click Up 1.0.1，GPL-3.0，总开关默认关闭，CreateWindowExW 钩子并入共享钩子分发）、`powerBtn.*`「开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2，MIT 惯例，总开关默认关闭，总开关关闭时恢复原生电源按钮）、`dragDel.*`「拖拽删除」（上游 iMAboud Drag to Delete 1.0.0，MIT，总开关默认关闭）、`sndLog.*`「登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3，MIT 惯例，总开关默认关闭）与 `winOpt.*`「窗口优化」（原 CW-窗口优化 1.1.0 整体并入，两级嵌套分组：组级总开关 + altDrag.* / winArrange.* / invisBorders.* 三个子分组，键名结构不变）。为覆盖窗口优化的跨进程钩子，`@include` 由 explorer.exe 改为 `*` 并排除 windhawk.exe / windhawk-ui.exe / devenv.exe，各分组按进程门控（桌面八组仅 explorer、电源按钮按 StartMenuExperienceHost/explorer 分流、窗口优化全进程）；移除 `@architecture x86-64` 单架构声明，x86 与 x64 双架构编译（并入代码已按本包铁律复核/修复无捕获 lambda 直传 stdcall 回调问题）。原六个独立模组源码文件移除，由本模组统一提供；旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
+- **1.4.0**：四个功能分组各新增「启用本组功能」总开关（组内第一项、默认开启）：`peek.enable`、`toggleIcons.enable`、`marquee.enable`、`purity.enable`。实现为运行时短路 + 分组级挂接管理：预览与框选在触发入口直通原逻辑，桌面图标隐藏按开关动态挂接/摘除桌面窗口子类，纯净化按开关跳过或还原图像列表补丁；全部沿用各分组现有的设置变更重载路径，切换即时生效、无需重启资源管理器。
+- **1.3.0**：并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak，MIT 惯例，汉化版 1.6.0），成为第四个可收起分组「纯净化图标」（Purity）：隐藏桌面图标文字（保留文件夹名）、移除快捷方式小箭头，并可选择性隐藏 UAC 管理员盾牌角标（默认关闭）。设置项迁移为 `purity.hideText` / `purity.hideArrows` / `purity.hideShields`；原模组的 CreateWindowExW 钩子并入文件末尾的共享钩子统一分发。
+- **1.2.0**：按用户要求重构「桌面图标隐藏设置」：移除 1.1.0 并入的独立平滑隐藏机制，桌面图标的隐藏机制只保留原系统开关方式；SmoothIcons 段精简为纯动画绘制器，只保留其绘制技术。新增「切换时平滑动画」（`toggleIcons.animate`，默认开启）与「动画时长」（`toggleIcons.animationDuration`）两项设置；删除 `toggleIcons.smooth` 子组。
+- **1.1.0**：并入「CW-桌面框选淡出」（angel_lov，MIT）与「CW-桌面图标平滑自动隐藏」（HeyOkay，MIT），两组设置分别迁移为 `marquee.*` 与 `toggleIcons.smooth.*` 前缀。
+- **1.0.0**：由「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）合并成模组。
 
 ## 致谢与许可
 
 - 「显示桌面按钮预览」原版 mod：Aero Peek on "Show desktop" button hover，作者 [m417z](https://github.com/m417z)，GPL-3.0，原版链接：<https://windhawk.net/mods/taskbar-show-desktop-button-aero-peek>。
 - 「双击隐藏桌面图标」为 CW-Beautify 整合包作者 Heptalune 的原创 mod。
-- 「桌面框选淡出」原版 mod：Desktop Marquee Fade，作者 [angel_lov](https://github.com/Twilight0Sparkle)，MIT 许可证，原版链接：<https://windhawk.net/mods/desktop-marquee-fade>，源码：<https://github.com/ramensoftware/windhawk-mods>。
-- 「平滑自动隐藏」原版 mod：Smooth Desktop Icons Auto-Hide，作者 [HeyOkay](https://github.com/HeyOkay)，MIT 许可证，原版链接：<https://windhawk.net/mods/smooth-desktop-icons-auto-hide>，源码：<https://github.com/ramensoftware/windhawk-mods/blob/main/mods/smooth-desktop-icons-auto-hide.wh.cpp>。1.2.0 起其独立隐藏机制已按用户要求移除，仅保留其绘制技术用于切换过渡动画。
+- 「桌面框选淡出」原版 mod：Desktop Marquee Fade，作者 [angel_lov](https://github.com/Twilight0Sparkle)，MIT 许可证，原版链接：<https://windhawk.net/mods/desktop-marquee-fade>。
+- 「平滑自动隐藏」原版 mod：Smooth Desktop Icons Auto-Hide，作者 [HeyOkay](https://github.com/HeyOkay)，MIT 许可证，原版链接：<https://windhawk.net/mods/smooth-desktop-icons-auto-hide>。1.2.0 起其独立隐藏机制已按用户要求移除，仅保留其绘制技术用于切换过渡动画。
 - 「纯净化图标」原版 mod：Hide Desktop Icon Text and Shortcut Arrows，作者 [kivsak](https://github.com/kivsak)，源码内未附许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/hide-desktop-icon-text>。
-- 本模组整体以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）整合维护；并入的三个 MIT 模组保留其原作者署名与 MIT 许可声明。
-
-## 变更记录
-
-- **1.3.0**：并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例，汉化版 1.6.0），成为第四个可收起分组「纯净化图标」（Purity）：隐藏桌面图标文字（保留文件夹名）、移除快捷方式小箭头，并可选择性隐藏 UAC 管理员盾牌角标（默认关闭，安全提示见功能四）。设置项迁移为 `purity.hideText` / `purity.hideArrows` / `purity.hideShields`（对应原模组 `hide_text` / `hide_arrows` / `hide_shields`，默认值不变）；原模组的 CreateWindowExW 钩子并入文件末尾的共享钩子统一分发，SHChangeNotify 先通知后补丁的初始化时序按上游实测结论原样保留，设置变更时对纯净化图标段单独复刻原版「重载后重新通知+补丁+重绘」的收尾。原独立模组源码文件（`local@cw-hide-desktop-icon-text.wh.cpp`）移除，由本模组统一提供。旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
-- **1.2.0**：按用户要求重构「桌面图标隐藏设置」：移除 1.1.0 并入的独立平滑隐藏机制（SmoothIcons 的闲置自动隐藏、单击/拖入显示、双击立即隐藏等触发与看护逻辑全部删除），桌面图标的隐藏机制只保留原系统开关方式（双击切换、闲置自动隐藏、任意输入恢复，隐藏效果与原版完全一致）；SmoothIcons 段精简为纯动画绘制器，只保留其绘制技术（接管桌面 SysListView32 绘制并做 alpha 混合）。在此基础上新增「切换时平滑动画」（`toggleIcons.animate`，默认开启）与「动画时长」（`toggleIcons.animationDuration`，50-1000 毫秒，默认 250，复用原 animationDuration 文案）两项设置：本模组每次触发切换时播放一次淡出/淡入过渡（隐藏方向先动画、结束后才放行系统切换命令；显示方向切换立即生效、图标从透明淡入）。删除 `toggleIcons.smooth` 子组，动画设置移入 `toggleIcons` 组顶层；旧设置键 `toggleIcons.smooth.*` 不再读取。
-- **1.1.0**：并入「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT，汉化版 1.0.1）与「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide，MIT，汉化版 0.14.3）两个独立模组，原作者署名与原版链接并入致谢；两组设置分别迁移为 `marquee.*` 与 `toggleIcons.smooth.*` 前缀（平滑自动隐藏作为「桌面图标隐藏设置」分组内的子分组，设置默认值保持上游默认、自动隐藏开启）；「双击隐藏桌面图标」分组更名为「桌面图标隐藏设置」（Desktop icon hiding settings），分组内系统开关双击隐藏与平滑自动隐藏两种机制并存，机制差异与共存建议见功能三；原两个独立模组源码文件（`local@cw-desktop-marquee-fade.wh.cpp`、`local@cw-smooth-desktop-icons-autohide.wh.cpp`）移除，由本模组统一提供。旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
-- **1.0.0**：由「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）合并成模组。
-
-## CW-Beautify 整合说明
-
-- 本模组由 CW-Beautify 整合包（作者 Heptalune）先后合并五个功能：1.0.0 合并「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；1.1.0 并入「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT）与「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide，MIT）；1.2.0 按用户要求移除平滑自动隐藏的独立机制，其绘制技术保留为切换过渡动画；1.3.0 并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例）。
-- 五部分代码分别以 Peek、ToggleIcons、Marquee、SmoothIcons、Purity 前缀隔离全局符号与函数，独立初始化与卸载，互不干扰；一处功能初始化失败时仅记录日志并降级，不影响其他功能。ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 `CreateWindowExW`，本模组只安装一次共享钩子并把新建窗口分发给三者，避免对同一 API 重复挂钩。
-- SmoothIcons 段自 1.2.0 起精简为纯动画绘制器（绘制接管 + alpha 混合 + 淡入淡出），不再包含任何触发/闲置/看护逻辑；与 ToggleIcons 的衔接点为三个切换函数（双击切换 / 闲置自动隐藏 / 任意输入恢复）调用的 `SmoothIconsBeginHideTransition` / `SmoothIconsBeginShowTransition` / `SmoothIconsIsHidePending` / `SmoothIconsCancelHideTransition` 接口。
-- Purity 段（纯净化图标）完整保留上游 kivsak 1.6.0 的实现：DrawTextW / DrawThemeTextEx 文字隐藏钩子、系统图像列表 overlay 补丁（快捷方式箭头与 UAC 盾牌）、SHGetFileInfoW / SHGetStockIconInfo 提取期合成拦截钩子与 IShellFolder 文件夹名缓存；SHChangeNotify 先通知后打图像列表补丁的初始化时序按上游实测结论原样保留。
-- 设置键分别为 `peek.*`（悬停延迟）、`toggleIcons.*`（系统开关双击隐藏、闲置自动隐藏，以及切换过渡动画 `toggleIcons.animate` / `toggleIcons.animationDuration`）、`marquee.*`（桌面框选淡出）与 `purity.*`（`purity.hideText` / `purity.hideArrows` / `purity.hideShields`，纯净化图标）。旧模组的设置不会自动迁移到本模组，安装后请在设置页重新确认数值。
-- 除 1.2.0 按用户要求重构的桌面图标隐藏部分与 1.3.0 的符号隔离/设置键前缀/共享钩子接入/设置变更收尾适配外，其余功能代码逻辑与各自原版保持一致。
+- 「扩展名警告」原版 mod：Turn off change file extension warning，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证，原版链接：<https://windhawk.net/mods/extension-change-no-warning>。
+- 「双击返回上级」原版 mod：Explorer Double Click Up，作者 [wrldspawn](https://github.com/wrldspawn)，GNU General Public License v3.0（源码内声明），原版链接：<https://windhawk.net/mods/explorer-double-click-up>。上游在源码中注明的实现参考致谢：COMInitializer 类与 UIAutomation 用法取自模组「Click on empty taskbar space」（GPL-3.0）；FileCabinet_CreateViewWindow2 挂钩与 ExplorerWrapper 参考/改写自「Classic Explorer Treeview」；返回上级目录的实现参考 Open-Shell。
+- 「开始菜单电源按钮」原版 mod：Windows 11 Start Menu Power Buttons，作者 Hakuuyosei（灵弦，[github.com/ahzvenol](https://github.com/ahzvenol)），源码内未附带许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/win11-power-buttons>。
+- 「拖拽删除」原版 mod：Drag to Delete，作者 [iMAboud](https://github.com/iMAboud)，MIT 许可证，原版链接：<https://windhawk.net/mods/drag-to-delete>。
+- 「登录注销关机音效」原版 mod：Logon, Logoff & Shutdown Sounds Restored，作者 [Toru the Red Fox](https://github.com/TorutheRedFox)，源码文件头未标注许可，按 Windhawk 官方模组仓库提交规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/logon-logoff-shutdown-sounds>。
+- 「窗口优化」三个子分组：窗口拖动（Alt+拖动）原版 mod [AltDrag](https://windhawk.net/mods/alt-drag) 与窗口排列原版 mod [Slick Window Arrangement](https://windhawk.net/mods/slick-window-arrangement)，作者均为 [m417z](https://github.com/m417z)，GPL-3.0 许可证（AltDrag 创意来自 Stefan Sundin）；隐形窗口边框原版 mod [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)，作者 [Bo0ii](https://github.com/Bo0ii)，MIT 许可证，源码仓库：<https://github.com/Bo0ii/windhawk-mods>。
+- 本模组整体以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）整合维护；并入的 MIT 模组保留其原作者署名与许可声明，各原作者署名与许可声明原样保留。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
 - peek:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the show desktop button peek. When turned off, Aero
+      Peek no longer activates on hover (an active preview stops at once) and
+      the rest of this group has no effect.
+    $description:zh-CN: >-
+      「显示桌面按钮预览」分组总开关。关闭后悬停「显示桌面」按钮不再触发
+      Aero Peek 桌面速览（正在显示的速览立即停止），组内其余设置不再生效；
+      重新开启立即恢复。
   - hoverDelay: 500
     $name: Hover delay
     $name:zh-CN: 悬停延迟
@@ -169,6 +250,18 @@
     悬停任务栏最右侧的「显示桌面」按钮时显示 Aero Peek 桌面速览。
     需要系统开启「启用 Peek」。
 - toggleIcons:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for desktop icon hiding. When turned off, double-click
+      toggling, idle auto-hide and restore on input do nothing, the system
+      "Show desktop icons" state is left untouched, and the smooth toggle
+      animation is never triggered.
+    $description:zh-CN: >-
+      「桌面图标隐藏设置」分组总开关。关闭后双击隐藏、闲置自动隐藏与任意输入
+      恢复均不动作，系统「显示桌面图标」状态保持不变，切换平滑动画也不会被
+      触发；重新开启立即恢复。
   - enableAutoHide: true
     $name: "Auto-hide icons when idle (system toggle)"
     $name:zh-CN: "闲置时自动隐藏图标（系统开关方式）"
@@ -214,6 +307,16 @@
     通过系统「显示桌面图标」开关双击隐藏桌面图标（可闲置自动隐藏、任意输入
     恢复），并可在本模组每次切换时叠加一次平滑的淡出/淡入过渡动画。
 - marquee:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the desktop marquee fade-out. When turned off, the
+      marquee selection rectangle disappears instantly on release, exactly as
+      without this mod.
+    $description:zh-CN: >-
+      「桌面框选淡出」分组总开关。关闭后框选矩形在松开鼠标的瞬间直接消失
+      （与未启用本模组时一致），不播放淡出动画；重新开启立即恢复。
   - speed: 100
     $name: Animation Speed (%)
     $name:zh-CN: 动画速度（%）
@@ -269,6 +372,18 @@
     桌面框选矩形在松开鼠标按钮后以平滑动画淡出消散。由独立模组
     「桌面框选淡出」（原作者 angel_lov，MIT）并入。
 - purity:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for desktop icon purification. When turned off, icon text
+      labels, shortcut arrows and UAC shields are all restored to their
+      original look (arrows and shields reappear once the icon cache
+      refreshes).
+    $description:zh-CN: >-
+      「纯净化图标」分组总开关。关闭后桌面图标文字、快捷方式箭头与 UAC 盾牌
+      全部恢复原样（箭头/盾牌待图标缓存刷新后重新出现）；重新开启立即恢复
+      隐藏效果。
   - hideText: true
     $name: Hide desktop icon text
     $name:zh-CN: 隐藏桌面图标文字
@@ -302,6 +417,399 @@
     （原作者 kivsak，MIT 惯例）并入。UAC 盾牌角标默认关闭：盾牌是「该程序
     需要管理员权限」的可视提醒，隐藏后将无法从桌面直观分辨哪些程序会以
     管理员身份运行，请在知情的前提下开启。
+- extWarn:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the file extension warning. Off by default: turning
+      this on suppresses a system safety prompt, so opt in explicitly. When
+      enabled, renaming a file with a changed extension no longer shows the
+      confirmation warning and applies directly; turning it off restores the
+      system behavior at once.
+    $description:zh-CN: >-
+      「扩展名警告」分组总开关。默认关闭——开启即屏蔽系统确认弹窗：重命名
+      文件并修改扩展名时不再弹出「如果改变文件扩展名，可能会导致文件不可用」
+      的警告，直接按「是」处理。该弹窗是防止误改扩展名的安全提醒，请确认知情
+      后再开启；关闭后立即恢复系统默认行为（该开关随设置变更即时生效）。
+  $name: File extension warning
+  $name:zh-CN: 扩展名警告
+  $description: >-
+    Turn off the confirmation warning shown when a file is renamed with a
+    changed extension. Merged from the standalone mod "Turn off change file
+    extension warning" by m417z (GPL-3.0). Off by default: enabling it
+    suppresses a system safety prompt, so opt in explicitly.
+  $description:zh-CN: >-
+    重命名文件并修改扩展名时不再弹出确认警告。由独立模组「关闭扩展名修改
+    警告」（原作者 m417z，GPL-3.0）并入。默认关闭：开启即屏蔽系统安全提醒，
+    请显式选择开启。
+- dblUp:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for double-click to go up. When turned on, double-clicking
+      empty space in File Explorer navigates to the parent folder (both the
+      classic list view and the Windows 11 DirectUI view are supported, and
+      each tab is handled independently). When turned off, double-clicking
+      behaves exactly as without this feature.
+    $description:zh-CN: >-
+      「双击返回上级」分组总开关。开启后，在文件资源管理器内容区空白处双击
+      即返回上一级文件夹（经典列表视图与 Windows 11 DirectUI 视图均支持，
+      多标签页互不干扰）；关闭后双击空白处行为与系统默认完全一致，
+      开关切换即时生效。
+  $name: Double-click to go up
+  $name:zh-CN: 双击返回上级
+  $description: >-
+    Double-click empty space in File Explorer to navigate to the parent
+    folder. Merged from the standalone mod "Explorer Double Click Up" by
+    wrldspawn (GPL-3.0).
+  $description:zh-CN: >-
+    双击文件资源管理器空白处，返回上一级文件夹。由独立模组「双击返回上级」
+    （原作者 wrldspawn，GPL-3.0）并入。
+- powerBtn:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the Start menu power buttons. When turned off, the
+      native power button and its flyout menu are restored and none of the
+      settings below have any effect.
+    $description:zh-CN: >-
+      「开始菜单电源按钮」分组总开关。开启后在 Windows 11 开始菜单中原生电源
+      按钮的位置注入一排一键电源按钮（关机/重启/注销/睡眠/休眠/锁定）；关闭后
+      恢复系统原生电源按钮及其二级菜单，组内其余设置不再生效。
+  - alignment: right
+    $name: Alignment
+    $name:zh-CN: 对齐方式
+    $description: Aligns the buttons within the NavigationPane.
+    $description:zh-CN: 设置按钮组在导航窗格中的对齐方式。
+    $options:
+      - left: Left
+      - center: Center
+      - right: Right
+    $options:zh-CN:
+      - left: 左对齐
+      - center: 居中
+      - right: 右对齐
+  - confirm_before_action: false
+    $name: Confirm before power actions
+    $name:zh-CN: 执行前确认
+    $description: Show a confirmation dialog before executing power actions.
+    $description:zh-CN: 在执行电源操作前显示确认对话框。
+  - enableShutdown: true
+    $name: Enable shutdown button
+    $name:zh-CN: 启用关机按钮
+    $description: Show the shutdown button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示关机按钮（还需在「按钮与排序」中列出才会显示）。
+  - enableRestart: true
+    $name: Enable restart button
+    $name:zh-CN: 启用重启按钮
+    $description: Show the restart button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示重启按钮（还需在「按钮与排序」中列出才会显示）。
+  - enableSignout: true
+    $name: Enable sign out button
+    $name:zh-CN: 启用注销按钮
+    $description: Show the sign out button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示注销按钮（还需在「按钮与排序」中列出才会显示）。
+  - enableSleep: true
+    $name: Enable sleep button
+    $name:zh-CN: 启用睡眠按钮
+    $description: Show the sleep button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示睡眠按钮（还需在「按钮与排序」中列出才会显示）。
+  - enableHibernate: false
+    $name: Enable hibernate button
+    $name:zh-CN: 启用休眠按钮
+    $description: Show the hibernate button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示休眠按钮（还需在「按钮与排序」中列出才会显示）。
+  - enableLock: false
+    $name: Enable lock button
+    $name:zh-CN: 启用锁定按钮
+    $description: Show the lock button (it must also be listed in "Buttons & Order" to appear).
+    $description:zh-CN: 显示锁定按钮（还需在「按钮与排序」中列出才会显示）。
+  - buttons: [sleep, signout, restart, shutdown]
+    $name: Buttons & Order
+    $name:zh-CN: 按钮与排序
+    $description: Select which buttons to display and their order. Duplicates are ignored. Only buttons that are both listed here and enabled (see the switches above) are shown.
+    $description:zh-CN: 选择要显示的按钮以及它们的顺序，重复项会被忽略。只有既列入本列表、又开启了对应启用开关的按钮才会显示（顺序与启用取交集）。
+    $options:
+      - shutdown: Shut down
+      - restart: Restart
+      - signout: Sign out
+      - sleep: Sleep
+      - hibernate: Hibernate
+      - lock: Lock
+    $options:zh-CN:
+      - shutdown: 关机
+      - restart: 重启
+      - signout: 注销
+      - sleep: 睡眠
+      - hibernate: 休眠
+      - lock: 锁定
+  $name: Start menu power buttons
+  $name:zh-CN: 开始菜单电源按钮
+  $description: >-
+    Adds customizable one-click Shut down, Restart, Sign out, Sleep, Hibernate
+    and Lock buttons to the Windows 11 Start menu, replacing the default power
+    flyout. Merged from the standalone mod "Windows 11 Start Menu Power
+    Buttons" by Hakuuyosei (MIT). The button injection runs in
+    StartMenuExperienceHost.exe while the privileged power actions are executed
+    by a hidden proxy window in explorer.exe.
+  $description:zh-CN: >-
+    添加可配置的一键关机/重启/注销/睡眠/休眠/锁定按钮到 Windows 11 开始菜单，
+    替换默认的电源按钮二级菜单。由独立模组「开始菜单电源按钮」（原作者
+    Hakuuyosei/灵弦，MIT 惯例）并入。按钮注入在开始菜单进程
+    （StartMenuExperienceHost.exe）完成，实际的电源动作由 explorer.exe 中的
+    隐藏代理窗口代为执行。
+- dragDel:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for drag to delete. When turned on, a floating trash
+      target appears at the top of the screen while files are being dragged;
+      dropping files onto it moves them to the Recycle Bin (silent, restore
+      from the Recycle Bin if needed). Off by default: this feature turns a
+      drag into a delete action, so opt in explicitly.
+    $description:zh-CN: >-
+      「拖拽删除」分组总开关。开启后，拖动文件时屏幕顶部会浮现悬浮垃圾桶
+      目标，把文件拖到目标上松手即移入回收站（静默执行，误删可从回收站还原；
+      拖到其他任何位置松手都是正常取消）。默认关闭——该功能会把拖放直接变成
+      删除动作，请显式选择开启；关闭后拖动文件不再出现悬浮目标，
+      开关切换即时生效。
+  $name: Drag to delete
+  $name:zh-CN: 拖拽删除
+  $description: >-
+    Drag files onto a floating target to move them to the Recycle Bin.
+    Merged from the standalone mod "Drag to Delete" by iMAboud (MIT).
+  $description:zh-CN: >-
+    把文件拖到屏幕悬浮目标上，即可将其移入回收站。由独立模组「拖拽删除文件」
+    （原作者 iMAboud，MIT）并入。
+- sndLog:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the logon, logoff and shutdown sounds. When turned on,
+      the Windows 7 era sounds are played again (the sound events must have
+      .wav files configured in the sound scheme first). When turned off, no
+      session sounds are played.
+    $description:zh-CN: >-
+      「登录注销关机音效」分组总开关。开启后恢复 Windows 7 时代的登录、注销
+      与关机音效（需先在声音方案中为相应事件配置 .wav 音效，未配置的事件
+      静默跳过）；关闭后不再播放任何会话音效，开关切换即时生效。登录音效仅在
+      本开关开启状态下随模组启动时播放一次，运行中开启不会补播。
+  - xpmode: false
+    $name: XP Startup behavior
+    $name:zh-CN: XP 启动行为
+    $description: Plays the startup sound on logon. Resuming will still play the logon sound. It is recommended to untick the box to play the startup sound in the control panel to prevent it from playing before you log on.
+    $description:zh-CN: 在登录时播放「Windows 启动」音效（XP 式开机音乐）；从睡眠/休眠恢复时仍会播放登录音效。建议在控制面板的声音设置中取消勾选「播放 Windows 启动声音」，以免登录前就提前播放。
+  - hookonsessionchange: true
+    $name: Hook OnSessionChange
+    $name:zh-CN: 挂钩 OnSessionChange（会话切换事件）
+    $description: Only disable this if using ExplorerEx or another port of explorer from XP/Server 2003 or earlier.
+    $description:zh-CN: 仅当使用 ExplorerEx 或其他移植自 XP / Server 2003 及更早版本的 explorer 时才需要关闭此选项。
+  $name: Logon, logoff & shutdown sounds
+  $name:zh-CN: 登录注销关机音效
+  $description: >-
+    Restores the logon, logoff and shutdown sounds from earlier versions of
+    Windows. Merged from the standalone mod "Logon, Logoff & Shutdown Sounds
+    Restored" by Toru the Red Fox (MIT).
+  $description:zh-CN: >-
+    恢复 Windows 7 时代的登录、注销与关机音效，重现熟悉的开机问候。由独立
+    模组「登录注销关机音效」（原作者 Toru the Red Fox，MIT 惯例）并入。
+- winOpt:
+  - enable: false
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the whole window optimization group. When turned off,
+      none of the three sub-groups below take effect, regardless of their own
+      switches; turning it back on restores them at once.
+    $description:zh-CN: >-
+      「窗口优化」分组总开关。关闭后下列三个子分组（窗口拖动/窗口排列/隐形
+      窗口边框）全部停止生效，与其各自开关无关；重新开启后按各子分组开关
+      立即恢复。本分组生效于所有进程。
+  - altDrag:
+    - enable: true
+      $name: Enable this feature group
+      $name:zh-CN: 启用本组功能
+      $description: >-
+        Master switch for window dragging. When turned off, the move and resize
+        triggers do nothing and clicking behaves exactly as without this mod.
+      $description:zh-CN: >-
+        「窗口拖动（Alt+拖动）」子分组开关。关闭后移动/调整大小触发键不再
+        生效，鼠标点击行为与未启用本功能时完全一致；重新开启立即恢复。
+    - moveTrigger:
+      - button: left
+        $name: Mouse button
+        $name:zh-CN: 鼠标键
+        $options:
+        - left: 左键
+        - right: 右键
+        - middle: 中键
+        - x1: X1（后退）键
+        - x2: X2（前进）键
+      - ctrl: false
+        $name: Ctrl
+        $name:zh-CN: Ctrl
+      - alt: true
+        $name: Alt
+        $name:zh-CN: Alt
+      - shift: false
+        $name: Shift
+        $name:zh-CN: Shift
+      - win: false
+        $name: Win
+        $name:zh-CN: Win
+      - delay: 0
+        $name: Delay
+        $name:zh-CN: 延迟
+        $description: >-
+          The time in milliseconds to hold the mouse button before the window
+          starts moving. A shorter press is passed to the window as a click.
+        $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始移动；更短的按压会作为点击交给窗口。
+      $name: Move trigger
+      $name:zh-CN: 移动触发
+      $description: >-
+        The mouse button and the keys to hold for moving a window.
+      $description:zh-CN: 移动窗口时按住的鼠标键与修饰键组合。
+    - sizeTrigger:
+      - button: right
+        $name: Mouse button
+        $name:zh-CN: 鼠标键
+        $options:
+        - left: 左键
+        - right: 右键
+        - middle: 中键
+        - x1: X1（后退）键
+        - x2: X2（前进）键
+      - ctrl: false
+        $name: Ctrl
+        $name:zh-CN: Ctrl
+      - alt: true
+        $name: Alt
+        $name:zh-CN: Alt
+      - shift: false
+        $name: Shift
+        $name:zh-CN: Shift
+      - win: false
+        $name: Win
+        $name:zh-CN: Win
+      - delay: 0
+        $name: Delay
+        $name:zh-CN: 延迟
+        $description: >-
+          The time in milliseconds to hold the mouse button before the window
+          starts resizing. A shorter press is passed to the window as a click.
+        $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始调整大小；更短的按压会作为点击交给窗口。
+      $name: Resize trigger
+      $name:zh-CN: 调整大小触发
+      $description: >-
+        The mouse button and the keys to hold for resizing a window. The edge or
+        corner which follows the mouse is the one closest to where the drag starts.
+      $description:zh-CN: 调整窗口大小时按住的鼠标键与修饰键组合。跟随鼠标的边或角，是最靠近起拖位置的那条。
+    - dragWindowsWithoutTitleBar: false
+      $name: Drag windows without a title bar
+      $name:zh-CN: 拖动无标题栏的窗口
+      $description: >-
+        Also drag windows without a title bar, such as popup menus, tooltips
+        and flyouts.
+      $description:zh-CN: 同时允许拖动没有标题栏的窗口，例如弹出菜单、工具提示和气泡。
+    $name: Window drag (Alt+drag)
+    $name:zh-CN: 窗口拖动（Alt+拖动）
+    $description: >-
+      Move or resize any window by holding the trigger keys and dragging it
+      from anywhere, without having to grab the title bar or the borders.
+    $description:zh-CN: >-
+      按住触发键从窗口任意位置拖动，即可移动或调整窗口大小，
+      无需瞄准标题栏或边框。
+  - winArrange:
+    - enable: true
+      $name: Enable this feature group
+      $name:zh-CN: 启用本组功能
+      $description: >-
+        Master switch for window arrangement. When turned off, windows stop
+        normally when released, without sliding animation or snapping.
+      $description:zh-CN: >-
+        「窗口排列」子分组开关。关闭后窗口松手即停，不再播放滑动动画，也不再
+        吸附对齐（拖动与滑动中的吸附均关闭）；重新开启立即恢复。
+    - SnapWindowsWhenDragging: true
+      $name: Snap windows when dragging
+      $name:zh-CN: 拖动窗口时吸附
+    - SnapWindowsDistance: 25
+      $name: Snap windows distance
+      $name:zh-CN: 吸附距离
+      $description: Set the required distance for windows to snap to other windows
+      $description:zh-CN: 设置窗口与其他窗口吸附时所需的距离
+    - KeysToDisableSnapping:
+      - Ctrl: false
+        $name: Ctrl
+        $name:zh-CN: Ctrl
+      - Alt: true
+        $name: Alt
+        $name:zh-CN: Alt
+      - Shift: false
+        $name: Shift
+        $name:zh-CN: Shift
+      $name: Keys to temporarily disable snapping
+      $name:zh-CN: 临时禁用吸附的按键
+      $description: A combination of keys that can be used to temporarily disable snapping
+      $description:zh-CN: 按住该组合键可临时禁用窗口吸附
+    - SlidingAnimation: true
+      $name: Sliding animation
+      $name:zh-CN: 滑动动画
+      $description: Keep sliding the window after it's being moved
+      $description:zh-CN: 窗口被拖动松手后继续保持惯性滑动
+    - SnapWindowsWhenSliding: true
+      $name: Snap windows when sliding
+      $name:zh-CN: 滑动时吸附窗口
+    - SlidingAnimationSlowdown: 15
+      $name: Sliding animation slowdown
+      $name:zh-CN: 滑动减速
+      $description: Set a smaller value for a sliding animation that lasts longer (between 1 and 99)
+      $description:zh-CN: 数值越小，滑动动画持续越久（取值 1 到 99 之间）
+    $name: Window arrangement
+    $name:zh-CN: 窗口排列
+    $description: >-
+      Snap windows when dragging or sliding, and keep them sliding smoothly
+      with inertia after they are released.
+    $description:zh-CN: >-
+      拖动或滑动窗口时自动吸附对齐，窗口松手后带惯性顺滑滑动。
+  - invisBorders:
+    - enable: true
+      $name: Enable this feature group
+      $name:zh-CN: 启用本组功能
+      $description: >-
+        Master switch for invisible window borders. When turned off, all
+        borders in this process return to their default color at once.
+      $description:zh-CN: >-
+        「隐形窗口边框」子分组开关。关闭后本进程内所有已被隐形的窗口边框立即
+        恢复系统默认颜色；重新开启立即恢复隐形效果。
+    - SpecialWindows: false
+      $name: Apply to Special Windows
+      $name:zh-CN: 应用到特殊窗口
+      $description: Also apply to special windows like dialogs
+      $description:zh-CN: 同时应用到对话框等特殊窗口
+    $name: Invisible window borders
+    $name:zh-CN: 隐形窗口边框
+    $description: >-
+      Make window borders invisible while keeping rounded corners.
+    $description:zh-CN: >-
+      将窗口边框设为隐形，同时保留圆角效果。
+  $name: Window optimization
+  $name:zh-CN: 窗口优化
+  $description: >-
+    Window operations three-in-one: move or resize windows from anywhere with
+    a custom trigger, slick sliding window arrangement with snapping, and
+    invisible window borders that keep rounded corners. Merged from AltDrag and
+    Slick Window Arrangement by m417z (GPL-3.0) and Invisible Window Borders by
+    Bo0ii (MIT). Applies to all processes.
+  $description:zh-CN: >-
+    窗口操作三合一：按住触发键即可从窗口任意位置拖动移动或调整大小（无需瞄准
+    标题栏或边框）；窗口移动带顺滑的滑动动画与吸附对齐；窗口边框隐形且保留
+    圆角。由「窗口拖动（Alt+拖动）」「窗口排列」（均原作者 m417z，GPL-3.0）与
+    「隐形窗口边框」（原作者 Bo0ii，MIT）并入。本分组生效于所有进程。
 */
 // ==/WindhawkModSettings==
 
@@ -316,37 +824,105 @@
 #include <oleidl.h>
 #include <uxtheme.h>
 #include <mmsystem.h>
+#include <powrprof.h>
+#include <dwmapi.h>
+#include <shellscalingapi.h>
+#include <shobjidl.h>
+#include <tlhelp32.h>
 #include <windhawk_utils.h>
+
+// DblUp（双击返回上级）：UIAutomation 与 COM 辅助头文件。initguid 使其后
+// 包含的头文件中的 GUID（如 CLSID_CUIAutomation）在本编译单元内定义为实体。
+#include <initguid.h>
+#include <UIAnimation.h>
+#include <UIAutomationClient.h>
+#include <UIAutomationCore.h>
+#include <comutil.h>
 
 #include <algorithm>
 #include <atomic>
+#include <bit>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
+#include <cwchar>
+#include <cwctype>
 #include <functional>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <optional>
+#include <set>
 #include <string>
+#include <tuple>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
 
+#include <gdiplus.h>
+
 #undef GetCurrentTime
 
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Input.h>
 #include <winrt/Windows.UI.Xaml.Input.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.h>
 
 using namespace winrt::Windows::UI::Xaml;
 
+// PowerBtn（开始菜单电源按钮）使用的 WinRT 命名空间别名（沿用其原内部写法）。
+namespace wux = winrt::Windows::UI::Xaml;
+namespace wuxc = winrt::Windows::UI::Xaml::Controls;
+namespace wuxm = winrt::Windows::UI::Xaml::Media;
+namespace wu = winrt::Windows::UI;
+namespace wuc = winrt::Windows::UI::Core;
+
 // ─────────────────────────────────────────────────────────────────────────────
-// 合并级共享状态：各功能初始化成功标志。文件末尾的共享 CreateWindowExW 钩子
-// 按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity 的处理函数。
-// 标志在 Wh_ModInit / 卸载流程内设置（Wh_SetFunctionHook 为延迟生效，钩子在
-// Wh_ModInit 返回后才应用，此处无数据竞争）。
+// 合并级共享状态：各功能初始化成功/激活标志。文件末尾的共享 CreateWindowExW
+// 钩子按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity / DblUp
+// 的处理函数。标志在 Wh_ModInit / 卸载流程内设置（Wh_SetFunctionHook 为延迟
+// 生效，钩子在 Wh_ModInit 返回后才应用，此处无数据竞争）。
 // ─────────────────────────────────────────────────────────────────────────────
 std::atomic<bool> g_QuickSettingsToggleIconsActive{false};
 std::atomic<bool> g_QuickSettingsSmoothIconsActive{false};
 std::atomic<bool> g_QuickSettingsPurityActive{false};
+std::atomic<bool> g_QuickSettingsDblUpActive{false};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 合并级进程判定（2.0.0）：@include 为 *，各功能段按进程门控——
+//   • Explorer：Peek / ToggleIcons（含 SmoothIcons）/ Marquee / Purity /
+//     ExtWarn / DblUp / DragDel / SndLog；
+//   • StartMenuExperienceHost + Explorer：PowerBtn（按钮注入在开始菜单进程、
+//     电源动作由 explorer 的隐藏代理窗口执行）；
+//   • 其他进程：仅 WinOpt（窗口优化）段启用。
+// ─────────────────────────────────────────────────────────────────────────────
+enum class QuickSettingsProcessKind {
+    Explorer,
+    StartMenuExperienceHost,
+    Other,
+};
+
+static QuickSettingsProcessKind QuickSettingsGetProcessKind() {
+    WCHAR path[MAX_PATH]{};
+    GetModuleFileNameW(nullptr, path, ARRAYSIZE(path));
+    PCWSTR fileName = wcsrchr(path, L'\\');
+    fileName = fileName ? fileName + 1 : path;
+    if (_wcsicmp(fileName, L"explorer.exe") == 0) {
+        return QuickSettingsProcessKind::Explorer;
+    }
+    if (_wcsicmp(fileName, L"StartMenuExperienceHost.exe") == 0) {
+        return QuickSettingsProcessKind::StartMenuExperienceHost;
+    }
+    return QuickSettingsProcessKind::Other;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 功能一：显示桌面按钮预览（Peek*）
@@ -355,6 +931,7 @@ std::atomic<bool> g_QuickSettingsPurityActive{false};
 // ─────────────────────────────────────────────────────────────────────────────
 
 struct {
+    bool enable;   // 分组总开关（peek.enable），关闭时本组功能完全不生效
     int hoverDelay;
 } PeekSettings;
 
@@ -459,6 +1036,12 @@ void PeekOnHoverStop() {
 using PeekIconView_OnPointerMoved_t = int(WINAPI*)(void* pThis, void* pArgs);
 PeekIconView_OnPointerMoved_t PeekIconView_OnPointerMoved_Original;
 int WINAPI PeekIconView_OnPointerMoved_Hook(void* pThis, void* pArgs) {
+    // 分组总开关关闭：完全直通原函数，悬停不再触发 Aero Peek（运行时短路，
+    // 设置变更经 PeekLoadSettings 即时生效，钩子无需重新安装）。
+    if (!PeekSettings.enable) {
+        return PeekIconView_OnPointerMoved_Original(pThis, pArgs);
+    }
+
     auto original = [=]() {
         return PeekIconView_OnPointerMoved_Original(pThis, pArgs);
     };
@@ -508,6 +1091,16 @@ int WINAPI PeekIconView_OnPointerMoved_Hook(void* pThis, void* pArgs) {
 using PeekIconView_OnPointerExited_t = int(WINAPI*)(void* pThis, void* pArgs);
 PeekIconView_OnPointerExited_t PeekIconView_OnPointerExited_Original;
 int WINAPI PeekIconView_OnPointerExited_Hook(void* pThis, void* pArgs) {
+    // 分组总开关关闭：直通原函数；若关闭瞬间仍有残留的悬停计时器或正在
+    // 显示的速览，这里顺带停止，避免速览卡在开启状态。
+    if (!PeekSettings.enable) {
+        if (PeekAeroPeekOn || PeekHoverTimer) {
+            PeekOnHoverStop();
+        }
+        PeekStartPointerPos.reset();
+        return PeekIconView_OnPointerExited_Original(pThis, pArgs);
+    }
+
     auto original = [=]() {
         return PeekIconView_OnPointerExited_Original(pThis, pArgs);
     };
@@ -638,6 +1231,7 @@ HMODULE WINAPI PeekLoadLibraryExW_Hook(LPCWSTR lpLibFileName,
 }
 
 void PeekLoadSettings() {
+    PeekSettings.enable = Wh_GetIntSetting(L"peek.enable") != 0;
     PeekSettings.hoverDelay = Wh_GetIntSetting(L"peek.hoverDelay");
 }
 
@@ -754,6 +1348,7 @@ void SmoothIconsCancelHideTransition(HWND hwndShell);
 // Global settings
 // ─────────────────────────────────────────────────────────────────────────────
 struct {
+    bool enable;              // 分组总开关（toggleIcons.enable）
     bool enableAutoHide;
     int  autoHideDelay;       // seconds, clamped 3–60
     bool showIconsOnAnyInput; // restore on any input after auto-hide
@@ -765,6 +1360,8 @@ struct {
 // ─────────────────────────────────────────────────────────────────────────────
 static void ToggleIconsLoadSettings()
 {
+    ToggleIconsSettings.enable =
+        Wh_GetIntSetting(L"toggleIcons.enable") != 0;
     ToggleIconsSettings.enableAutoHide =
         Wh_GetIntSetting(L"toggleIcons.enableAutoHide") != 0;
     ToggleIconsSettings.autoHideDelay =
@@ -778,7 +1375,8 @@ static void ToggleIconsLoadSettings()
     ToggleIconsSettings.animate =
         Wh_GetIntSetting(L"toggleIcons.animate") != 0;
 
-    Wh_Log(L"[CW] Settings loaded: enableAutoHide=%d, autoHideDelay=%d, showIconsOnAnyInput=%d, animate=%d",
+    Wh_Log(L"[CW] Settings loaded: enable=%d, enableAutoHide=%d, autoHideDelay=%d, showIconsOnAnyInput=%d, animate=%d",
+           (int)ToggleIconsSettings.enable,
            (int)ToggleIconsSettings.enableAutoHide,
            ToggleIconsSettings.autoHideDelay,
            (int)ToggleIconsSettings.showIconsOnAnyInput,
@@ -1078,6 +1676,33 @@ static void ToggleIconsUnsubclassWindows()
         Cleanup(FindWindowExW(hwndWorkerW, NULL, L"SHELLDLL_DefView", NULL));
 }
 
+// 分组总开关（toggleIcons.enable）激活状态同步：开启时挂接桌面窗口子类，
+// 关闭时摘除子类并清理计时器/窗口属性（复用卸载路径 ToggleIconsUnsubclass-
+// Windows，双击/闲置隐藏/输入恢复随之全部失效）。Wh_ModSettingsChanged 沿
+// 现有重载路径调用本函数，开关切换即时生效；Init 亦复用同一路径，禁用时
+// 完全不挂接。
+static void ToggleIconsUpdateActivation()
+{
+    bool enable = ToggleIconsSettings.enable;
+    bool active = g_QuickSettingsToggleIconsActive.load();
+
+    if (enable && !active) {
+        // 先置活动标志再枚举挂接：枚举期间新建的桌面窗口由共享
+        // CreateWindowExW 钩子分发补挂（同 id 重复 SetWindowSubclass 为
+        // 安全的覆盖）。
+        g_QuickSettingsToggleIconsActive = true;
+        ToggleIconsSubclassExistingWindows();
+        Wh_Log(L"[CW] toggleIcons group enabled, desktop windows subclassed");
+    } else if (!enable && active) {
+        // 先清活动标志再摘除：摘除期间新建的桌面窗口不再被分发挂接。
+        g_QuickSettingsToggleIconsActive = false;
+        ToggleIconsUnsubclassWindows();
+        Wh_Log(L"[CW] toggleIcons group disabled, subclasses removed");
+    } else if (enable && active) {
+        ToggleIconsUpdateAllTimers();
+    }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // New desktop window dispatch — called by the shared CreateWindowExW hook
 // （原 CreateWindowExW 钩子函数的创建后处理段；挂钩本体见文件末尾）
@@ -1341,8 +1966,8 @@ static BOOL ToggleIconsInit()
     // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
     // 与 SmoothIcons 共用一次挂钩），这里不再重复安装。
 
-    ToggleIconsSubclassExistingWindows();
-    g_QuickSettingsToggleIconsActive = true;
+    // 总开关关闭时本组保持完全不激活（不挂接任何窗口），开启时挂接。
+    ToggleIconsUpdateActivation();
     Wh_Log(L"[CW] Init complete");
     return TRUE;
 }
@@ -1374,6 +1999,7 @@ struct MarqueeAnimPayload {
 std::atomic<int>  g_MarqueeSettingSpeed{100};
 std::atomic<int>  g_MarqueeSettingDuration{300};
 std::atomic<int>  g_MarqueeSettingInitialAlpha{90};
+std::atomic<bool> g_MarqueeSettingEnabled{true};  // 分组总开关（marquee.enable）
 std::atomic<bool> g_MarqueeSettingAutoCalcAlpha{false};
 std::atomic<bool> g_MarqueeSettingAccelerateIfCovered{true};
 std::atomic<bool> g_MarqueeSettingSingleInstance{false};
@@ -1466,6 +2092,8 @@ DWORD MarqueeParseHexColorOrDefault(PCWSTR hexStr, DWORD defaultValue) {
 }
 
 void MarqueeLoadSettings() {
+    g_MarqueeSettingEnabled.store(
+        Wh_GetIntSetting(L"marquee.enable") != 0);
     g_MarqueeSettingSpeed.store(
         std::max(50, std::min(500, Wh_GetIntSetting(L"marquee.speed"))));
     g_MarqueeSettingDuration.store(
@@ -1763,6 +2391,15 @@ LRESULT CALLBACK MarqueeManagerWndProc(HWND hwnd, UINT msg,
 // ---------------------------------------------------------------------------
 
 LRESULT CALLBACK MarqueeMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    // 分组总开关关闭：完全直通，不记录拖动状态、不做桌面命中预检、不创建
+    // 淡出动画（运行时短路，设置变更经 MarqueeLoadSettings 即时生效）。
+    if (!g_MarqueeSettingEnabled.load(std::memory_order_relaxed)) {
+        // 清掉关闭前可能残留的拖动标记，避免重新开启后吃到过期的起点。
+        g_MarqueeIsDragging.store(false);
+        g_MarqueeIsStartPointValid.store(false);
+        return CallNextHookEx(g_MarqueeMouseHook, nCode, wParam, lParam);
+    }
+
     if (nCode == HC_ACTION) {
         MSLLHOOKSTRUCT* pMouse = (MSLLHOOKSTRUCT*)lParam;
 
@@ -3110,6 +3747,7 @@ void SmoothIconsNotifySettingsChanged() {
 static thread_local bool PurityIsDrawingDesktop = false;
 
 static struct {
+    bool enable;      // 分组总开关（purity.enable）
     bool hideText;
     bool hideArrows;
     bool hideShields;
@@ -3200,7 +3838,8 @@ static void PurityUpdateFolderCache() {
 }
 
 static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
-    if (!PuritySettings.hideText) return false;
+    // 分组总开关关闭时不隐藏任何文字（运行时短路，随设置重载即时生效）。
+    if (!PuritySettings.enable || !PuritySettings.hideText) return false;
     std::wstring s(text, cch == -1 ? wcslen(text) : cch);
     return PurityFolderNames.count(s) == 0;
 }
@@ -3211,7 +3850,7 @@ static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
 
 static LRESULT CALLBACK PurityDesktopListSubclass(HWND hWnd, UINT uMsg, WPARAM wParam,
                                                   LPARAM lParam, DWORD_PTR dwRefData) {
-    if (uMsg == WM_PAINT && PuritySettings.hideText) {
+    if (uMsg == WM_PAINT && PuritySettings.enable && PuritySettings.hideText) {
         PurityUpdateFolderCache();
         PurityIsDrawingDesktop = true;
         LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -3405,7 +4044,7 @@ using PuritySHGetFileInfoW_t = decltype(&SHGetFileInfoW);
 static PuritySHGetFileInfoW_t PuritySHGetFileInfoW_Original;
 DWORD_PTR WINAPI PuritySHGetFileInfoW_Hook(LPCWSTR pszPath, DWORD dwFileAttributes,
                                            SHFILEINFOW* psfi, UINT cbFileInfo, UINT uFlags) {
-    if (PuritySettings.hideShields) {
+    if (PuritySettings.enable && PuritySettings.hideShields) {
         // SHGFI_ADDOVERLAYS 会把已注册的 overlay（含 UAC 盾牌）烘焙进返回的 HICON；
         // SHGFI_OVERLAYINDEX 把 overlay 序号编码进 iIcon 高位。一并剥离即得到干净图标。
         // 仅在 hideShields 开启时剥离，保证与「移除快捷方式箭头」互相独立。
@@ -3420,8 +4059,8 @@ HRESULT WINAPI PuritySHGetStockIconInfo_Hook(SHSTOCKICONID siid, UINT uFlags, SH
     HRESULT hr = PuritySHGetStockIconInfo_Original(siid, uFlags, psii);
 
     // 直接请求 SIID_SHIELD 图标句柄的调用方（工具栏、按钮装饰等）改为拿到空白图标。
-    if (PuritySettings.hideShields && SUCCEEDED(hr) && siid == SIID_SHIELD && psii &&
-        (uFlags & SHGSI_ICON) && psii->hIcon) {
+    if (PuritySettings.enable && PuritySettings.hideShields && SUCCEEDED(hr) &&
+        siid == SIID_SHIELD && psii && (uFlags & SHGSI_ICON) && psii->hIcon) {
         int slot = (uFlags & SHGSI_SMALLICON) ? 1 : 0;
         if (PurityBlankShieldIcon[slot]) {
             DestroyIcon(psii->hIcon);
@@ -3447,6 +4086,7 @@ static void PurityInitBlankShieldIcons() {
 // ---------------------------------------------------------------------------
 
 static void PurityLoadSettings() {
+    PuritySettings.enable = Wh_GetIntSetting(L"purity.enable") != 0;
     PuritySettings.hideText = Wh_GetIntSetting(L"purity.hideText") != 0;
     PuritySettings.hideArrows = Wh_GetIntSetting(L"purity.hideArrows") != 0;
     PuritySettings.hideShields = Wh_GetIntSetting(L"purity.hideShields") != 0;
@@ -3478,7 +4118,7 @@ static BOOL PurityInit() {
     PurityLoadSettings();
 
     // 空白盾牌图标需在安装钩子前就绪（钩子安装后即可被任意线程调用）。
-    if (PuritySettings.hideShields) {
+    if (PuritySettings.enable && PuritySettings.hideShields) {
         PurityInitBlankShieldIcons();
     }
 
@@ -3501,8 +4141,10 @@ static BOOL PurityInit() {
 
     // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
     // 与 ToggleIcons / SmoothIcons 共用一次挂钩），这里不再重复安装。
-    g_QuickSettingsPurityActive = true;
-    Wh_Log(L"[CW] Init complete");
+    // 文字/提取期钩子始终安装（代价极低），由各钩子内的总开关判断短路；
+    // 活动标志仅反映总开关状态，关闭时共享钩子不再向本组分发新窗口。
+    g_QuickSettingsPurityActive = PuritySettings.enable;
+    Wh_Log(L"[CW] Init complete (enabled=%d)", (int)PuritySettings.enable);
     return TRUE;
 }
 
@@ -3511,7 +4153,9 @@ static void PurityAfterInit() {
 
     // 注意时序：SHChangeNotify 会刷新图标缓存并触发系统图像列表重建，必须先通知、
     // 后打图像列表补丁，否则补丁会被整体丢弃（上游 2.5.0 实测结论）。
-    if (PuritySettings.hideArrows || PuritySettings.hideShields) {
+    // 总开关关闭时跳过通知与补丁，箭头/盾牌保持系统原样。
+    if (PuritySettings.enable &&
+        (PuritySettings.hideArrows || PuritySettings.hideShields)) {
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
         PurityPatchOverlayImageLists();
     }
@@ -3532,17 +4176,26 @@ static void PurityNotifySettingsChanged() {
 
     // 与独立版行为对齐：独立版任何设置变更都会整模组重载（Wh_ModInit /
     // Wh_ModAfterInit 重跑，重新执行 SHChangeNotify + 图像列表补丁并重绘桌面）。
-    // 合并版为免其他分组的设置改动也触发图标缓存刷新，仅在纯净化图标开关
-    // 实际变化时复刻该收尾。
+    // 合并版为免其他分组的设置改动也触发图标缓存刷新，仅在纯净化图标设置
+    // 实际变化时复刻该收尾；总开关（purity.enable）的切换同样在此即时生效。
+    bool prevEnable = PuritySettings.enable;
     bool prevHideText = PuritySettings.hideText;
     bool prevHideArrows = PuritySettings.hideArrows;
     bool prevHideShields = PuritySettings.hideShields;
 
     PurityLoadSettings();
 
-    if (PuritySettings.hideText != prevHideText ||
-        PuritySettings.hideArrows != prevHideArrows ||
-        PuritySettings.hideShields != prevHideShields) {
+    if (PuritySettings.enable == prevEnable &&
+        PuritySettings.hideText == prevHideText &&
+        PuritySettings.hideArrows == prevHideArrows &&
+        PuritySettings.hideShields == prevHideShields) {
+        return;
+    }
+
+    // 运行中开关状态同步：共享 CreateWindowExW 钩子按此分发新建桌面窗口。
+    g_QuickSettingsPurityActive = PuritySettings.enable;
+
+    if (PuritySettings.enable) {
         // 运行中新开启盾牌隐藏时补建空白图标（SHGetStockIconInfo 钩子依赖）。
         if (PuritySettings.hideShields) {
             PurityInitBlankShieldIcons();
@@ -3553,11 +4206,22 @@ static void PurityNotifySettingsChanged() {
             PurityPatchOverlayImageLists();
         }
 
-        // 强制重绘桌面，让文字隐藏等变化立即可见。
+        // 重新启用时确保现有桌面 FolderView 已挂子类（禁用期间新建的桌面
+        // 窗口未经共享 CreateWindowExW 钩子分发挂接；重复挂接为安全覆盖）。
         if (HWND hDesktop = PurityGetDesktopFolderView()) {
-            InvalidateRect(hDesktop, nullptr, TRUE);
-            UpdateWindow(hDesktop);
+            WindhawkUtils::SetWindowSubclassFromAnyThread(
+                hDesktop, PurityDesktopListSubclass, 0);
         }
+    } else if (prevEnable && (prevHideArrows || prevHideShields)) {
+        // 总开关关闭且此前打过图像列表补丁：只通知图标缓存刷新（重建图像
+        // 列表即可还原箭头/盾牌原样），不再重新打补丁。
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+    }
+
+    // 强制重绘桌面，让文字隐藏等变化立即可见。
+    if (HWND hDesktop = PurityGetDesktopFolderView()) {
+        InvalidateRect(hDesktop, nullptr, TRUE);
+        UpdateWindow(hDesktop);
     }
 }
 
@@ -3582,11 +4246,6498 @@ static void PurityUninit() {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons 与 Purity 共用）
+// 功能六：扩展名警告（ExtWarn*）
+// 来源：m417z Turn off change file extension warning 1.0.1（GPL-3.0），
+// 原版链接：https://windhawk.net/mods/extension-change-no-warning。
+// 逻辑与上游一致，全局符号与函数统一加 ExtWarn 前缀以与其他功能隔离；设置键
+// 迁移为 extWarn.enable（分组总开关，默认关闭——开启即屏蔽系统确认弹窗，
+// 让用户显式选择）。
+// 实现方式（照 Purity 先例）：ShellMessageBoxW / ShellMessageBoxInternal 钩子
+// 始终安装（代价极低），由各钩子内的总开关判断短路——关闭时完全直通原函数，
+// 系统默认警告照常弹出；开启时命中重命名警告特征即代答 IDYES。
+// 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+static struct {
+    bool enable;      // 分组总开关（extWarn.enable，默认 false）
+} ExtWarnSettings;
+
+static void ExtWarnLoadSettings() {
+    ExtWarnSettings.enable = Wh_GetIntSetting(L"extWarn.enable") != 0;
+}
+
+static bool ExtWarnIsRenameMessageBoxParams(HINSTANCE hAppInst,
+                                            LPCWSTR lpcText,
+                                            LPCWSTR lpcTitle,
+                                            UINT fuStyle) {
+    return hAppInst && lpcText == MAKEINTRESOURCE(4112) &&
+           lpcTitle == MAKEINTRESOURCE(4148) &&
+           fuStyle == (MB_ICONEXCLAMATION | MB_YESNO) &&
+           hAppInst == GetModuleHandle(L"shell32.dll");
+}
+
+// Forwarding arguments of varadic functions isn't supported in C/C++:
+// https://stackoverflow.com/q/3530771
 //
-// 三个功能都需要捕获新建的桌面窗口（SHELLDLL_DefView / SysListView32）。
-// 为避免在同一 mod 内对同一目标 API 安装多个钩子，这里只安装一次，由共享钩子
-// 按各功能的启用状态把创建结果分发给三个功能的处理函数。
+// Therefore, instead of using `decltype(&ShellMessageBoxW)`, only declare the
+// first arguments (must be at least 4 as they're passed in registers in x86-64)
+// and use the musttail attribute to ensure that a tail call is used, which in
+// turn ensures that the rest of the arguments are passed along in the stack.
+using ExtWarnShellMessageBoxW_t = int(__cdecl*)(HINSTANCE hAppInst,
+                                                HWND hWnd,
+                                                LPCWSTR lpcText,
+                                                LPCWSTR lpcTitle,
+                                                UINT fuStyle);
+ExtWarnShellMessageBoxW_t ExtWarnShellMessageBoxW_Original;
+int __cdecl ExtWarnShellMessageBoxW_Hook(HINSTANCE hAppInst,
+                                         HWND hWnd,
+                                         LPCWSTR lpcText,
+                                         LPCWSTR lpcTitle,
+                                         UINT fuStyle) {
+    Wh_Log(L">");
+
+    // 分组总开关关闭：完全直通原函数，系统默认确认警告照常弹出（运行时
+    // 短路，设置变更经 ExtWarnLoadSettings 即时生效）。
+    if (ExtWarnSettings.enable &&
+        ExtWarnIsRenameMessageBoxParams(hAppInst, lpcText, lpcTitle, fuStyle)) {
+        return IDYES;
+    }
+
+    [[clang::musttail]] return ExtWarnShellMessageBoxW_Original(
+        hAppInst, hWnd, lpcText, lpcTitle, fuStyle);
+}
+
+using ExtWarnShellMessageBoxInternal_t = int(__cdecl*)(HINSTANCE hAppInst,
+                                                       HWND hWnd,
+                                                       DWORD dwFlags,
+                                                       LPCWSTR lpcText,
+                                                       LPCWSTR lpcTitle,
+                                                       UINT fuStyle);
+ExtWarnShellMessageBoxInternal_t ExtWarnShellMessageBoxInternal_Original;
+int __cdecl ExtWarnShellMessageBoxInternal_Hook(HINSTANCE hAppInst,
+                                                HWND hWnd,
+                                                DWORD dwFlags,
+                                                LPCWSTR lpcText,
+                                                LPCWSTR lpcTitle,
+                                                UINT fuStyle) {
+    Wh_Log(L">");
+
+    if (ExtWarnSettings.enable &&
+        ExtWarnIsRenameMessageBoxParams(hAppInst, lpcText, lpcTitle, fuStyle)) {
+        return IDYES;
+    }
+
+    [[clang::musttail]] return ExtWarnShellMessageBoxInternal_Original(
+        hAppInst, hWnd, dwFlags, lpcText, lpcTitle, fuStyle);
+}
+
+static BOOL ExtWarnInit() {
+    Wh_Log(L">");
+
+    ExtWarnLoadSettings();
+
+    Wh_SetFunctionHook((void*)ShellMessageBoxW,
+                       (void*)ExtWarnShellMessageBoxW_Hook,
+                       (void**)&ExtWarnShellMessageBoxW_Original);
+
+    // Also hook ShellMessageBoxInternal which was added in newer builds around
+    // April 2025.
+    HMODULE shlwapiModule = LoadLibrary(L"shlwapi.dll");
+    if (shlwapiModule) {
+        if (auto pShellMessageBoxInternal =
+                GetProcAddress(shlwapiModule, "ShellMessageBoxInternal")) {
+            Wh_SetFunctionHook((void*)pShellMessageBoxInternal,
+                               (void*)ExtWarnShellMessageBoxInternal_Hook,
+                               (void**)&ExtWarnShellMessageBoxInternal_Original);
+        } else {
+            Wh_Log(L"Couldn't find ShellMessageBoxInternal");
+        }
+    } else {
+        Wh_Log(L"Couldn't load shlwapi.dll");
+    }
+
+    return TRUE;
+}
+
+static void ExtWarnUninit() {
+    Wh_Log(L">");
+}
+
+static void ExtWarnNotifySettingsChanged() {
+    Wh_Log(L"[CW] ExtWarn settings changed");
+    ExtWarnLoadSettings();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 功能七：双击返回上级（DblUp*）
+// 来源：wrldspawn Explorer Double Click Up 1.0.1（GPL-3.0），
+// 原版链接：https://windhawk.net/mods/explorer-double-click-up。
+// 上游源码内注明的实现参考致谢：COMInitializer 类与 UIAutomation 用法取自
+// 模组「Click on empty taskbar space」（GPL-3.0）；FileCabinet_CreateViewWindow2
+// 挂钩与 ExplorerWrapper 参考/改写自「Classic Explorer Treeview」；返回上级
+// 目录的实现参考 Open-Shell。
+// 逻辑与上游一致，全局符号与函数统一加 DblUp 前缀以与其他功能隔离；设置键
+// 迁移为 dblUp.enable（分组总开关，默认关闭）。
+// 上游全部回调均为显式 CALLBACK / WINAPI / __cdecl 函数，无无捕获 lambda
+// 直传 WINAPI/stdcall 回调的情况，x86 兼容（经临时移除架构声明验证 i686
+// 本地编译通过）。
+// CreateWindowExW 的挂钩由文件末尾的共享钩子统一安装，本段只保留创建后的
+// 分发处理函数 DblUpOnCreatedWindow（原 CreateWindowExW_hook 的创建后处理
+// 段，逻辑不变）；总开关经 DblUpUpdateActivation 动态挂接/摘除子类（照
+// ToggleIcons 先例），关闭时共享钩子不再向本组分发新建窗口。
+// 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+class DblUpExplorerWrapper {
+    winrt::com_ptr<IShellBrowser> hBrowser;
+
+public:
+    HWND hShellTab = NULL;
+    HWND hListView = NULL;
+
+    DblUpExplorerWrapper(HWND hWnd, IShellBrowser* hShellBrowser) {
+        hShellTab = hWnd;
+        hBrowser.copy_from(hShellBrowser);
+    }
+
+    void GoUp() {
+        hBrowser->BrowseObject(NULL, SBSP_SAMEBROWSER | SBSP_PARENT);
+    }
+};
+
+class DblUpComInitializer
+{
+public:
+    DblUpComInitializer() : initialized(false) {}
+
+    bool Init()
+    {
+        if (!initialized)
+        {
+            initialized = SUCCEEDED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED));
+        }
+        return initialized;
+    }
+
+    void Uninit()
+    {
+        if (initialized)
+        {
+            CoUninitialize();
+            initialized = false;
+            Wh_Log(L"COM de-initialized");
+        }
+    }
+
+    ~DblUpComInitializer()
+    {
+        Uninit();
+    }
+
+    bool IsInitialized() { return initialized; }
+
+protected:
+    bool initialized;
+} g_DblUpComInitializer;
+
+std::vector<DblUpExplorerWrapper> g_DblUpWrappers;
+static winrt::com_ptr<IUIAutomation> g_DblUpUIAutomation;
+
+LRESULT CALLBACK DblUpSysListViewSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR dwRefData) {
+    if (uMsg == WM_LBUTTONDBLCLK) {
+        POINT mousePos;
+        GetCursorPos(&mousePos);
+        ScreenToClient(hWnd, &mousePos);
+
+        LVHITTESTINFO hitTestInfo;
+        hitTestInfo.flags = LVHT_NOWHERE;
+        hitTestInfo.pt.x = mousePos.x;
+        hitTestInfo.pt.y = mousePos.y;
+
+        // FIXME: Ignores group headers
+        int hitRes = ListView_SubItemHitTest(hWnd, &hitTestInfo);
+        if (hitRes == -1) {
+            bool found = false;
+            HWND parent = GetParent(hWnd);
+            while (parent != NULL) {
+                wchar_t className[256];
+                GetClassName(parent, className, 256);
+
+                if (wcscmp(className, L"ShellTabWindowClass") != 0) {
+                    parent = GetParent(parent);
+                    continue;
+                }
+
+                for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
+                    if (wrapper.hShellTab == parent) {
+                        found = true;
+                        wrapper.GoUp();
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+    };
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+struct DblUpClickHelper {
+    DWORD time = 0;
+    wchar_t className[256];
+    HWND hWnd;
+};
+
+DblUpClickHelper DblUpCurrentClick;
+DblUpClickHelper DblUpLastClick;
+
+LRESULT CALLBACK DblUpDUISubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR dwRefData) {
+    if (uMsg == WM_PARENTNOTIFY && wParam == WM_LBUTTONDOWN) {
+        DWORD now = GetTickCount();
+        DblUpCurrentClick.time = now;
+        DblUpCurrentClick.hWnd = hWnd;
+
+        POINT mousePos;
+        GetCursorPos(&mousePos);
+
+        winrt::com_ptr<IUIAutomationElement> pElement = NULL;
+        if (SUCCEEDED(g_DblUpUIAutomation->ElementFromPoint(mousePos, pElement.put())) && pElement) {
+            _bstr_t _className;
+            if (SUCCEEDED(pElement->get_CurrentClassName(_className.GetAddress()))) {
+                wchar_t* className = _className.GetBSTR();
+                wcsncpy(DblUpCurrentClick.className, className, 256);
+
+                DWORD delta = DblUpCurrentClick.time - DblUpLastClick.time;
+
+                if (
+                    DblUpCurrentClick.hWnd == DblUpLastClick.hWnd &&
+                    (
+                        (wcscmp(className, L"UIGroupItem") == 0 && wcscmp(DblUpLastClick.className, L"UIGroupItem") == 0) ||
+                        (wcscmp(className, L"UIItemsView") == 0 && wcscmp(DblUpLastClick.className, L"UIItemsView") == 0)
+                    ) &&
+                    delta <= GetDoubleClickTime()
+                ) {
+                    bool found = false;
+                    HWND parent = GetParent(hWnd);
+                    while (parent != NULL) {
+                        wchar_t className[256];
+                        GetClassName(parent, className, 256);
+
+                        if (wcscmp(className, L"ShellTabWindowClass") != 0) {
+                            parent = GetParent(parent);
+                            continue;
+                        }
+
+                        for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
+                            if (wrapper.hShellTab == parent) {
+                                found = true;
+                                wrapper.GoUp();
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                }
+
+                DblUpLastClick.time = now;
+                DblUpLastClick.hWnd = hWnd;
+                wcsncpy(DblUpLastClick.className, className, 256);
+            }
+        }
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+// 共享 CreateWindowExW 钩子的创建后分发处理函数（原独立版 CreateWindowExW_hook
+// 的创建后处理段；挂钩本体见文件末尾共享钩子）。
+static void DblUpOnCreatedWindow(HWND hWnd, LPCWSTR lpClassName, HWND hWndParent) {
+    // 与上游一致：不依赖传入的 lpClassName/hWndParent，自行按类名与父链判定。
+    UNREFERENCED_PARAMETER(lpClassName);
+    UNREFERENCED_PARAMETER(hWndParent);
+
+    if (hWnd != NULL) {
+        wchar_t className[256];
+        GetClassName(hWnd, className, 256);
+
+        HWND parent = GetParent(hWnd);
+        if (parent != NULL) {
+            wchar_t parentClassName[256];
+            GetClassName(parent, parentClassName, 256);
+
+            HWND parentParent = GetParent(parent);
+            if (parentParent != NULL) {
+                wchar_t parentParentClassName[256];
+                GetClassName(parentParent, parentParentClassName, 256);
+
+                if (wcscmp(parentParentClassName, L"ShellTabWindowClass") == 0) {
+                    if (wcscmp(className, L"SysListView32") == 0) {
+                        if (WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DblUpSysListViewSubclass, 0)) {
+                            Wh_Log(L"SysListView32 Subclassed %p", hWnd);
+                            for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
+                                if (wrapper.hShellTab == parentParent) {
+                                    wrapper.hListView = hWnd;
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (wcscmp(className, L"DirectUIHWND") == 0 && wcscmp(parentClassName, L"SHELLDLL_DefView") == 0) {
+                        if (WindhawkUtils::SetWindowSubclassFromAnyThread(parent, DblUpDUISubclass, 0)) {
+                            Wh_Log(L"DirectUIHWND Subclassed %p", parent);
+                            for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
+                                if (wrapper.hShellTab == parentParent) {
+                                    wrapper.hListView = parent;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+typedef HRESULT (*__cdecl DblUpFileCabinet_CreateViewWindow2_t)(IShellBrowser*, void*, IShellView*, IShellView*, void*, HWND*);
+DblUpFileCabinet_CreateViewWindow2_t DblUpFileCabinet_CreateViewWindow2Original;
+HRESULT __cdecl DblUpFileCabinet_CreateViewWindow2Hook(IShellBrowser* pBrowser, void* var1, IShellView* psv1, IShellView* psv2, void* var2, HWND* hWnd) {
+    HRESULT hRes = DblUpFileCabinet_CreateViewWindow2Original(pBrowser, var1, psv1, psv2, var2, hWnd);
+
+    HWND hShellTab = GetParent(*hWnd);
+    if (hShellTab != NULL)
+        g_DblUpWrappers.push_back(DblUpExplorerWrapper(hShellTab, pBrowser));
+
+    return hRes;
+}
+
+BOOL CALLBACK DblUpInitEnumChildWindowsProc(HWND hWnd, LPARAM lParam) {
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hWnd, &pid);
+    if (pid == GetCurrentProcessId()) {
+        wchar_t className[256];
+        GetClassName(hWnd, className, 256);
+
+        if (wcscmp(className, L"SHELLDLL_DefView") == 0) {
+            HWND shellTab = (HWND)lParam;
+
+            auto browser = winrt::com_ptr<IShellBrowser>{
+                reinterpret_cast<IShellBrowser*>((void*)SendMessage(shellTab, WM_USER + 7, 0, 0)),
+                winrt::take_ownership_from_abi
+            };
+            if (browser != NULL) {
+                DblUpExplorerWrapper wrapper = DblUpExplorerWrapper(shellTab, browser.get());
+
+                HWND listView = FindWindowEx(hWnd, NULL, L"SysListView32", NULL);
+                HWND dui = FindWindowEx(hWnd, NULL, L"DirectUIHWND", NULL);
+                if (listView) {
+                    if (WindhawkUtils::SetWindowSubclassFromAnyThread(listView, DblUpSysListViewSubclass, 0)) {
+                        Wh_Log(L"SysListView32 Subclassed %p", listView);
+                        wrapper.hListView = listView;
+                    }
+                } else if (dui) {
+                    if (WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DblUpDUISubclass, 0)) {
+                        Wh_Log(L"DirectUIHWND Subclassed %p", hWnd);
+                        wrapper.hListView = hWnd;
+                    }
+                }
+
+                if (wrapper.hListView) {
+                    g_DblUpWrappers.push_back(wrapper);
+                } else {
+                    Wh_Log(L"Failed to setup wrapper for %p", shellTab);
+                }
+
+                return FALSE;
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+BOOL CALLBACK DblUpInitEnumWindowsProc(HWND hWnd, LPARAM lParam) {
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hWnd, &pid);
+    if (pid == GetCurrentProcessId()) {
+        wchar_t className[256];
+        GetClassName(hWnd, className, 256);
+
+        if (wcscmp(className, L"CabinetWClass") == 0) {
+            HWND shellTab = FindWindowEx(hWnd, NULL, L"ShellTabWindowClass", NULL);
+            if (shellTab != NULL) {
+                EnumChildWindows(shellTab, DblUpInitEnumChildWindowsProc, (LPARAM)shellTab);
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+static void DblUpSubclassExistingWindows()
+{
+    EnumWindows(DblUpInitEnumWindowsProc, 0);
+}
+
+static void DblUpUnsubclassWindows()
+{
+    for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
+        HWND hWnd = wrapper.hListView;
+        if (hWnd) {
+            wchar_t className[256];
+            GetClassName(hWnd, className, 256);
+
+            if (wcscmp(className, L"SysListView32") == 0) {
+                WindhawkUtils::RemoveWindowSubclassFromAnyThread(hWnd, DblUpSysListViewSubclass);
+                Wh_Log(L"SysListView32 Unsubclassed %p", hWnd);
+            } else if (wcscmp(className, L"SHELLDLL_DefView") == 0) {
+                WindhawkUtils::RemoveWindowSubclassFromAnyThread(hWnd, DblUpDUISubclass);
+                Wh_Log(L"DirectUIHWND Unsubclassed %p", hWnd);
+            }
+        }
+    }
+    g_DblUpWrappers.clear();
+}
+
+static bool DblUpIsEnabled()
+{
+    return Wh_GetIntSetting(L"dblUp.enable") != 0;
+}
+
+// 分组总开关（dblUp.enable）激活状态同步：开启时枚举挂接现有文件夹窗口子类，
+// 关闭时摘除子类（照 ToggleIcons 先例）。共享 CreateWindowExW 钩子按
+// g_QuickSettingsDblUpActive 分发新建窗口，开关切换即时生效。
+static void DblUpUpdateActivation()
+{
+    bool enable = DblUpIsEnabled();
+    bool active = g_QuickSettingsDblUpActive.load();
+
+    if (enable && !active) {
+        // 先置活动标志再枚举挂接：枚举期间新建的文件夹窗口由共享
+        // CreateWindowExW 钩子分发补挂。
+        g_QuickSettingsDblUpActive = true;
+        DblUpSubclassExistingWindows();
+        Wh_Log(L"[CW] dblUp group enabled, folder windows subclassed");
+    } else if (!enable && active) {
+        // 先清活动标志再摘除：摘除期间新建的文件夹窗口不再被分发挂接。
+        g_QuickSettingsDblUpActive = false;
+        DblUpUnsubclassWindows();
+        Wh_Log(L"[CW] dblUp group disabled, subclasses removed");
+    }
+}
+
+static void DblUpLoadSettings()
+{
+    // 本分组仅有总开关（dblUp.enable），读取仅为记录与激活同步使用。
+    Wh_Log(L"[CW] dblUp settings loaded: enable=%d", (int)DblUpIsEnabled());
+}
+
+static BOOL DblUpInit() {
+    Wh_Log(L"DblUp (Explorer Double Click Up) Init");
+
+    HMODULE hExplorerFrame = LoadLibraryExW(L"explorerframe.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+
+    if (!hExplorerFrame) {
+        Wh_Log(L"Failed to load explorerframe.dll");
+        return FALSE;
+    }
+
+    WindhawkUtils::SYMBOL_HOOK explorerframe_dll_hooks[] = {
+        {
+            {
+                L"long __cdecl FileCabinet_CreateViewWindow2(struct IShellBrowser *,struct tagFolderSetDataBase *,struct IShellView *,struct IShellView *,struct tagRECT *,struct HWND__ * *)"
+            },
+            (void**)&DblUpFileCabinet_CreateViewWindow2Original,
+            (void*)DblUpFileCabinet_CreateViewWindow2Hook,
+            FALSE
+        }
+    };
+    if (!WindhawkUtils::HookSymbols(hExplorerFrame, explorerframe_dll_hooks, ARRAYSIZE(explorerframe_dll_hooks))) {
+        Wh_Log(L"Failed to hook ExplorerFrame.dll");
+        return FALSE;
+    }
+
+    // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
+    // 与 ToggleIcons / SmoothIcons / Purity 共用一次挂钩），这里不再重复安装。
+
+    if (!g_DblUpComInitializer.Init()) {
+        Wh_Log(L"COM initialization failed");
+        return FALSE;
+    }
+    if (
+        FAILED(CoCreateInstance(CLSID_CUIAutomation, NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), g_DblUpUIAutomation.put_void())) ||
+        !g_DblUpUIAutomation
+    ) {
+        Wh_Log(L"Failed to create UIAutomation COM instance");
+        return FALSE;
+    }
+
+    DblUpLoadSettings();
+    // 激活（枚举挂接现有窗口）放在 Wh_ModAfterInit 的 DblUpAfterInit 中进行，
+    // 与上游「AfterInit 再枚举」的时序一致；总开关关闭时不挂接任何窗口。
+
+    return TRUE;
+}
+
+static void DblUpAfterInit() {
+    DblUpUpdateActivation();
+}
+
+static void DblUpUninit() {
+    Wh_Log(L"DblUp Uninit");
+    g_QuickSettingsDblUpActive = false;
+    DblUpUnsubclassWindows();
+}
+
+static void DblUpNotifySettingsChanged() {
+    Wh_Log(L"[CW] DblUp settings changed");
+    DblUpLoadSettings();
+    DblUpUpdateActivation();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 功能八：开始菜单电源按钮（PowerBtn*）
+// 来源：Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2（MIT 惯例），
+// 原版链接：https://windhawk.net/mods/win11-power-buttons（官方源码仓库：
+// https://github.com/ramensoftware/windhawk-mods，mods/win11-power-buttons.wh.cpp）。
+// 1.0.4 版已按用户要求新增逐按钮启用开关（enableShutdown 等 6 项，「启用什么
+// 就显示什么」，仅影响 BuildButtons 的显示过滤）。
+// 逻辑与 CW 版 1.0.4 一致，全局符号与函数统一加 PowerBtn 前缀以与其他功能
+// 隔离；设置键迁移为 powerBtn.* 前缀（powerBtn.enable / powerBtn.alignment /
+// powerBtn.confirm_before_action / powerBtn.enableShutdown 等 / powerBtn.buttons）。
+// 新增分组总开关 powerBtn.enable（默认关闭）：关闭时开始菜单不注入按钮、
+// 原生电源按钮及其二级菜单保持原样；运行中切换即时生效（开启路径重启可见性
+// 监视并注入，关闭路径停止监视、移除注入容器并还原原生按钮）。
+// 进程分流（原版自带进程门控的保留，改用合并级判定）：
+//   • explorer.exe：创建隐藏代理窗口（ProxyWindowThread），代为执行特权电源
+//     动作（开始菜单进程运行在 AppContainer 沙箱中无权执行 ExitWindowsEx /
+//     SetSuspendState 等）；
+//   • StartMenuExperienceHost.exe：挂钩 CreateWindowInBand[Ex] 捕获 CoreWindow，
+//     在开始菜单 UI 中注入按钮；
+//   • 其他进程：本段不启用（合并入口按进程判定）。
+// x86 兼容修复（上游 5 处无捕获 lambda 直传 stdcall 回调，CW 1.0.3 已改为
+// 显式 static ... CALLBACK/WINAPI 函数，行为不变，此处原样保留）：
+//   1. CallOnWindowThread 中 SetWindowsHookEx(WH_CALLWNDPROC) 的钩子回调改为
+//      显式 static LRESULT CALLBACK ThreadCallWndProcHook（HOOKPROC）；
+//   2. FindCoreWindow 中 EnumWindows 的枚举回调改为显式 static BOOL CALLBACK
+//      FindCoreWindowEnumProc（WNDENUMPROC）；
+//   3. 传给 CallOnWindowThread 的三个无捕获 lambda（回调类型 ThreadCallProc_t
+//      = void(WINAPI*)(PVOID)）改为显式 static ... WINAPI 函数。
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Global state flags
+static std::atomic<bool> g_PowerBtnInitialized = false;
+static std::atomic<bool> g_PowerBtnUnloading = false;
+static std::atomic<bool> g_PowerBtnButtonsInjected = false;
+static std::atomic<bool> g_PowerBtnMonitoringActive = false;
+static std::atomic<bool> g_PowerBtnForceRebuild = false;
+
+static std::mutex g_PowerBtnSettingsMutex;
+
+// Forward declarations（定义见下方 Visibility Monitoring 区）。
+static bool PowerBtnStartVisibilityMonitoring();
+static void PowerBtnStopVisibilityMonitoring();
+
+// ============================================================================
+// Settings Management
+// ============================================================================
+
+struct PowerBtnSettingsData {
+    bool enable = false;  // 分组总开关（powerBtn.enable，默认 false）
+    wux::HorizontalAlignment alignment = wux::HorizontalAlignment::Right;
+    // 逐按钮启用开关（CW 1.0.4）：默认值与默认 buttons 数组 [sleep, signout,
+    // restart, shutdown] 对齐——关机/重启/注销/睡眠启用，休眠/锁定关闭。
+    bool enableShutdown = true;
+    bool enableRestart = true;
+    bool enableSignout = true;
+    bool enableSleep = true;
+    bool enableHibernate = false;
+    bool enableLock = false;
+    std::vector<std::wstring> buttonKeywords;
+};
+
+static PowerBtnSettingsData g_PowerBtnSettings;
+
+static std::wstring PowerBtnJoinStrings(const std::vector<std::wstring>& v) {
+    std::wstring out;
+    for (size_t i = 0; i < v.size(); i++) {
+        if (i) out += L",";
+        out += v[i];
+    }
+    return out;
+}
+
+// Parses Windhawk settings into internal structures
+static void PowerBtnLoadSettings() {
+    std::lock_guard<std::mutex> lock(g_PowerBtnSettingsMutex);
+
+    g_PowerBtnSettings.enable = Wh_GetIntSetting(L"powerBtn.enable") != 0;
+
+    g_PowerBtnSettings.alignment = wux::HorizontalAlignment::Right;
+    PCWSTR alignmentStr = Wh_GetStringSetting(L"powerBtn.alignment");
+
+    if (_wcsicmp(alignmentStr, L"left") == 0) {
+        g_PowerBtnSettings.alignment = wux::HorizontalAlignment::Left;
+    } else if (_wcsicmp(alignmentStr, L"center") == 0) {
+        g_PowerBtnSettings.alignment = wux::HorizontalAlignment::Center;
+    }
+
+    Wh_FreeStringSetting(alignmentStr);
+
+    // 逐按钮启用开关（CW 1.0.4，「启用什么就显示什么」）：
+    g_PowerBtnSettings.enableShutdown = Wh_GetIntSetting(L"powerBtn.enableShutdown") != 0;
+    g_PowerBtnSettings.enableRestart = Wh_GetIntSetting(L"powerBtn.enableRestart") != 0;
+    g_PowerBtnSettings.enableSignout = Wh_GetIntSetting(L"powerBtn.enableSignout") != 0;
+    g_PowerBtnSettings.enableSleep = Wh_GetIntSetting(L"powerBtn.enableSleep") != 0;
+    g_PowerBtnSettings.enableHibernate = Wh_GetIntSetting(L"powerBtn.enableHibernate") != 0;
+    g_PowerBtnSettings.enableLock = Wh_GetIntSetting(L"powerBtn.enableLock") != 0;
+
+    g_PowerBtnSettings.buttonKeywords.clear();
+    // 'buttons' is defined as an array of strings in settings.
+    // Iterates up to a reasonable limit or until an empty/missing entry is encountered.
+    for (int i = 0; i < 32; i++) {
+        PCWSTR itemStr = Wh_GetStringSetting(L"powerBtn.buttons[%d]", i);
+        if (!itemStr || !*itemStr) {
+            Wh_FreeStringSetting(itemStr);
+            break;
+        }
+
+        std::wstring item(itemStr);
+        Wh_FreeStringSetting(itemStr);
+
+        if (!item.empty())
+            g_PowerBtnSettings.buttonKeywords.push_back(std::move(item));
+    }
+
+    Wh_Log(L"PowerBtn settings loaded: enable=%d, alignment=%d, "
+           L"enable[shutdown=%d, restart=%d, signout=%d, sleep=%d, hibernate=%d, lock=%d], "
+           L"buttons=%s",
+           (int)g_PowerBtnSettings.enable,
+           static_cast<int>(g_PowerBtnSettings.alignment),
+           g_PowerBtnSettings.enableShutdown, g_PowerBtnSettings.enableRestart, g_PowerBtnSettings.enableSignout,
+           g_PowerBtnSettings.enableSleep, g_PowerBtnSettings.enableHibernate, g_PowerBtnSettings.enableLock,
+           PowerBtnJoinStrings(g_PowerBtnSettings.buttonKeywords).c_str());
+}
+
+// ============================================================================
+// Button Configuration
+// ============================================================================
+
+enum class PowerBtnAction {
+    Shutdown = 0,
+    Restart = 1,
+    SignOut = 2,
+    Sleep = 3,
+    Hibernate = 4,
+    Lock = 5,
+};
+
+struct PowerBtnButtonDefinition {
+    std::wstring keyword;
+    PowerBtnAction action;
+    const wchar_t* glyph;
+};
+
+// Glyphs are from Segoe Fluent Icons.
+static const std::vector<PowerBtnButtonDefinition> g_PowerBtnButtonDefinitions = {
+    {L"shutdown",  PowerBtnAction::Shutdown,  L"\uE7E8"},
+    {L"restart",   PowerBtnAction::Restart,   L"\uE777"},
+    {L"signout",   PowerBtnAction::SignOut,   L"\uF3B1"},
+    {L"sleep",     PowerBtnAction::Sleep,     L"\uE708"},
+    {L"hibernate", PowerBtnAction::Hibernate, L"\uE823"},
+    {L"lock",      PowerBtnAction::Lock,      L"\uE72E"},
+};
+
+struct PowerBtnButtonConfig {
+    PowerBtnAction action;
+    const wchar_t* glyph;
+};
+
+static std::vector<PowerBtnButtonConfig> g_PowerBtnButtons;
+
+// CW 1.0.4 逐按钮启用开关：对应开关是否打开（调用方需已持有设置互斥量）。
+static bool PowerBtnIsActionEnabled(const PowerBtnSettingsData& settings, PowerBtnAction action) {
+    switch (action) {
+        case PowerBtnAction::Shutdown:  return settings.enableShutdown;
+        case PowerBtnAction::Restart:   return settings.enableRestart;
+        case PowerBtnAction::SignOut:   return settings.enableSignout;
+        case PowerBtnAction::Sleep:     return settings.enableSleep;
+        case PowerBtnAction::Hibernate: return settings.enableHibernate;
+        case PowerBtnAction::Lock:      return settings.enableLock;
+    }
+    return false;
+}
+
+// Maps configuration keywords to actionable button definitions, ensuring uniqueness.
+// CW 1.0.4：buttons 数组只决定顺序，实际显示取「列入数组」与「启用开关打开」的
+// 交集——数组里有但开关关闭的不显示，开关打开但数组里没列的也不显示。
+// 2.0.0：分组总开关 powerBtn.enable 关闭时按钮列表恒为空（不注入任何按钮）。
+static void PowerBtnBuildButtons() {
+    std::lock_guard<std::mutex> lock(g_PowerBtnSettingsMutex);
+
+    g_PowerBtnButtons.clear();
+    if (!g_PowerBtnSettings.enable) {
+        return;
+    }
+
+    std::set<PowerBtnAction> seen;
+
+    for (const auto& keyword : g_PowerBtnSettings.buttonKeywords) {
+        for (const auto& def : g_PowerBtnButtonDefinitions) {
+            if (def.keyword == keyword && PowerBtnIsActionEnabled(g_PowerBtnSettings, def.action) &&
+                seen.insert(def.action).second) {
+                g_PowerBtnButtons.push_back({def.action, def.glyph});
+                break;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Localization
+// ============================================================================
+
+static std::wstring PowerBtnGetActionDisplayName(PowerBtnAction action) {
+    LANGID lang = PRIMARYLANGID(GetThreadUILanguage());
+
+    switch (action) {
+        case PowerBtnAction::Shutdown:
+            switch (lang) {
+                case LANG_CHINESE: return L"关机";
+                default: return L"Shut down";
+            }
+        case PowerBtnAction::Restart:
+            switch (lang) {
+                case LANG_CHINESE: return L"重启";
+                default: return L"Restart";
+            }
+        case PowerBtnAction::SignOut:
+            switch (lang) {
+                case LANG_CHINESE: return L"注销";
+                default: return L"Sign out";
+            }
+        case PowerBtnAction::Sleep:
+            switch (lang) {
+                case LANG_CHINESE: return L"睡眠";
+                default: return L"Sleep";
+            }
+        case PowerBtnAction::Hibernate:
+            switch (lang) {
+                case LANG_CHINESE: return L"休眠";
+                default: return L"Hibernate";
+            }
+        case PowerBtnAction::Lock:
+            switch (lang) {
+                case LANG_CHINESE: return L"锁定";
+                default: return L"Lock";
+            }
+    }
+    return L"";
+}
+
+static std::wstring PowerBtnGetConfirmTitle() {
+    switch (PRIMARYLANGID(GetThreadUILanguage())) {
+        case LANG_CHINESE:
+            return L"确认电源操作";
+        default:
+            return  L"Confirm Power Action";
+    }
+}
+
+static std::wstring PowerBtnGetConfirmMessage(PowerBtnAction action) {
+    std::wstring actionName = PowerBtnGetActionDisplayName(action);
+    switch (PRIMARYLANGID(GetThreadUILanguage())) {
+        case LANG_CHINESE:
+            return L"您确定要执行" + actionName + L"吗？";
+        default:
+            for (auto& c : actionName) c = towlower(c);
+            return  L"Are you sure you want to " + actionName + L"?";
+    }
+}
+
+// ============================================================================
+// Cross-Process IPC (Explorer Proxy)
+//
+// StartMenuExperienceHost.exe runs within a restricted AppContainer sandbox
+// and lacks privileges to execute ExitWindowsEx or SetSuspendState.
+// To perform these privileged commands, a hidden message-only window is
+// injected into Explorer.exe (running with user privileges) to act as a proxy.
+// ============================================================================
+
+static const wchar_t* PowerBtnProxyWindowClass = L"PowerActionProxy_Class";
+static const wchar_t* PowerBtnProxyWindowName  = L"PowerActionProxy_Window";
+static const wchar_t* PowerBtnProxyMessageName = L"PowerActionProxy_Execute";
+
+static UINT g_PowerBtnProxyMessage = 0;
+static HWND g_PowerBtnProxyWindow = NULL;
+static HANDLE g_PowerBtnProxyThread = NULL;
+
+static void PowerBtnInitProxyMessage() {
+    if (g_PowerBtnProxyMessage == 0) {
+        g_PowerBtnProxyMessage = RegisterWindowMessageW(PowerBtnProxyMessageName);
+    }
+}
+
+static bool PowerBtnConfirmPowerAction(PowerBtnAction action) {
+    std::wstring title = PowerBtnGetConfirmTitle();
+    std::wstring message = PowerBtnGetConfirmMessage(action);
+
+    int button = MessageBoxW(nullptr, message.c_str(), title.c_str(), MB_ICONQUESTION | MB_YESNO | MB_TOPMOST | MB_SETFOREGROUND);
+    return button == IDYES;
+}
+
+// Executes the requested power action, acquiring necessary privileges if required
+static void PowerBtnPerformPowerAction(PowerBtnAction action) {
+    HANDLE hToken = NULL;
+    TOKEN_PRIVILEGES tkp{};
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        if (LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid)) {
+            tkp.PrivilegeCount = 1;
+            tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+            AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, NULL, 0);
+        }
+        CloseHandle(hToken);
+    }
+
+    switch (action) {
+        case PowerBtnAction::Shutdown:
+            ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE, SHTDN_REASON_MAJOR_OTHER);
+            break;
+        case PowerBtnAction::Restart:
+            ExitWindowsEx(EWX_REBOOT | EWX_FORCE, SHTDN_REASON_MAJOR_OTHER);
+            break;
+        case PowerBtnAction::SignOut:
+            ExitWindowsEx(EWX_LOGOFF | EWX_FORCE, 0);
+            break;
+        case PowerBtnAction::Sleep:
+            SetSuspendState(FALSE, FALSE, FALSE);
+            break;
+        case PowerBtnAction::Hibernate:
+            SetSuspendState(TRUE, FALSE, FALSE);
+            break;
+        case PowerBtnAction::Lock:
+            LockWorkStation();
+            break;
+    }
+}
+
+static LRESULT CALLBACK PowerBtnProxyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == g_PowerBtnProxyMessage && g_PowerBtnProxyMessage != 0) {
+        PowerBtnAction action = (PowerBtnAction)wParam;
+        bool needConfirm = Wh_GetIntSetting(L"powerBtn.confirm_before_action") != 0;
+        if (!needConfirm || PowerBtnConfirmPowerAction(action)) {
+            PowerBtnPerformPowerAction(action);
+        }
+        return 0;
+    }
+    switch (message) {
+        case WM_DESTROY:
+            g_PowerBtnProxyWindow = NULL;
+            PostQuitMessage(0);
+            return 0;
+    }
+    return DefWindowProcW(hWnd, message, wParam, lParam);
+}
+
+// Thread function for the hidden proxy window
+static DWORD WINAPI PowerBtnProxyWindowThread(LPVOID) {
+    PowerBtnInitProxyMessage();
+
+    WNDCLASSEXW wcex = { sizeof(WNDCLASSEX) };
+    wcex.lpfnWndProc = PowerBtnProxyWndProc;
+    wcex.hInstance = GetModuleHandle(NULL);
+    wcex.lpszClassName = PowerBtnProxyWindowClass;
+
+    if (!RegisterClassExW(&wcex)) {
+        Wh_Log(L"Proxy: RegisterClassEx failed, error %lu", GetLastError());
+        return 1;
+    }
+
+    g_PowerBtnProxyWindow = CreateWindowExW(
+        0, PowerBtnProxyWindowClass, PowerBtnProxyWindowName,
+        0, 0, 0, 0, 0, HWND_MESSAGE,
+        NULL, GetModuleHandle(NULL), NULL
+    );
+
+    if (!g_PowerBtnProxyWindow) {
+        Wh_Log(L"Proxy: Failed to create window, error %lu", GetLastError());
+        UnregisterClassW(PowerBtnProxyWindowClass, GetModuleHandle(NULL));
+        return 1;
+    }
+
+    // Bypass UIPI to allow messages from lower-integrity processes
+    ChangeWindowMessageFilterEx(g_PowerBtnProxyWindow, g_PowerBtnProxyMessage, MSGFLT_ALLOW, NULL);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    UnregisterClassW(PowerBtnProxyWindowClass, GetModuleHandle(NULL));
+
+    return 0;
+}
+
+static void PowerBtnStartProxyThread() {
+    if (g_PowerBtnProxyThread) {
+        return;
+    }
+
+    g_PowerBtnProxyThread = CreateThread(NULL, 0, PowerBtnProxyWindowThread, NULL, 0, NULL);
+    if (!g_PowerBtnProxyThread) {
+        Wh_Log(L"Proxy: Failed to create thread, error %lu", GetLastError());
+    }
+}
+
+// Sends a message to the explorer proxy window to execute the command
+[[maybe_unused]]
+static void PowerBtnSendPowerAction(PowerBtnAction action) {
+    PowerBtnInitProxyMessage();
+
+    HWND hProxy = FindWindowW(PowerBtnProxyWindowClass, PowerBtnProxyWindowName);
+    if (!hProxy) {
+        Wh_Log(L"Proxy: Window not found. Is explorer.exe hooked?");
+        return;
+    }
+
+    DWORD proxyProcessId = 0;
+    GetWindowThreadProcessId(hProxy, &proxyProcessId);
+    AllowSetForegroundWindow(proxyProcessId);
+
+    PostMessageW(hProxy, g_PowerBtnProxyMessage, (WPARAM)action, 0);
+}
+
+// ============================================================================
+// Start Menu UI Injection
+// ============================================================================
+
+static const wchar_t* PowerBtnContainerTag  = L"PowerButtons_Container";
+
+// Weak references to key UI elements to avoid repeated VisualTree traversal
+static winrt::weak_ref<wuxc::Panel> g_PowerBtnParentPanel{ nullptr };
+static winrt::weak_ref<wux::FrameworkElement> g_PowerBtnOriginalPowerButton{ nullptr };
+static winrt::weak_ref<wuxc::StackPanel> g_PowerBtnButtonContainer{ nullptr };
+
+static void PowerBtnInjectButtons(wuxc::Panel parentPanel, wux::FrameworkElement originalPowerButton) {
+    try {
+        PowerBtnSettingsData currentSettings;
+        std::vector<PowerBtnButtonConfig> currentButtons;
+        {
+            std::lock_guard<std::mutex> lock(g_PowerBtnSettingsMutex);
+            currentSettings = g_PowerBtnSettings;
+            currentButtons = g_PowerBtnButtons;
+        }
+
+        // Ensure the native power button remains hidden
+        if (originalPowerButton && originalPowerButton.Visibility() != wux::Visibility::Collapsed) {
+            originalPowerButton.Visibility(wux::Visibility::Collapsed);
+        }
+
+        wuxc::StackPanel container = nullptr;
+
+        // Attempt to retrieve the container from cache
+        container = g_PowerBtnButtonContainer.get();
+        if (container) {
+            // Validate that the cached container is still attached to the target parent
+            try {
+                auto containerParent = wuxm::VisualTreeHelper::GetParent(container);
+                if (!containerParent || containerParent != parentPanel) {
+                    container = nullptr;
+                    g_PowerBtnButtonContainer = nullptr;
+                }
+            } catch (...) {
+                container = nullptr;
+                g_PowerBtnButtonContainer = nullptr;
+            }
+        }
+
+        // Cache miss: scan children to locate the tagged container
+        if (!container) {
+            auto children = parentPanel.Children();
+            for (uint32_t i = 0; i < children.Size(); i++) {
+                auto child = children.GetAt(i);
+                if (auto panel = child.try_as<wuxc::StackPanel>()) {
+                    auto tag = panel.Tag();
+                    if (tag && winrt::unbox_value_or<winrt::hstring>(tag, L"") == PowerBtnContainerTag) {
+                        container = panel;
+                        g_PowerBtnButtonContainer = container;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // If still not found, create and insert a new container
+        if (!container) {
+            container = wuxc::StackPanel();
+            container.Tag(winrt::box_value(PowerBtnContainerTag));
+            container.Orientation(wuxc::Orientation::Horizontal);
+            container.VerticalAlignment(wux::VerticalAlignment::Center);
+            parentPanel.Children().Append(container);
+            g_PowerBtnButtonContainer = container;
+        }
+
+        // Fast path: if the button count matches and no rebuild is forced,
+        // only update layout properties to handle potential style changes.
+        if (!g_PowerBtnForceRebuild.exchange(false) &&
+            container.Children().Size() == currentButtons.size()) {
+
+            if (container.Visibility() != wux::Visibility::Visible)
+                container.Visibility(wux::Visibility::Visible);
+
+            if (container.HorizontalAlignment() != currentSettings.alignment)
+                container.HorizontalAlignment(currentSettings.alignment);
+
+            container.Margin({ 0, 0, 0, 0 });
+            return;
+        }
+
+        // Full rebuild path
+        if (container.Visibility() != wux::Visibility::Visible)
+            container.Visibility(wux::Visibility::Visible);
+
+        container.HorizontalAlignment(currentSettings.alignment);
+
+        container.Margin({ 0, 0, 0, 0 });
+
+        container.Children().Clear();
+
+        for (size_t i = 0; i < currentButtons.size(); i++) {
+            const auto& cfg = currentButtons[i];
+
+            wuxc::Button btn;
+            btn.Width(40);
+            btn.Height(40);
+
+            // Apply margin only between buttons, not on outer edges
+            if (i == currentButtons.size() - 1) {
+                btn.Margin({ 0, 0, 0, 0 });
+            } else {
+                btn.Margin({ 0, 0, 4, 0 });
+            }
+
+            // Style the button to be transparent and blend with the Start Menu
+            btn.Background(wuxm::SolidColorBrush(wu::Colors::Transparent()));
+            btn.BorderThickness({ 0, 0, 0, 0 });
+            btn.CornerRadius({ 4, 4, 4, 4 });
+
+            wuxc::FontIcon icon;
+            icon.Glyph(cfg.glyph);
+            icon.FontFamily(wuxm::FontFamily(L"Segoe Fluent Icons"));
+            icon.FontSize(16);
+            btn.Content(icon);
+
+            wuxc::ToolTipService::SetToolTip(btn, winrt::box_value(PowerBtnGetActionDisplayName(cfg.action)));
+
+            PowerBtnAction action = cfg.action;
+            btn.Click([action](auto&&, auto&&) {
+                PowerBtnSendPowerAction(action);
+            });
+
+            container.Children().Append(btn);
+        }
+
+    } catch (winrt::hresult_error const& ex) {
+        Wh_Log(L"Inject: WinRT error 0x%08X", (unsigned)ex.code());
+    } catch (...) {
+        Wh_Log(L"Inject: Unknown error");
+    }
+}
+
+// Searches the Visual Tree recursively for the element named "PowerButton"
+static wux::FrameworkElement PowerBtnFindOriginalPowerButton(wux::DependencyObject parent) {
+    if (!parent) return nullptr;
+
+    int count = wuxm::VisualTreeHelper::GetChildrenCount(parent);
+    for (int i = 0; i < count; i++) {
+        auto child = wuxm::VisualTreeHelper::GetChild(parent, i);
+
+        if (auto fe = child.try_as<wux::FrameworkElement>()) {
+            if (fe.Name() == L"PowerButton")
+                return fe;
+        }
+
+        auto found = PowerBtnFindOriginalPowerButton(child);
+        if (found) return found;
+    }
+
+    return nullptr;
+}
+
+static bool PowerBtnTryInjectButtons() {
+    if (g_PowerBtnUnloading) return false;
+
+    // 分组总开关关闭：不注入（已注入的由 PowerBtnStopVisibilityMonitoring 还原）。
+    if (!g_PowerBtnSettings.enable) return false;
+
+    try {
+        auto window = wux::Window::Current();
+        if (!window) return false;
+
+        auto content = window.Content();
+        if (!content) return false;
+
+        auto powerButton = PowerBtnFindOriginalPowerButton(content);
+        if (!powerButton) return false;
+
+        auto parentObj = wuxm::VisualTreeHelper::GetParent(powerButton);
+        if (!parentObj) return false;
+
+        auto parentPanel = parentObj.try_as<wuxc::Panel>();
+        if (!parentPanel) return false;
+
+        g_PowerBtnParentPanel = parentPanel;
+        g_PowerBtnOriginalPowerButton = powerButton;
+
+        PowerBtnInjectButtons(parentPanel, powerButton);
+        g_PowerBtnButtonsInjected = true;
+
+        return true;
+
+    } catch (...) {
+        Wh_Log(L"Inject: Exception during TryInjectButtons");
+        return false;
+    }
+}
+
+// CW x86 兼容修复：CallOnWindowThread 的回调参数 ThreadCallProc_t 为
+// void(WINAPI*)(PVOID)（stdcall），无捕获 lambda 不能直传，改为显式
+// static ... WINAPI 函数（行为与上游 lambda 完全一致，下同）。
+static void WINAPI PowerBtnReloadSettingsThreadCall(PVOID) {
+    PowerBtnLoadSettings();
+    PowerBtnBuildButtons();
+    if (g_PowerBtnSettings.enable) {
+        // 运行中开启（或重启监视）：监视可能在此前被关闭路径停止，重启之
+        // （已激活时本调用为幂等直通），随后按新设置注入。
+        PowerBtnStartVisibilityMonitoring();
+        PowerBtnTryInjectButtons();
+    } else {
+        // 运行中关闭：停止监视、移除注入容器并还原原生电源按钮。
+        PowerBtnStopVisibilityMonitoring();
+        g_PowerBtnButtonsInjected = false;
+    }
+}
+
+// ============================================================================
+// Visibility Monitoring
+// Hooks Start Menu window events to trigger injection when UI becomes visible.
+// ============================================================================
+
+static winrt::event_token g_PowerBtnVisibilityToken{};
+static winrt::event_token g_PowerBtnActivatedToken{};
+
+static void PowerBtnOnWindowVisible() {
+    if (g_PowerBtnUnloading) return;
+
+    // Skip if already injected and no setting changes occurred
+    if (g_PowerBtnButtonsInjected && !g_PowerBtnForceRebuild) {
+        return;
+    }
+
+    // Schedule injection on the UI thread at low priority to avoid blocking UI startup
+    auto dq = winrt::Windows::System::DispatcherQueue::GetForCurrentThread();
+    if (dq) {
+        dq.TryEnqueue(winrt::Windows::System::DispatcherQueuePriority::Low, []() {
+            if (!g_PowerBtnUnloading) {
+                PowerBtnTryInjectButtons();
+            }
+        });
+    }
+}
+
+static bool PowerBtnStartVisibilityMonitoring() {
+    if (g_PowerBtnMonitoringActive) return true;
+
+    try {
+        wuc::CoreWindow coreWindow = wuc::CoreWindow::GetForCurrentThread();
+        if (!coreWindow) return false;
+
+        g_PowerBtnVisibilityToken =
+            coreWindow.VisibilityChanged([](auto&&, auto&& args) {
+                if (args.Visible()) PowerBtnOnWindowVisible();
+            });
+
+        g_PowerBtnActivatedToken =
+            coreWindow.Activated([](auto&&, auto&& args) {
+                if (args.WindowActivationState() != wuc::CoreWindowActivationState::Deactivated)
+                    PowerBtnOnWindowVisible();
+            });
+
+        g_PowerBtnMonitoringActive = true;
+
+        // If Start Menu is already visible, trigger immediately
+        if (coreWindow.Visible())
+            PowerBtnOnWindowVisible();
+
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+static void PowerBtnStopVisibilityMonitoring() {
+    try {
+        // Unregister event handlers
+        wuc::CoreWindow coreWindow = wuc::CoreWindow::GetForCurrentThread();
+        if (coreWindow) {
+            if (g_PowerBtnVisibilityToken) {
+                coreWindow.VisibilityChanged(g_PowerBtnVisibilityToken);
+                g_PowerBtnVisibilityToken = {};
+            }
+            if (g_PowerBtnActivatedToken) {
+                coreWindow.Activated(g_PowerBtnActivatedToken);
+                g_PowerBtnActivatedToken = {};
+            }
+        }
+    } catch (...) {}
+
+    // Cleanup UI: Remove custom buttons and restore original state
+    try {
+        auto panel = g_PowerBtnParentPanel.get();
+        auto container = g_PowerBtnButtonContainer.get();
+        auto originalBtn = g_PowerBtnOriginalPowerButton.get();
+
+        if (panel) {
+            // Remove the injected container from the visual tree
+            if (container) {
+                uint32_t index;
+                if (panel.Children().IndexOf(container, index)) {
+                    panel.Children().RemoveAt(index);
+                }
+            }
+            // Clear tag/marker if used
+            panel.Tag(nullptr);
+        }
+
+        // Restore original power button visibility
+        if (originalBtn) {
+            originalBtn.Visibility(wux::Visibility::Visible);
+        }
+
+    } catch (winrt::hresult_error const& ex) {
+        Wh_Log(L"Cleanup: WinRT error 0x%08X", (unsigned)ex.code());
+    } catch (...) {
+        Wh_Log(L"Cleanup: Unknown error");
+    }
+
+    // Clear references
+    g_PowerBtnParentPanel = nullptr;
+    g_PowerBtnOriginalPowerButton = nullptr;
+    g_PowerBtnButtonContainer = nullptr;
+    g_PowerBtnMonitoringActive = false;
+}
+
+// CW x86 兼容修复：同上，无捕获 lambda 改为显式 static ... WINAPI 函数。
+static void WINAPI PowerBtnStopMonitoringThreadCall(PVOID) {
+    PowerBtnStopVisibilityMonitoring();
+}
+
+// ============================================================================
+// Initialization Hooks
+// Intercepts window creation to detect the Start Menu's CoreWindow.
+// ============================================================================
+
+static const wchar_t* PowerBtnThreadCallMsg = L"PowerButtons_ThreadCall";
+
+static void PowerBtnInitWithRetry(HWND hwnd);
+
+static void CALLBACK PowerBtnRetryTimerProc(HWND hwnd, UINT, UINT_PTR idEvent, DWORD) {
+    KillTimer(hwnd, idEvent);
+    PowerBtnInitWithRetry(hwnd);
+}
+
+// Attempts to initialize UWP hooks. Retries if the environment isn't ready.
+static void PowerBtnInitWithRetry(HWND hwnd) {
+    if (!g_PowerBtnInitialized.exchange(true)) {
+        PowerBtnLoadSettings();
+        PowerBtnBuildButtons();
+    }
+
+    // 分组总开关关闭：不注入、不监视（总开关运行中开启时由设置变更路径
+    // 经 ReloadSettingsThreadCall 重启监视并注入）。
+    if (!g_PowerBtnSettings.enable) {
+        return;
+    }
+
+    if (!PowerBtnStartVisibilityMonitoring()) {
+        SetTimer(hwnd, 1772058423, 100, PowerBtnRetryTimerProc);
+    }
+}
+
+// CW x86 兼容修复：同上，无捕获 lambda 改为显式 static ... WINAPI 函数。
+static void WINAPI PowerBtnInitWithRetryThreadCall(PVOID param) {
+    PowerBtnInitWithRetry((HWND)param);
+}
+
+// Hook CreateWindowInBand to catch the Windows.UI.Core.CoreWindow creation
+using PowerBtnCreateWindowInBand_t = HWND(WINAPI*)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, PVOID, DWORD);
+static PowerBtnCreateWindowInBand_t PowerBtnCreateWindowInBand_Original;
+
+static HWND WINAPI PowerBtnCreateWindowInBand_Hook(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
+                                                   int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu,
+                                                   HINSTANCE hInstance, PVOID lpParam, DWORD dwBand) {
+    HWND hWnd = PowerBtnCreateWindowInBand_Original(dwExStyle, lpClassName, lpWindowName, dwStyle,
+                                                    X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam, dwBand);
+    if (!hWnd) return hWnd;
+
+    // Check for CoreWindow class name efficiently
+    if (lpClassName && ((ULONG_PTR)lpClassName & ~(ULONG_PTR)0xffff) != 0 &&
+        _wcsicmp(lpClassName, L"Windows.UI.Core.CoreWindow") == 0) {
+        PowerBtnInitWithRetry(hWnd);
+    }
+
+    return hWnd;
+}
+
+using PowerBtnCreateWindowInBandEx_t = HWND(WINAPI*)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, PVOID, DWORD, DWORD);
+static PowerBtnCreateWindowInBandEx_t PowerBtnCreateWindowInBandEx_Original;
+
+static HWND WINAPI PowerBtnCreateWindowInBandEx_Hook(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
+                                                     int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu,
+                                                     HINSTANCE hInstance, PVOID lpParam, DWORD dwBand, DWORD dwTypeFlags) {
+    HWND hWnd = PowerBtnCreateWindowInBandEx_Original(dwExStyle, lpClassName, lpWindowName, dwStyle,
+                                                      X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam, dwBand, dwTypeFlags);
+    if (!hWnd) return hWnd;
+
+    if (lpClassName && ((ULONG_PTR)lpClassName & ~(ULONG_PTR)0xffff) != 0 &&
+        _wcsicmp(lpClassName, L"Windows.UI.Core.CoreWindow") == 0) {
+        PowerBtnInitWithRetry(hWnd);
+    }
+
+    return hWnd;
+}
+
+// Helper to run a function on the target window's thread.
+// CW x86 兼容修复：HOOKPROC（WH_CALLWNDPROC）为 stdcall 回调，无捕获 lambda 不能
+// 直传，改为显式 static LRESULT CALLBACK 函数（行为与上游 lambda 完全一致）。
+using PowerBtnThreadCallProc_t = void(WINAPI*)(PVOID);
+struct PowerBtnCallParam { PowerBtnThreadCallProc_t proc; PVOID param; };
+
+static LRESULT CALLBACK PowerBtnThreadCallWndProcHook(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode == HC_ACTION) {
+        const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+        if (cwp->message == RegisterWindowMessage(PowerBtnThreadCallMsg)) {
+            PowerBtnCallParam* p = (PowerBtnCallParam*)cwp->lParam;
+            p->proc(p->param);
+        }
+    }
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+static bool PowerBtnCallOnWindowThread(HWND hWnd, PowerBtnThreadCallProc_t proc, PVOID param) {
+    static const UINT msg = RegisterWindowMessage(PowerBtnThreadCallMsg);
+
+    DWORD threadId = GetWindowThreadProcessId(hWnd, nullptr);
+    if (threadId == 0) return false;
+
+    if (threadId == GetCurrentThreadId()) {
+        proc(param);
+        return true;
+    }
+
+    HHOOK hook = SetWindowsHookEx(WH_CALLWNDPROC, PowerBtnThreadCallWndProcHook, nullptr, threadId);
+
+    if (!hook) return false;
+
+    PowerBtnCallParam p = { proc, param };
+    SendMessage(hWnd, msg, 0, (LPARAM)&p);
+    UnhookWindowsHookEx(hook);
+    return true;
+}
+
+struct PowerBtnEnumParam { HWND* result; };
+
+// CW x86 兼容修复：WNDENUMPROC 为 stdcall 回调，无捕获 lambda 不能直传，
+// 改为显式 static BOOL CALLBACK 函数（行为与上游 lambda 完全一致）。
+static BOOL CALLBACK PowerBtnFindCoreWindowEnumProc(HWND w, LPARAM lParam) {
+    PowerBtnEnumParam& p = *(PowerBtnEnumParam*)lParam;
+
+    DWORD pid = 0;
+    if (!GetWindowThreadProcessId(w, &pid) || pid != GetCurrentProcessId())
+        return TRUE;
+
+    WCHAR cls[64]{};
+    if (GetClassName(w, cls, 64) == 0)
+        return TRUE;
+
+    if (_wcsicmp(cls, L"Windows.UI.Core.CoreWindow") == 0) {
+        *p.result = w;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static HWND PowerBtnFindCoreWindow() {
+    HWND hWnd = nullptr;
+    PowerBtnEnumParam param = { &hWnd };
+
+    EnumWindows(PowerBtnFindCoreWindowEnumProc, (LPARAM)&param);
+
+    return hWnd;
+}
+
+// ============================================================================
+// PowerBtn Entry Points（由合并入口调用，进程分流见各函数内部）
+// ============================================================================
+
+static BOOL PowerBtnInit() {
+    QuickSettingsProcessKind kind = QuickSettingsGetProcessKind();
+
+    if (kind == QuickSettingsProcessKind::Explorer) {
+        // explorer：仅创建隐藏代理窗口，代为执行特权电源动作。
+        PowerBtnLoadSettings();
+        if (g_PowerBtnSettings.enable) {
+            PowerBtnStartProxyThread();
+        }
+        return TRUE;
+    }
+
+    if (kind != QuickSettingsProcessKind::StartMenuExperienceHost) {
+        // 其他进程：本段不启用。
+        return FALSE;
+    }
+
+    // StartMenuExperienceHost：挂钩 CreateWindowInBand[Ex] 捕获 CoreWindow。
+    PowerBtnLoadSettings();
+
+    HMODULE user32 = LoadLibraryEx(L"user32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    if (!user32) {
+        Wh_Log(L"Init: Failed to load user32.dll");
+        return TRUE;
+    }
+
+    void* pCreateWindowInBand = (void*)GetProcAddress(user32, "CreateWindowInBand");
+    if (pCreateWindowInBand) {
+        Wh_SetFunctionHook(pCreateWindowInBand, (void*)PowerBtnCreateWindowInBand_Hook, (void**)&PowerBtnCreateWindowInBand_Original);
+    } else {
+        Wh_Log(L"Init: CreateWindowInBand not found");
+    }
+
+    void* pCreateWindowInBandEx = (void*)GetProcAddress(user32, "CreateWindowInBandEx");
+    if (pCreateWindowInBandEx) {
+        Wh_SetFunctionHook(pCreateWindowInBandEx, (void*)PowerBtnCreateWindowInBandEx_Hook, (void**)&PowerBtnCreateWindowInBandEx_Original);
+    } else {
+        Wh_Log(L"Init: CreateWindowInBandEx not found");
+    }
+
+    return TRUE;
+}
+
+static void PowerBtnAfterInit() {
+    if (QuickSettingsGetProcessKind() != QuickSettingsProcessKind::StartMenuExperienceHost) {
+        return;
+    }
+
+    HWND hCoreWnd = PowerBtnFindCoreWindow();
+    if (!hCoreWnd) {
+        // Start Menu process started but no window yet. Hook will catch it.
+        return;
+    }
+
+    PowerBtnCallOnWindowThread(hCoreWnd, PowerBtnInitWithRetryThreadCall, hCoreWnd);
+}
+
+static void PowerBtnUninit() {
+    Wh_Log(L"PowerBtn Uninit");
+
+    g_PowerBtnUnloading = true;
+
+    if (g_PowerBtnProxyWindow) {
+        PostMessage(g_PowerBtnProxyWindow, WM_CLOSE, 0, 0);
+    }
+
+    if (g_PowerBtnProxyThread) {
+        WaitForSingleObject(g_PowerBtnProxyThread, 5000);
+        CloseHandle(g_PowerBtnProxyThread);
+        g_PowerBtnProxyThread = NULL;
+    }
+    g_PowerBtnProxyWindow = NULL;
+
+    if (QuickSettingsGetProcessKind() == QuickSettingsProcessKind::StartMenuExperienceHost) {
+        HWND hCoreWnd = PowerBtnFindCoreWindow();
+        if (hCoreWnd) {
+            PowerBtnCallOnWindowThread(hCoreWnd, PowerBtnStopMonitoringThreadCall, nullptr);
+        }
+    }
+}
+
+static void PowerBtnSettingsChanged() {
+    QuickSettingsProcessKind kind = QuickSettingsGetProcessKind();
+
+    if (kind == QuickSettingsProcessKind::Explorer) {
+        // explorer：总开关开启且代理线程未创建时补建（运行中开启即生效）。
+        PowerBtnLoadSettings();
+        if (g_PowerBtnSettings.enable) {
+            PowerBtnStartProxyThread();
+        }
+        return;
+    }
+
+    if (kind != QuickSettingsProcessKind::StartMenuExperienceHost) {
+        return;
+    }
+
+    PowerBtnLoadSettings();
+    PowerBtnBuildButtons();
+
+    g_PowerBtnForceRebuild = true;
+    g_PowerBtnButtonsInjected = false;
+    g_PowerBtnButtonContainer = nullptr;
+
+    HWND hCoreWnd = PowerBtnFindCoreWindow();
+    if (!hCoreWnd) return;
+
+    PowerBtnCallOnWindowThread(hCoreWnd, PowerBtnReloadSettingsThreadCall, nullptr);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 功能九：拖拽删除（DragDel*）
+// 来源：iMAboud Drag to Delete 1.0.0（MIT），
+// 原版链接：https://windhawk.net/mods/drag-to-delete。
+// 逻辑与上游一致，全局符号与函数统一加 DragDel 前缀以与其他功能隔离；设置键
+// 迁移为 dragDel.enable（分组总开关，默认关闭——该功能会把拖放直接变成删除
+// 动作，让用户显式选择）。
+// 实现方式：DoDragDrop 钩子段加开关短路——总开关关闭时不显示悬浮目标（拖放
+// 行为与系统完全一致），但拖放计数保持对称，避免开关切换瞬间残留状态；覆盖
+// 窗口线程与删除工作线程常驻（空闲零轮询、资源占用极低），总开关切换即时
+// 生效。仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
+// 上游全部线程/窗口回调均为显式 WINAPI/CALLBACK 函数或成员函数，无无捕获
+// lambda 直传 WINAPI/stdcall 回调的情况，x86 兼容。
+// ─────────────────────────────────────────────────────────────────────────────
+
+using namespace Gdiplus;
+
+static const int DRAGDEL_BASE_WND_WIDTH    = 200;
+static const int DRAGDEL_BASE_WND_HEIGHT   = 160;
+static const int DRAGDEL_BASE_TOP_Y        = 8;
+static const float DRAGDEL_BASE_CENTER_X   = 100.0f;
+static const float DRAGDEL_BASE_CENTER_Y   = 50.0f;
+static const float DRAGDEL_BASE_RADIUS     = 34.0f;
+static const float DRAGDEL_BASE_HIT_MARGIN = 16.0f;
+
+constexpr WCHAR kDragDelClassName[] = L"WindhawkDragToDeleteOverlay";
+
+enum class DragDelAnimState { HIDDEN, VISIBLE, DROPPED };
+
+static HWND g_DragDelOverlayWnd = nullptr;
+static HANDLE g_DragDelUIThread = nullptr;
+static DWORD g_DragDelUIThreadId = 0;
+static HANDLE g_DragDelReadyEvent = nullptr;
+static LONG g_DragDelActiveDrags = 0;
+static ULONG_PTR g_DragDelGdiplusToken = 0;
+
+static HANDLE g_DragDelDeleteWorker = nullptr;
+static HANDLE g_DragDelDeleteQueueEvent = nullptr;
+static HANDLE g_DragDelDeleteStopEvent = nullptr;
+static CRITICAL_SECTION g_DragDelDeleteCs;
+static std::vector<std::vector<wchar_t>> g_DragDelDeleteQueue;
+
+static RECT g_DragDelTargetWorkArea = {};
+static float g_DragDelCurrentDpiScale = 1.0f;
+static DragDelAnimState g_DragDelAnimState = DragDelAnimState::HIDDEN;
+static float g_DragDelCurrentScale = 0.0f;
+static float g_DragDelTargetScale = 0.0f;
+static float g_DragDelLastRenderedScale = -1.0f;
+
+// 分组总开关（dragDel.enable，默认 false）。
+static struct {
+    bool enable;
+} DragDelSettings;
+
+static void DragDelLoadSettings() {
+    DragDelSettings.enable = Wh_GetIntSetting(L"dragDel.enable") != 0;
+}
+
+#define DRAGDEL_WM_UPDATE_DRAG_STATE (WM_USER + 101)
+#define DRAGDEL_TIMER_ANIM 1
+
+HMODULE DragDelGetCurrentModuleHandle() {
+    HMODULE hModule = nullptr;
+    GetModuleHandleExW(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCWSTR)DragDelGetCurrentModuleHandle,
+        &hModule
+    );
+    return hModule;
+}
+
+static UINT DragDelGetMonitorDpi(HMONITOR hMon) {
+    if (hMon) {
+        static auto pfnGetDpiForMonitor = (HRESULT(WINAPI*)(HMONITOR, int, UINT*, UINT*))
+            GetProcAddress(GetModuleHandleW(L"shcore.dll"), "GetDpiForMonitor");
+        if (!pfnGetDpiForMonitor) {
+            HMODULE hShcore = LoadLibraryW(L"shcore.dll");
+            if (hShcore) {
+                pfnGetDpiForMonitor = (HRESULT(WINAPI*)(HMONITOR, int, UINT*, UINT*))
+                    GetProcAddress(hShcore, "GetDpiForMonitor");
+            }
+        }
+        if (pfnGetDpiForMonitor) {
+            UINT dpiX = 96, dpiY = 96;
+            if (SUCCEEDED(pfnGetDpiForMonitor(hMon, 0 /* MDT_EFFECTIVE_DPI */, &dpiX, &dpiY))) {
+                if (dpiX > 0) return dpiX;
+            }
+        }
+    }
+    return 96;
+}
+
+void DragDelRenderFrame(HWND hWnd);
+void DragDelMoveFilesToRecycleBin(const std::vector<wchar_t>& buffer);
+
+void DragDelDrawModernTrashIcon(Graphics& g, float cx, float cy, float scale, Color color) {
+    SolidBrush brush(color);
+    float s = scale;
+
+    Pen handlePen(color, 2.5f * s);
+    handlePen.SetStartCap(LineCapRound);
+    handlePen.SetEndCap(LineCapRound);
+    g.DrawLine(&handlePen, cx - 4.5f * s, cy - 16.5f * s, cx + 4.5f * s, cy - 16.5f * s);
+
+    Pen lidPen(color, 3.5f * s);
+    lidPen.SetStartCap(LineCapRound);
+    lidPen.SetEndCap(LineCapRound);
+    g.DrawLine(&lidPen, cx - 14.0f * s, cy - 12.0f * s, cx + 14.0f * s, cy - 12.0f * s);
+
+    GraphicsPath bodyPath;
+    float topW = 12.0f * s;
+    float botW = 9.5f * s;
+    float topY = cy - 8.0f * s;
+    float botY = cy + 15.0f * s;
+    float r = 3.5f * s;
+
+    bodyPath.AddLine(cx - topW, topY, cx + topW, topY);
+    bodyPath.AddLine(cx + topW, topY, cx + botW, botY - r);
+    bodyPath.AddArc(cx + botW - r * 2, botY - r * 2, r * 2, r * 2, 0, 90);
+    bodyPath.AddLine(cx + botW - r, botY, cx - botW + r, botY);
+    bodyPath.AddArc(cx - botW, botY - r * 2, r * 2, r * 2, 90, 90);
+    bodyPath.AddLine(cx - botW, botY - r, cx - topW, topY);
+    bodyPath.CloseFigure();
+    g.FillPath(&brush, &bodyPath);
+
+    Pen slotPen(Color(180, 22, 22, 26), 1.8f * s);
+    slotPen.SetStartCap(LineCapRound);
+    slotPen.SetEndCap(LineCapRound);
+    for (float off : { -4.5f * s, 0.0f, 4.5f * s }) {
+        g.DrawLine(&slotPen, cx + off, topY + 4.0f * s, cx + off, botY - 4.0f * s);
+    }
+}
+
+void DragDelRenderFrame(HWND hWnd) {
+    if (g_DragDelAnimState == DragDelAnimState::HIDDEN || g_DragDelCurrentScale < 0.05f) return;
+
+    float dpiScale = g_DragDelCurrentDpiScale;
+    int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * dpiScale);
+    int wndHeight = (int)(DRAGDEL_BASE_WND_HEIGHT * dpiScale);
+    int topY = (int)(DRAGDEL_BASE_TOP_Y * dpiScale);
+    float cx = DRAGDEL_BASE_CENTER_X * dpiScale;
+    float cy = DRAGDEL_BASE_CENTER_Y * dpiScale;
+    float baseRadius = DRAGDEL_BASE_RADIUS * dpiScale;
+
+    HDC hdcScreen = GetDC(nullptr);
+    HDC hdcMem = CreateCompatibleDC(hdcScreen);
+
+    BITMAPINFO bmi = {};
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = wndWidth;
+    bmi.bmiHeader.biHeight = -wndHeight;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    void* pBits = nullptr;
+    HBITMAP hBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, &pBits, nullptr, 0);
+    HGDIOBJ hOldBitmap = SelectObject(hdcMem, hBitmap);
+
+    {
+        Bitmap bmp(wndWidth, wndHeight, wndWidth * 4, PixelFormat32bppPARGB, (BYTE*)pBits);
+        Graphics g(&bmp);
+        g.SetSmoothingMode(SmoothingModeAntiAlias);
+
+        float r = baseRadius * g_DragDelCurrentScale;
+
+        SolidBrush shadowBrush(Color(25, 0, 0, 0));
+        g.FillEllipse(&shadowBrush, cx - r - 4.0f * dpiScale, cy - r - 1.0f * dpiScale, (r + 4.0f * dpiScale) * 2, (r + 4.0f * dpiScale) * 2 + 5.0f * dpiScale);
+
+        RectF glassRect(cx - r, cy - r, r * 2, r * 2);
+        LinearGradientBrush glassBrush(
+            PointF(cx, cy - r),
+            PointF(cx, cy + r),
+            Color(215, 38, 40, 46),
+            Color(190, 20, 21, 25)
+        );
+        g.FillEllipse(&glassBrush, glassRect);
+
+        Pen innerEdgePen(Color(35, 255, 255, 255), 1.0f * dpiScale);
+        g.DrawEllipse(&innerEdgePen, cx - r + 0.5f, cy - r + 0.5f, (r - 0.5f) * 2, (r - 0.5f) * 2);
+
+        DragDelDrawModernTrashIcon(g, cx, cy, g_DragDelCurrentScale * dpiScale, Color(245, 248, 250));
+    }
+
+    int monLeft = g_DragDelTargetWorkArea.left;
+    int monWidth = g_DragDelTargetWorkArea.right - g_DragDelTargetWorkArea.left;
+    int wndLeft = monLeft + (monWidth - wndWidth) / 2;
+    int wndTop = g_DragDelTargetWorkArea.top + topY;
+
+    POINT ptDst = { wndLeft, wndTop };
+    POINT ptSrc = { 0, 0 };
+    SIZE wndSize = { wndWidth, wndHeight };
+    BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+
+    UpdateLayeredWindow(hWnd, hdcScreen, &ptDst, &wndSize, hdcMem, &ptSrc, 0, &blend, ULW_ALPHA);
+
+    SelectObject(hdcMem, hOldBitmap);
+    DeleteObject(hBitmap);
+    DeleteDC(hdcMem);
+    ReleaseDC(nullptr, hdcScreen);
+}
+
+class DragDelRecycleDropTarget final : public IDropTarget {
+    LONG m_refCount = 1;
+    bool m_hasHDrop = false;
+
+    bool IsOverTrash(POINTL pt) {
+        if (!g_DragDelOverlayWnd) return false;
+
+        float dpiScale = g_DragDelCurrentDpiScale;
+        int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * dpiScale);
+        int topY = (int)(DRAGDEL_BASE_TOP_Y * dpiScale);
+        float centerX = DRAGDEL_BASE_CENTER_X * dpiScale;
+        float centerY = DRAGDEL_BASE_CENTER_Y * dpiScale;
+        float baseRadius = DRAGDEL_BASE_RADIUS * dpiScale;
+        float hitMargin = DRAGDEL_BASE_HIT_MARGIN * dpiScale;
+
+        int monLeft = g_DragDelTargetWorkArea.left;
+        int monWidth = g_DragDelTargetWorkArea.right - g_DragDelTargetWorkArea.left;
+        int wndLeft = monLeft + (monWidth - wndWidth) / 2;
+        int wndTop = g_DragDelTargetWorkArea.top + topY;
+
+        float dx = (float)(pt.x - wndLeft) - centerX;
+        float dy = (float)(pt.y - wndTop) - centerY;
+        float hitRadius = baseRadius * g_DragDelCurrentScale + hitMargin;
+
+        return (dx * dx + dy * dy) <= (hitRadius * hitRadius);
+    }
+
+public:
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppv) override {
+        if (riid == __uuidof(IUnknown) || riid == __uuidof(IDropTarget)) {
+            *ppv = static_cast<IDropTarget*>(this);
+            AddRef();
+            return S_OK;
+        }
+        *ppv = nullptr;
+        return E_NOINTERFACE;
+    }
+
+    ULONG STDMETHODCALLTYPE AddRef() override { return InterlockedIncrement(&m_refCount); }
+    ULONG STDMETHODCALLTYPE Release() override {
+        LONG count = InterlockedDecrement(&m_refCount);
+        if (count == 0) delete this;
+        return count;
+    }
+
+    HRESULT STDMETHODCALLTYPE DragEnter(IDataObject* pDataObj, DWORD, POINTL pt, DWORD* pdwEffect) override {
+        FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        m_hasHDrop = (pDataObj && pDataObj->QueryGetData(&fmt) == S_OK);
+
+        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
+        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
+            *pdwEffect = DROPEFFECT_MOVE;
+            g_DragDelTargetScale = 1.2f;
+        } else {
+            if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
+            g_DragDelTargetScale = 1.0f;
+        }
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL pt, DWORD* pdwEffect) override {
+        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
+        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
+            *pdwEffect = DROPEFFECT_MOVE;
+            g_DragDelTargetScale = 1.2f;
+        } else {
+            if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
+            g_DragDelTargetScale = 1.0f;
+        }
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE DragLeave() override {
+        m_hasHDrop = false;
+        g_DragDelTargetScale = 1.0f;
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE Drop(IDataObject* pDataObj, DWORD, POINTL pt, DWORD* pdwEffect) override {
+        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
+        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
+            *pdwEffect = DROPEFFECT_MOVE;
+
+            FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+            STGMEDIUM stg;
+            if (SUCCEEDED(pDataObj->GetData(&fmt, &stg))) {
+                HDROP hDrop = (HDROP)GlobalLock(stg.hGlobal);
+                if (hDrop) {
+                    UINT fileCount = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
+                    if (fileCount > 0) {
+                        std::vector<wchar_t> buffer;
+                        for (UINT i = 0; i < fileCount; i++) {
+                            UINT len = DragQueryFileW(hDrop, i, nullptr, 0);
+                            size_t prevSize = buffer.size();
+                            buffer.resize(prevSize + len + 1);
+                            DragQueryFileW(hDrop, i, buffer.data() + prevSize, len + 1);
+                        }
+                        buffer.push_back(L'\0');
+
+                        EnterCriticalSection(&g_DragDelDeleteCs);
+                        g_DragDelDeleteQueue.push_back(std::move(buffer));
+                        LeaveCriticalSection(&g_DragDelDeleteCs);
+                        SetEvent(g_DragDelDeleteQueueEvent);
+                    }
+                    GlobalUnlock(stg.hGlobal);
+                }
+                ReleaseStgMedium(&stg);
+            }
+
+            g_DragDelCurrentScale = 1.25f;
+            g_DragDelTargetScale = 0.0f;
+            g_DragDelAnimState = DragDelAnimState::DROPPED;
+        } else {
+            if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
+        }
+        m_hasHDrop = false;
+        return S_OK;
+    }
+};
+
+static DragDelRecycleDropTarget* g_DragDelDropTarget = nullptr;
+
+void DragDelMoveFilesToRecycleBin(const std::vector<wchar_t>& buffer) {
+    if (buffer.empty()) return;
+
+    SHFILEOPSTRUCTW fileOp = {};
+    fileOp.wFunc = FO_DELETE;
+    fileOp.pFrom = buffer.data();
+    fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_WANTNUKEWARNING | FOF_SILENT;
+    SHFileOperationW(&fileOp);
+}
+
+DWORD WINAPI DragDelDeleteWorkerThread(LPVOID) {
+    HANDLE handles[2] = { g_DragDelDeleteStopEvent, g_DragDelDeleteQueueEvent };
+    while (true) {
+        DWORD wait = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+        if (wait == WAIT_OBJECT_0) {
+            EnterCriticalSection(&g_DragDelDeleteCs);
+            auto queueCopy = std::move(g_DragDelDeleteQueue);
+            LeaveCriticalSection(&g_DragDelDeleteCs);
+
+            for (const auto& item : queueCopy) {
+                DragDelMoveFilesToRecycleBin(item);
+            }
+            break;
+        } else if (wait == WAIT_OBJECT_0 + 1) {
+            while (true) {
+                std::vector<wchar_t> item;
+                EnterCriticalSection(&g_DragDelDeleteCs);
+                if (!g_DragDelDeleteQueue.empty()) {
+                    item = std::move(g_DragDelDeleteQueue.front());
+                    g_DragDelDeleteQueue.erase(g_DragDelDeleteQueue.begin());
+                }
+                LeaveCriticalSection(&g_DragDelDeleteCs);
+
+                if (item.empty()) break;
+                DragDelMoveFilesToRecycleBin(item);
+            }
+        } else {
+            break;
+        }
+    }
+    return 0;
+}
+
+LRESULT CALLBACK DragDelOverlayWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+        case DRAGDEL_WM_UPDATE_DRAG_STATE: {
+            if (wParam != 0) {
+                POINT ptCursor;
+                GetCursorPos(&ptCursor);
+                HMONITOR hMon = MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST);
+                MONITORINFO mi = { sizeof(mi) };
+                if (GetMonitorInfoW(hMon, &mi)) {
+                    g_DragDelTargetWorkArea = mi.rcWork;
+                } else {
+                    g_DragDelTargetWorkArea = { 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
+                }
+
+                g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(hMon) / 96.0f;
+                g_DragDelAnimState = DragDelAnimState::VISIBLE;
+                g_DragDelCurrentScale = 0.3f;
+                g_DragDelTargetScale = 1.0f;
+                g_DragDelLastRenderedScale = -1.0f;
+                ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+                SetTimer(hWnd, DRAGDEL_TIMER_ANIM, 16, nullptr);
+            } else {
+                if (g_DragDelAnimState != DragDelAnimState::DROPPED) {
+                    g_DragDelTargetScale = 0.0f;
+                }
+            }
+            return 0;
+        }
+
+        case WM_TIMER: {
+            if (wParam == DRAGDEL_TIMER_ANIM) {
+                if (abs((int)((g_DragDelTargetScale - g_DragDelCurrentScale) * 1000.0f)) < 5) {
+                    g_DragDelCurrentScale = g_DragDelTargetScale;
+                } else {
+                    g_DragDelCurrentScale += (g_DragDelTargetScale - g_DragDelCurrentScale) * 0.25f;
+                }
+
+                if (g_DragDelTargetScale == 0.0f && g_DragDelCurrentScale < 0.05f) {
+                    g_DragDelAnimState = DragDelAnimState::HIDDEN;
+                    KillTimer(hWnd, DRAGDEL_TIMER_ANIM);
+                    ShowWindow(hWnd, SW_HIDE);
+                    return 0;
+                }
+
+                if (g_DragDelCurrentScale != g_DragDelLastRenderedScale) {
+                    g_DragDelLastRenderedScale = g_DragDelCurrentScale;
+                    DragDelRenderFrame(hWnd);
+                }
+            }
+            return 0;
+        }
+
+        case WM_DESTROY: {
+            KillTimer(hWnd, DRAGDEL_TIMER_ANIM);
+            RevokeDragDrop(hWnd);
+            return 0;
+        }
+    }
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+DWORD WINAPI DragDelOverlayUIThread(LPVOID) {
+    MSG msg;
+    PeekMessageW(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
+    SetEvent(g_DragDelReadyEvent);
+
+    OleInitialize(nullptr);
+    GdiplusStartupInput gdiplusInput;
+    GdiplusStartup(&g_DragDelGdiplusToken, &gdiplusInput, nullptr);
+
+    HINSTANCE hInstance = DragDelGetCurrentModuleHandle();
+    WNDCLASSEXW wc = {};
+    wc.cbSize = sizeof(WNDCLASSEXW);
+    wc.lpfnWndProc = DragDelOverlayWndProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = kDragDelClassName;
+
+    if (!RegisterClassExW(&wc)) {
+        Wh_Log(L"Failed to register overlay window class (error: %lu)", GetLastError());
+        GdiplusShutdown(g_DragDelGdiplusToken);
+        OleUninitialize();
+        return 0;
+    }
+
+    HMONITOR hPrimary = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
+    g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(hPrimary) / 96.0f;
+
+    int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * g_DragDelCurrentDpiScale);
+    int wndHeight = (int)(DRAGDEL_BASE_WND_HEIGHT * g_DragDelCurrentDpiScale);
+    int topY = (int)(DRAGDEL_BASE_TOP_Y * g_DragDelCurrentDpiScale);
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+
+    g_DragDelOverlayWnd = CreateWindowExW(
+        WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+        kDragDelClassName, nullptr, WS_POPUP,
+        (screenWidth - wndWidth) / 2, topY,
+        wndWidth, wndHeight,
+        nullptr, nullptr, hInstance, nullptr
+    );
+
+    if (!g_DragDelOverlayWnd) {
+        Wh_Log(L"Failed to create overlay window (error: %lu)", GetLastError());
+        UnregisterClassW(kDragDelClassName, hInstance);
+        GdiplusShutdown(g_DragDelGdiplusToken);
+        OleUninitialize();
+        return 0;
+    }
+
+    g_DragDelDropTarget = new DragDelRecycleDropTarget();
+    HRESULT hrDrop = RegisterDragDrop(g_DragDelOverlayWnd, g_DragDelDropTarget);
+    if (FAILED(hrDrop)) {
+        Wh_Log(L"RegisterDragDrop failed with HRESULT 0x%08X", hrDrop);
+    }
+
+    while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
+
+    if (g_DragDelOverlayWnd) {
+        DestroyWindow(g_DragDelOverlayWnd); // WM_DESTROY revokes the drop target
+        g_DragDelOverlayWnd = nullptr;
+    }
+
+    UnregisterClassW(kDragDelClassName, hInstance);
+
+    if (g_DragDelDropTarget) {
+        g_DragDelDropTarget->Release();
+        g_DragDelDropTarget = nullptr;
+    }
+
+    GdiplusShutdown(g_DragDelGdiplusToken);
+    OleUninitialize();
+    return 0;
+}
+
+using DragDelDoDragDrop_t = decltype(&DoDragDrop);
+static DragDelDoDragDrop_t g_DragDelOriginalDoDragDrop = nullptr;
+
+HRESULT WINAPI DragDelHookedDoDragDrop(IDataObject* pDataObj, IDropSource* pDropSource, DWORD dwOKEffects, LPDWORD pdwEffect) {
+    bool bIsFileDrag = false;
+    if (pDataObj) {
+        FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        bIsFileDrag = (pDataObj->QueryGetData(&fmt) == S_OK);
+    }
+
+    // 计数严格对称（wasCounted 配对增减），总开关只控制悬浮目标的显示：
+    // 关闭时拖放行为与系统完全一致，开关切换即时生效且无残留状态。
+    bool wasCounted = false;
+    if (bIsFileDrag) {
+        wasCounted = InterlockedIncrement(&g_DragDelActiveDrags) == 1;
+        if (wasCounted && DragDelSettings.enable && g_DragDelOverlayWnd) {
+            PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_UPDATE_DRAG_STATE, 1, 0);
+        }
+    }
+
+    HRESULT hr = g_DragDelOriginalDoDragDrop(pDataObj, pDropSource, dwOKEffects, pdwEffect);
+
+    if (bIsFileDrag && wasCounted && InterlockedDecrement(&g_DragDelActiveDrags) == 0 && g_DragDelOverlayWnd) {
+        PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_UPDATE_DRAG_STATE, 0, 0);
+    }
+
+    return hr;
+}
+
+static void DragDelUninit();
+
+static BOOL DragDelInit() {
+    DragDelLoadSettings();
+
+    InitializeCriticalSection(&g_DragDelDeleteCs);
+    g_DragDelDeleteQueueEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    g_DragDelDeleteStopEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!g_DragDelDeleteQueueEvent || !g_DragDelDeleteStopEvent) {
+        Wh_Log(L"Failed to create deletion worker events");
+        DragDelUninit();
+        return FALSE;
+    }
+
+    g_DragDelDeleteWorker = CreateThread(nullptr, 0, DragDelDeleteWorkerThread, nullptr, 0, nullptr);
+    if (!g_DragDelDeleteWorker) {
+        Wh_Log(L"Failed to create deletion worker thread (error: %lu)", GetLastError());
+        DragDelUninit();
+        return FALSE;
+    }
+
+    g_DragDelReadyEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!g_DragDelReadyEvent) {
+        Wh_Log(L"Failed to create ready event (error: %lu)", GetLastError());
+        DragDelUninit();
+        return FALSE;
+    }
+
+    g_DragDelUIThread = CreateThread(nullptr, 0, DragDelOverlayUIThread, nullptr, 0, &g_DragDelUIThreadId);
+    if (!g_DragDelUIThread) {
+        Wh_Log(L"Failed to create overlay UI thread (error: %lu)", GetLastError());
+        DragDelUninit();
+        return FALSE;
+    }
+
+    if (!WindhawkUtils::SetFunctionHook(DoDragDrop, DragDelHookedDoDragDrop, &g_DragDelOriginalDoDragDrop)) {
+        Wh_Log(L"Failed to hook DoDragDrop");
+        DragDelUninit();
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static void DragDelUninit() {
+    if (g_DragDelUIThread) {
+        if (g_DragDelReadyEvent) WaitForSingleObject(g_DragDelReadyEvent, INFINITE);
+        PostThreadMessageW(g_DragDelUIThreadId, WM_QUIT, 0, 0);
+        WaitForSingleObject(g_DragDelUIThread, INFINITE);
+        CloseHandle(g_DragDelUIThread);
+        g_DragDelUIThread = nullptr;
+    }
+    if (g_DragDelReadyEvent) {
+        CloseHandle(g_DragDelReadyEvent);
+        g_DragDelReadyEvent = nullptr;
+    }
+
+    if (g_DragDelDeleteWorker) {
+        if (g_DragDelDeleteStopEvent) SetEvent(g_DragDelDeleteStopEvent);
+        WaitForSingleObject(g_DragDelDeleteWorker, INFINITE);
+        CloseHandle(g_DragDelDeleteWorker);
+        g_DragDelDeleteWorker = nullptr;
+    }
+    if (g_DragDelDeleteStopEvent) {
+        CloseHandle(g_DragDelDeleteStopEvent);
+        g_DragDelDeleteStopEvent = nullptr;
+    }
+    if (g_DragDelDeleteQueueEvent) {
+        CloseHandle(g_DragDelDeleteQueueEvent);
+        g_DragDelDeleteQueueEvent = nullptr;
+    }
+    DeleteCriticalSection(&g_DragDelDeleteCs);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 功能十：登录注销关机音效（SndLog*）
+// 来源：Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3
+// （MIT 惯例），原版链接：
+// https://windhawk.net/mods/logon-logoff-shutdown-sounds。
+// 逻辑与上游一致，全局符号与函数统一加 SndLog 前缀以与其他功能隔离；设置键
+// 迁移为 sndLog.xpmode / sndLog.hookonsessionchange，并新增分组总开关
+// sndLog.enable（默认 false）。
+// 开关实现：CTray::_OnSessionChange 钩子与声音窗口的 WM_QUERYENDSESSION 播放
+// 路径均加总开关短路（运行中切换即时生效）；登录音效仅在模组启动时总开关为
+// 开的状态下播放一次（会话去重逻辑不变），运行中开启不补播。声音窗口始终
+// 创建（空闲零开销），保证运行中开启后注销/关机音效立即可用。
+// 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
+// x86 兼容性：上游全部线程/窗口回调本就是显式 static 或 WINAPI/CALLBACK 函数
+// （无无捕获 lambda 传 stdcall 回调问题），两架构原生兼容；CTray::
+// _OnSessionChange 符号按 _WIN64/x86 分别匹配（原样保留）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+// settings
+static struct
+{
+    bool    enable;               // 分组总开关（sndLog.enable，默认 false）
+    bool    bXpMode;
+    bool    bHookOnSessionChange;
+} SndLogSettings;
+
+// the various global handles used
+
+static HMODULE g_SndLogShlwapi;
+static HWND g_SndLogHwndSound;
+static HANDLE g_SndLogSoundThread;
+static HMODULE g_SndLogExplorer;
+
+// NOTE: sligtly different versions of this exist in...
+//      SHPlaySound() -> shell32
+//      IEPlaySound() -> shdocvw/browseui
+
+STDAPI_(void) SndLogExplorerPlaySound(LPCTSTR pszSound)
+{
+    // note, we have access only to global system sounds here as we use "Apps\.Default"
+    TCHAR szKey[256];
+    wsprintf(szKey, TEXT("AppEvents\\Schemes\\Apps\\.Default\\%s\\.current"), pszSound);
+
+    TCHAR szFileName[MAX_PATH];
+    szFileName[0] = 0;
+    LONG cbSize = sizeof(szFileName);
+
+    // test for an empty string, PlaySound will play the Default Sound if we
+    // give it a sound it cannot find...
+
+    if ((RegQueryValue(HKEY_CURRENT_USER, szKey, szFileName, &cbSize) == ERROR_SUCCESS)
+        && szFileName[0])
+    {
+        // flags are relevant, we try to not stomp currently playing sounds
+        PlaySound(szFileName, NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+    }
+}
+
+typedef LRESULT WINAPI (* SndLog_OnSessionChange_t)(void* _this, WPARAM wParam, LPARAM lParam);
+SndLog_OnSessionChange_t SndLog_OnSessionChange_orig;
+LRESULT WINAPI SndLog_OnSessionChange_hook(void* _this, WPARAM wParam, LPARAM lParam)
+{
+    // 分组总开关关闭：不播放会话切换音效，仍直通原函数（运行时短路，
+    // 设置变更经 SndLogLoadSettings 即时生效）。
+    if (SndLogSettings.enable) {
+        if ((WTS_SESSION_LOCK == wParam) || (WTS_SESSION_UNLOCK == wParam))
+        {
+            if (wParam == WTS_SESSION_LOCK)
+            {
+                SndLogExplorerPlaySound(TEXT("WindowsLogoff"));
+            }
+            else if (wParam == WTS_SESSION_UNLOCK)
+            {
+                SndLogExplorerPlaySound(TEXT("WindowsLogon"));
+            }
+        }
+    }
+
+    return SndLog_OnSessionChange_orig(_this, wParam, lParam);
+}
+
+#ifndef SND_SYSTEM // because this is sometimes missing???
+#define SND_SYSTEM 0x00200000
+#endif
+
+DWORD WINAPI SndLogPlaySoundFileThreadProc( LPVOID lpParam )
+{
+    PlaySoundW((WCHAR*)lpParam, 0, SND_NODEFAULT | SND_MEMORY | SND_SYSTEM);
+    LocalFree(lpParam);
+    return 0;
+}
+
+DWORD WINAPI SndLogGetLastErrorError()
+{
+    DWORD hr = GetLastError();
+    if ( hr == S_OK )
+        return 1;
+    return hr;
+}
+
+HRESULT WINAPI SndLogHRESULTFromLastErrorError()
+{
+    HRESULT hr = SndLogGetLastErrorError();
+    if ( FAILED(hr) )
+        return HRESULT_FROM_WIN32((USHORT)hr);
+    return hr;
+}
+
+HRESULT WINAPI SndLogPlaySoundFile(HANDLE* hCurrentThread, LPCWSTR lpszFileName)
+{
+    DWORD szSoundFile;           // eax
+    signed int hr = 0;    // esi
+    DWORD NumberOfBytesRead;  // [esp+8h] [ebp-Ch] BYREF
+    HANDLE hFile;             // [esp+Ch] [ebp-8h]
+    LPVOID lpSndBuf = 0;       // [esp+10h] [ebp-4h]
+
+    hFile = CreateFile(
+        lpszFileName,
+        GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
+        NULL
+    );
+
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        szSoundFile = GetFileSize(hFile, 0);
+        hr = E_OUTOFMEMORY;
+        if (szSoundFile != INVALID_FILE_SIZE && szSoundFile >= 0 && szSoundFile < 0x400000)
+        {
+            lpSndBuf = LocalAlloc(0, szSoundFile);
+            if (lpSndBuf && ReadFile(hFile, lpSndBuf, szSoundFile, &NumberOfBytesRead, 0))
+            {
+                hr = szSoundFile != NumberOfBytesRead ? HRESULT_FROM_WIN32(ERROR_IO_PENDING) : 0;
+            }
+            else
+            {
+                hr = SndLogHRESULTFromLastErrorError();
+            }
+        }
+        CloseHandle(hFile);
+    }
+    else
+    {
+        hr = SndLogHRESULTFromLastErrorError();
+    }
+
+    if (SUCCEEDED(hr))
+    {
+        HANDLE hPlaySndThread = CreateThread(0, 0, SndLogPlaySoundFileThreadProc, lpSndBuf, 0, 0);
+        if (hPlaySndThread)
+        {
+            if (hCurrentThread)
+                *hCurrentThread = hPlaySndThread;
+            else
+                CloseHandle(hPlaySndThread);
+            return hr;
+        }
+        hr = SndLogHRESULTFromLastErrorError();
+    }
+
+    if (lpSndBuf)
+        LocalFree(lpSndBuf);
+
+    return hr;
+}
+
+typedef enum _SndLogELOGONLOGOFFSOUNDTYPE
+{
+    SndLog_ST_LOGON,
+    SndLog_ST_LOGOFF,
+    SndLog_ST_EXIT,
+    SndLog_ST_START,
+} SndLogELOGONLOGOFFSOUNDTYPE;
+
+HRESULT SndLogPlayLogonLogoffSound(HANDLE* hThread, SndLogELOGONLOGOFFSOUNDTYPE enSoundType)
+{
+    const wchar_t *szSoundType;
+    HRESULT hr;
+    DWORD pcbData[4];
+    WCHAR szSubKey[264];
+    WCHAR pvData[264];
+
+    switch (enSoundType) {
+        case SndLog_ST_LOGON:
+            szSoundType = TEXT("WindowsLogon");
+            break;
+        case SndLog_ST_LOGOFF:
+            szSoundType = TEXT("WindowsLogoff");
+            break;
+        case SndLog_ST_EXIT:
+            szSoundType = TEXT("SystemExit");
+            break;
+        case SndLog_ST_START:
+            szSoundType = TEXT("SystemStart");
+            break;
+    }
+
+    pcbData[0] = 520;
+
+    hr = wsprintf(szSubKey, TEXT("AppEvents\\Schemes\\Apps\\.Default\\%ws\\.Current"), szSoundType);
+
+    if (SUCCEEDED(hr))
+    {
+        hr = RegGetValue(HKEY_CURRENT_USER, szSubKey, 0, 2u, 0, pvData, pcbData);
+        if (hr == S_OK)
+            return SndLogPlaySoundFile(hThread, pvData);
+        else
+            return HRESULT_FROM_WIN32((USHORT)hr);
+    }
+    return hr;
+}
+
+LRESULT SndLogSHDefWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (IsWindowUnicode(hwnd))
+    {
+        return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    }
+    else
+    {
+        return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+    }
+}
+
+STDAPI_(BOOL) SndLogSHRegisterClassW(const WNDCLASSW* pwc)
+{
+    WNDCLASSW wc;
+    if (!GetClassInfo(pwc->hInstance, pwc->lpszClassName, &wc))
+    {
+        return RegisterClass(pwc);
+    }
+    return TRUE;
+}
+
+HWND WINAPI SndLogSHCreateWorkerWindowW(WNDPROC pfnWndProc, HWND hwndParent, DWORD dwExStyle, DWORD dwFlags, HMENU hmenu, void * p)
+{
+    WNDCLASSW wc = {0};
+
+    wc.lpfnWndProc      = DefWindowProcW;
+    wc.cbWndExtra       = sizeof(void *);
+    wc.hInstance        = g_SndLogShlwapi;
+    wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground    = (HBRUSH) (COLOR_BTNFACE + 1);
+    wc.lpszClassName    = L"WorkerW";
+    //dwExStyle |= IsBiDiLocalizedSystem() ? /*dwExStyleRTLMirrorWnd*/0L : 0L;
+
+    SndLogSHRegisterClassW(&wc);
+
+    HWND hwnd = CreateWindowExW(dwExStyle, L"WorkerW", NULL, dwFlags,
+                                  0, 0, 0, 0, hwndParent,
+                                  (HMENU)hmenu, g_SndLogShlwapi, NULL);
+    if (hwnd)
+    {
+        SetWindowLongPtr(hwnd, 0, (LPARAM)(p));
+
+        // Note: Must explicitly use W version to avoid charset thunks
+        if (pfnWndProc)
+            SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)pfnWndProc);
+
+    }
+
+    return hwnd;
+}
+
+class SndLogSoundWnd
+{
+    public:
+        WINAPI SndLogSoundWnd();
+        LONG m_refCount;
+        HWND m_hwndSound;
+        HANDLE m_thread;
+        BOOL WINAPI Init();
+        static DWORD CALLBACK s_ThreadProc(void* lpParam);
+        LONG WINAPI Release();
+        static DWORD CALLBACK s_CreateWindow(void* lpParam);
+        static LRESULT CALLBACK s_WndProc(HWND hWnd,
+                                   UINT msg,
+                                   WPARAM wParam,
+                                   LPARAM lParam);
+        LRESULT WINAPI v_WndProc(HWND hWnd, UINT mst, WPARAM wParam, LPARAM lParam);
+};
+
+WINAPI SndLogSoundWnd::SndLogSoundWnd()
+    : m_refCount(1)
+    , m_hwndSound(nullptr)
+    , m_thread(nullptr)
+{
+}
+
+BOOL WINAPI SndLogSoundWnd::Init()
+{
+    if (!SHCreateThread(s_ThreadProc, this, CTF_COINIT_STA | CTF_PROCESS_REF, s_CreateWindow))
+    {
+        DWORD dwLastError = GetLastError();
+        LPWSTR pszMessageBuffer = nullptr;
+
+        //Ask Win32 to give us the string version of that message ID.
+        //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+        FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, dwLastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&pszMessageBuffer, 0, NULL);
+
+        Wh_Log(TEXT("SndLogSoundWnd::Init Failed to create thread %s"), pszMessageBuffer);
+    }
+    g_SndLogHwndSound = this->m_hwndSound;
+    SetProcessShutdownParameters(0x4FF, NULL);
+    return this->m_hwndSound != NULL;
+}
+
+DWORD CALLBACK SndLogSoundWnd::s_CreateWindow(void* lpParam)
+{
+    InterlockedIncrement(&((SndLogSoundWnd*)lpParam)->m_refCount);
+
+    ((SndLogSoundWnd*)lpParam)->m_hwndSound = SndLogSHCreateWorkerWindowW(s_WndProc, 0, 0, 0, 0, lpParam);
+    return 0;
+}
+
+__inline void * SndLogGetWindowPtr0(HWND hWnd) {
+    return (void *)GetWindowLongPtrA(hWnd, 0);
+}
+
+DWORD CALLBACK SndLogSoundWnd::s_ThreadProc(void* lpParam)
+{
+    struct tagMSG Msg; // [esp+8h] [ebp-1Ch] BYREF
+    SndLogSoundWnd* _this = static_cast<SndLogSoundWnd*>(lpParam);
+
+    if ( _this->m_hwndSound )
+    {
+        while ( GetMessageW(&Msg, 0, 0, 0) )
+        {
+            TranslateMessage(&Msg);
+            DispatchMessageW(&Msg);
+        }
+    }
+    _this->Release();
+    return 0;
+}
+
+LRESULT CALLBACK SndLogSoundWnd::s_WndProc(HWND hWnd,
+                                   UINT msg,
+                                   WPARAM wParam,
+                                   LPARAM lParam)
+{
+    SndLogSoundWnd* soundWnd = (SndLogSoundWnd*)SndLogGetWindowPtr0(hWnd);
+    if (soundWnd)
+        return soundWnd->v_WndProc(hWnd, msg, wParam, lParam);
+    else
+        return SndLogSHDefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+LRESULT WINAPI SndLogSoundWnd::v_WndProc(HWND hWnd,
+                             UINT msg,
+                             WPARAM wParam,
+                             LPARAM lParam)
+{
+    WCHAR szShutdownReason[256];
+
+    switch (msg)
+    {
+        case WM_QUERYENDSESSION:
+            if ((lParam & ENDSESSION_CRITICAL) == FALSE)
+            {
+                // 分组总开关关闭：不再创建阻止理由、不播放音效也不等待，
+                // 直接放行会话结束（运行时短路，设置变更即时生效）。
+                if (SndLogSettings.enable)
+                {
+                    LoadString(GetModuleHandle(NULL), 0x2DBu, szShutdownReason, ARRAYSIZE(szShutdownReason));
+                    ShutdownBlockReasonCreate(this->m_hwndSound, szShutdownReason);
+                    SndLogPlayLogonLogoffSound(&this->m_thread, (lParam & ENDSESSION_LOGOFF && SndLogSettings.bXpMode == false) != 0 ? SndLog_ST_LOGOFF : SndLog_ST_EXIT);
+                    if (this->m_thread)
+                    {
+                        g_SndLogSoundThread = this->m_thread;
+                        WaitForSingleObject(this->m_thread, INFINITE);
+                        CloseHandle(this->m_thread);
+                    }
+                }
+            }
+            return 1;
+        case WM_ENDSESSION:
+            if (wParam && (lParam & ENDSESSION_CRITICAL) == FALSE && this->m_thread)
+            {
+                WaitForSingleObject(this->m_thread, INFINITE);
+                CloseHandle(this->m_thread);
+            }
+            DestroyWindow(this->m_hwndSound);
+            return SndLogSHDefWindowProc(hWnd, msg, wParam, lParam);
+        case WM_NCDESTROY:
+            SetWindowLong(hWnd, 0, 0);
+            g_SndLogHwndSound = NULL;
+            this->m_hwndSound = NULL;
+            PostQuitMessage(0);
+            return 0;
+        default:
+            return SndLogSHDefWindowProc(hWnd, msg, wParam, lParam);
+    }
+}
+
+LONG WINAPI SndLogSoundWnd::Release()
+{
+    LONG lRefCount = InterlockedDecrement(&this->m_refCount);
+    if ( !lRefCount )
+        operator delete((void *)this);
+    return lRefCount;
+}
+
+BOOL WINAPI SndLogInitSoundWindow()
+{
+    BOOL bSuccess = FALSE;
+    SndLogSoundWnd* soundWnd = new SndLogSoundWnd();
+    if (soundWnd)
+    {
+        bSuccess = soundWnd->Init();
+        soundWnd->Release();
+    }
+    return bSuccess;
+}
+
+DWORD WINAPI SndLogGetCurrentSessionId()
+{
+    DWORD pSessionId;
+    DWORD CurrentProcessId = GetCurrentProcessId();
+    ProcessIdToSessionId(CurrentProcessId, &pSessionId);
+    return pSessionId;
+}
+
+HRESULT WINAPI SndLogSHCreateSessionKey(REGSAM samDesired, PHKEY phKey)
+{
+    HRESULT hr = S_OK;
+    static WCHAR wszSessionKey[256];
+    LONG Error;
+
+    if (DWORD dwSessionId = SndLogGetCurrentSessionId())
+    {
+        swprintf(wszSessionKey,
+                      L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\SessionInfo\\%d",
+                      dwSessionId);
+    }
+    else
+        hr = HRESULT_FROM_WIN32(GetLastError());
+
+    if(SUCCEEDED(hr))
+    {
+        Error = RegCreateKeyEx(HKEY_CURRENT_USER, wszSessionKey, 0, NULL,
+                                REG_OPTION_VOLATILE, samDesired, NULL, phKey, NULL);
+        if (Error != ERROR_SUCCESS)
+            hr = HRESULT_FROM_WIN32(Error);
+    }
+
+    return hr;
+}
+
+//  a three state boolean for bools that need initialization
+typedef enum
+{
+    SndLog_TRIBIT_UNDEFINED = 0,
+    SndLog_TRIBIT_TRUE,
+    SndLog_TRIBIT_FALSE,
+} SndLogTRIBIT;
+
+SndLogTRIBIT g_SndLogTbPlayedStartupSound;
+DWORD g_SndLogDwCurProcId;
+
+BOOL WINAPI SndLogHasPerLogonActionBeenDone(LPCWSTR lpSubKey, SndLogTRIBIT* out_tbDone)
+{
+    DWORD dwDisposition;
+    HKEY hKey;
+    HKEY phkResult;
+
+    *out_tbDone = SndLog_TRIBIT_TRUE;
+    if ( SUCCEEDED(SndLogSHCreateSessionKey(KEY_WRITE, &hKey)) )
+    {
+        if ( RegCreateKeyExW(hKey, lpSubKey, NULL, NULL, REG_OPTION_VOLATILE, KEY_WRITE, NULL, &phkResult, &dwDisposition) == ERROR_SUCCESS )
+        {
+            RegCloseKey(phkResult);
+            if ( dwDisposition == REG_CREATED_NEW_KEY )
+                *out_tbDone = SndLog_TRIBIT_FALSE;
+        }
+        RegCloseKey(hKey);
+    }
+    return *out_tbDone == SndLog_TRIBIT_TRUE;
+}
+
+BOOL WINAPI SndLogHasLogonSoundBeenPlayed()
+{
+    return SndLogHasPerLogonActionBeenDone(L"LogonSoundHasBeenPlayed", &g_SndLogTbPlayedStartupSound);
+}
+
+BOOL WINAPI SndLogIsDesktopProcess()
+{
+    DWORD dwShellProcId = NULL;
+    DWORD dwCurProcId = GetCurrentProcessId();
+    HWND hShellWindow = FindWindow(TEXT("Shell_TrayWnd"), NULL);
+    if (!hShellWindow) // no desktop present yet, assume it's main explorer starting up
+    {
+        g_SndLogDwCurProcId = dwCurProcId;
+        return TRUE;
+    }
+    GetWindowThreadProcessId(hShellWindow, &dwShellProcId);
+    if (dwCurProcId == dwShellProcId || !hShellWindow)
+    {
+        if (dwCurProcId != g_SndLogDwCurProcId)
+        {
+            g_SndLogTbPlayedStartupSound = SndLog_TRIBIT_UNDEFINED;
+            g_SndLogDwCurProcId = dwCurProcId;
+        }
+        return TRUE;
+    }
+    else
+    {
+        g_SndLogDwCurProcId = dwCurProcId;
+        return FALSE;
+    }
+}
+
+// Load the settings for the mod
+static void SndLogLoadSettings(void)
+{
+    SndLogSettings.enable = (BOOL)Wh_GetIntSetting(L"sndLog.enable");
+    SndLogSettings.bXpMode = (BOOL)Wh_GetIntSetting(L"sndLog.xpmode");
+    SndLogSettings.bHookOnSessionChange = (BOOL)Wh_GetIntSetting(L"sndLog.hookonsessionchange");
+}
+
+// SndLog entry points（由合并入口调用；仅 explorer.exe 启用）。
+static BOOL SndLogInit()
+{
+    Wh_Log(L"SndLog Init");
+
+    SndLogLoadSettings();
+
+    g_SndLogExplorer = GetModuleHandleW(NULL);
+    if (!g_SndLogExplorer)
+        Wh_Log(L"Failed to get Explorer's handle");
+
+    g_SndLogShlwapi = LoadLibrary(TEXT("shlwapi.dll"));
+
+    if (SndLogSettings.bHookOnSessionChange) {
+        WindhawkUtils::SYMBOL_HOOK explorerExeHooks[] = {
+            {
+                {
+                    #ifdef _WIN64
+                    L"protected: __int64 __cdecl CTray::_OnSessionChange(unsigned __int64,__int64)"
+                    #else
+                    L"protected: long __thiscall CTray::_OnSessionChange(unsigned int,long)"
+                    #endif
+                },
+                (void **)&SndLog_OnSessionChange_orig,
+                (void *)SndLog_OnSessionChange_hook,
+                false
+            }
+        };
+
+        if (!WindhawkUtils::HookSymbols(
+            g_SndLogExplorer,
+            explorerExeHooks,
+            ARRAYSIZE(explorerExeHooks)
+        ))
+        {
+            Wh_Log(L"Failed to hook _OnSessionChange...");
+            //return FALSE;
+        }
+    }
+
+    if (SndLogIsDesktopProcess())
+    {
+        // 声音窗口始终创建（空闲零开销），保证运行中开启总开关后注销/关机
+        // 音效立即可用；播放路径内部按 sndLog.enable 短路。
+        SndLogInitSoundWindow();
+        SetProcessShutdownParameters(0x4FF, NULL);
+        if (!SndLogSettings.enable)
+        {
+            Wh_Log(L"sndLog group disabled, logon sound skipped");
+        }
+        else if (!SndLogHasLogonSoundBeenPlayed())
+        {
+            SndLogPlayLogonLogoffSound(NULL, SndLogSettings.bXpMode ? SndLog_ST_START : SndLog_ST_LOGON);
+        }
+        else
+        {
+            Wh_Log(TEXT("Logon sound already played in this session."));
+        }
+    }
+
+    return TRUE;
+}
+
+static void SndLogNotifySettingsChanged(void)
+{
+    SndLogLoadSettings();
+}
+
+static VOID SndLogUninit()
+{
+    Wh_Log(TEXT("SndLog Exiting"));
+
+    if (g_SndLogSoundThread) // make sure DLL stays alive until we finish playing
+        WaitForSingleObject(g_SndLogSoundThread, INFINITE);
+
+    if (g_SndLogHwndSound)
+    {
+        PostMessage(g_SndLogHwndSound, WM_CLOSE, NULL, NULL);
+        g_SndLogHwndSound = NULL;
+    }
+
+    if (g_SndLogExplorer)
+        CloseHandle(g_SndLogExplorer);
+
+    if (g_SndLogShlwapi)
+        CloseHandle(g_SndLogShlwapi);
+}
+
+// ============================================================================
+// 功能十一：窗口优化（WinOpt 命名空间）
+//
+// 来自 CW-窗口优化 1.1.0（本包三合一融合模组，2.0.0 起整体并入本模组）：
+//   • 窗口拖动（Alt+拖动）：上游 AltDrag 1.1，原作者 m417z，GPL-3.0 许可证，
+//     原版链接 https://windhawk.net/mods/alt-drag；
+//   • 窗口排列：上游 Slick Window Arrangement 1.0.2，原作者 m417z，GPL-3.0
+//     许可证，原版链接 https://windhawk.net/mods/slick-window-arrangement；
+//   • 隐形窗口边框：上游 Invisible Window Borders 1.0.0，原作者 Bo0ii，MIT
+//     许可证，原版链接 https://windhawk.net/mods/invisible-borders。
+// 三段代码沿用其在本包 CW-窗口优化 1.1.0 中的内部结构，整体收进 WinOpt
+// 命名空间（内含 AltDrag / WinArrange / InvisBorders 三个子命名空间）；设置
+// 迁移为两级嵌套分组：组级总开关 winOpt.enable（默认关闭）+ 子分组键
+// winOpt.altDrag.* / winOpt.winArrange.* / winOpt.invisBorders.*（子分组内的
+// 键名结构不变），三个子分组各自的 enable 总开关与运行时短路逻辑全部保留，
+// 并与组级总开关相与（见各 LoadSettings）。
+// 进程范围：窗口拖动的钩子需要跨进程工作，本段在全进程启用（@include *，
+// 见元数据；原 devenv.exe 排除保留在 @exclude 中）。
+// x86 兼容修复（并入 CW-窗口优化 1.0.0 时已修复，此处原样保留）：
+// EnumThreadWindows/EnumWindows 两处无捕获 lambda 回调已改为显式 CALLBACK
+// 函数（MarkHookedWindowEnumProc/UnmarkHookedWindowsEnumProc）。
+// ============================================================================
+namespace WinOpt {
+
+// 分组总开关（winOpt.enable）：关闭时三个子分组全部失效（与其各自开关无关）。
+inline bool IsMasterEnabled() {
+    return Wh_GetIntSetting(L"winOpt.enable") != 0;
+}
+// ============================================================================
+// 窗口拖动（Alt+拖动）
+//
+// 来自 CW-窗口拖动（Alt+拖动）1.2（上游 AltDrag 1.1，原作者 m417z，GPL-3.0，
+// 原版链接 https://windhawk.net/mods/alt-drag），代码逻辑与上游逐字节一致，
+// 仅做四类机械改动以并入本模组：
+//   1. 整体置于 AltDrag 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModUninit→Uninit、Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 altDrag. 前缀（moveTrigger→
+//      altDrag.moveTrigger 等），与「窗口排列」「隐形窗口边框」分组隔离；
+//   3. EnumThreadWindows/EnumWindows 两处无捕获 lambda 回调改为显式
+//      CALLBACK 函数（MarkHookedWindowEnumProc/UnmarkHookedWindowsEnumProc），
+//      保证 x86 目标可编译（WNDENUMPROC 为 stdcall）；
+//   4. 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽为 OnThreadDetach()，由
+//      本模组唯一的 DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+// 入口由本模组的 Wh_ModInit / Wh_ModUninit / Wh_ModSettingsChanged 统一调用，
+// 初始化失败时仅降级本功能，不影响其余功能。
+// ============================================================================
+namespace AltDrag {
+
+// A drag is started by taking the button press away from the target window as
+// it's retrieved from the message queue, and posting a request to the root
+// window, which the mod instance in the root window's thread turns into the
+// system command a title bar or border drag generates. Intercepting at
+// retrieval time means the window procedure never sees the press, so it
+// doesn't matter how the program handles mouse input, and the system size/move
+// loop provides snapping, DWM animations and maximized window handling the
+// same way a title bar drag does. The root window may belong to another
+// process, e.g. ApplicationFrameHost.exe hosting a UWP app's CoreWindow, so
+// the request is a registered message which is allowed through the UIPI
+// message filter.
+//
+// The loop is made for the left button: it starts only with that button down
+// in the thread's synchronized key state, and ends only on WM_LBUTTONUP, which
+// the release of any other button is turned into as the loop retrieves it. A
+// release within the drag threshold ends it before it got going, and the
+// press taken for it is then replayed as a click, simulated at the cursor, so
+// that a click with the keys held keeps whatever meaning the program gives it.
+// A press held for the drag delay is taken from the queue right away and
+// turned into the request once the delay is over, posted back as a click if
+// the button was released before that, or handed back in place of the move
+// which left the drag threshold before that, the drag being the program's own.
+//
+// The interception is done with a WH_GETMESSAGE hook per thread. Threads which
+// retrieve messages are discovered by hooking the win32u syscall stubs, which
+// every message loop goes through, including user32's internal modal loops such
+// as DialogBox2 which bypass the exported PeekMessage. The stub hooks only
+// install the thread hooks and then tail call the original function, so no mod
+// frame is left on the stack while a thread waits for a message, which would
+// otherwise prevent unloading the mod.
+//
+// Pointer input (WM_POINTER*, used by XAML and other mouse-in-pointer windows)
+// is delivered straight to the window procedure and is never seen by
+// WH_GETMESSAGE or WH_CALLWNDPROC hooks, so it's intercepted by subclassing. A
+// WH_CALLWNDPROC hook subclasses the window under the pointer while a
+// trigger's keys are held, and the subclass routes a contact those keys
+// started to DefWindowProc, which promotes it to the legacy mouse messages the
+// retrieval hook handles. A trigger with no keys is armed all the time, so it
+// keeps the window under the pointer subclassed all the same.
+//
+// Content hosted in a composition input sink, such as a WinUI XAML island,
+// receives its pointer input over a side channel and produces no window message
+// at all, so neither hook nor subclass sees the press, and it reaches the
+// island, which turns the release into a click. Only input which hasn't been
+// routed yet can be taken away from it, so while a trigger's keys are held a
+// low level mouse hook swallows the press over composition hosted content,
+// recognized by the class of the hosting window, and moves or resizes the
+// window itself with SetWindowPos. A trigger with no keys has the process
+// which owns the foreground window hold the hook instead, which keeps it to
+// one hook rather than one per process; being global, that one serves a drag
+// of any window. The cursor shown over such content is
+// chosen by the content, on every move it sees, from a thread of its own, so
+// nothing set from outside sticks. For the duration of the drag, and ahead of
+// it from the end of the drag delay, a small invisible topmost window of the
+// hook's thread follows the cursor instead: it receives the moves, and with
+// them the right to choose the cursor. Windows
+// which deliver the press as a message are left to the paths above and keep
+// the system loop, which is of no use here: it retrieves no mouse input while
+// the sink owns the contact, so it starts and then tracks nothing. With keys
+// to hold, the hook exists only while they are, keeping it out of the input
+// path the rest of the time.
+//
+// The hook is global, and the island of a window which isn't focused belongs to
+// a process which never saw the keys go down and so has no hook of its own. The
+// process which does hold the hook therefore handles any window, not just its
+// own, and moves it asynchronously since it doesn't own it.
+//
+// A root window is dragged only if its thread runs the mod's hooks: a request
+// to it would otherwise go unserved, and a program the mod isn't loaded in,
+// e.g. one excluded from it, keeps its input as is, as it does for a press in
+// its own windows, which no hook sees. Each hooked thread marks its top level
+// windows with a window property, readable from any thread and process, and
+// the low level hook checks it like the message paths do. That hook is the
+// focused thread's, so while a program without the mod is focused there is
+// none, and composition hosted content elsewhere gets the press as a click,
+// which moves the focus there.
+//
+// A swallowed press never reaches the input queue, so as far as the system is
+// concerned Alt, when it's among the keys, was tapped on its own, and
+// DefWindowProc turns the release into SC_KEYMENU, activating the menu bar.
+// The Alt release which ends such a drag is therefore taken as well. A
+// swallowed press which isn't followed by a drag is replayed on the release
+// as a click, like a press taken for the loop.
+//
+// The Start menu, which a Win key tapped on its own opens, is put off by
+// another key alone, not by a press, swallowed or not. The Win release ending
+// a drag is therefore masked by a low level keyboard hook of the thread
+// running the drag, the way AutoHotkey masks menu keys: it's swallowed and
+// sent again behind a tap of an unassigned key.
+
+enum : DWORD {
+    kModifierCtrl = 1 << 0,
+    kModifierAlt = 1 << 1,
+    kModifierShift = 1 << 2,
+    kModifierWin = 1 << 3,
+};
+
+// The button, as its virtual key, the modifier keys to hold with it, and the
+// time to hold it for before the drag starts.
+struct TriggerSettings {
+    std::atomic<int> button;
+    std::atomic<DWORD> modifiers;
+    std::atomic<int> delay;
+};
+
+struct {
+    std::atomic<bool> enable;  // 分组总开关（altDrag.enable），关闭时本组功能完全不生效
+    TriggerSettings moveTrigger;
+    TriggerSettings sizeTrigger;
+    std::atomic<bool> dragWindowsWithoutTitleBar;
+} g_settings;
+
+std::atomic<bool> g_uninitializing;
+std::atomic<int> g_hookRefCount;
+
+// A drag is identified by the system command it amounts to: SC_MOVE |
+// HTCAPTION for a move, SC_SIZE | WMSZ_* for a resize from that edge or corner.
+bool IsSizeCommand(UINT command) {
+    return (command & 0xFFF0) == SC_SIZE;
+}
+
+const TriggerSettings& TriggerOfCommand(UINT command) {
+    return IsSizeCommand(command) ? g_settings.sizeTrigger
+                                  : g_settings.moveTrigger;
+}
+
+UINT g_sizeMoveRequestMessage =
+    RegisterWindowMessage(L"Windhawk_SizeMoveRequest_" WH_MOD_ID);
+UINT g_unsubclassRegisteredMessage =
+    RegisterWindowMessage(L"Windhawk_Unsubclass_" WH_MOD_ID);
+UINT g_replayPressMessage =
+    RegisterWindowMessage(L"Windhawk_ReplayPress_" WH_MOD_ID);
+UINT g_dragUpdateMessage =
+    RegisterWindowMessage(L"Windhawk_DragUpdate_" WH_MOD_ID);
+
+thread_local bool g_threadHooksAttempted;
+thread_local HHOOK g_getMessageHook;
+thread_local HHOOK g_callWndProcHook;
+std::mutex g_allThreadHooksMutex;
+std::unordered_set<HHOOK> g_allThreadHooks;
+
+// The drag this thread was asked to run, from the request's retrieval until
+// the loop is seen to be over. It's dragged once the loop got going: a move
+// past the threshold wait the caption drag holds the capture through, a resize
+// once the pointer leaves the drag threshold, the size loop having no such
+// wait. Until then a release is a click.
+thread_local struct {
+    UINT command;
+    int button;
+    HWND hWnd;
+    POINT startPt;
+    bool dragged;
+} g_loop;
+
+// A press taken from this thread's queue for as long as the drag delay runs.
+thread_local struct {
+    UINT_PTR timerId;
+    MSG downMsg;
+    int button;
+    UINT command;
+    HWND hRootWnd;
+} g_delayedPress;
+
+// The button of the last press taken from this thread's queue, whose release
+// is taken as well unless a loop consumes it.
+thread_local int g_takenPressButton;
+
+// Set while the press of a replayed click is posted and yet to be retrieved,
+// so that it's passed on rather than taken again.
+thread_local bool g_replayedPressPending;
+
+thread_local HWND g_lastSubclassedWnd;
+std::mutex g_subclassedWindowsMutex;
+std::unordered_set<HWND> g_subclassedWindows;
+
+// The pointer contact being routed to DefWindowProc, if any.
+thread_local HWND g_contactWnd;
+thread_local UINT g_contactPointerId;
+thread_local int g_contactButton;
+
+// The low level mouse hook, installed only while a trigger's keys are held, by
+// whichever thread retrieves the press. The mutex guards the handle and the
+// thread, and keeps an installation from slipping past the removal at uninit.
+// It's taken from DllMain as well, under the loader lock, so nothing may call
+// into the loader while holding it, which would invert the two.
+std::mutex g_lowLevelMouseHookMutex;
+HHOOK g_lowLevelMouseHook;
+DWORD g_lowLevelMouseHookThreadId;
+// Set when a press was swallowed during the current hold with Alt held.
+std::atomic<bool> g_swallowedPress;
+
+// Marks the input sent by the mod, which the hooks let through.
+constexpr ULONG_PTR kOwnInputExtraInfo = 0x57484152;
+
+// The low level keyboard hook masking the Win release which ends a drag,
+// installed by the thread running the drag and removed with that release. The
+// mutex carries the same rule as the one above.
+std::mutex g_winKeyMaskHookMutex;
+HHOOK g_winKeyMaskHook;
+DWORD g_winKeyMaskHookThreadId;
+
+// Unassigned, the key AutoHotkey masks menu keys with (A_MenuMaskKey).
+constexpr WORD kMenuMaskKey = 0xE8;
+
+// The press the low level hook swallowed, until its release: the root window
+// a drag takes hold of and the drag it amounts to, a candidate for one until
+// the pointer leaves the drag threshold with the delay over. Touched only on
+// the hook's thread, which its callback runs on, and reset with the hook
+// gone: at uninit once the callbacks are waited out, and at the start of a
+// hold.
+HWND g_llRootWnd;
+UINT g_llCommand;
+int g_llButton;
+POINT g_llDownPt;
+DWORD g_llDownTime;
+bool g_llDragging;
+// Where the drag started: a move takes its grab from it, a resize measures
+// from it.
+POINT g_llDragStartPt;
+// Where a move holds the window relative to its origin.
+POINT g_llDragGrab;
+// The window's rect when a resize started.
+RECT g_llDragStartRect;
+// Whether the work a drag starts with has been done. The callback decides
+// that a drag is on, the message loop then sets it up.
+bool g_llDragSetUp;
+// Where the drag last saw the pointer, and whether an update for it is queued.
+POINT g_llDragPt;
+bool g_llDragUpdatePosted;
+HWND g_llDragOverlayWnd;
+// Times the drag delay of a candidate for the cursor at its end. The drag
+// itself waits for a move, timed from the press. A timer is its thread's, and
+// only that thread can kill it.
+thread_local UINT_PTR g_llDelayTimerId;
+
+constexpr WCHAR kDragOverlayClassName[] = L"Windhawk_AltDragOverlay_" WH_MOD_ID;
+
+// Sized for the cursor alone: a window covering a monitor counts as a full
+// screen one, which the taskbar and notifications make way for.
+constexpr int kDragOverlaySize = 32;
+
+// The monitor the pointer was last seen on, in physical coordinates and in
+// those of this thread, which are scaled per monitor unless the thread is per
+// monitor DPI aware.
+struct {
+    RECT physicalRect;
+    RECT logicalRect;
+} g_llMonitor;
+
+void ReplayPress(int button, bool asClick);
+void MaskWinKeyReleaseIfNeeded(UINT command);
+void OnLowLevelDragDelayElapsed();
+void OnDragUpdate();
+void RemoveLowLevelMouseHook();
+void InstallLowLevelMouseHookIfNeeded();
+void RemoveLowLevelMouseHookIfIdle();
+
+auto HookRefCountScope() {
+    g_hookRefCount++;
+    return std::unique_ptr<decltype(g_hookRefCount),
+                           void (*)(decltype(g_hookRefCount)*)>{
+        &g_hookRefCount, [](auto hookRefCount) { (*hookRefCount)--; }};
+}
+
+void TakeMessage(MSG* msg) {
+    msg->message = WM_NULL;
+    msg->wParam = 0;
+    msg->lParam = 0;
+}
+
+void SetSyncKeyState(int vk, bool down) {
+    BYTE keyState[256];
+    if (GetKeyboardState(keyState)) {
+        if (down) {
+            keyState[vk] |= 0x80;
+        } else {
+            keyState[vk] &= ~0x80;
+        }
+        SetKeyboardState(keyState);
+    }
+}
+
+// The modifier keys held, from GetKeyState or GetAsyncKeyState.
+DWORD HeldModifiers(SHORT(WINAPI* getKeyState)(int)) {
+    DWORD held = 0;
+    if (getKeyState(VK_CONTROL) < 0) {
+        held |= kModifierCtrl;
+    }
+    if (getKeyState(VK_MENU) < 0) {
+        held |= kModifierAlt;
+    }
+    if (getKeyState(VK_SHIFT) < 0) {
+        held |= kModifierShift;
+    }
+    if (getKeyState(VK_LWIN) < 0 || getKeyState(VK_RWIN) < 0) {
+        held |= kModifierWin;
+    }
+    return held;
+}
+
+DWORD ModifierOfKey(WPARAM vk) {
+    switch (vk) {
+        case VK_CONTROL:
+            return kModifierCtrl;
+        case VK_MENU:
+            return kModifierAlt;
+        case VK_SHIFT:
+            return kModifierShift;
+        case VK_LWIN:
+        case VK_RWIN:
+            return kModifierWin;
+    }
+
+    return 0;
+}
+
+// Other keys held along with the trigger's don't get in the way, so that AltGr,
+// which is Ctrl+Alt, counts as Alt.
+bool IsTriggerHeld(const TriggerSettings& trigger, DWORD held) {
+    DWORD modifiers = trigger.modifiers;
+    return (held & modifiers) == modifiers;
+}
+
+// Whether a trigger's keys are held, for the paths their hold gates. A
+// trigger with no keys is never held this way: it's armed all the time, and
+// what it needs is kept up for as long as it's configured.
+bool IsModifierTriggerHeld(const TriggerSettings& trigger, DWORD held) {
+    return trigger.modifiers && IsTriggerHeld(trigger, held);
+}
+
+bool IsAnyModifierTriggerHeld(DWORD held) {
+    return IsModifierTriggerHeld(g_settings.moveTrigger, held) ||
+           IsModifierTriggerHeld(g_settings.sizeTrigger, held);
+}
+
+bool IsAnyTriggerKeyless() {
+    return !g_settings.moveTrigger.modifiers ||
+           !g_settings.sizeTrigger.modifiers;
+}
+
+// The low level hook of a keyless trigger is held by the process which owns
+// the foreground window, so that one hook is in the input path rather than one
+// per process. Activation is what puts it up and takes it down, the way a key
+// press and release do for a trigger which has keys.
+bool ShouldHoldKeylessHook() {
+    // 分组总开关关闭：不持有无修饰键触发的低级鼠标钩子（已安装的会因本
+    // 判断在空闲时被移除）。
+    if (!g_settings.enable || !IsAnyTriggerKeyless()) {
+        return false;
+    }
+
+    DWORD processId = 0;
+    GetWindowThreadProcessId(GetForegroundWindow(), &processId);
+    return processId == GetCurrentProcessId();
+}
+
+// The button of a client or non-client button message, or 0 for any other
+// message. An X button is told by the high word of wParam, or of mouseData for
+// the messages of the low level hook.
+int ButtonOfMessage(UINT message, WORD xButton, bool* down) {
+    switch (message) {
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONDBLCLK:
+        case WM_NCLBUTTONDOWN:
+        case WM_NCLBUTTONDBLCLK:
+            *down = true;
+            return VK_LBUTTON;
+
+        case WM_LBUTTONUP:
+        case WM_NCLBUTTONUP:
+            *down = false;
+            return VK_LBUTTON;
+
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONDBLCLK:
+        case WM_NCRBUTTONDOWN:
+        case WM_NCRBUTTONDBLCLK:
+            *down = true;
+            return VK_RBUTTON;
+
+        case WM_RBUTTONUP:
+        case WM_NCRBUTTONUP:
+            *down = false;
+            return VK_RBUTTON;
+
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONDBLCLK:
+        case WM_NCMBUTTONDOWN:
+        case WM_NCMBUTTONDBLCLK:
+            *down = true;
+            return VK_MBUTTON;
+
+        case WM_MBUTTONUP:
+        case WM_NCMBUTTONUP:
+            *down = false;
+            return VK_MBUTTON;
+
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONDBLCLK:
+        case WM_NCXBUTTONDOWN:
+        case WM_NCXBUTTONDBLCLK:
+            *down = true;
+            break;
+
+        case WM_XBUTTONUP:
+        case WM_NCXBUTTONUP:
+            *down = false;
+            break;
+
+        default:
+            return 0;
+    }
+
+    switch (xButton) {
+        case XBUTTON1:
+            return VK_XBUTTON1;
+        case XBUTTON2:
+            return VK_XBUTTON2;
+    }
+
+    return 0;
+}
+
+UINT ButtonUpMessageOf(UINT downMessage) {
+    switch (downMessage) {
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONDBLCLK:
+            return WM_LBUTTONUP;
+        case WM_NCLBUTTONDOWN:
+        case WM_NCLBUTTONDBLCLK:
+            return WM_NCLBUTTONUP;
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONDBLCLK:
+            return WM_RBUTTONUP;
+        case WM_NCRBUTTONDOWN:
+        case WM_NCRBUTTONDBLCLK:
+            return WM_NCRBUTTONUP;
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONDBLCLK:
+            return WM_MBUTTONUP;
+        case WM_NCMBUTTONDOWN:
+        case WM_NCMBUTTONDBLCLK:
+            return WM_NCMBUTTONUP;
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONDBLCLK:
+            return WM_XBUTTONUP;
+        case WM_NCXBUTTONDOWN:
+        case WM_NCXBUTTONDBLCLK:
+            return WM_NCXBUTTONUP;
+    }
+
+    return 0;
+}
+
+// The MK_* flag of the button in the wParam of a client mouse message.
+WPARAM ButtonMask(int button) {
+    switch (button) {
+        case VK_LBUTTON:
+            return MK_LBUTTON;
+        case VK_RBUTTON:
+            return MK_RBUTTON;
+        case VK_MBUTTON:
+            return MK_MBUTTON;
+        case VK_XBUTTON1:
+            return MK_XBUTTON1;
+        case VK_XBUTTON2:
+            return MK_XBUTTON2;
+    }
+
+    return 0;
+}
+
+bool IsNonClientMessage(UINT message) {
+    return message < WM_MOUSEFIRST;
+}
+
+bool IsPastDragThreshold(POINT from, POINT to) {
+    return abs(to.x - from.x) >= GetSystemMetrics(SM_CXDRAG) ||
+           abs(to.y - from.y) >= GetSystemMetrics(SM_CYDRAG);
+}
+
+bool IsPointerMessage(UINT message) {
+    return message >= WM_NCPOINTERUPDATE && message <= WM_POINTERROUTEDRELEASED;
+}
+
+bool IsPointerButtonDown(WPARAM wParam, int button) {
+    switch (button) {
+        case VK_LBUTTON:
+            return IS_POINTER_FIRSTBUTTON_WPARAM(wParam);
+        case VK_RBUTTON:
+            return IS_POINTER_SECONDBUTTON_WPARAM(wParam);
+        case VK_MBUTTON:
+            return IS_POINTER_THIRDBUTTON_WPARAM(wParam);
+        case VK_XBUTTON1:
+            return IS_POINTER_FOURTHBUTTON_WPARAM(wParam);
+        case VK_XBUTTON2:
+            return IS_POINTER_FIFTHBUTTON_WPARAM(wParam);
+    }
+
+    return false;
+}
+
+// The button a new contact was made with, or 0 for any other message. The
+// mouse is in contact while any of its buttons is down, so at that point it's
+// the only one.
+int ButtonOfPointerDownMessage(UINT message, WPARAM wParam) {
+    switch (message) {
+        case WM_POINTERDOWN:
+        case WM_NCPOINTERDOWN:
+            for (int button : {VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1,
+                               VK_XBUTTON2}) {
+                if (IsPointerButtonDown(wParam, button)) {
+                    return button;
+                }
+            }
+            break;
+    }
+
+    return 0;
+}
+
+bool IsPointerContactEndMessage(UINT message) {
+    switch (message) {
+        case WM_POINTERUP:
+        case WM_NCPOINTERUP:
+        case WM_POINTERCAPTURECHANGED:
+            return true;
+    }
+
+    return false;
+}
+
+// A message showing that a contact is no longer this window's: the pointer
+// left, e.g. captured by the move loop, or the button is up already, the
+// release having gone elsewhere.
+bool IsPointerContactGoneMessage(UINT message, WPARAM wParam, int button) {
+    switch (message) {
+        case WM_POINTERLEAVE:
+            return true;
+
+        case WM_POINTERUPDATE:
+        case WM_NCPOINTERUPDATE:
+            return !IsPointerButtonDown(wParam, button);
+    }
+
+    return false;
+}
+
+// Set on the top level windows of a thread which runs the mod's hooks.
+constexpr WCHAR kHookedWindowProp[] = L"Windhawk_Hooked_" WH_MOD_ID;
+
+void MarkHookedWindow(HWND hWnd) {
+    if (!SetProp(hWnd, kHookedWindowProp, (HANDLE)1)) {
+        Wh_Log(L"SetProp error for %08X: %u", (DWORD)(ULONG_PTR)hWnd,
+               GetLastError());
+    }
+}
+
+// x86 下 WNDENUMPROC 为 stdcall，无捕获 lambda 直接传入会报
+// "no known conversion ... __attribute__((stdcall))"；改为显式 CALLBACK 函数
+// （逻辑不变）。
+BOOL CALLBACK MarkHookedWindowEnumProc(HWND hWnd, LPARAM /*lParam*/) {
+    MarkHookedWindow(hWnd);
+    return TRUE;
+}
+
+// 同上：卸载时清除本进程窗口标记的枚举回调。
+BOOL CALLBACK UnmarkHookedWindowsEnumProc(HWND hWnd, LPARAM /*lParam*/) {
+    DWORD processId = 0;
+    GetWindowThreadProcessId(hWnd, &processId);
+    if (processId == GetCurrentProcessId()) {
+        RemoveProp(hWnd, kHookedWindowProp);
+    }
+    return TRUE;
+}
+
+// This thread's hooks are in place, another thread's are told by the mark.
+bool IsRootWindowHooked(HWND hRootWnd) {
+    return GetWindowThreadProcessId(hRootWnd, nullptr) ==
+               GetCurrentThreadId() ||
+           GetProp(hRootWnd, kHookedWindowProp);
+}
+
+bool IsExcludedRootWindow(HWND hRootWnd) {
+    // A window of a thread without the mod's hooks, e.g. of a process the mod
+    // isn't loaded in, keeps its input as is.
+    if (!IsRootWindowHooked(hRootWnd)) {
+        return true;
+    }
+
+    WCHAR className[64];
+    if (!GetClassName(hRootWnd, className, ARRAYSIZE(className))) {
+        return true;
+    }
+
+    // The taskbar, the desktop, and the mod's own drag overlay.
+    return _wcsicmp(className, L"Shell_TrayWnd") == 0 ||
+           _wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0 ||
+           _wcsicmp(className, L"Progman") == 0 ||
+           _wcsicmp(className, L"WorkerW") == 0 ||
+           _wcsicmp(className, kDragOverlayClassName) == 0;
+}
+
+bool CanMoveRootWindow(HWND hRootWnd) {
+    if (IsExcludedRootWindow(hRootWnd)) {
+        return false;
+    }
+
+    if (g_settings.dragWindowsWithoutTitleBar) {
+        return true;
+    }
+
+    LONG style = GetWindowLong(hRootWnd, GWL_STYLE);
+    return (style & WS_CAPTION) == WS_CAPTION;
+}
+
+bool CanSizeRootWindow(HWND hRootWnd) {
+    if (IsExcludedRootWindow(hRootWnd)) {
+        return false;
+    }
+
+    LONG style = GetWindowLong(hRootWnd, GWL_STYLE);
+    return (style & WS_THICKFRAME) && !(style & WS_MAXIMIZE);
+}
+
+// The edge or corner a resize which grabs the window at pt takes hold of, from
+// a 3x3 grid over the window. The center cell resizes from the bottom right
+// corner.
+UINT SizeCommandAtPoint(HWND hRootWnd, POINT pt) {
+    RECT rc;
+    if (!GetWindowRect(hRootWnd, &rc) || IsRectEmpty(&rc)) {
+        return SC_SIZE | WMSZ_BOTTOMRIGHT;
+    }
+
+    int col =
+        std::clamp<int>((pt.x - rc.left) * 3 / (rc.right - rc.left), 0, 2);
+    int row = std::clamp<int>((pt.y - rc.top) * 3 / (rc.bottom - rc.top), 0, 2);
+
+    static constexpr UINT kEdges[3][3] = {
+        {WMSZ_TOPLEFT, WMSZ_TOP, WMSZ_TOPRIGHT},
+        {WMSZ_LEFT, WMSZ_BOTTOMRIGHT, WMSZ_RIGHT},
+        {WMSZ_BOTTOMLEFT, WMSZ_BOTTOM, WMSZ_BOTTOMRIGHT},
+    };
+    return SC_SIZE | kEdges[row][col];
+}
+
+// The drag a press of the button starts, given the modifier keys held, or 0.
+// When the press fits both triggers, the one with more keys is the closer fit.
+UINT DragCommandForPress(int button, DWORD held, HWND hRootWnd, POINT pt) {
+    // 分组总开关关闭：不把任何按键识别为拖动触发（消息路径、指针路径与
+    // 低级钩子路径都经由本函数，运行时短路，随设置重载即时生效）。
+    if (!g_settings.enable) {
+        return 0;
+    }
+
+    bool move = button == g_settings.moveTrigger.button &&
+                IsTriggerHeld(g_settings.moveTrigger, held) &&
+                CanMoveRootWindow(hRootWnd);
+    bool size = button == g_settings.sizeTrigger.button &&
+                IsTriggerHeld(g_settings.sizeTrigger, held) &&
+                CanSizeRootWindow(hRootWnd);
+    if (move && size &&
+        std::popcount<DWORD>(g_settings.sizeTrigger.modifiers) >
+            std::popcount<DWORD>(g_settings.moveTrigger.modifiers)) {
+        move = false;
+    }
+
+    if (move) {
+        return SC_MOVE | HTCAPTION;
+    }
+
+    if (size) {
+        return SizeCommandAtPoint(hRootWnd, pt);
+    }
+
+    return 0;
+}
+
+PCWSTR CursorOfCommand(UINT command) {
+    switch (command) {
+        case SC_SIZE | WMSZ_LEFT:
+        case SC_SIZE | WMSZ_RIGHT:
+            return IDC_SIZEWE;
+        case SC_SIZE | WMSZ_TOP:
+        case SC_SIZE | WMSZ_BOTTOM:
+            return IDC_SIZENS;
+        case SC_SIZE | WMSZ_TOPLEFT:
+        case SC_SIZE | WMSZ_BOTTOMRIGHT:
+            return IDC_SIZENWSE;
+        case SC_SIZE | WMSZ_TOPRIGHT:
+        case SC_SIZE | WMSZ_BOTTOMLEFT:
+            return IDC_SIZENESW;
+    }
+
+    return IDC_SIZEALL;
+}
+
+PCWSTR NameOfCommand(UINT command) {
+    return IsSizeCommand(command) ? L"resize" : L"move";
+}
+
+// Windows which host their content in a composition input sink, such as a WinUI
+// XAML island. Their pointer input never becomes a window message.
+bool IsCompositionHostedWindow(HWND hWnd) {
+    WCHAR className[64];
+    if (!GetClassName(hWnd, className, ARRAYSIZE(className))) {
+        return false;
+    }
+
+    return _wcsnicmp(className, L"Microsoft.UI.Content.",
+                     ARRAYSIZE(L"Microsoft.UI.Content.") - 1) == 0 ||
+           _wcsnicmp(className, L"Windows.UI.Composition.",
+                     ARRAYSIZE(L"Windows.UI.Composition.") - 1) == 0 ||
+           _wcsnicmp(className, L"Windows.UI.Input.InputSite.",
+                     ARRAYSIZE(L"Windows.UI.Input.InputSite.") - 1) == 0 ||
+           _wcsicmp(className, L"InputSiteWindowClass") == 0;
+}
+
+// Found by geometry alone, from the desktop window down. WindowFromPoint sends
+// WM_NCHITTEST to windows of other threads, and from the low level hook a
+// program which stopped responding a moment ago would hold up the mouse
+// system wide. An island host commonly answers that message with HTTRANSPARENT
+// anyway, to do its own hit testing, which would stop the lookup at the host.
+// What geometry misses is per pixel transparency of layered windows, behind
+// which nothing is found.
+HWND CompositionHostedWindowFromPoint(POINT pt) {
+    HWND hWnd = GetDesktopWindow();
+    for (int depth = 0; depth < 9; depth++) {
+        POINT clientPt = pt;
+        if (!ScreenToClient(hWnd, &clientPt)) {
+            break;
+        }
+
+        HWND hChildWnd = ChildWindowFromPointEx(
+            hWnd, clientPt,
+            CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT);
+        if (!hChildWnd || hChildWnd == hWnd) {
+            break;
+        }
+
+        hWnd = hChildWnd;
+        if (IsCompositionHostedWindow(hWnd)) {
+            return hWnd;
+        }
+    }
+
+    return nullptr;
+}
+
+// Whether the system size/move loop is running on this thread.
+bool IsInMoveLoop() {
+    GUITHREADINFO gti{.cbSize = sizeof(gti)};
+    return GetGUIThreadInfo(GetCurrentThreadId(), &gti) &&
+           (gti.flags & GUI_INMOVESIZE);
+}
+
+// Posted messages are retrieved before input, so a button release that's
+// already queued is seen by the loop rather than by the program.
+bool PostSizeMoveRequest(HWND hRootWnd, UINT command, int button, POINT pt) {
+    if (!PostMessage(hRootWnd, g_sizeMoveRequestMessage,
+                     MAKEWPARAM(command, button), MAKELPARAM(pt.x, pt.y))) {
+        Wh_Log(L"PostMessage error: %u", GetLastError());
+        return false;
+    }
+
+    return true;
+}
+
+// A request carries the command, the button and the window from another
+// process, and the command is handed to DefWindowProc, so each is held to
+// what the mod itself asks for. The filter which lets the message through
+// from any integrity level is meant for a drag and for nothing else: any
+// other command, SC_CLOSE or one of the program's own among them, would
+// otherwise be the sender's to send.
+bool IsRequestAcceptable(UINT command, int button, HWND hRootWnd) {
+    if (!ButtonMask(button) || GetAncestor(hRootWnd, GA_ROOT) != hRootWnd) {
+        return false;
+    }
+
+    if (command == (SC_MOVE | HTCAPTION)) {
+        return CanMoveRootWindow(hRootWnd);
+    }
+
+    UINT edge = command & 0xF;
+    return IsSizeCommand(command) && edge >= WMSZ_LEFT &&
+           edge <= WMSZ_BOTTOMRIGHT && CanSizeRootWindow(hRootWnd);
+}
+
+// Turns a request retrieved by the root window's thread into the system
+// command. The loop only starts if this thread's synchronized state has the
+// left button down: it isn't when the press was retrieved by another thread,
+// and it's the left button which counts whichever button is really held.
+void OnSizeMoveRequestRemoved(MSG* msg) {
+    UINT command = LOWORD(msg->wParam);
+    int button = HIWORD(msg->wParam);
+
+    if (!IsRequestAcceptable(command, button, msg->hwnd)) {
+        Wh_Log(L"Dropping the request %04X %02X for %08X", command, button,
+               (DWORD)(ULONG_PTR)msg->hwnd);
+        TakeMessage(msg);
+        return;
+    }
+
+    if (GetAsyncKeyState(button) >= 0) {
+        // Released already, a loop would stick to the cursor, and short of a
+        // held button nothing backs the request.
+        Wh_Log(L"Request to %s %08X, button already released",
+               NameOfCommand(command), (DWORD)(ULONG_PTR)msg->hwnd);
+        TakeMessage(msg);
+        return;
+    }
+
+    if (GetKeyState(VK_LBUTTON) >= 0) {
+        SetSyncKeyState(VK_LBUTTON, true);
+    }
+
+    Wh_Log(L"Request to %s %08X, starting the loop", NameOfCommand(command),
+           (DWORD)(ULONG_PTR)msg->hwnd);
+
+    g_loop = {
+        .command = command,
+        .button = button,
+        .hWnd = msg->hwnd,
+        .startPt = msg->pt,
+    };
+
+    msg->message = WM_SYSCOMMAND;
+    msg->wParam = command;
+}
+
+// Runs for the messages the loop retrieves, and ahead of it the wait for the
+// drag threshold, which inLoop tells apart.
+void OnLoopMessageRemoved(MSG* msg, bool inLoop) {
+    if (!g_loop.dragged) {
+        // A resize starts the loop with GUI_INMOVESIZE already set, so the
+        // pointer leaving the drag threshold is what tells it apart from a
+        // click; a move waits at the threshold and sets GUI_INMOVESIZE then.
+        bool started = IsSizeCommand(g_loop.command)
+                           ? IsPastDragThreshold(g_loop.startPt, msg->pt)
+                           : inLoop;
+        if (started) {
+            g_loop.dragged = true;
+            MaskWinKeyReleaseIfNeeded(g_loop.command);
+        }
+    }
+
+    if (msg->message == WM_MOUSEMOVE) {
+        // The loop retrieves the moves itself, without dispatching them,
+        // holds an internal capture for which no WM_SETCURSOR is sent, and
+        // shows the class cursor.
+        SetCursor(LoadCursor(nullptr, CursorOfCommand(g_loop.command)));
+        return;
+    }
+
+    bool down;
+    int button = ButtonOfMessage(msg->message, HIWORD(msg->wParam), &down);
+    if (button != g_loop.button || down) {
+        return;
+    }
+
+    if (button != VK_LBUTTON) {
+        Wh_Log(L"Ending the loop with the release of button %02X", button);
+        if (IsNonClientMessage(msg->message)) {
+            msg->message = WM_NCLBUTTONUP;
+        } else {
+            msg->message = WM_LBUTTONUP;
+            msg->wParam = 0;
+        }
+
+        if (GetAsyncKeyState(VK_LBUTTON) >= 0) {
+            SetSyncKeyState(VK_LBUTTON, false);
+        }
+    }
+
+    if (!g_loop.dragged) {
+        Wh_Log(L"Released within the drag threshold, replaying the click");
+        ReplayPress(button, true);
+    }
+
+    // The loop consumes the release.
+    g_loop = {};
+    g_takenPressButton = 0;
+}
+
+// The loop ended without its release being seen, e.g. cancelled with Esc.
+void OnLoopOver() {
+    if (GetAsyncKeyState(VK_LBUTTON) >= 0 && GetKeyState(VK_LBUTTON) < 0) {
+        SetSyncKeyState(VK_LBUTTON, false);
+    }
+
+    g_loop = {};
+}
+
+// Posts the press taken for the drag delay back to its window, followed by a
+// release, as the click it turned out to be.
+void ReplayDelayedPress() {
+    const MSG& down = g_delayedPress.downMsg;
+    WPARAM upWParam = IsNonClientMessage(down.message)
+                          ? down.wParam
+                          : down.wParam & ~ButtonMask(g_delayedPress.button);
+
+    Wh_Log(L"Replaying the press %04X for %08X as a click", down.message,
+           (DWORD)(ULONG_PTR)down.hwnd);
+
+    g_replayedPressPending = true;
+    if (!PostMessage(down.hwnd, down.message, down.wParam, down.lParam)) {
+        Wh_Log(L"PostMessage error: %u", GetLastError());
+        g_replayedPressPending = false;
+        return;
+    }
+
+    PostMessage(down.hwnd, ButtonUpMessageOf(down.message), upWParam,
+                down.lParam);
+}
+
+void EndDragDelay() {
+    KillTimer(nullptr, g_delayedPress.timerId);
+    g_delayedPress = {};
+}
+
+// The mouse left the drag threshold before the delay was over: the drag is
+// the program's own, e.g. a selection, so the press is handed back in place
+// of this move, ahead of the moves which follow, and its release is left
+// alone.
+void HandDelayedPressBack(MSG* msg) {
+    Wh_Log(
+        L"Moved before the drag delay elapsed, handing the press %04X for "
+        L"%08X back",
+        g_delayedPress.downMsg.message,
+        (DWORD)(ULONG_PTR)g_delayedPress.downMsg.hwnd);
+
+    *msg = g_delayedPress.downMsg;
+    g_takenPressButton = 0;
+    EndDragDelay();
+}
+
+bool StartDragDelay(const MSG* downMsg,
+                    int button,
+                    UINT command,
+                    HWND hRootWnd,
+                    int delay) {
+    UINT_PTR timerId = SetTimer(nullptr, 0, delay, nullptr);
+    if (!timerId) {
+        Wh_Log(L"SetTimer error: %u", GetLastError());
+        return false;
+    }
+
+    Wh_Log(L"Message %04X for %08X, holding the press for %d ms",
+           downMsg->message, (DWORD)(ULONG_PTR)downMsg->hwnd, delay);
+
+    g_delayedPress = {
+        .timerId = timerId,
+        .downMsg = *downMsg,
+        .button = button,
+        .command = command,
+        .hRootWnd = hRootWnd,
+    };
+    return true;
+}
+
+void OnDragDelayElapsed() {
+    if (GetAsyncKeyState(g_delayedPress.button) < 0 &&
+        PostSizeMoveRequest(g_delayedPress.hRootWnd, g_delayedPress.command,
+                            g_delayedPress.button, g_delayedPress.downMsg.pt)) {
+        Wh_Log(L"Drag delay elapsed, requesting a %s of root window %08X",
+               NameOfCommand(g_delayedPress.command),
+               (DWORD)(ULONG_PTR)g_delayedPress.hRootWnd);
+
+        // Shown from here on, ahead of the first move the loop sets it for:
+        // the window under the cursor is this thread's, which retrieved the
+        // press.
+        SetCursor(LoadCursor(nullptr, CursorOfCommand(g_delayedPress.command)));
+    } else {
+        ReplayDelayedPress();
+    }
+
+    EndDragDelay();
+}
+
+// Tracks the modifier keys so the low level mouse hook exists only while a
+// trigger's keys are held.
+void OnModifierKeyMessageRemoved(MSG* msg, DWORD modifier) {
+    bool down = msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN;
+
+    // GetKeyState reflects the state at the time of the retrieved message.
+    DWORD held = HeldModifiers(GetKeyState);
+    bool triggerHeld = IsAnyModifierTriggerHeld(held);
+
+    if (down) {
+        // Bit 30 of lParam is set for the auto repeats which arrive while
+        // the key is held, including throughout a drag.
+        constexpr LPARAM kPreviousKeyStateDown = 1 << 30;
+        if (!(msg->lParam & kPreviousKeyStateDown) && triggerHeld &&
+            !IsAnyModifierTriggerHeld(held & ~modifier)) {
+            // A hold starts with this key. A keyless trigger keeps its own
+            // hook, and with it whatever drag is under way.
+            g_swallowedPress = false;
+            if (!IsAnyTriggerKeyless()) {
+                RemoveLowLevelMouseHook();
+            }
+        }
+    }
+
+    if (triggerHeld) {
+        InstallLowLevelMouseHookIfNeeded();
+    } else {
+        RemoveLowLevelMouseHookIfIdle();
+    }
+
+    if (!down && msg->wParam == VK_MENU && g_swallowedPress.exchange(false)) {
+        Wh_Log(L"Swallowing the Alt release of a drag");
+        TakeMessage(msg);
+    }
+}
+
+// Runs for every message removed from the queue of the current thread, before
+// the program sees it.
+void OnMessageRemoved(MSG* msg) {
+    if (msg->message == g_replayPressMessage) {
+        ReplayPress((int)msg->wParam, msg->lParam != 0);
+        TakeMessage(msg);
+        return;
+    }
+
+    if (msg->message == g_dragUpdateMessage) {
+        OnDragUpdate();
+        TakeMessage(msg);
+        return;
+    }
+
+    if (msg->message == WM_TIMER && !msg->hwnd) {
+        if (g_delayedPress.timerId && msg->wParam == g_delayedPress.timerId) {
+            OnDragDelayElapsed();
+            TakeMessage(msg);
+            return;
+        }
+
+        if (g_llDelayTimerId && msg->wParam == g_llDelayTimerId) {
+            OnLowLevelDragDelayElapsed();
+            TakeMessage(msg);
+            return;
+        }
+    }
+
+    if (!msg->hwnd) {
+        return;
+    }
+
+    if (msg->message == g_sizeMoveRequestMessage) {
+        OnSizeMoveRequestRemoved(msg);
+        return;
+    }
+
+    if (msg->message == WM_SYSKEYDOWN || msg->message == WM_KEYDOWN ||
+        msg->message == WM_SYSKEYUP || msg->message == WM_KEYUP) {
+        if (DWORD modifier = ModifierOfKey(msg->wParam)) {
+            OnModifierKeyMessageRemoved(msg, modifier);
+        }
+        return;
+    }
+
+    if (g_loop.command) {
+        // Ahead of the loop is the wait for the drag threshold, during which
+        // the window holds the capture.
+        bool inLoop = IsInMoveLoop();
+        if (inLoop || GetCapture() == g_loop.hWnd) {
+            OnLoopMessageRemoved(msg, inLoop);
+            return;
+        }
+
+        OnLoopOver();
+    }
+
+    if (g_delayedPress.timerId &&
+        (msg->message == WM_MOUSEMOVE || msg->message == WM_NCMOUSEMOVE) &&
+        IsPastDragThreshold(g_delayedPress.downMsg.pt, msg->pt)) {
+        HandDelayedPressBack(msg);
+        return;
+    }
+
+    bool down;
+    int button = ButtonOfMessage(msg->message, HIWORD(msg->wParam), &down);
+    if (!button) {
+        return;
+    }
+
+    if (g_delayedPress.timerId) {
+        if (button == g_delayedPress.button && !down) {
+            Wh_Log(L"Released before the drag delay elapsed");
+            ReplayDelayedPress();
+            EndDragDelay();
+            TakeMessage(msg);
+        }
+        return;
+    }
+
+    if (!down) {
+        if (button == g_takenPressButton) {
+            g_takenPressButton = 0;
+            Wh_Log(
+                L"Message %04X for %08X, taking the release of a taken press",
+                msg->message, (DWORD)(ULONG_PTR)msg->hwnd);
+            TakeMessage(msg);
+        }
+        return;
+    }
+
+    // A new press: the release of the last one, if it's still awaited, went
+    // elsewhere.
+    if (button == g_takenPressButton) {
+        g_takenPressButton = 0;
+    }
+
+    if (g_replayedPressPending) {
+        g_replayedPressPending = false;
+        return;
+    }
+
+    // The extra info of a retrieved input message is the thread's until the
+    // next one.
+    if (GetMessageExtraInfo() == kOwnInputExtraInfo) {
+        return;
+    }
+
+    HWND hRootWnd = GetAncestor(msg->hwnd, GA_ROOT);
+    if (!hRootWnd) {
+        return;
+    }
+
+    UINT command = DragCommandForPress(button, HeldModifiers(GetKeyState),
+                                       hRootWnd, msg->pt);
+    if (!command) {
+        return;
+    }
+
+    g_takenPressButton = button;
+
+    // A press on the title bar or the border isn't held: DefWindowProc
+    // answers such a press, when replayed, with a drag wait of its own which
+    // only a client release ends.
+    int delay = TriggerOfCommand(command).delay;
+    if (delay > 0 && !IsNonClientMessage(msg->message) &&
+        StartDragDelay(msg, button, command, hRootWnd, delay)) {
+        TakeMessage(msg);
+        return;
+    }
+
+    Wh_Log(L"Message %04X for %08X, requesting a %s of root window %08X",
+           msg->message, (DWORD)(ULONG_PTR)msg->hwnd, NameOfCommand(command),
+           (DWORD)(ULONG_PTR)hRootWnd);
+
+    if (!PostSizeMoveRequest(hRootWnd, command, button, msg->pt)) {
+        g_takenPressButton = 0;
+        return;
+    }
+
+    TakeMessage(msg);
+}
+
+LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    auto hookScope = HookRefCountScope();
+
+    if (nCode == HC_ACTION && (wParam & PM_REMOVE) && lParam &&
+        !g_uninitializing) {
+        OnMessageRemoved((MSG*)lParam);
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+void UnsubclassWindow(HWND hWnd);
+
+LRESULT CALLBACK SubclassProc(HWND hWnd,
+                              UINT uMsg,
+                              WPARAM wParam,
+                              LPARAM lParam,
+                              UINT_PTR uIdSubclass,
+                              DWORD_PTR dwRefData) {
+    auto hookScope = HookRefCountScope();
+
+    if (uMsg == WM_NCDESTROY) {
+        if (hWnd == g_contactWnd) {
+            g_contactWnd = nullptr;
+        }
+
+        UnsubclassWindow(hWnd);
+    } else if (uMsg == g_unsubclassRegisteredMessage) {
+        UnsubclassWindow(hWnd);
+        return 0;
+    } else if (!IsAnyTriggerKeyless() &&
+               !IsAnyModifierTriggerHeld(HeldModifiers(GetAsyncKeyState)) &&
+               hWnd != g_contactWnd) {
+        // Needed only while a trigger's keys are held or a contact is being
+        // routed. The hit test preceding the next press puts it back.
+        UnsubclassWindow(hWnd);
+    } else if (IsPointerMessage(uMsg)) {
+        UINT pointerId = GET_POINTERID_WPARAM(wParam);
+        bool tracked = hWnd == g_contactWnd && pointerId == g_contactPointerId;
+
+        if (int button = ButtonOfPointerDownMessage(uMsg, wParam)) {
+            // A new contact, the mouse reuses its pointer id for every one.
+            if (tracked) {
+                g_contactWnd = nullptr;
+            }
+
+            HWND hRootWnd = GetAncestor(hWnd, GA_ROOT);
+            POINT pt{(short)LOWORD(lParam), (short)HIWORD(lParam)};
+            if (hRootWnd && !g_uninitializing &&
+                DragCommandForPress(button, HeldModifiers(GetAsyncKeyState),
+                                    hRootWnd, pt)) {
+                Wh_Log(
+                    L"Message %04X for %08X, routing pointer %u to "
+                    L"DefWindowProc",
+                    uMsg, (DWORD)(ULONG_PTR)hWnd, pointerId);
+                g_contactWnd = hWnd;
+                g_contactPointerId = pointerId;
+                g_contactButton = button;
+                return DefWindowProc(hWnd, uMsg, wParam, lParam);
+            }
+        } else if (tracked &&
+                   IsPointerContactGoneMessage(uMsg, wParam, g_contactButton)) {
+            // The program saw the pointer enter, so it gets to see this.
+            g_contactWnd = nullptr;
+        } else if (tracked) {
+            if (IsPointerContactEndMessage(uMsg)) {
+                g_contactWnd = nullptr;
+            }
+
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
+        }
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+void UnsubclassWindow(HWND hWnd) {
+    RemoveWindowSubclass(hWnd, SubclassProc, 0);
+
+    if (hWnd == g_lastSubclassedWnd) {
+        g_lastSubclassedWnd = nullptr;
+    }
+
+    std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+    g_subclassedWindows.erase(hWnd);
+}
+
+void SubclassWindowIfNeeded(HWND hWnd) {
+    if (hWnd == g_lastSubclassedWnd) {
+        return;
+    }
+
+    HWND hRootWnd = GetAncestor(hWnd, GA_ROOT);
+    if (!hRootWnd ||
+        (!CanMoveRootWindow(hRootWnd) && !CanSizeRootWindow(hRootWnd))) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+    if (g_uninitializing) {
+        return;
+    }
+
+    if (!g_subclassedWindows.contains(hWnd)) {
+        if (!SetWindowSubclass(hWnd, SubclassProc, 0, 0)) {
+            Wh_Log(L"SetWindowSubclass error for %08X", (DWORD)(ULONG_PTR)hWnd);
+            return;
+        }
+
+        g_subclassedWindows.insert(hWnd);
+    }
+
+    g_lastSubclassedWnd = hWnd;
+}
+
+LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    auto hookScope = HookRefCountScope();
+
+    if (nCode == HC_ACTION && lParam) {
+        const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+        if (cwp->message == WM_NCCREATE) {
+            // The mark is looked up on root windows, so a child window goes
+            // without.
+            const CREATESTRUCT* cs = (const CREATESTRUCT*)cwp->lParam;
+            if (!(cs->style & WS_CHILD) && g_getMessageHook) {
+                MarkHookedWindow(cwp->hwnd);
+            }
+        } else if (cwp->message == WM_NCHITTEST &&
+                   (IsAnyTriggerKeyless() ||
+                    IsAnyModifierTriggerHeld(
+                        HeldModifiers(GetAsyncKeyState)))) {
+            // The thread's synchronized key state is stale if the window
+            // isn't active yet, e.g. a click on a background window.
+            SubclassWindowIfNeeded(cwp->hwnd);
+        } else if (cwp->message == WM_ACTIVATEAPP && IsAnyTriggerKeyless()) {
+            // Told by the message rather than by the foreground window, which
+            // the two processes see change at their own times.
+            if (cwp->wParam) {
+                InstallLowLevelMouseHookIfNeeded();
+            } else {
+                RemoveLowLevelMouseHookIfIdle();
+            }
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+// Where the window is held relative to its origin. A maximized window is
+// restored first, like a title bar drag does, keeping the grab proportional to
+// the size it restores to. The restore is queued rather than performed: this
+// runs while the input thread waits, and the window's thread may be busy. The
+// move which follows queues up behind it.
+POINT CalcDragGrab(HWND hRootWnd, POINT ptDown) {
+    RECT rc;
+    GetWindowRect(hRootWnd, &rc);
+
+    WINDOWPLACEMENT placement{.length = sizeof(placement)};
+    if (!GetWindowPlacement(hRootWnd, &placement) ||
+        placement.showCmd != SW_SHOWMAXIMIZED) {
+        return POINT{ptDown.x - rc.left, ptDown.y - rc.top};
+    }
+
+    const RECT& normal = placement.rcNormalPosition;
+    POINT grab{
+        MulDiv(ptDown.x - rc.left, normal.right - normal.left,
+               rc.right - rc.left),
+        MulDiv(ptDown.y - rc.top, normal.bottom - normal.top,
+               rc.bottom - rc.top),
+    };
+
+    // For a window of this thread the move is applied at once, so the restore
+    // has to be as well.
+    if (GetWindowThreadProcessId(hRootWnd, nullptr) == GetCurrentThreadId()) {
+        ShowWindow(hRootWnd, SW_RESTORE);
+    } else {
+        ShowWindowAsync(hRootWnd, SW_RESTORE);
+    }
+
+    return grab;
+}
+
+// SWP_ASYNCWINDOWPOS posts the request when the window belongs to another
+// thread, which keeps a busy owner from blocking the caller.
+void MoveDraggedWindow(HWND hRootWnd, POINT grab, POINT pt) {
+    SetWindowPos(
+        hRootWnd, nullptr, pt.x - grab.x, pt.y - grab.y, 0, 0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+}
+
+// The edges the command takes hold of follow the pointer from where the drag
+// started, the others stay put. SetWindowPos doesn't ask the window for its
+// minimum size, so the system's minimum is kept instead.
+void SizeDraggedWindow(HWND hRootWnd,
+                       UINT command,
+                       const RECT& rcStart,
+                       POINT ptStart,
+                       POINT pt) {
+    UINT edge = command & 0xF;
+    LONG dx = pt.x - ptStart.x;
+    LONG dy = pt.y - ptStart.y;
+    LONG minWidth = GetSystemMetrics(SM_CXMINTRACK);
+    LONG minHeight = GetSystemMetrics(SM_CYMINTRACK);
+
+    RECT rc = rcStart;
+    switch (edge) {
+        case WMSZ_LEFT:
+        case WMSZ_TOPLEFT:
+        case WMSZ_BOTTOMLEFT:
+            rc.left = std::min(rcStart.left + dx, rc.right - minWidth);
+            break;
+        case WMSZ_RIGHT:
+        case WMSZ_TOPRIGHT:
+        case WMSZ_BOTTOMRIGHT:
+            rc.right = std::max(rcStart.right + dx, rc.left + minWidth);
+            break;
+    }
+
+    switch (edge) {
+        case WMSZ_TOP:
+        case WMSZ_TOPLEFT:
+        case WMSZ_TOPRIGHT:
+            rc.top = std::min(rcStart.top + dy, rc.bottom - minHeight);
+            break;
+        case WMSZ_BOTTOM:
+        case WMSZ_BOTTOMLEFT:
+        case WMSZ_BOTTOMRIGHT:
+            rc.bottom = std::max(rcStart.bottom + dy, rc.top + minHeight);
+            break;
+    }
+
+    SetWindowPos(hRootWnd, nullptr, rc.left, rc.top, rc.right - rc.left,
+                 rc.bottom - rc.top,
+                 SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+}
+
+void DragWindowTo(POINT pt) {
+    if (IsSizeCommand(g_llCommand)) {
+        SizeDraggedWindow(g_llRootWnd, g_llCommand, g_llDragStartRect,
+                          g_llDragStartPt, pt);
+    } else {
+        MoveDraggedWindow(g_llRootWnd, g_llDragGrab, pt);
+    }
+}
+
+// The class supplies the cursor, and with DefWindowProc as the window procedure
+// no mod code is on the window's call path.
+HWND CreateDragOverlay(POINT pt, PCWSTR cursor) {
+    WNDCLASS wc{
+        .lpfnWndProc = DefWindowProc,
+        .hInstance = GetModuleHandle(nullptr),
+        .hCursor = LoadCursor(nullptr, cursor),
+        .lpszClassName = kDragOverlayClassName,
+    };
+    if (!RegisterClass(&wc) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+        Wh_Log(L"RegisterClass error: %u", GetLastError());
+        return nullptr;
+    }
+
+    HWND hWnd = CreateWindowEx(
+        WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_LAYERED,
+        kDragOverlayClassName, nullptr, WS_POPUP, pt.x - kDragOverlaySize / 2,
+        pt.y - kDragOverlaySize / 2, kDragOverlaySize, kDragOverlaySize,
+        nullptr, nullptr, wc.hInstance, nullptr);
+    if (!hWnd) {
+        Wh_Log(L"CreateWindowEx error: %u", GetLastError());
+        return nullptr;
+    }
+
+    // The class is registered once and kept, with the cursor of that time.
+    SetClassLongPtr(hWnd, GCLP_HCURSOR, (LONG_PTR)wc.hCursor);
+
+    // As good as invisible, while an alpha of zero would let the mouse through.
+    SetLayeredWindowAttributes(hWnd, 0, 1, LWA_ALPHA);
+    ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+    return hWnd;
+}
+
+void PlaceDragOverlay(POINT pt) {
+    if (g_llDragOverlayWnd) {
+        SetWindowPos(g_llDragOverlayWnd, nullptr, pt.x - kDragOverlaySize / 2,
+                     pt.y - kDragOverlaySize / 2, 0, 0,
+                     SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+}
+
+// Through DefWindowProc, so on the window's own thread wherever this runs.
+void DestroyDragOverlay() {
+    if (HWND hOverlayWnd = g_llDragOverlayWnd) {
+        g_llDragOverlayWnd = nullptr;
+        PostMessage(hOverlayWnd, WM_CLOSE, 0, 0);
+    }
+}
+
+void KillLowLevelDelayTimer() {
+    if (g_llDelayTimerId) {
+        KillTimer(nullptr, g_llDelayTimerId);
+        g_llDelayTimerId = 0;
+    }
+}
+
+void ResetLowLevelDragState() {
+    g_llRootWnd = nullptr;
+    g_llButton = 0;
+    g_llDragging = false;
+    g_llDragSetUp = false;
+    g_llDragUpdatePosted = false;
+    KillLowLevelDelayTimer();
+    DestroyDragOverlay();
+}
+
+// Display settings are never scaled, so they give the physical side.
+BOOL CALLBACK FindMonitorEnumProc(HMONITOR hMonitor,
+                                  HDC hdc,
+                                  LPRECT lprcMonitor,
+                                  LPARAM lParam) {
+    MONITORINFOEX monitorInfo;
+    monitorInfo.cbSize = sizeof(monitorInfo);
+    DEVMODE mode{};
+    mode.dmSize = sizeof(mode);
+    if (!GetMonitorInfo(hMonitor, &monitorInfo) ||
+        !EnumDisplaySettings(monitorInfo.szDevice, ENUM_CURRENT_SETTINGS,
+                             &mode)) {
+        return TRUE;
+    }
+
+    RECT physicalRect{mode.dmPosition.x, mode.dmPosition.y,
+                      mode.dmPosition.x + (LONG)mode.dmPelsWidth,
+                      mode.dmPosition.y + (LONG)mode.dmPelsHeight};
+    if (!PtInRect(&physicalRect, *(const POINT*)lParam)) {
+        return TRUE;
+    }
+
+    g_llMonitor.physicalRect = physicalRect;
+    g_llMonitor.logicalRect = monitorInfo.rcMonitor;
+    return FALSE;
+}
+
+bool FindMonitorForPhysicalPoint(POINT physicalPt) {
+    g_llMonitor = {};
+    EnumDisplayMonitors(nullptr, nullptr, FindMonitorEnumProc,
+                        (LPARAM)&physicalPt);
+    return !IsRectEmpty(&g_llMonitor.physicalRect);
+}
+
+// The hook reports physical coordinates, while this thread looks windows up
+// and places them in its own.
+POINT ToLogicalPoint(POINT physicalPt) {
+    if (!PtInRect(&g_llMonitor.physicalRect, physicalPt) &&
+        !FindMonitorForPhysicalPoint(physicalPt)) {
+        return physicalPt;
+    }
+
+    const RECT& physical = g_llMonitor.physicalRect;
+    const RECT& logical = g_llMonitor.logicalRect;
+    return POINT{
+        logical.left + MulDiv(physicalPt.x - physical.left,
+                              logical.right - logical.left,
+                              physical.right - physical.left),
+        logical.top + MulDiv(physicalPt.y - physical.top,
+                             logical.bottom - logical.top,
+                             physical.bottom - physical.top),
+    };
+}
+
+// Simulates the press of the button at the cursor, and its release too for a
+// click. Runs from a message loop, never from the low level mouse hook's
+// callback: input sent from within a low level hook callback isn't processed
+// until the hook's timeout has run out, and the callbacks arriving in the
+// meantime see state the callback hasn't updated yet. Since this press does
+// enter the input queue, the Alt release needs no swallowing on its account.
+void ReplayPress(int button, bool asClick) {
+    DWORD downFlag;
+    DWORD upFlag;
+    DWORD mouseData = 0;
+    switch (button) {
+        case VK_RBUTTON:
+            downFlag = MOUSEEVENTF_RIGHTDOWN;
+            upFlag = MOUSEEVENTF_RIGHTUP;
+            break;
+        case VK_MBUTTON:
+            downFlag = MOUSEEVENTF_MIDDLEDOWN;
+            upFlag = MOUSEEVENTF_MIDDLEUP;
+            break;
+        case VK_XBUTTON1:
+        case VK_XBUTTON2:
+            downFlag = MOUSEEVENTF_XDOWN;
+            upFlag = MOUSEEVENTF_XUP;
+            mouseData = button == VK_XBUTTON1 ? XBUTTON1 : XBUTTON2;
+            break;
+        default:
+            downFlag = MOUSEEVENTF_LEFTDOWN;
+            upFlag = MOUSEEVENTF_LEFTUP;
+            break;
+    }
+
+    INPUT inputs[2]{};
+    inputs[0].type = INPUT_MOUSE;
+    inputs[0].mi.dwFlags = downFlag;
+    inputs[0].mi.mouseData = mouseData;
+    inputs[0].mi.dwExtraInfo = kOwnInputExtraInfo;
+    inputs[1].type = INPUT_MOUSE;
+    inputs[1].mi.dwFlags = upFlag;
+    inputs[1].mi.mouseData = mouseData;
+    inputs[1].mi.dwExtraInfo = kOwnInputExtraInfo;
+    UINT count = asClick ? 2 : 1;
+    if (SendInput(count, inputs, sizeof(inputs[0])) == count) {
+        g_swallowedPress = false;
+    } else {
+        Wh_Log(L"SendInput error: %u", GetLastError());
+    }
+}
+
+// Hands a replay over to the message loop of this thread, where it's retrieved
+// ahead of the input which follows, including an Alt release.
+void PostReplayPress(int button, bool asClick) {
+    HWND hFocusWnd = GetFocus();
+    if (!hFocusWnd ||
+        !PostMessage(hFocusWnd, g_replayPressMessage, button, asClick)) {
+        PostThreadMessage(GetCurrentThreadId(), g_replayPressMessage, button,
+                          asClick);
+    }
+}
+
+// The press of a trigger's button over composition hosted content. Returns
+// whether it was swallowed.
+bool OnLowLevelButtonDown(const MSLLHOOKSTRUCT* ms, int button) {
+    // Looked up afresh in case the display layout changed.
+    g_llMonitor = {};
+    POINT pt = ToLogicalPoint(ms->pt);
+
+    HWND hWnd = CompositionHostedWindowFromPoint(pt);
+    if (!hWnd) {
+        // Delivered as a message, so the paths above handle it and keep the
+        // system loop.
+        return false;
+    }
+
+    HWND hRootWnd = GetAncestor(hWnd, GA_ROOT);
+    if (!hRootWnd) {
+        return false;
+    }
+
+    UINT command = DragCommandForPress(button, HeldModifiers(GetAsyncKeyState),
+                                       hRootWnd, pt);
+    if (!command) {
+        return false;
+    }
+
+    Wh_Log(L"Swallowed the press of button %02X over %08X, root window %08X",
+           button, (DWORD)(ULONG_PTR)hWnd, (DWORD)(ULONG_PTR)hRootWnd);
+
+    g_llRootWnd = hRootWnd;
+    g_llCommand = command;
+    g_llButton = button;
+    g_llDownPt = pt;
+    g_llDownTime = ms->time;
+    if (GetAsyncKeyState(VK_MENU) < 0) {
+        g_swallowedPress = true;
+    }
+
+    // A timer may be left from a candidate reset on another thread.
+    KillLowLevelDelayTimer();
+    if (int delay = TriggerOfCommand(command).delay; delay > 0) {
+        g_llDelayTimerId = SetTimer(nullptr, 0, delay, nullptr);
+        if (!g_llDelayTimerId) {
+            Wh_Log(L"SetTimer error: %u", GetLastError());
+        }
+    }
+
+    return true;
+}
+
+// Puts the overlay up for a press which is still a candidate, if this is
+// still the hook's thread: the timer is this thread's, the press the hook's.
+// The press being held is what the state means, its release clearing it; the
+// key state can't tell, a swallowed press never reaching it.
+void OnLowLevelDragDelayElapsed() {
+    KillLowLevelDelayTimer();
+
+    {
+        std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+        if (GetCurrentThreadId() != g_lowLevelMouseHookThreadId) {
+            return;
+        }
+    }
+
+    POINT pt;
+    if (!g_llRootWnd || g_llDragging || !GetCursorPos(&pt)) {
+        return;
+    }
+
+    Wh_Log(L"Drag delay elapsed, showing the %s cursor",
+           NameOfCommand(g_llCommand));
+    g_llDragOverlayWnd = CreateDragOverlay(pt, CursorOfCommand(g_llCommand));
+}
+
+// The first move past the drag threshold, once the drag delay is over. Only
+// what a low level hook callback can afford is done here, the rest waiting for
+// the update this leaves to be posted.
+void BeginLowLevelDrag(POINT pt) {
+    Wh_Log(L"Starting a %s of root window %08X", NameOfCommand(g_llCommand),
+           (DWORD)(ULONG_PTR)g_llRootWnd);
+
+    g_llDragging = true;
+    g_llDragStartPt = pt;
+    KillLowLevelDelayTimer();
+}
+
+// The work a drag starts with, none of which belongs in the callback: the
+// restore of a maximized window runs the program's layout, and it runs inline
+// when the window is of the hook's own thread, which the foreground process's
+// window commonly is.
+void SetUpLowLevelDrag() {
+    if (IsSizeCommand(g_llCommand)) {
+        GetWindowRect(g_llRootWnd, &g_llDragStartRect);
+    } else {
+        g_llDragGrab = CalcDragGrab(g_llRootWnd, g_llDragStartPt);
+    }
+
+    // The press was swallowed, so the window wasn't brought to the front the
+    // way a click on it would have been. Allowed because the process holding
+    // the hook is the foreground one.
+    DWORD processId = 0;
+    GetWindowThreadProcessId(g_llRootWnd, &processId);
+    if (!SetForegroundWindow(g_llRootWnd)) {
+        Wh_Log(L"SetForegroundWindow error: %u", GetLastError());
+    } else if (processId != GetCurrentProcessId()) {
+        // The Alt release goes there now, and a later one here isn't to be
+        // taken for it.
+        g_swallowedPress = false;
+    }
+
+    MaskWinKeyReleaseIfNeeded(g_llCommand);
+
+    if (!g_llDragOverlayWnd) {
+        g_llDragOverlayWnd =
+            CreateDragOverlay(g_llDragStartPt, CursorOfCommand(g_llCommand));
+    }
+}
+
+// Runs on the hook's thread once the update posted for it is retrieved. The
+// press may be over by then, its release having reset the state.
+void OnDragUpdate() {
+    g_llDragUpdatePosted = false;
+
+    if (!g_llRootWnd) {
+        return;
+    }
+
+    if (g_llDragging && !g_llDragSetUp) {
+        g_llDragSetUp = true;
+        SetUpLowLevelDrag();
+    }
+
+    PlaceDragOverlay(g_llDragPt);
+
+    if (g_llDragging) {
+        DragWindowTo(g_llDragPt);
+    }
+}
+
+// The callback records where the pointer is and leaves the windows to the
+// message loop: a low level hook which takes too long to return is dropped by
+// the system, and moving or resizing a window of the hook's own thread runs
+// the program's handlers inline. One update is queued at a time, and it acts
+// on whatever position the last move left.
+void PostDragUpdate(POINT pt) {
+    g_llDragPt = pt;
+    if (g_llDragUpdatePosted) {
+        return;
+    }
+
+    // GetFocus is of this thread, so the update is retrieved here, where the
+    // drag state belongs.
+    HWND hFocusWnd = GetFocus();
+    if (hFocusWnd && PostMessage(hFocusWnd, g_dragUpdateMessage, 0, 0)) {
+        g_llDragUpdatePosted = true;
+    } else if (PostThreadMessage(GetCurrentThreadId(), g_dragUpdateMessage, 0,
+                                 0)) {
+        g_llDragUpdatePosted = true;
+    }
+}
+
+// Runs for mouse input before it's routed anywhere, which is the only point at
+// which a press can be taken away from composition hosted content. Moves are
+// never swallowed: that would stop the cursor.
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    auto hookScope = HookRefCountScope();
+
+    if (nCode != HC_ACTION || g_uninitializing) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    const MSLLHOOKSTRUCT* ms = (const MSLLHOOKSTRUCT*)lParam;
+
+    if (ms->dwExtraInfo == kOwnInputExtraInfo) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    // Focus can move away while the keys are held, e.g. Alt+Tab, and their
+    // release then goes to another process. Drop the hook here instead of
+    // keeping it for the rest of the process's life.
+    RemoveLowLevelMouseHookIfIdle();
+
+    bool down;
+    int button = ButtonOfMessage((UINT)wParam, HIWORD(ms->mouseData), &down);
+    if (button && down) {
+        // A press of the drag's button again means its release was missed.
+        if (button == g_llButton) {
+            ResetLowLevelDragState();
+        }
+
+        if (!g_llRootWnd && OnLowLevelButtonDown(ms, button)) {
+            return 1;
+        }
+    } else if (button && button == g_llButton) {
+        // The reset goes first: it closes the overlay, if the delay put one
+        // up, with a message queued ahead of the replay, which would
+        // otherwise land on it.
+        bool dragging = g_llDragging;
+        ResetLowLevelDragState();
+        if (!dragging) {
+            PostReplayPress(button, true);
+        }
+
+        return 1;
+    } else if (wParam == WM_MOUSEMOVE && g_llRootWnd) {
+        POINT pt = ToLogicalPoint(ms->pt);
+
+        DWORD delay = TriggerOfCommand(g_llCommand).delay;
+
+        if (g_llDragging || !IsPastDragThreshold(g_llDownPt, pt)) {
+            PostDragUpdate(pt);
+        } else if (ms->time - g_llDownTime >= delay) {
+            BeginLowLevelDrag(pt);
+            PostDragUpdate(pt);
+        } else {
+            // The drag is the program's own, so the press goes back to it,
+            // where the cursor is by now. The release then follows on its
+            // own.
+            Wh_Log(L"Moved before the drag delay elapsed, replaying the press");
+            int pressButton = g_llButton;
+            ResetLowLevelDragState();
+            PostReplayPress(pressButton, false);
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+// A hook left over from before is discarded. The release ending a drag may
+// never arrive: a hook further along the chain can swallow it, and the system
+// drops a hook which took too long to return. What is left then keeps the
+// hook, or a dead handle, in place for good. The drag state it leaves behind
+// is cleared by the next installation, on the thread which then owns it.
+void RemoveLowLevelMouseHook() {
+    std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+
+    if (g_lowLevelMouseHook) {
+        UnhookWindowsHookEx(g_lowLevelMouseHook);
+        g_lowLevelMouseHook = nullptr;
+    }
+}
+
+void InstallLowLevelMouseHookIfNeeded() {
+    // 分组总开关关闭：不安装低级鼠标钩子，避免给全局鼠标输入添加无谓的
+    // 中转层；已安装的钩子会在触发条件解除后按原逻辑移除。
+    if (!g_settings.enable) {
+        return;
+    }
+
+    // Outside the lock, the loader being out of bounds while it's held.
+    HMODULE module = GetModuleHandle(nullptr);
+
+    std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+    if (g_lowLevelMouseHook || g_uninitializing) {
+        return;
+    }
+
+    // With no hook there's no thread the drag state belongs to, so whatever a
+    // discarded hook left behind is cleared here, before the callbacks of the
+    // new one start reading it on this thread.
+    ResetLowLevelDragState();
+
+    g_lowLevelMouseHook =
+        SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, module, 0);
+    if (g_lowLevelMouseHook) {
+        g_lowLevelMouseHookThreadId = GetCurrentThreadId();
+    } else {
+        Wh_Log(L"SetWindowsHookEx(WH_MOUSE_LL) error: %u", GetLastError());
+    }
+}
+
+void RemoveLowLevelMouseHookIfIdle() {
+    std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+
+    // Only the hook's thread can tell whether a press is being held or a drag
+    // is in progress, which keep the hook, as do the keys and, for a keyless
+    // trigger, this process being the foreground one. A key release or a
+    // deactivation retrieved elsewhere leaves the removal to the callback,
+    // which checks on the next mouse event.
+    if (!g_lowLevelMouseHook ||
+        GetCurrentThreadId() != g_lowLevelMouseHookThreadId || g_llRootWnd ||
+        IsAnyModifierTriggerHeld(HeldModifiers(GetAsyncKeyState)) ||
+        ShouldHoldKeylessHook()) {
+        return;
+    }
+
+    UnhookWindowsHookEx(g_lowLevelMouseHook);
+    g_lowLevelMouseHook = nullptr;
+}
+
+void RemoveWinKeyMaskHook() {
+    std::lock_guard<std::mutex> guard(g_winKeyMaskHookMutex);
+
+    if (g_winKeyMaskHook) {
+        UnhookWindowsHookEx(g_winKeyMaskHook);
+        g_winKeyMaskHook = nullptr;
+    }
+}
+
+// Sends the release again behind a tap of the mask key. Returns whether the
+// original is to be swallowed, which it is only with the whole sequence sent:
+// short of the release the key would stay down, e.g. with SendInput refused
+// while an elevated window is in the foreground.
+bool ResendWinKeyReleaseMasked(const KBDLLHOOKSTRUCT* kbd) {
+    INPUT inputs[3]{};
+    inputs[0].type = INPUT_KEYBOARD;
+    inputs[0].ki.wVk = kMenuMaskKey;
+    inputs[1].type = INPUT_KEYBOARD;
+    inputs[1].ki.wVk = kMenuMaskKey;
+    inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+    // The Win keys are extended keys, and a release without the flag may not
+    // register, leaving the key down.
+    inputs[2].type = INPUT_KEYBOARD;
+    inputs[2].ki.wVk = (WORD)kbd->vkCode;
+    inputs[2].ki.wScan = (WORD)kbd->scanCode;
+    inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
+    if (kbd->flags & LLKHF_EXTENDED) {
+        inputs[2].ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+    }
+
+    if (SendInput(ARRAYSIZE(inputs), inputs, sizeof(inputs[0])) !=
+        ARRAYSIZE(inputs)) {
+        Wh_Log(L"SendInput error: %u", GetLastError());
+        return false;
+    }
+
+    return true;
+}
+
+// Keyboard input sent from within the callback is processed on the spot, the
+// hook included, which is where the injected flag matters.
+LRESULT CALLBACK WinKeyMaskProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    auto hookScope = HookRefCountScope();
+
+    if (nCode != HC_ACTION || g_uninitializing) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    const KBDLLHOOKSTRUCT* kbd = (const KBDLLHOOKSTRUCT*)lParam;
+    if ((kbd->vkCode != VK_LWIN && kbd->vkCode != VK_RWIN) ||
+        (kbd->flags & LLKHF_INJECTED)) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
+        Wh_Log(L"Masking the Win release of a drag");
+        bool swallow = ResendWinKeyReleaseMasked(kbd);
+        RemoveWinKeyMaskHook();
+        if (swallow) {
+            return 1;
+        }
+    } else if (GetAsyncKeyState(kbd->vkCode) >= 0) {
+        // The key state is updated once the hook lets the event through, so
+        // the key shows up for an auto repeat and not for a new hold, which
+        // means the release the hook was installed for went by unseen.
+        RemoveWinKeyMaskHook();
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+// The Start menu is armed by every auto repeat of the held key, so the mask
+// has to go right before the release, and the hook is installed on the drag
+// thread to see it. One left over from an earlier drag is replaced.
+void InstallWinKeyMaskHook() {
+    // Outside the lock, the loader being out of bounds while it's held.
+    HMODULE module = GetModuleHandle(nullptr);
+
+    std::lock_guard<std::mutex> guard(g_winKeyMaskHookMutex);
+    if (g_uninitializing) {
+        return;
+    }
+
+    if (g_winKeyMaskHook) {
+        UnhookWindowsHookEx(g_winKeyMaskHook);
+    }
+
+    g_winKeyMaskHook =
+        SetWindowsHookEx(WH_KEYBOARD_LL, WinKeyMaskProc, module, 0);
+    if (g_winKeyMaskHook) {
+        g_winKeyMaskHookThreadId = GetCurrentThreadId();
+    } else {
+        Wh_Log(L"SetWindowsHookEx(WH_KEYBOARD_LL) error: %u", GetLastError());
+    }
+}
+
+// For a drag started with a trigger which has Win among its keys.
+void MaskWinKeyReleaseIfNeeded(UINT command) {
+    const TriggerSettings& trigger = TriggerOfCommand(command);
+    if ((trigger.modifiers & kModifierWin) &&
+        (HeldModifiers(GetAsyncKeyState) & kModifierWin)) {
+        InstallWinKeyMaskHook();
+    }
+}
+
+void SetThreadHooksIfNeeded() {
+    // 分组总开关关闭：不在新线程上安装钩子（g_threadHooksAttempted 不置位，
+    // 重新开启后下一条消息 retrieval 会自动补装）。
+    if (g_threadHooksAttempted || !g_settings.enable) {
+        return;
+    }
+
+    g_threadHooksAttempted = true;
+
+    std::unique_lock<std::mutex> guard(g_allThreadHooksMutex);
+    if (g_uninitializing) {
+        return;
+    }
+
+    DWORD dwThreadId = GetCurrentThreadId();
+
+    g_getMessageHook =
+        SetWindowsHookEx(WH_GETMESSAGE, GetMsgProc, nullptr, dwThreadId);
+    if (g_getMessageHook) {
+        g_allThreadHooks.insert(g_getMessageHook);
+    } else {
+        Wh_Log(L"SetWindowsHookEx(WH_GETMESSAGE) error for thread %u: %u",
+               dwThreadId, GetLastError());
+    }
+
+    g_callWndProcHook =
+        SetWindowsHookEx(WH_CALLWNDPROC, CallWndProc, nullptr, dwThreadId);
+    if (g_callWndProcHook) {
+        g_allThreadHooks.insert(g_callWndProcHook);
+    } else {
+        Wh_Log(L"SetWindowsHookEx(WH_CALLWNDPROC) error for thread %u: %u",
+               dwThreadId, GetLastError());
+    }
+
+    if (g_getMessageHook && g_callWndProcHook) {
+        Wh_Log(L"SetWindowsHookEx succeeded for thread %u", dwThreadId);
+    }
+
+    if (g_getMessageHook) {
+        // The windows the thread has by now, later ones are marked as created.
+        EnumThreadWindows(dwThreadId, MarkHookedWindowEnumProc, 0);
+    }
+
+    guard.unlock();
+
+    // A process which is the foreground one already sees no activation to put
+    // the hook of a keyless trigger up on.
+    if (ShouldHoldKeylessHook()) {
+        InstallLowLevelMouseHookIfNeeded();
+    }
+}
+
+using NtUserGetMessage_t = BOOL(WINAPI*)(MSG* pMsg,
+                                         HWND hWnd,
+                                         UINT wMsgFilterMin,
+                                         UINT wMsgFilterMax);
+NtUserGetMessage_t NtUserGetMessage_Original;
+BOOL WINAPI NtUserGetMessage_Hook(MSG* pMsg,
+                                  HWND hWnd,
+                                  UINT wMsgFilterMin,
+                                  UINT wMsgFilterMax) {
+    SetThreadHooksIfNeeded();
+
+    [[clang::musttail]] return NtUserGetMessage_Original(
+        pMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+}
+
+// The last parameter is a flags value which user32 sets from the calling
+// PeekMessage variant.
+using NtUserPeekMessage_t = BOOL(WINAPI*)(MSG* pMsg,
+                                          HWND hWnd,
+                                          UINT wMsgFilterMin,
+                                          UINT wMsgFilterMax,
+                                          UINT wRemoveMsg,
+                                          UINT flags);
+NtUserPeekMessage_t NtUserPeekMessage_Original;
+BOOL WINAPI NtUserPeekMessage_Hook(MSG* pMsg,
+                                   HWND hWnd,
+                                   UINT wMsgFilterMin,
+                                   UINT wMsgFilterMax,
+                                   UINT wRemoveMsg,
+                                   UINT flags) {
+    SetThreadHooksIfNeeded();
+
+    [[clang::musttail]] return NtUserPeekMessage_Original(
+        pMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg, flags);
+}
+
+// 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽到这里，由本模组唯一的
+// DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+void OnThreadDetach() {
+    if (g_getMessageHook || g_callWndProcHook) {
+        std::lock_guard<std::mutex> guard(g_allThreadHooksMutex);
+
+        for (HHOOK hook : {g_getMessageHook, g_callWndProcHook}) {
+            auto it = g_allThreadHooks.find(hook);
+            if (it != g_allThreadHooks.end()) {
+                UnhookWindowsHookEx(hook);
+                g_allThreadHooks.erase(it);
+            }
+        }
+    }
+
+    // The low level hooks and the overlay go away with their
+    // thread. The drag state is this thread's to clear, the hook
+    // being this thread's.
+    {
+        std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+
+        if (g_lowLevelMouseHook &&
+            GetCurrentThreadId() == g_lowLevelMouseHookThreadId) {
+            g_lowLevelMouseHook = nullptr;
+            g_llRootWnd = nullptr;
+            g_llButton = 0;
+            g_llDragging = false;
+            g_llDragSetUp = false;
+            g_llDragUpdatePosted = false;
+            g_llDragOverlayWnd = nullptr;
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(g_winKeyMaskHookMutex);
+
+        if (g_winKeyMaskHook &&
+            GetCurrentThreadId() == g_winKeyMaskHookThreadId) {
+            g_winKeyMaskHook = nullptr;
+        }
+    }
+}
+
+int ButtonFromSetting(PCWSTR value) {
+    if (_wcsicmp(value, L"right") == 0) {
+        return VK_RBUTTON;
+    }
+    if (_wcsicmp(value, L"middle") == 0) {
+        return VK_MBUTTON;
+    }
+    if (_wcsicmp(value, L"x1") == 0) {
+        return VK_XBUTTON1;
+    }
+    if (_wcsicmp(value, L"x2") == 0) {
+        return VK_XBUTTON2;
+    }
+    return VK_LBUTTON;
+}
+
+void LoadTriggerSettings(TriggerSettings& trigger, PCWSTR name) {
+    PCWSTR button = Wh_GetStringSetting(L"%ls.button", name);
+    trigger.button = ButtonFromSetting(button);
+    Wh_FreeStringSetting(button);
+
+    DWORD modifiers = 0;
+    if (Wh_GetIntSetting(L"%ls.ctrl", name)) {
+        modifiers |= kModifierCtrl;
+    }
+    if (Wh_GetIntSetting(L"%ls.alt", name)) {
+        modifiers |= kModifierAlt;
+    }
+    if (Wh_GetIntSetting(L"%ls.shift", name)) {
+        modifiers |= kModifierShift;
+    }
+    if (Wh_GetIntSetting(L"%ls.win", name)) {
+        modifiers |= kModifierWin;
+    }
+    trigger.modifiers = modifiers;
+
+    trigger.delay = std::max(Wh_GetIntSetting(L"%ls.delay", name), 0);
+}
+
+void LoadSettings() {
+    g_settings.enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.altDrag.enable") != 0;
+    LoadTriggerSettings(g_settings.moveTrigger, L"winOpt.altDrag.moveTrigger");
+    LoadTriggerSettings(g_settings.sizeTrigger, L"winOpt.altDrag.sizeTrigger");
+    g_settings.dragWindowsWithoutTitleBar =
+        Wh_GetIntSetting(L"winOpt.altDrag.dragWindowsWithoutTitleBar");
+}
+
+BOOL Init() {
+    Wh_Log(L">");
+
+    LoadSettings();
+
+    HMODULE win32uModule = GetModuleHandle(L"win32u.dll");
+    if (!win32uModule) {
+        Wh_Log(L"win32u.dll isn't loaded");
+        return FALSE;
+    }
+
+    void* pNtUserGetMessage =
+        (void*)GetProcAddress(win32uModule, "NtUserGetMessage");
+    void* pNtUserPeekMessage =
+        (void*)GetProcAddress(win32uModule, "NtUserPeekMessage");
+    if (!pNtUserGetMessage || !pNtUserPeekMessage) {
+        Wh_Log(L"NtUserGetMessage or NtUserPeekMessage not found");
+        return FALSE;
+    }
+
+    Wh_SetFunctionHook(pNtUserGetMessage, (void*)NtUserGetMessage_Hook,
+                       (void**)&NtUserGetMessage_Original);
+    Wh_SetFunctionHook(pNtUserPeekMessage, (void*)NtUserPeekMessage_Hook,
+                       (void**)&NtUserPeekMessage_Original);
+
+    // Lets a lower integrity process, e.g. a UWP app, request a drag of a root
+    // window in this process.
+    ChangeWindowMessageFilter(g_sizeMoveRequestMessage, MSGFLT_ADD);
+
+    return TRUE;
+}
+
+void Uninit() {
+    Wh_Log(L">");
+
+    g_uninitializing = true;
+
+    std::unordered_set<HWND> subclassedWindows;
+    {
+        std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+        subclassedWindows = std::move(g_subclassedWindows);
+        g_subclassedWindows.clear();
+    }
+
+    for (HWND hWnd : subclassedWindows) {
+        SendMessage(hWnd, g_unsubclassRegisteredMessage, 0, 0);
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(g_allThreadHooksMutex);
+
+        for (HHOOK hook : g_allThreadHooks) {
+            UnhookWindowsHookEx(hook);
+        }
+
+        g_allThreadHooks.clear();
+    }
+
+    ChangeWindowMessageFilter(g_sizeMoveRequestMessage, MSGFLT_REMOVE);
+
+    {
+        std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+
+        if (g_lowLevelMouseHook) {
+            UnhookWindowsHookEx(g_lowLevelMouseHook);
+            g_lowLevelMouseHook = nullptr;
+        }
+    }
+
+    RemoveWinKeyMaskHook();
+
+    while (g_hookRefCount > 0) {
+        Sleep(200);
+    }
+
+    // With the hooks gone, no window is marked from here on.
+    EnumWindows(UnmarkHookedWindowsEnumProc, 0);
+
+    // The class may outlive the window, and is then found in place next time.
+    DestroyDragOverlay();
+    UnregisterClass(kDragOverlayClassName, GetModuleHandle(nullptr));
+}
+
+void SettingsChanged() {
+    Wh_Log(L">");
+
+    LoadSettings();
+}
+
+}  // namespace AltDrag
+
+// ============================================================================
+// 窗口排列
+//
+// 来自 CW-窗口滑动排列 1.0.3（上游 Slick Window Arrangement 1.0.2，原作者
+// m417z，GPL-3.0，原版链接
+// https://windhawk.net/mods/slick-window-arrangement），代码逻辑与上游逐字节
+// 一致，仅做三类机械改动以并入本模组：
+//   1. 整体置于 WinArrange 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModUninit→Uninit、Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 winArrange. 前缀（SnapWindowsWhenDragging→
+//      winArrange.SnapWindowsWhenDragging 等），与其他两组设置键隔离；
+//   3. 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽为 OnThreadDetach()，由
+//      本模组唯一的 DllMain 统一调用。
+// 入口由本模组的 Wh_ModInit / Wh_ModUninit / Wh_ModSettingsChanged 统一调用，
+// 初始化失败时仅降级本功能，不影响其余功能。
+// ============================================================================
+namespace WinArrange {
+
+struct {
+    bool enable;  // 分组总开关（winArrange.enable），关闭时本组功能完全不生效
+    bool snapWindowsWhenDragging;
+    int snapWindowsDistance;
+    bool keysToDisableSnappingCtrl;
+    bool keysToDisableSnappingAlt;
+    bool keysToDisableSnappingShift;
+    bool slidingAnimation;
+    bool snapWindowsWhenSliding;
+    int slidingAnimationSlowdown;
+} g_settings;
+
+#ifndef SWP_STATECHANGED
+#define SWP_STATECHANGED 0x8000
+#endif
+
+typedef DPI_AWARENESS_CONTEXT (WINAPI *GetThreadDpiAwarenessContext_t)();
+GetThreadDpiAwarenessContext_t pGetThreadDpiAwarenessContext;
+
+typedef DPI_AWARENESS_CONTEXT (WINAPI *SetThreadDpiAwarenessContext_t)(DPI_AWARENESS_CONTEXT dpiContext);
+SetThreadDpiAwarenessContext_t pSetThreadDpiAwarenessContext;
+
+typedef DPI_AWARENESS (WINAPI *GetAwarenessFromDpiAwarenessContext_t)(DPI_AWARENESS_CONTEXT value);
+GetAwarenessFromDpiAwarenessContext_t pGetAwarenessFromDpiAwarenessContext;
+
+typedef UINT (WINAPI *GetDpiForSystem_t)();
+GetDpiForSystem_t pGetDpiForSystem;
+
+typedef UINT (WINAPI *GetDpiForWindow_t)(HWND hwnd);
+GetDpiForWindow_t pGetDpiForWindow;
+
+typedef BOOL (WINAPI *IsWindowArranged_t)(HWND hwnd);
+IsWindowArranged_t pIsWindowArranged;
+
+typedef HRESULT (WINAPI *GetDpiForMonitor_t)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
+GetDpiForMonitor_t pGetDpiForMonitor;
+
+// https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507
+BOOL IsWindowCloaked(HWND hwnd)
+{
+    BOOL isCloaked = FALSE;
+    return SUCCEEDED(DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED,
+        &isCloaked, sizeof(isCloaked))) && isCloaked;
+}
+
+BOOL GetWindowFrameBounds(HWND hWnd, LPRECT lpRect)
+{
+    if (FAILED(DwmGetWindowAttribute(hWnd, DWMWA_EXTENDED_FRAME_BOUNDS, lpRect, sizeof(*lpRect))) &&
+        !GetWindowRect(hWnd, lpRect)) {
+        return FALSE;
+    }
+
+    if (pGetThreadDpiAwarenessContext && pGetAwarenessFromDpiAwarenessContext &&
+        pGetAwarenessFromDpiAwarenessContext(pGetThreadDpiAwarenessContext()) == DPI_AWARENESS_PER_MONITOR_AWARE) {
+        // No scaling is needed.
+        return TRUE;
+    }
+
+    if (pSetThreadDpiAwarenessContext && pGetDpiForMonitor && pGetDpiForSystem) {
+        auto prevThreadDpiAwarenessContext =
+            pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+        HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+        OffsetRect(lpRect, -monitorInfo.rcMonitor.left, -monitorInfo.rcMonitor.top);
+
+        UINT dpiFromX, dpiFromY;
+        pGetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiFromX, &dpiFromY);
+        UINT dpiFrom = dpiFromX; // dpiFromX and dpiFromY are equal
+
+        pSetThreadDpiAwarenessContext(prevThreadDpiAwarenessContext);
+
+        UINT dpiTo = pGetDpiForSystem();
+
+        lpRect->left = MulDiv(lpRect->left, dpiTo, dpiFrom);
+        lpRect->top = MulDiv(lpRect->top, dpiTo, dpiFrom);
+        lpRect->right = MulDiv(lpRect->right, dpiTo, dpiFrom);
+        lpRect->bottom = MulDiv(lpRect->bottom, dpiTo, dpiFrom);
+
+        GetMonitorInfo(monitor, &monitorInfo);
+        OffsetRect(lpRect, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top);
+    }
+
+    return TRUE;
+}
+
+class WindowMagnet {
+public:
+    WindowMagnet(HWND hTargetWnd) {
+        CalculateMetrics(hTargetWnd);
+
+        InitialWndEnumProcParam enumParam;
+        enumParam.hTargetWnd = hTargetWnd;
+        EnumWindows(InitialWndEnumProc, (LPARAM)&enumParam);
+
+        for (auto it = enumParam.windowRects.rbegin(); it != enumParam.windowRects.rend(); ++it) {
+            const auto& rc = *it;
+
+            RemoveOverlappedTargets(magnetTargetsLeft, rc.left, rc.right, rc.top, rc.bottom);
+            RemoveOverlappedTargets(magnetTargetsTop, rc.top, rc.bottom, rc.left, rc.right);
+            RemoveOverlappedTargets(magnetTargetsRight, rc.left, rc.right, rc.top, rc.bottom);
+            RemoveOverlappedTargets(magnetTargetsBottom, rc.top, rc.bottom, rc.left, rc.right);
+
+            magnetTargetsLeft.emplace(rc.left, rc.top, rc.bottom);
+            magnetTargetsTop.emplace(rc.top, rc.left, rc.right);
+            magnetTargetsRight.emplace(rc.right, rc.top, rc.bottom);
+            magnetTargetsBottom.emplace(rc.bottom, rc.left, rc.right);
+        }
+
+        EnumDisplayMonitors(nullptr, nullptr, InitialMonitorEnumProc, (LPARAM)this);
+    }
+
+    void MagnetMove(HWND hSourceWnd, int* x, int* y, int* cx, int* cy) {
+        if (IsSnappingTemporarilyDisabled()) {
+            return;
+        }
+
+        CalculateMetrics(hSourceWnd);
+
+        RECT sourceRect = {
+            *x + windowBorderRect.left,
+            *y + windowBorderRect.top,
+            *x + *cx - windowBorderRect.right,
+            *y + *cy - windowBorderRect.bottom
+        };
+
+        int newX = *x;
+        int newY = *y;
+
+        long targetLeft = FindClosestTarget(magnetTargetsLeft,
+            sourceRect.right, sourceRect.top, sourceRect.bottom, magnetPixels);
+        long targetRight = FindClosestTarget(magnetTargetsRight,
+            sourceRect.left, sourceRect.top, sourceRect.bottom, magnetPixels);
+
+        if (targetLeft != LONG_MAX && targetRight != LONG_MAX &&
+            std::abs(targetLeft - sourceRect.right) < std::abs(targetRight - sourceRect.left)) {
+            newX = targetLeft - *cx + windowBorderRect.right;
+        }
+        else if (targetRight != LONG_MAX) {
+            newX = targetRight - windowBorderRect.left;
+        }
+        else if (targetLeft != LONG_MAX) {
+            newX = targetLeft - *cx + windowBorderRect.right;
+        }
+
+        long targetTop = FindClosestTarget(magnetTargetsTop,
+            sourceRect.bottom, sourceRect.left, sourceRect.right, magnetPixels);
+        long targetBottom = FindClosestTarget(magnetTargetsBottom,
+            sourceRect.top, sourceRect.left, sourceRect.right, magnetPixels);
+
+        if (targetTop != LONG_MAX && targetBottom != LONG_MAX &&
+            std::abs(targetTop - sourceRect.bottom) < std::abs(targetBottom - sourceRect.top)) {
+            newY = targetTop - *cy + windowBorderRect.bottom;
+        }
+        else if (targetBottom != LONG_MAX) {
+            newY = targetBottom - windowBorderRect.top;
+        }
+        else if (targetTop != LONG_MAX) {
+            newY = targetTop - *cy + windowBorderRect.bottom;
+        }
+
+        if (newX != *x || newY != *y) {
+            // Make sure the title bar is within a work area, otherwise
+            // the window might become undraggable.
+            RECT targetRect = {
+                newX + windowBorderRect.left,
+                newY + windowBorderRect.top,
+                newX + *cx - windowBorderRect.right,
+                newY + windowBorderRect.top + 1
+            };
+
+            if (IsRectInWorkArea(targetRect)) {
+                *x = newX;
+                *y = newY;
+            }
+        }
+    }
+
+private:
+    UINT windowDpi = -1;
+    bool windowMaximized = false;
+    RECT windowBorderRect{};
+
+    int magnetPixels;
+    std::set<std::tuple<long, long, long>> magnetTargetsLeft;
+    std::set<std::tuple<long, long, long>> magnetTargetsTop;
+    std::set<std::tuple<long, long, long>> magnetTargetsRight;
+    std::set<std::tuple<long, long, long>> magnetTargetsBottom;
+
+    void CalculateMetrics(HWND hTargetWnd) {
+        UINT prevWindowDpi = windowDpi;
+        windowDpi = pGetDpiForWindow ? pGetDpiForWindow(hTargetWnd) : 0;
+
+        bool prevWindowMaximized = windowMaximized;
+        windowMaximized = IsZoomed(hTargetWnd);
+
+        if (prevWindowDpi == windowDpi && prevWindowMaximized == windowMaximized) {
+            return;
+        }
+
+        RECT rect, frame;
+        if (GetWindowRect(hTargetWnd, &rect) && GetWindowFrameBounds(hTargetWnd, &frame)) {
+            windowBorderRect.left = frame.left - rect.left;
+            windowBorderRect.top = frame.top - rect.top;
+            windowBorderRect.right = rect.right - frame.right;
+            windowBorderRect.bottom = rect.bottom - frame.bottom;
+        }
+
+        magnetPixels = g_settings.snapWindowsDistance;
+        if (windowDpi) {
+            magnetPixels = MulDiv(magnetPixels, windowDpi, 96);
+        }
+    }
+
+    struct InitialWndEnumProcParam {
+        HWND hTargetWnd = nullptr;
+        std::vector<RECT> windowRects;
+    };
+
+    static BOOL CALLBACK InitialWndEnumProc(HWND hWnd, LPARAM lParam) {
+        auto& param = *(InitialWndEnumProcParam*)lParam;
+
+        if (hWnd == param.hTargetWnd) {
+            return TRUE;
+        }
+
+        if (!IsWindowVisible(hWnd) || IsWindowCloaked(hWnd) || IsIconic(hWnd)) {
+            return TRUE;
+        }
+
+        if (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW)) {
+            return TRUE;
+        }
+
+        RECT rc;
+        if (!GetWindowFrameBounds(hWnd, &rc)) {
+            return TRUE;
+        }
+
+        if (rc.left >= rc.right || rc.top >= rc.bottom) {
+            return TRUE;
+        }
+
+        param.windowRects.push_back(rc);
+
+        return TRUE;
+    }
+
+    static BOOL CALLBACK InitialMonitorEnumProc(HMONITOR monitor, HDC, LPRECT, LPARAM lParam) {
+        auto& windowMagnet = *(WindowMagnet*)lParam;
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+
+        auto& rc = monitorInfo.rcWork;
+
+        windowMagnet.magnetTargetsLeft.emplace(rc.right, rc.top, rc.bottom);
+        windowMagnet.magnetTargetsTop.emplace(rc.bottom, rc.left, rc.right);
+        windowMagnet.magnetTargetsRight.emplace(rc.left, rc.top, rc.bottom);
+        windowMagnet.magnetTargetsBottom.emplace(rc.top, rc.left, rc.right);
+
+        return TRUE;
+    }
+
+    static void RemoveOverlappedTargets(std::set<std::tuple<long, long, long>>& magnetTargets,
+        long start, long end, long otherAxisStart, long otherAxisEnd) {
+        for (auto it = magnetTargets.lower_bound({ start, otherAxisStart, otherAxisStart });
+            it != magnetTargets.end();) {
+            auto a = std::get<0>(*it);
+            auto b = std::get<1>(*it);
+            auto c = std::get<2>(*it);
+
+            if (a > end || (a == end && b > otherAxisEnd)) {
+                break;
+            }
+
+            if (otherAxisStart < c && otherAxisEnd > b) {
+                it = magnetTargets.erase(it);
+
+                if (otherAxisStart > b) {
+                    magnetTargets.emplace(a, b, otherAxisStart);
+                }
+
+                if (otherAxisEnd < c) {
+                    magnetTargets.emplace(a, otherAxisEnd, c);
+                }
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+
+    static long FindClosestTarget(const std::set<std::tuple<long, long, long>>& magnetTargets,
+        long source, long otherAxisStart, long otherAxisEnd, int magnetPixels) {
+        long target = LONG_MAX;
+
+        long iterStart = source - magnetPixels;
+        long iterEnd = source + magnetPixels;
+
+        for (auto it = magnetTargets.lower_bound({ iterStart, otherAxisStart, otherAxisStart });
+            it != magnetTargets.end();
+            ++it) {
+            auto a = std::get<0>(*it);
+            auto b = std::get<1>(*it);
+            auto c = std::get<2>(*it);
+
+            if (a > iterEnd || (a == iterEnd && b > otherAxisEnd)) {
+                break;
+            }
+
+            if (target != LONG_MAX) {
+                if (a == target) {
+                    continue;
+                }
+
+                if (std::abs(source - a) >= std::abs(source - target)) {
+                    break;
+                }
+            }
+
+            if (otherAxisStart < c && otherAxisEnd > b) {
+                target = a;
+            }
+        }
+
+        return target;
+    }
+
+    struct IsRectInWorkAreaMonitorEnumProcParam {
+        const RECT* rc;
+        bool inWorkArea;
+    };
+
+    static BOOL CALLBACK IsRectInWorkAreaMonitorEnumProc(HMONITOR monitor, HDC, LPRECT, LPARAM lParam) {
+        auto& param = *(IsRectInWorkAreaMonitorEnumProcParam*)lParam;
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+
+        auto& rcA = *param.rc;
+        auto& rcB = monitorInfo.rcWork;
+
+        if (rcA.left < rcB.right && rcA.right > rcB.left &&
+            rcA.top < rcB.bottom && rcA.bottom > rcB.top) {
+            param.inWorkArea = true;
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    static bool IsRectInWorkArea(const RECT& rc) {
+        IsRectInWorkAreaMonitorEnumProcParam param;
+        param.rc = &rc;
+        param.inWorkArea = false;
+        EnumDisplayMonitors(nullptr, nullptr, IsRectInWorkAreaMonitorEnumProc, (LPARAM)&param);
+        return param.inWorkArea;
+    }
+
+    static bool IsSnappingTemporarilyDisabled() {
+        if (!g_settings.keysToDisableSnappingCtrl &&
+            !g_settings.keysToDisableSnappingAlt &&
+            !g_settings.keysToDisableSnappingShift) {
+            return false;
+        }
+
+        return
+            (!g_settings.keysToDisableSnappingCtrl || GetKeyState(VK_CONTROL) < 0) &&
+            (!g_settings.keysToDisableSnappingAlt || GetKeyState(VK_MENU) < 0) &&
+            (!g_settings.keysToDisableSnappingShift || GetKeyState(VK_SHIFT) < 0);
+    }
+};
+
+class WindowMoving {
+public:
+    WindowMoving(HWND hTargetWnd) :
+        windowMagnet(hTargetWnd) {}
+
+    void PreProcessPos(HWND hTargetWnd, int* x, int* y, int* cx, int* cy) {
+        MovingState state = GetCurrentMovingState(hTargetWnd, *x, *y);
+
+        // If window state changes, e.g. the window is snapped, don't adjust its
+        // position, which could interfere with the snapping and doesn't make
+        // sense in general.
+        if (lastState && lastState->isMaximized == state.isMaximized &&
+            lastState->isMinimized == state.isMinimized &&
+            lastState->isArranged == state.isArranged) {
+            // Adjust window pos, which can be off in the DPI contexts:
+            // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE
+            // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+
+            int lastDeltaX = GET_X_LPARAM(lastState->messagePos) - lastState->x;
+            int lastDeltaY = GET_Y_LPARAM(lastState->messagePos) - lastState->y;
+
+            int deltaX = GET_X_LPARAM(state.messagePos) - state.x;
+            int deltaY = GET_Y_LPARAM(state.messagePos) - state.y;
+
+            state.x -= lastDeltaX - deltaX;
+            state.y -= lastDeltaY - deltaY;
+
+            *x = state.x;
+            *y = state.y;
+        }
+
+        lastState = state;
+
+        windowMagnet.MagnetMove(hTargetWnd, x, y, cx, cy);
+    }
+
+    void ForgetLastPos() {
+        lastState.reset();
+    }
+
+    WindowMagnet& GetWindowMagnet() {
+        return windowMagnet;
+    }
+
+private:
+    struct MovingState {
+        bool isMinimized;
+        bool isMaximized;
+        bool isArranged;
+        DWORD messagePos;
+        int x;
+        int y;
+    };
+
+    static MovingState GetCurrentMovingState(HWND hTargetWnd, int x, int y) {
+        return MovingState{
+            .isMinimized = !!IsMaximized(hTargetWnd),
+            .isMaximized = !!IsMinimized(hTargetWnd),
+            .isArranged = pIsWindowArranged && !!pIsWindowArranged(hTargetWnd),
+            .messagePos = GetMessagePos(),
+            .x = x,
+            .y = y,
+        };
+    }
+
+    std::optional<MovingState> lastState;
+    WindowMagnet windowMagnet;
+};
+
+class WindowMove {
+public:
+    WindowMove() {}
+
+    void Reset() {
+        lastState.reset();
+        for (auto& snapshotItem : snapshot) {
+            snapshotItem = nullptr;
+        }
+    }
+
+    void UpdateWithNewPos(HWND hTargetWnd, int x, int y) {
+        DWORD tickCount = GetTickCount();
+
+        if (snapshot[0] && tickCount - snapshot[0]->tickCount >= 100) {
+            // Waited for too long, reset.
+            Reset();
+        }
+
+        WindowState state = GetWindowState(hTargetWnd);
+        if (lastState && (state.isMinimized != lastState->isMinimized ||
+                          state.isMaximized != lastState->isMaximized ||
+                          state.isArranged != lastState->isArranged)) {
+            // Window state changed, e.g. it was snapped, reset.
+            Reset();
+        }
+
+        lastState = state;
+
+        if (!snapshot[0]) {
+            snapshot[0] = &snapshotStorage[0];
+        }
+        else if (!snapshot[1]) {
+            snapshot[1] = &snapshotStorage[0];
+            snapshot[0] = &snapshotStorage[1];
+        }
+
+        if (snapshot[1] && tickCount - snapshot[1]->tickCount >= 100) {
+            if (!snapshot[2]) {
+                snapshot[2] = &snapshotStorage[2];
+            }
+
+            auto* temp = snapshot[2];
+            snapshot[2] = snapshot[1];
+            snapshot[1] = snapshot[0];
+            snapshot[0] = temp;
+        }
+
+        snapshot[0]->tickCount = tickCount;
+        snapshot[0]->x = x;
+        snapshot[0]->y = y;
+    }
+
+    bool CompleteMove(int* x, int* y, double* velocityX, double* velocityY) {
+        if (!snapshot[0] || !snapshot[1]) {
+            return false;
+        }
+
+        if (GetTickCount() - snapshot[0]->tickCount >= 100) {
+            return false;
+        }
+
+        auto* winMoveLast = snapshot[0];
+        auto* winMovePrev = snapshot[2] ? snapshot[2] : snapshot[1];
+
+        int tickCountDiff = winMoveLast->tickCount - winMovePrev->tickCount;
+        if (tickCountDiff <= 0) {
+            return false;
+        }
+
+        *x = winMoveLast->x;
+        *y = winMoveLast->y;
+
+        // Velocity in client coordinates per second.
+        *velocityX = 1000.0 * (winMoveLast->x - winMovePrev->x) / tickCountDiff;
+        *velocityY = 1000.0 * (winMoveLast->y - winMovePrev->y) / tickCountDiff;
+
+        return true;
+    }
+
+private:
+    struct WindowState {
+        bool isMinimized;
+        bool isMaximized;
+        bool isArranged;
+    };
+
+    struct MoveSnapshot {
+        DWORD tickCount;
+        int x, y;
+    };
+
+    static WindowState GetWindowState(HWND hTargetWnd) {
+        return WindowState{
+            .isMinimized = !!IsMaximized(hTargetWnd),
+            .isMaximized = !!IsMinimized(hTargetWnd),
+            .isArranged = pIsWindowArranged && !!pIsWindowArranged(hTargetWnd),
+        };
+    }
+
+    std::optional<WindowState> lastState;
+    MoveSnapshot snapshotStorage[3];
+    MoveSnapshot* snapshot[3]{};
+};
+
+struct WindowSlideTimer {
+public:
+    WindowSlideTimer(TIMERPROC proc, int cursorX, int cursorY, int x, int y, double velocityX, double velocityY, std::optional<WindowMagnet> windowMagnet) :
+        cursorPoint{ cursorX, cursorY }, x((double)x), y((double)y), velocityX(velocityX), velocityY(velocityY), windowMagnet(std::move(windowMagnet)) {
+        timerId = SetTimer(nullptr, 0, 10, proc);
+
+        HMONITOR monitor = MonitorFromPoint(cursorPoint, MONITOR_DEFAULTTONEAREST);
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+        CopyRect(&workArea, &monitorInfo.rcWork);
+    }
+
+    ~WindowSlideTimer() {
+        KillTimer(nullptr, timerId);
+    }
+
+    WindowSlideTimer(const WindowSlideTimer&) = delete;
+    WindowSlideTimer(WindowSlideTimer&&) = delete;
+    WindowSlideTimer& operator=(const WindowSlideTimer&) = delete;
+    WindowSlideTimer& operator=(WindowSlideTimer&&) = delete;
+
+    UINT_PTR GetTimerId() const {
+        return timerId;
+    }
+
+    bool SlideNextFrame(HWND hWnd) {
+        RECT rect;
+        GetWindowRect(hWnd, &rect);
+        if (frame != 0) {
+            // If the window's position or size changed, stop timer.
+            if (
+                lastX != rect.left ||
+                lastY != rect.top ||
+                lastCx != rect.right - rect.left ||
+                lastCy != rect.bottom - rect.top
+            ) {
+                return false;
+            }
+        }
+
+        int prevX = (int)x;
+        int prevY = (int)y;
+
+        // The default timer resolution on Windows is 15.6 ms.
+        x += velocityX / (1000.0 / 15.6);
+        y += velocityY / (1000.0 / 15.6);
+
+        int currentX = (int)x;
+        int currentY = (int)y;
+
+        if (currentX == prevX && currentY == prevY) {
+            return false;
+        }
+
+        POINT anchor{ currentX + cursorPoint.x, currentY + cursorPoint.y };
+        if (!PtInRect(&workArea, anchor)) {
+            bool foundNewMonitor = false;
+
+            HMONITOR monitor = MonitorFromPoint(anchor, MONITOR_DEFAULTTONULL);
+            if (monitor) {
+                MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+                GetMonitorInfo(monitor, &monitorInfo);
+                if (PtInRect(&monitorInfo.rcWork, anchor)) {
+                    foundNewMonitor = true;
+                    CopyRect(&workArea, &monitorInfo.rcWork);
+                }
+            }
+
+            if (!foundNewMonitor) {
+                if (anchor.x < workArea.left) {
+                    x = workArea.left - cursorPoint.x;
+                    velocityX = -velocityX * .05;
+                }
+                else if (anchor.x > workArea.right) {
+                    x = workArea.right - cursorPoint.x;
+                    velocityX = -velocityX * .05;
+                }
+
+                if (anchor.y < workArea.top) {
+                    y = workArea.top - cursorPoint.y;
+                    velocityY = -velocityY * .05;
+                }
+                else if (anchor.y > workArea.bottom) {
+                    y = workArea.bottom - cursorPoint.y;
+                    velocityY = -velocityY * .05;
+                }
+
+                currentX = (int)x;
+                currentY = (int)y;
+            }
+        }
+
+        int slidingAnimationSlowdown = g_settings.slidingAnimationSlowdown;
+        if (slidingAnimationSlowdown < 1) {
+            slidingAnimationSlowdown = 1;
+        }
+        else if (slidingAnimationSlowdown > 99) {
+            slidingAnimationSlowdown = 99;
+        }
+
+        double slowdownMultiplier = (100 - g_settings.slidingAnimationSlowdown) / 100.0;
+
+        velocityX *= slowdownMultiplier;
+        velocityY *= slowdownMultiplier;
+
+        if (windowMagnet) {
+            int magnetX = currentX;
+            int magnetY = currentY;
+            int cx = rect.right - rect.left;
+            int cy = rect.bottom - rect.top;
+            windowMagnet->MagnetMove(hWnd, &magnetX, &magnetY, &cx, &cy);
+
+            if (magnetX != currentX) {
+                x = magnetX;
+                currentX = magnetX;
+                velocityX = 0.0;
+            }
+
+            if (magnetY != currentY) {
+                y = magnetY;
+                currentY = magnetY;
+                velocityY = 0.0;
+            }
+        }
+
+        SetWindowPos(hWnd, nullptr, currentX, currentY, 0, 0,
+            SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+
+        lastX = currentX;
+        lastY = currentY;
+        lastCx = rect.right - rect.left;
+        lastCy = rect.bottom - rect.top;
+
+        frame++;
+        return frame < 50;
+    }
+
+private:
+    UINT_PTR timerId;
+    int frame = 0;
+    POINT cursorPoint;
+    RECT workArea;
+    double x, y;
+    double velocityX, velocityY;
+    int lastX, lastY, lastCx, lastCy;
+    std::optional<WindowMagnet> windowMagnet;
+};
+
+std::atomic<bool> g_uninitializing;
+std::atomic<int> g_hookRefCount;
+thread_local std::unordered_map<HWND, WindowMoving> g_winMoving;
+thread_local std::unordered_map<HWND, WindowMove> g_winMove;
+thread_local std::unordered_map<HWND, WindowSlideTimer> g_winSlideTimers;
+
+UINT g_unsubclassRegisteredMessage = RegisterWindowMessage(
+    L"Windhawk_Unsubclass_slick-window-arrangement");
+std::mutex g_subclassedWindowsMutex;
+std::unordered_set<HWND> g_subclassedWindows;
+
+thread_local HHOOK g_callWndProcHook;
+std::mutex g_allCallWndProcHooksMutex;
+std::unordered_set<HHOOK> g_allCallWndProcHooks;
+
+LRESULT CALLBACK SubclassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
+auto hookRefCountScope() {
+    g_hookRefCount++;
+    return std::unique_ptr<decltype(g_hookRefCount), void(*)(decltype(g_hookRefCount)*)>{
+        &g_hookRefCount, [](auto hookRefCount) {
+            (*hookRefCount)--;
+        }};
+}
+
+void UnsubclassWindow(HWND hWnd)
+{
+    RemoveWindowSubclass(hWnd, SubclassWndProc, 0);
+
+    std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+
+    auto it = g_subclassedWindows.find(hWnd);
+    if (it != g_subclassedWindows.end()) {
+        g_subclassedWindows.erase(it);
+    }
+}
+
+bool KillWindowSlideTimer(HWND hWnd)
+{
+    auto it = g_winSlideTimers.find(hWnd);
+    if (it == g_winSlideTimers.end()) {
+        return false;
+    }
+
+    g_winSlideTimers.erase(it);
+    return true;
+}
+
+void CALLBACK WindowSlideTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idTimer, DWORD dwTime)
+{
+    auto it = g_winSlideTimers.begin();
+    for (; it != g_winSlideTimers.end(); ++it) {
+        auto& timer = it->second;
+        if (timer.GetTimerId() == idTimer) {
+            break;
+        }
+    }
+
+    if (it == g_winSlideTimers.end()) {
+        return;
+    }
+
+    HWND hTargetWnd = it->first;
+    auto& timer = it->second;
+
+    if (!timer.SlideNextFrame(hTargetWnd)) {
+        g_winSlideTimers.erase(it);
+        UnsubclassWindow(hTargetWnd);
+    }
+}
+
+void OnEnterSizeMove(HWND hWnd)
+{
+    KillWindowSlideTimer(hWnd);
+
+    // 分组总开关关闭：不登记吸附/滑动状态，WM_WINDOWPOSCHANGING/CHANGED 与
+    // 滑动定时器随之全部失效（运行时短路，随设置重载即时生效）。
+    if (!g_settings.enable) {
+        return;
+    }
+
+    if (g_settings.snapWindowsWhenDragging) {
+        g_winMoving.try_emplace(hWnd, hWnd);
+    }
+
+    if (g_settings.slidingAnimation) {
+        g_winMove.try_emplace(hWnd);
+    }
+}
+
+void OnExitSizeMove(HWND hWnd)
+{
+    bool unsubclass = true;
+    auto winMovingIt = g_winMoving.find(hWnd);
+    auto winMoveIt = g_winMove.find(hWnd);
+
+    if (winMoveIt != g_winMove.end()) {
+        auto& windowMove = winMoveIt->second;
+
+        int x, y;
+        double velocityX, velocityY;
+        if (windowMove.CompleteMove(&x, &y, &velocityX, &velocityY)) {
+            DWORD messagePos = GetMessagePos();
+
+            g_winSlideTimers.try_emplace(hWnd,
+                WindowSlideTimerProc,
+                GET_X_LPARAM(messagePos) - x,
+                GET_Y_LPARAM(messagePos) - y,
+                x,
+                y,
+                velocityX,
+                velocityY,
+                !g_settings.snapWindowsWhenSliding
+                    ? std::nullopt
+                    : std::optional(winMovingIt != g_winMoving.end()
+                        ? std::move(winMovingIt->second.GetWindowMagnet())
+                        : WindowMagnet(hWnd)));
+
+            unsubclass = false;
+        }
+
+        g_winMove.erase(winMoveIt);
+    }
+
+    if (winMovingIt != g_winMoving.end()) {
+        g_winMoving.erase(winMovingIt);
+    }
+
+    if (unsubclass) {
+        UnsubclassWindow(hWnd);
+    }
+}
+
+void OnWindowPosChanging(HWND hWnd, WINDOWPOS* windowPos)
+{
+    if ((windowPos->flags & (SWP_NOSIZE | SWP_NOMOVE)) == (SWP_NOSIZE | SWP_NOMOVE)) {
+        return;
+    }
+
+    RECT rc;
+    if (!GetWindowRect(hWnd, &rc)) {
+        return;
+    }
+
+    int x = (windowPos->flags & SWP_NOMOVE) ? rc.left : windowPos->x;
+    int y = (windowPos->flags & SWP_NOMOVE) ? rc.top : windowPos->y;
+    int cx = (windowPos->flags & SWP_NOSIZE) ? (rc.right - rc.left) : windowPos->cx;
+    int cy = (windowPos->flags & SWP_NOSIZE) ? (rc.bottom - rc.top) : windowPos->cy;
+
+    bool posChanged = rc.left != x || rc.top != y;
+    bool sizeChanged = rc.right - rc.left != cx || rc.bottom - rc.top != cy;
+
+    if (!posChanged && !sizeChanged) {
+        return;
+    }
+
+    auto it = g_winMoving.find(hWnd);
+    if (it == g_winMoving.end()) {
+        return;
+    }
+
+    auto& windowMoving = it->second;
+    if (posChanged && !sizeChanged) {
+        windowMoving.PreProcessPos(hWnd, &x, &y, &cx, &cy);
+
+        if (!(windowPos->flags & SWP_NOMOVE)) {
+            windowPos->x = x;
+            windowPos->y = y;
+        }
+
+        if (!(windowPos->flags & SWP_NOSIZE)) {
+            windowPos->cx = cx;
+            windowPos->cy = cy;
+        }
+    }
+    else {
+        // Maybe support resize one day...
+        windowMoving.ForgetLastPos();
+    }
+}
+
+void OnWindowPosChanged(HWND hWnd, const WINDOWPOS* windowPos)
+{
+    auto it = g_winMove.find(hWnd);
+    if (it == g_winMove.end()) {
+        // SWP_STATECHANGED is set when the state changes, e.g. the window is
+        // maximized.
+        // 0x00300000 is set when the window is snapped, e.g. with Win+left.
+        if ((windowPos->flags & SWP_STATECHANGED) || (windowPos->flags & 0x00300000)) {
+            if (KillWindowSlideTimer(hWnd)) {
+                UnsubclassWindow(hWnd);
+            }
+        }
+
+        return;
+    }
+
+    auto& windowMove = it->second;
+
+    if ((windowPos->flags & SWP_NOMOVE) || !(windowPos->flags & SWP_NOSIZE)) {
+        // Somethings that's not a move happened, reset.
+        windowMove.Reset();
+        return;
+    }
+
+    windowMove.UpdateWithNewPos(hWnd, windowPos->x, windowPos->y);
+}
+
+void OnSysCommand(HWND hWnd, WPARAM command)
+{
+    switch (command) {
+    case SC_SIZE:
+    case SC_MOVE:
+    case SC_MINIMIZE:
+    case SC_MAXIMIZE:
+    case SC_CLOSE:
+    case SC_MOUSEMENU:
+    case SC_KEYMENU:
+    case SC_RESTORE:
+        {
+            if (KillWindowSlideTimer(hWnd)) {
+                UnsubclassWindow(hWnd);
+            }
+        }
+        break;
+    }
+}
+
+void OnNcDestroy(HWND hWnd)
+{
+    KillWindowSlideTimer(hWnd);
+    UnsubclassWindow(hWnd);
+}
+
+LRESULT CALLBACK SubclassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+    auto hookScope = hookRefCountScope();
+
+    switch (uMsg) {
+    case WM_ENTERSIZEMOVE:
+        OnEnterSizeMove(hWnd);
+        break;
+
+    case WM_EXITSIZEMOVE:
+        OnExitSizeMove(hWnd);
+        break;
+
+    case WM_WINDOWPOSCHANGING:
+        OnWindowPosChanging(hWnd, (WINDOWPOS*)lParam);
+        break;
+
+    case WM_WINDOWPOSCHANGED:
+        OnWindowPosChanged(hWnd, (const WINDOWPOS*)lParam);
+        break;
+
+    case WM_SYSCOMMAND:
+        OnSysCommand(hWnd, wParam);
+        break;
+
+    case WM_NCDESTROY:
+        OnNcDestroy(hWnd);
+        break;
+
+    default:
+        if (uMsg == g_unsubclassRegisteredMessage) {
+            KillWindowSlideTimer(hWnd);
+            RemoveWindowSubclass(hWnd, SubclassWndProc, 0);
+        }
+        break;
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (nCode != HC_ACTION) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+
+    if (cwp->message == WM_ENTERSIZEMOVE) {
+        // 分组总开关关闭：不再为新的移动循环挂子类（已挂的子类行为由
+        // OnEnterSizeMove 内的总开关短路）。
+        if (!g_settings.enable) {
+            return CallNextHookEx(nullptr, nCode, wParam, lParam);
+        }
+
+        WCHAR className[32];
+        if (GetClassName(GetAncestor(cwp->hwnd, GA_ROOT), className, ARRAYSIZE(className)) &&
+            (wcsicmp(className, L"Shell_TrayWnd") == 0 || wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0)) {
+            // Skip the taskbar as it causes wired
+            // behavior and doesn't make sense in general.
+        }
+        else {
+            std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+            if (!g_uninitializing && SetWindowSubclass(cwp->hwnd, SubclassWndProc, 0, 0)) {
+                g_subclassedWindows.insert(cwp->hwnd);
+            }
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+void SetWindowHookForUiThreadIfNeeded(HWND hWnd)
+{
+    // 分组总开关关闭：不为新的 UI 线程安装 WH_CALLWNDPROC 钩子（重新开启后
+    // 下一条消息会自动补装）。
+    if (!g_settings.enable) {
+        return;
+    }
+
+    if (!g_callWndProcHook && IsWindowVisible(GetAncestor(hWnd, GA_ROOT))) {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+        if (!g_uninitializing) {
+            DWORD dwThreadId = GetCurrentThreadId();
+            HHOOK callWndProcHook = SetWindowsHookEx(WH_CALLWNDPROC, CallWndProc, nullptr, dwThreadId);
+            if (callWndProcHook) {
+                Wh_Log(L"SetWindowsHookEx succeeded for thread %u", dwThreadId);
+                g_callWndProcHook = callWndProcHook;
+                g_allCallWndProcHooks.insert(callWndProcHook);
+            }
+            else {
+                Wh_Log(L"SetWindowsHookEx error for thread %u: %u", dwThreadId, GetLastError());
+            }
+        }
+    }
+}
+
+using DispatchMessageA_t = decltype(&DispatchMessageA);
+DispatchMessageA_t pOriginalDispatchMessageA;
+LRESULT WINAPI DispatchMessageAHook(CONST MSG *lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (lpMsg && lpMsg->hwnd) {
+        SetWindowHookForUiThreadIfNeeded(lpMsg->hwnd);
+    }
+
+    return pOriginalDispatchMessageA(lpMsg);
+}
+
+using DispatchMessageW_t = decltype(&DispatchMessageW);
+DispatchMessageW_t pOriginalDispatchMessageW;
+LRESULT WINAPI DispatchMessageWHook(CONST MSG *lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (lpMsg && lpMsg->hwnd) {
+        SetWindowHookForUiThreadIfNeeded(lpMsg->hwnd);
+    }
+
+    return pOriginalDispatchMessageW(lpMsg);
+}
+
+using IsDialogMessageA_t = decltype(&IsDialogMessageA);
+IsDialogMessageA_t pOriginalIsDialogMessageA;
+LRESULT WINAPI IsDialogMessageAHook(HWND hDlg, LPMSG lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (hDlg) {
+        SetWindowHookForUiThreadIfNeeded(hDlg);
+    }
+
+    return pOriginalIsDialogMessageA(hDlg, lpMsg);
+}
+
+using IsDialogMessageW_t = decltype(&IsDialogMessageW);
+IsDialogMessageW_t pOriginalIsDialogMessageW;
+LRESULT WINAPI IsDialogMessageWHook(HWND hDlg, LPMSG lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (hDlg) {
+        SetWindowHookForUiThreadIfNeeded(hDlg);
+    }
+
+    return pOriginalIsDialogMessageW(hDlg, lpMsg);
+}
+
+// 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽到这里，由本模组唯一的
+// DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+void OnThreadDetach() {
+    if (g_callWndProcHook) {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+
+        auto it = g_allCallWndProcHooks.find(g_callWndProcHook);
+        if (it != g_allCallWndProcHooks.end()) {
+            UnhookWindowsHookEx(g_callWndProcHook);
+            g_allCallWndProcHooks.erase(it);
+        }
+    }
+}
+
+void LoadSettings()
+{
+    g_settings.enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.winArrange.enable") != 0;
+    g_settings.snapWindowsWhenDragging = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsWhenDragging");
+    g_settings.snapWindowsDistance = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsDistance");
+    g_settings.keysToDisableSnappingCtrl = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Ctrl");
+    g_settings.keysToDisableSnappingAlt = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Alt");
+    g_settings.keysToDisableSnappingShift = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Shift");
+    g_settings.slidingAnimation = Wh_GetIntSetting(L"winOpt.winArrange.SlidingAnimation");
+    g_settings.snapWindowsWhenSliding = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsWhenSliding");
+    g_settings.slidingAnimationSlowdown = Wh_GetIntSetting(L"winOpt.winArrange.SlidingAnimationSlowdown");
+}
+
+BOOL Init()
+{
+    Wh_Log(L"Init");
+
+    LoadSettings();
+
+    HMODULE hUser32 = LoadLibrary(L"user32.dll");
+    if (hUser32) {
+        pGetThreadDpiAwarenessContext = (GetThreadDpiAwarenessContext_t)GetProcAddress(hUser32, "GetThreadDpiAwarenessContext");
+        pSetThreadDpiAwarenessContext = (SetThreadDpiAwarenessContext_t)GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
+        pGetAwarenessFromDpiAwarenessContext = (GetAwarenessFromDpiAwarenessContext_t)GetProcAddress(hUser32, "GetAwarenessFromDpiAwarenessContext");
+        pGetDpiForSystem = (GetDpiForSystem_t)GetProcAddress(hUser32, "GetDpiForSystem");
+        pGetDpiForWindow = (GetDpiForWindow_t)GetProcAddress(hUser32, "GetDpiForWindow");
+        pIsWindowArranged = (IsWindowArranged_t)GetProcAddress(hUser32, "IsWindowArranged");
+    }
+
+    HMODULE hShcore = LoadLibrary(L"shcore.dll");
+    if (hShcore) {
+        pGetDpiForMonitor = (GetDpiForMonitor_t)GetProcAddress(hShcore, "GetDpiForMonitor");
+    }
+
+    // DispatchMessageA, DispatchMessageW could hopefully be enough to detect a message loop, but
+    // DispatchMessageWorker, which implements DispatchMessageA, DispatchMessageW, is sometimes
+    // called directly by functions such as DialogBoxParam.
+    Wh_SetFunctionHook((void*)DispatchMessageA, (void*)DispatchMessageAHook, (void**)&pOriginalDispatchMessageA);
+    Wh_SetFunctionHook((void*)DispatchMessageW, (void*)DispatchMessageWHook, (void**)&pOriginalDispatchMessageW);
+    Wh_SetFunctionHook((void*)IsDialogMessageA, (void*)IsDialogMessageAHook, (void**)&pOriginalIsDialogMessageA);
+    Wh_SetFunctionHook((void*)IsDialogMessageW, (void*)IsDialogMessageWHook, (void**)&pOriginalIsDialogMessageW);
+
+    return TRUE;
+}
+
+void Uninit()
+{
+    Wh_Log(L"Uninit");
+
+    g_uninitializing = true;
+
+    std::unordered_set<HWND> subclassedWindows;
+    {
+        std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+        subclassedWindows = std::move(g_subclassedWindows);
+        g_subclassedWindows.clear();
+    }
+
+    for (HWND hWnd : subclassedWindows) {
+        SendMessage(hWnd, g_unsubclassRegisteredMessage, 0, 0);
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+
+        for (HHOOK hook : g_allCallWndProcHooks) {
+            UnhookWindowsHookEx(hook);
+        }
+
+        g_allCallWndProcHooks.clear();
+    }
+
+    while (g_hookRefCount > 0) {
+        Sleep(200);
+    }
+}
+
+void SettingsChanged()
+{
+    Wh_Log(L"SettingsChanged");
+
+    LoadSettings();
+}
+
+}  // namespace WinArrange
+
+// ============================================================================
+// 隐形窗口边框
+//
+// 来自 CW-隐形窗口边框 1.0.1（上游 Invisible Window Borders 1.0.0，原作者
+// Bo0ii，MIT，原版链接 https://windhawk.net/mods/invisible-borders），代码
+// 逻辑与上游逐字节一致，仅做两类机械改动以并入本模组：
+//   1. 整体置于 InvisBorders 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModAfterInit→AfterInit、Wh_ModBeforeUninit→BeforeUninit、
+//      Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 invisBorders. 前缀（SpecialWindows→
+//      invisBorders.SpecialWindows），与其他两组设置键隔离。
+// 入口由本模组的 Wh_ModInit / Wh_ModAfterInit / Wh_ModBeforeUninit /
+// Wh_ModSettingsChanged 统一调用（本功能无独立的 Uninit 清理，边框还原在
+// BeforeUninit 完成）。
+// ============================================================================
+namespace InvisBorders {
+
+// Special DWM color values
+#ifndef DWMWA_COLOR_NONE
+#define DWMWA_COLOR_NONE 0xFFFFFFFE
+#endif
+
+const COLORREF BorderInvisible = DWMWA_COLOR_NONE;  // No border color
+const COLORREF ColorDefault = DWMWA_COLOR_DEFAULT;
+
+// 分组总开关（invisBorders.enable），关闭时本组功能完全不生效；
+// SpecialWindows 同样仅在总开关开启时被应用。
+bool enable = true;
+bool SpecialWindows = false;
+
+BOOL IsValidWindow(HWND hWnd) {
+    DWORD dwStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
+    // Better exclude context menus
+    return (dwStyle & WS_THICKFRAME) == WS_THICKFRAME ||
+           (dwStyle & WS_CAPTION) == WS_CAPTION ||
+           (SpecialWindows && (dwStyle & WS_OVERLAPPED) == WS_OVERLAPPED && (dwStyle & WS_POPUP) != WS_POPUP);
+}
+
+using DwmSetWindowAttribute_t = decltype(&DwmSetWindowAttribute);
+DwmSetWindowAttribute_t DwmSetWindowAttribute_orig;
+HRESULT WINAPI DwmSetWindowAttribute_hook(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute) {
+    // 分组总开关关闭：完全放行，应用程序设置的边框颜色保持原样。
+    if (!enable) {
+        return DwmSetWindowAttribute_orig(hwnd, dwAttribute, pvAttribute, cbAttribute);
+    }
+
+    if (dwAttribute == DWMWA_BORDER_COLOR && IsValidWindow(hwnd)) {
+        Wh_Log(L"Intercepted DWMWA_BORDER_COLOR - setting to invisible");
+        // Override with invisible border
+        return DwmSetWindowAttribute_orig(hwnd, dwAttribute, &BorderInvisible, sizeof(BorderInvisible));
+    }
+
+    return DwmSetWindowAttribute_orig(hwnd, dwAttribute, pvAttribute, cbAttribute);
+}
+
+void SetBorderInvisible(HWND hWnd)
+{
+    // 分组总开关关闭：不把任何窗口边框设为隐形（DefWindowProc/DefDlgProc
+    // 钩子与启用枚举都经由本函数，运行时短路，随设置重载即时生效）。
+    if (!enable || !IsValidWindow(hWnd))
+        return;
+
+    Wh_Log(L"Setting invisible border");
+    DwmSetWindowAttribute_orig(hWnd, DWMWA_BORDER_COLOR, &BorderInvisible, sizeof(BorderInvisible));
+}
+
+using DefWindowProcA_t = decltype(&DefWindowProcA);
+DefWindowProcA_t DefWindowProcA_orig;
+LRESULT WINAPI DefWindowProcA_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefWindowProcA_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_ACTIVATE:
+        case WM_NCACTIVATE:
+        case WM_DWMCOLORIZATIONCOLORCHANGED:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefWindowProcW_t = decltype(&DefWindowProcW);
+DefWindowProcW_t DefWindowProcW_orig;
+LRESULT WINAPI DefWindowProcW_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefWindowProcW_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_ACTIVATE:
+        case WM_NCACTIVATE:
+        case WM_DWMCOLORIZATIONCOLORCHANGED:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefDlgProcA_t = decltype(&DefDlgProcA);
+DefDlgProcA_t DefDlgProcA_orig;
+LRESULT WINAPI DefDlgProcA_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefDlgProcA_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_NCACTIVATE:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefDlgProcW_t = decltype(&DefDlgProcW);
+DefDlgProcW_t DefDlgProcW_orig;
+LRESULT WINAPI DefDlgProcW_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefDlgProcW_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_NCACTIVATE:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+BOOL CALLBACK EnableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
+    DWORD pid = lParam;
+
+    DWORD wPid = 0;
+    GetWindowThreadProcessId(hWnd, &wPid);
+
+    if (pid == wPid) {
+        SetBorderInvisible(hWnd);
+    }
+
+    return TRUE;
+}
+
+BOOL CALLBACK DisableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
+    DWORD pid = lParam;
+    DWORD wPid = 0;
+    GetWindowThreadProcessId(hWnd, &wPid);
+
+    if (pid == wPid && IsValidWindow(hWnd))
+        DwmSetWindowAttribute_orig(hWnd, DWMWA_BORDER_COLOR, &ColorDefault, sizeof(ColorDefault));
+
+    return TRUE;
+}
+
+BOOL Init() {
+    Wh_Log(L"Init - Invisible Borders");
+
+    enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.invisBorders.enable") != 0;
+    SpecialWindows = Wh_GetIntSetting(L"winOpt.invisBorders.SpecialWindows");
+
+    Wh_SetFunctionHook(
+        (void *)DwmSetWindowAttribute,
+        (void *)DwmSetWindowAttribute_hook,
+        (void **)&DwmSetWindowAttribute_orig);
+
+    Wh_SetFunctionHook(
+        (void *)DefWindowProcW,
+        (void *)DefWindowProcW_hook,
+        (void **)&DefWindowProcW_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefWindowProcA,
+        (void *)DefWindowProcA_hook,
+        (void **)&DefWindowProcA_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefDlgProcW,
+        (void *)DefDlgProcW_hook,
+        (void **)&DefDlgProcW_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefDlgProcA,
+        (void *)DefDlgProcA_hook,
+        (void **)&DefDlgProcA_orig
+    );
+
+    return TRUE;
+}
+
+void AfterInit() {
+    Wh_Log(L"AfterInit - Applying invisible borders");
+
+    // 分组总开关关闭：不把现有窗口的边框设为隐形。
+    if (!enable) {
+        return;
+    }
+
+    EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+}
+
+void BeforeUninit() {
+    Wh_Log(L"BeforeUninit - Restoring default borders");
+    EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
+}
+
+void SettingsChanged() {
+    Wh_Log(L"SettingsChanged");
+
+    // 先整体还原默认边框，再按新设置（含总开关）决定是否重新应用：
+    // 总开关关闭时还原即终点，本组功能完全失效；重新开启则立即恢复隐形。
+    EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
+    enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.invisBorders.enable") != 0;
+    SpecialWindows = Wh_GetIntSetting(L"winOpt.invisBorders.SpecialWindows");
+    if (enable) {
+        EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+    }
+}
+
+}  // namespace InvisBorders
+
+}  // namespace WinOpt
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons、Purity 与 DblUp 共用）
+//
+// 四个功能都需要捕获新建窗口（桌面 SHELLDLL_DefView / SysListView32，或文件
+// 夹窗口 ShellTabWindowClass 树内的 SysListView32 / DirectUIHWND）。为避免在
+// 同一 mod 内对同一目标 API 安装多个钩子，这里只安装一次，由共享钩子按各功能
+// 的激活状态把创建结果分发给四个功能的处理函数。
 // ─────────────────────────────────────────────────────────────────────────────
 
 using QuickSettingsCreateWindowExW_t = decltype(&CreateWindowExW);
@@ -3623,62 +10774,138 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
         if (g_QuickSettingsPurityActive) {
             PurityOnCreatedWindow(hWnd, lpClassName, hWndParent);
         }
+        if (g_QuickSettingsDblUpActive) {
+            DblUpOnCreatedWindow(hWnd, lpClassName, hWndParent);
+        }
     }
 
     return hWnd;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 合并入口：Peek、ToggleIcons、Marquee、SmoothIcons 与 Purity 独立初始化与
-// 卸载，一处失败不影响其他功能。
+// 合并入口（2.0.0）：@include 为 *，各功能段按进程门控——
+//   • explorer.exe：Peek、ToggleIcons（含 SmoothIcons）、Marquee、Purity、
+//     ExtWarn、DblUp、DragDel、SndLog；
+//   • StartMenuExperienceHost.exe + explorer.exe：PowerBtn（按钮注入在开始
+//     菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
+//   • 全进程：WinOpt（窗口优化，含 altDrag / winArrange / invisBorders 三段）。
+// 各段独立初始化与卸载，一处失败不影响其他功能。
 // ─────────────────────────────────────────────────────────────────────────────
 BOOL Wh_ModInit() {
     Wh_Log(L">");
 
-    // 先安装共享 CreateWindowExW 钩子（Wh_SetFunctionHook 为延迟生效，
-    // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的三个功能。
-    bool createWindowHookOk = QuickSettingsInstallCreateWindowExWHook() != FALSE;
-    if (!createWindowHookOk) {
-        Wh_Log(L"Shared CreateWindowExW hook failed, disabling ToggleIcons/SmoothIcons/Purity");
+    QuickSettingsProcessKind kind = QuickSettingsGetProcessKind();
+    bool isExplorer = kind == QuickSettingsProcessKind::Explorer;
+
+    bool anyOk = false;
+
+    // ── WinOpt（窗口优化）：全进程启用 ──
+    // 三个子段各自独立初始化，初始化失败时只记录日志，不阻断其余功能。
+    if (!WinOpt::AltDrag::Init()) {
+        Wh_Log(L"WinOpt AltDrag (window drag) init failed, continuing without it");
+    }
+    if (!WinOpt::WinArrange::Init()) {
+        Wh_Log(L"WinOpt WinArrange (window arrangement) init failed, continuing "
+               L"without it");
+    }
+    if (!WinOpt::InvisBorders::Init()) {
+        Wh_Log(L"WinOpt InvisBorders (invisible borders) init failed, "
+               L"continuing without it");
+    }
+    anyOk = true;
+
+    // ── PowerBtn（开始菜单电源按钮）：explorer + StartMenuExperienceHost ──
+    if (isExplorer || kind == QuickSettingsProcessKind::StartMenuExperienceHost) {
+        if (PowerBtnInit() != FALSE) {
+            anyOk = true;
+        } else {
+            Wh_Log(L"PowerBtn init failed, continuing without it");
+        }
     }
 
-    bool peekOk = PeekInit() != FALSE;
-    if (!peekOk) {
-        Wh_Log(L"Peek init failed, continuing without it");
+    // ── 桌面各段：仅 explorer.exe ──
+    if (isExplorer) {
+        // 先安装共享 CreateWindowExW 钩子（Wh_SetFunctionHook 为延迟生效，
+        // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的四个功能。
+        bool createWindowHookOk = QuickSettingsInstallCreateWindowExWHook() != FALSE;
+        if (!createWindowHookOk) {
+            Wh_Log(L"Shared CreateWindowExW hook failed, disabling "
+                   L"ToggleIcons/SmoothIcons/Purity/DblUp");
+        }
+
+        bool peekOk = PeekInit() != FALSE;
+        if (!peekOk) {
+            Wh_Log(L"Peek init failed, continuing without it");
+        }
+
+        bool toggleIconsOk = createWindowHookOk && ToggleIconsInit() != FALSE;
+        if (!toggleIconsOk) {
+            Wh_Log(L"ToggleIcons init failed, continuing without it");
+        }
+
+        bool marqueeOk = MarqueeInit() != FALSE;
+        if (!marqueeOk) {
+            Wh_Log(L"Marquee init failed, continuing without it");
+        }
+
+        bool smoothIconsOk = createWindowHookOk && SmoothIconsInit() != FALSE;
+        if (!smoothIconsOk) {
+            Wh_Log(L"SmoothIcons init failed, continuing without it");
+        }
+
+        // Purity 对新建桌面窗口的捕获同样经由共享 CreateWindowExW 钩子；其文字/
+        // 提取期钩子在本段内部独立安装。
+        bool purityOk = createWindowHookOk && PurityInit() != FALSE;
+        if (!purityOk) {
+            Wh_Log(L"Purity init failed, continuing without it");
+        }
+
+        bool extWarnOk = ExtWarnInit() != FALSE;
+        if (!extWarnOk) {
+            Wh_Log(L"ExtWarn init failed, continuing without it");
+        }
+
+        // DblUp 对新建文件夹窗口的捕获经由共享 CreateWindowExW 钩子；现有窗口
+        // 的枚举挂接在 Wh_ModAfterInit 的 DblUpAfterInit 中进行（与上游
+        // 「AfterInit 再枚举」时序一致）。
+        bool dblUpOk = createWindowHookOk && DblUpInit() != FALSE;
+        if (!dblUpOk) {
+            Wh_Log(L"DblUp init failed, continuing without it");
+        }
+
+        bool dragDelOk = DragDelInit() != FALSE;
+        if (!dragDelOk) {
+            Wh_Log(L"DragDel init failed, continuing without it");
+        }
+
+        bool sndLogOk = SndLogInit() != FALSE;
+        if (!sndLogOk) {
+            Wh_Log(L"SndLog init failed, continuing without it");
+        }
+
+        anyOk = anyOk || peekOk || toggleIconsOk || marqueeOk || smoothIconsOk ||
+                purityOk || extWarnOk || dblUpOk || dragDelOk || sndLogOk;
     }
 
-    bool toggleIconsOk = createWindowHookOk && ToggleIconsInit() != FALSE;
-    if (!toggleIconsOk) {
-        Wh_Log(L"ToggleIcons init failed, continuing without it");
-    }
-
-    bool marqueeOk = MarqueeInit() != FALSE;
-    if (!marqueeOk) {
-        Wh_Log(L"Marquee init failed, continuing without it");
-    }
-
-    bool smoothIconsOk = createWindowHookOk && SmoothIconsInit() != FALSE;
-    if (!smoothIconsOk) {
-        Wh_Log(L"SmoothIcons init failed, continuing without it");
-    }
-
-    // Purity 对新建桌面窗口的捕获同样经由共享 CreateWindowExW 钩子；其文字/
-    // 提取期钩子在本段内部独立安装。
-    bool purityOk = createWindowHookOk && PurityInit() != FALSE;
-    if (!purityOk) {
-        Wh_Log(L"Purity init failed, continuing without it");
-    }
-
-    return (peekOk || toggleIconsOk || marqueeOk || smoothIconsOk || purityOk) ? TRUE
-                                                                               : FALSE;
+    return anyOk ? TRUE : FALSE;
 }
 
 void Wh_ModAfterInit() {
     Wh_Log(L">");
 
-    PeekAfterInit();
-    SmoothIconsAfterInit();
-    PurityAfterInit();
+    QuickSettingsProcessKind kind = QuickSettingsGetProcessKind();
+
+    if (kind == QuickSettingsProcessKind::Explorer) {
+        PeekAfterInit();
+        SmoothIconsAfterInit();
+        PurityAfterInit();
+        DblUpAfterInit();
+    }
+
+    PowerBtnAfterInit();
+
+    // 全进程：应用本进程现有窗口的隐形边框。
+    WinOpt::InvisBorders::AfterInit();
 }
 
 void Wh_ModBeforeUninit() {
@@ -3686,26 +10913,81 @@ void Wh_ModBeforeUninit() {
 
     // Windhawk 将在本次调用返回后移除本模组的钩子；SmoothIcons 由此把绘制钩子、
     // 子类与过渡动画接口置为惰性（与上游 Wh_ModBeforeUninit 语义一致）。
-    SmoothIconsBeforeUninit();
+    if (QuickSettingsGetProcessKind() == QuickSettingsProcessKind::Explorer) {
+        SmoothIconsBeforeUninit();
+    }
+
+    // 全进程：还原本进程所有已被隐形的窗口边框。
+    WinOpt::InvisBorders::BeforeUninit();
 }
 
 void Wh_ModUninit() {
     Wh_Log(L">");
 
-    PeekUninit();
-    ToggleIconsUninit();
-    SmoothIconsUninit();
-    MarqueeUninit();
-    PurityUninit();
+    if (QuickSettingsGetProcessKind() == QuickSettingsProcessKind::Explorer) {
+        PeekUninit();
+        ToggleIconsUninit();
+        SmoothIconsUninit();
+        MarqueeUninit();
+        PurityUninit();
+        ExtWarnUninit();
+        DblUpUninit();
+        DragDelUninit();
+        SndLogUninit();
+    }
+
+    PowerBtnUninit();
+
+    WinOpt::AltDrag::Uninit();
+    WinOpt::WinArrange::Uninit();
 }
 
 void Wh_ModSettingsChanged() {
     Wh_Log(L">");
 
-    PeekLoadSettings();
-    ToggleIconsLoadSettings();
-    ToggleIconsUpdateAllTimers();
-    MarqueeLoadSettings();
-    SmoothIconsNotifySettingsChanged();
-    PurityNotifySettingsChanged();
+    QuickSettingsProcessKind kind = QuickSettingsGetProcessKind();
+
+    if (kind == QuickSettingsProcessKind::Explorer) {
+        PeekLoadSettings();
+        ToggleIconsLoadSettings();
+        ToggleIconsUpdateActivation();
+        MarqueeLoadSettings();
+        SmoothIconsNotifySettingsChanged();
+        PurityNotifySettingsChanged();
+        ExtWarnNotifySettingsChanged();
+        DblUpNotifySettingsChanged();
+        DragDelLoadSettings();
+        SndLogNotifySettingsChanged();
+    }
+
+    if (kind == QuickSettingsProcessKind::Explorer ||
+        kind == QuickSettingsProcessKind::StartMenuExperienceHost) {
+        PowerBtnSettingsChanged();
+    }
+
+    WinOpt::AltDrag::SettingsChanged();
+    WinOpt::WinArrange::SettingsChanged();
+    WinOpt::InvisBorders::SettingsChanged();
+}
+
+// 合并前各模组（窗口拖动、窗口排列）各有 DllMain，本模组只保留唯一一份：
+// 线程退出时分别清理 WinOpt 内 AltDrag / WinArrange 的线程级钩子状态。
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
+    switch (fdwReason) {
+        case DLL_PROCESS_ATTACH:
+            break;
+
+        case DLL_THREAD_ATTACH:
+            break;
+
+        case DLL_THREAD_DETACH:
+            WinOpt::AltDrag::OnThreadDetach();
+            WinOpt::WinArrange::OnThreadDetach();
+            break;
+
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+
+    return TRUE;
 }

@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-任务栏音量控制
 // @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
 // @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.5.0
+// @version         1.6.0
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -57,10 +57,16 @@
 - **不自动切换静音**：默认关闭，即音量降到 0 自动静音、调高自动取消静音；开启后不再改变静音状态。
 - **音量步长**：每格滚轮变化的音量，默认 2；Windows 11 指示器下必须是 2 的倍数。
 - **自定义 Windows 11 旧版任务栏**：配合 ExplorerPatcher 等工具使用。
+
+### 切换媒体设备
+
+媒体设备快捷切换相关设置（1.6.0 起从「全局音量控制」分组移出，收进独立的可收起分组）：
+
 - **媒体（播放）设备快速切换**：全局快捷键，按下后把默认播放设备切到下一个，左下角短暂提示设备名；设为 None 关闭。
 - **录音（采集）设备快速切换**：同上，作用于麦克风等录音设备，默认关闭。
 - **跳过未激活的设备**：切换时跳过已禁用或未插入的设备。
-- **切换后提示**：切换成功后在屏幕左下角短暂显示新设备名称。
+- **切换后提示**：切换成功后在屏幕左下角短暂显示新设备名称（播放/录音切换共用该提示；1.6.0 修复了提示从不显示的问题）。
+- **提示持续时间（毫秒）**：提示停留的时长，到时后淡出，默认 1500（范围 500-5000）。
 
 ### 分应用音量控制
 
@@ -87,6 +93,11 @@ explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务�
 - 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
 
 ## 更新日志
+- **1.6.0**：
+  - 设置分组：媒体（播放）/录音（采集）设备快捷切换、跳过未激活的设备、切换后提示四项设置从「全局音量控制」分组移出，收进新的可收起分组「**切换媒体设备**」（键名改为 deviceSwitch.* 前缀；「全局音量控制」分组只保留滚动调音量相关设置，已保存的自定义值在 deploy 脚本同步迁移前会回落为默认值）。
+  - 修复「切换后提示」从不显示的问题：toast 窗口此前创建时样式只有 WS_POPUP（未带 WS_VISIBLE），之后也从未调用 ShowWindow，窗口一直处于隐藏状态——计时与淡出逻辑其实都在正常运行，只是画在了一个看不见的窗口上；现改为分层属性设置完成后立即以 SW_SHOWNOACTIVATE 显示（不抢前台焦点），播放与录音设备切换共用该提示。
+  - 新增「提示持续时间（毫秒）」设置（deviceSwitch.toastDuration，默认 1500，范围 500-5000），控制切换提示停留时长（此前硬编码 2200 毫秒），与「切换后提示」开关并存（开关决定是否显示，时长决定显示多久）。
+
 - **1.5.0**：设置页重组——模组最初的核心功能（滚动调音量、修饰键任意位置滚动、媒体设备快捷切换等）收进「全局音量控制」可收起分组，键名加 globalVolume. 前缀（与「分应用音量控制」分组并列；deploy 会自动迁移旧扁平键的值）。分组归类只影响设置页展示，功能行为与默认值完全不变。
 
 - **1.4.0**：分应用音量控制模组并入本模组（上游 Taskbar Volume Control Per-App，同为 m417z
@@ -164,32 +175,6 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     - modern: Windows 10
     - classic: Windows 7
     - none: 无
-  - deviceSwitchPlaybackKey: "Ctrl+Alt+A"
-    $name: Quick switch media device
-    $name:zh-CN: 媒体（播放）设备快速切换
-    $description: Global hotkey that cycles the default playback device to the next one. Example. Ctrl+Alt+A. Use None to disable.
-    $description:zh-CN: 全局快捷键，按下后把默认播放（媒体输出）设备循环切到下一个。示例 Ctrl+Alt+A。设为 None 可关闭。
-  - deviceSwitchCaptureKey: "None"
-    $name: Quick switch capture device
-    $name:zh-CN: 录音（采集）设备快速切换
-    $description: Global hotkey that cycles the default capture (microphone) device.
-    $description:zh-CN: 全局快捷键，按下后把默认录音（麦克风）设备循环切到下一个。默认关闭。
-  - deviceCycleSkipInactive: "1"
-    $name: Skip inactive devices
-    $name:zh-CN: 跳过未激活的设备
-    $description: Inactive or disconnected devices are skipped when cycling.
-    $description:zh-CN: 循环切换时跳过未激活或已断开的设备。
-    $options:
-    - "1": 开启
-    - "0": 关闭
-  - showDeviceSwitchToast: "1"
-    $name: Toast after device switch
-    $name:zh-CN: 切换后提示
-    $description: Briefly show the new device name at the bottom-left corner after a switch.
-    $description:zh-CN: 切换成功后在屏幕左下角短暂显示新设备名称。
-    $options:
-    - "1": 开启
-    - "0": 关闭
   - scrollArea: taskbar
     $name: Scroll area
     $name:zh-CN: 滚动区域
@@ -250,9 +235,49 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
   $name: Global volume control
   $name:zh-CN: 全局音量控制
   $description: >-
-    The original core features of this mod: scrolling volume control,
-    modifier-key anywhere scrolling, and media device hotkey switching.
-  $description:zh-CN: 模组最初始的核心功能：滚动调音量、修饰键任意位置滚动与播放/录音设备快捷切换。
+    The original core features of this mod: scrolling volume control and
+    modifier-key anywhere scrolling.
+  $description:zh-CN: 模组最初始的核心功能：滚动调音量与修饰键任意位置滚动。
+- deviceSwitch:
+  - playbackKey: "Ctrl+Alt+A"
+    $name: Quick switch media device
+    $name:zh-CN: 媒体（播放）设备快速切换
+    $description: Global hotkey that cycles the default playback device to the next one. Example. Ctrl+Alt+A. Use None to disable.
+    $description:zh-CN: 全局快捷键，按下后把默认播放（媒体输出）设备循环切到下一个。示例 Ctrl+Alt+A。设为 None 可关闭。
+  - captureKey: "None"
+    $name: Quick switch capture device
+    $name:zh-CN: 录音（采集）设备快速切换
+    $description: Global hotkey that cycles the default capture (microphone) device.
+    $description:zh-CN: 全局快捷键，按下后把默认录音（麦克风）设备循环切到下一个。默认关闭。
+  - cycleSkipInactive: "1"
+    $name: Skip inactive devices
+    $name:zh-CN: 跳过未激活的设备
+    $description: Inactive or disconnected devices are skipped when cycling.
+    $description:zh-CN: 循环切换时跳过未激活或已断开的设备。
+    $options:
+    - "1": 开启
+    - "0": 关闭
+  - showToast: "1"
+    $name: Toast after device switch
+    $name:zh-CN: 切换后提示
+    $description: Briefly show the new device name at the bottom-left corner after a switch.
+    $description:zh-CN: 切换成功后在屏幕左下角短暂显示新设备名称。
+    $options:
+    - "1": 开启
+    - "0": 关闭
+  - toastDuration: 1500
+    $name: Toast duration (ms)
+    $name:zh-CN: 提示持续时间（毫秒）
+    $description: >-
+      How long (in milliseconds) the device switch toast stays visible before
+      fading out. Range: 500-5000.
+    $description:zh-CN: 切换提示在屏幕左下角停留的时长（毫秒），到时后淡出。范围 500-5000。
+  $name: Switch media devices
+  $name:zh-CN: 切换媒体设备
+  $description: >-
+    Global hotkeys that cycle the default playback/capture devices, with an
+    optional bottom-left toast showing the new device name.
+  $description:zh-CN: 用全局快捷键循环切换默认播放/录音设备，并可在屏幕左下角短暂提示新设备名称。
 - perApp:
   - volumeChangeStep: 10
     $name: Volume change step (per-app)
@@ -999,6 +1024,7 @@ struct CwDevSwitch {
     bool hasCap = false;
     bool skipInactive = true;
     bool toast = true;
+    int toastDuration = 1500;  // 提示停留时长（毫秒），设置范围 500-5000
 };
 
 static CwDevSwitch g_dev;
@@ -1295,23 +1321,32 @@ static void ShowDevToast(const std::wstring& text) {
         return;
     SetLayeredWindowAttributes(g_devToast, 0, 215, LWA_ALPHA);
     g_toastAlpha = 215;
-    SetTimer(g_devToast, 1, 2200, NULL);
+    SetTimer(g_devToast, 1, g_dev.toastDuration, NULL);
+    // 修复：窗口创建时只有 WS_POPUP（不带 WS_VISIBLE），此前从未调用
+    // ShowWindow，导致 toast 窗口一直处于隐藏状态、提示从未显示。
+    // 现在分层属性设置完毕后立即以不激活方式显示（不抢前台焦点）。
+    ShowWindow(g_devToast, SW_SHOWNOACTIVATE);
 }
 
 static void LoadDevSettings() {
-    PCWSTR s = Wh_GetStringSetting(L"globalVolume.deviceSwitchPlaybackKey");
+    PCWSTR s = Wh_GetStringSetting(L"deviceSwitch.playbackKey");
     g_dev.hasPlay = ParseHotkey(s, g_dev.playMods, g_dev.playKey);
     Wh_FreeStringSetting(s);
-    s = Wh_GetStringSetting(L"globalVolume.deviceSwitchCaptureKey");
+    s = Wh_GetStringSetting(L"deviceSwitch.captureKey");
     g_dev.hasCap = ParseHotkey(s, g_dev.capMods, g_dev.capKey);
     Wh_FreeStringSetting(s);
     // 字符串型设置：缺失/空串视为开启（与设置页默认值一致）
-    PCWSTR skip = Wh_GetStringSetting(L"globalVolume.deviceCycleSkipInactive");
+    PCWSTR skip = Wh_GetStringSetting(L"deviceSwitch.cycleSkipInactive");
     g_dev.skipInactive = wcscmp(skip, L"0") != 0;
     Wh_FreeStringSetting(skip);
-    PCWSTR toast = Wh_GetStringSetting(L"globalVolume.showDeviceSwitchToast");
+    PCWSTR toast = Wh_GetStringSetting(L"deviceSwitch.showToast");
     g_dev.toast = wcscmp(toast, L"0") != 0;
     Wh_FreeStringSetting(toast);
+    // 提示时长：缺失/非法值回落默认 1500，并夹取到 500-5000 毫秒
+    int duration = Wh_GetIntSetting(L"deviceSwitch.toastDuration");
+    if (duration <= 0)
+        duration = 1500;
+    g_dev.toastDuration = std::clamp(duration, 500, 5000);
 }
 
 static void RegisterDevHotkeys() {

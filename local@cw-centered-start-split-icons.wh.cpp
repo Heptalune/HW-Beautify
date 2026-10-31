@@ -1,10 +1,10 @@
 // ==WindhawkMod==
 // @id              cw-centered-start-split-icons
-// @name            CW-开始按钮居中留空
-// @name:zh-CN      CW-开始按钮居中留空
-// @description     Pins the Start button to the true horizontal center of the primary display and splits taskbar app icons into two balanced groups flanking it, assigned right/left alternately by appearance order and anchored tight against the Start button's edges (no window-position tracking; Windows 11 only; incompatible with "Start button always on the left")
-// @description:zh-CN 将「开始」按钮钉在主显示器真正的水平中央，并把应用图标按出现顺序左右交替分成两组均衡的图标簇、分列开始按钮两侧、紧贴其边缘（不跟踪窗口位置、图标不随窗口移动换边；仅 Windows 11；与「开始按钮始终居左」模组互斥）。
-// @version         2.1.0
+// @name            CW-开始按钮居中
+// @name:zh-CN      CW-开始按钮居中
+// @description     Pins the Start button to the true horizontal center of the primary display and splits taskbar app icons into two balanced groups flanking it, assigned right/left alternately by appearance order and anchored tight against the Start button's edges; hover preview thumbnails follow the rearranged visual positions (no window-position tracking; Windows 11 only; incompatible with "Start button always on the left")
+// @description:zh-CN 将「开始」按钮钉在主显示器真正的水平中央，并把应用图标按出现顺序左右交替分成两组均衡的图标簇、分列开始按钮两侧、紧贴其边缘；悬停缩略图预览跟随重排后的视觉位置（不跟踪窗口位置、图标不随窗口移动换边；仅 Windows 11；与「开始按钮始终居左」模组互斥）。
+// @version         2.1.1
 // @author          rick
 // @github          https://github.com/rycalvo
 // @include         explorer.exe
@@ -17,15 +17,21 @@
 
 // CW-Beautify 整合说明：本文件基于上游 1.0.x（rick，Taskbar Start Button
 // Centered Origin）做机制性重写（2.0.0「居中留空·纯布局」；2.1.0 再把 2.0.0
-// 的 leftApps/rightApps 静态名单分流改为按出现顺序的奇偶交替均衡分流）。上游
-// 的全部动态跟踪机制已整体删除——窗口位置周期轮询线程、窗口矩形缓存与拖过
-// 中线换边判定、哨兵点击探测式「按钮 → 窗口句柄」解析、trackWindowPositions
-// 开关、taskListOrder 的 distance-from-center 排序、pinnedAppsAnchor 设置、
-// unresolvedAppsDefaultSide 的 contralateral-to-system-buttons 选项——仅保留并
-// 打磨静态布局能力：开始按钮布局级钉在主显示器水平正中；应用图标按任务栏
-// 原始顺序编号、奇偶交替分流到开始按钮右/左两侧（任意数量下两侧都有图标、
-// 数量差 ≤1），紧贴开始按钮左/右缘向外排列，同侧内保持任务栏原有顺序；
-// 搜索/任务视图/小组件可留最左端或紧贴开始按钮。原版 mod：
+// 的 leftApps/rightApps 静态名单分流改为按出现顺序的奇偶交替均衡分流；2.1.1
+// 修复缩略图预览锚定在按钮「逻辑位置」而非重排后「视觉位置」的问题——悬停
+// 预览窗口由 taskbar.dll 传统任务列表模型按其自有的顺序布局坐标定位，完全不
+// 读 XAML 视觉位置，故本模组在子类化的预览窗口（TaskListThumbnailWnd /
+// XamlExplorerHostIslandWindow）上按「悬停按钮的视觉位移量」同步平移预览
+// 窗口，使缩略图跟随重排后的按钮；详见下方「Hover preview anchor correction」
+// 一节的注释）。上游的全部动态跟踪机制已整体删除——窗口位置周期轮询线程、
+// 窗口矩形缓存与拖过中线换边判定、哨兵点击探测式「按钮 → 窗口句柄」解析、
+// trackWindowPositions 开关、taskListOrder 的 distance-from-center 排序、
+// pinnedAppsAnchor 设置、unresolvedAppsDefaultSide 的
+// contralateral-to-system-buttons 选项——仅保留并打磨静态布局能力：开始按钮
+// 布局级钉在主显示器水平正中；应用图标按任务栏原始顺序编号、奇偶交替分流到
+// 开始按钮右/左两侧（任意数量下两侧都有图标、数量差 ≤1），紧贴开始按钮左/
+// 右缘向外排列，同侧内保持任务栏原有顺序；搜索/任务视图/小组件可留最左端或
+// 紧贴开始按钮。原版 mod：
 // https://windhawk.net/mods/taskbar-centered-start-split-icons
 // x86 兼容性说明：FindCurrentProcessTaskbarWnd() 中存在「无捕获 lambda 直接传给
 // EnumWindows（WNDENUMPROC/stdcall 回调）」的写法，按 x86 兼容规则本应改为显式
@@ -33,13 +39,14 @@
 // 编译 x86 目标，且下方 XamlRootFromTaskbarHostSharedPtr 对非 x64/ARM64 架构有
 // #error 保护），改写该 lambda 并不能让 x86 通过编译、只会无谓偏离上游，故按
 // 上游原样保留、不做改写。代码中其余全部 Win32 回调（子类化/挂钩过程）均为
-// 显式 WINAPI/CALLBACK 函数，无同类问题。
+// 显式 WINAPI/CALLBACK 函数（2.1.1 新增的 EnumWindows 预览窗口扫描同样使用
+// 显式 CALLBACK 函数而非 lambda），无同类问题。
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**rick**（[GitHub：rycalvo](https://github.com/rycalvo)，[Taskbar Start Button Centered Origin](https://windhawk.net/mods/taskbar-centered-start-split-icons)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）基于上游 1.0.x 机制性重写（2.0.0「居中留空·纯布局」；2.1.0 把分流规则改为按出现顺序左右交替均衡排列）。
+> 原作者：**rick**（[GitHub：rycalvo](https://github.com/rycalvo)，[Taskbar Start Button Centered Origin](https://windhawk.net/mods/taskbar-centered-start-split-icons)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）基于上游 1.0.x 机制性重写（2.0.0「居中留空·纯布局」；2.1.0 把分流规则改为按出现顺序左右交替均衡排列；2.1.1 修复缩略图预览不跟随重排位置的问题）。
 
-# CW-开始按钮居中留空
+# CW-开始按钮居中
 
 **开始按钮永远钉在主显示器屏幕真正的水平正中**（无论任务栏上有多少图标）；应用图标按**出现顺序左右交替**分成两组数量均衡的图标簇，分列开始按钮两侧、**紧贴开始按钮的左右边缘**向外排列：
 
@@ -59,6 +66,7 @@
 - **紧贴开始按钮**：两侧图标簇锚定开始按钮边缘、向外生长，同侧内保持任务栏原有顺序。
 - **系统按钮可调**：搜索/任务视图/小组件可留在最左端，或紧贴开始按钮（左/右侧可选）。
 - **无后台活动**：没有窗口位置轮询、没有后台定时器探测、没有窗口跟踪；布局完全由任务栏自身的布局过程驱动，设置改动即时生效。
+- **缩略图预览跟随重排**（2.1.1）：悬停任意图标弹出的缩略图预览窗口出现在该图标当前视觉位置的上方，两组图标各自的预览互不串位。
 
 ## 兼容性
 
@@ -82,6 +90,14 @@
 ## 从 1.x / 2.0.x 升级
 
 1.x 的全部动态能力在 2.0.0 中已整体移除，不再有对应设置：窗口位置轮询与拖过中线图标换边、按离中心线距离排序、`pinnedAppsAnchor`、`trackWindowPositions` 开关、`contralateral-to-system-buttons` 兜底选项。2.1.0 又把 2.0.0 的静态名单分流改为按出现顺序均衡交替分流，`leftApps`/`rightApps`/`unresolvedAppsDefaultSide` 三个设置随之移除——现在无需任何配置，图标即按出现顺序左右交替、均衡地分列开始按钮两侧；若离开了动态换边不可接受，请改用基于上游原版思路的其它实现。
+
+## 2.1.1 变更记录
+
+**修复：悬停图标的缩略图预览弹在按钮的「逻辑位置」而非重排后的「视觉位置」**（开始按钮左侧图标的缩略图弹到右侧）。
+
+根因（对 Windows 11 22H2 的 taskbar.dll / Taskbar.View.dll 做符号级逆向确认）：悬停预览窗口不是由本模组改写的 XAML 布局定位的——它是 taskbar.dll 传统任务列表模型（`CTaskListThumbnailWnd`，内嵌 `XamlExplorerHost` 子窗口）弹出的经典预览，其锚点矩形来自任务栏传统模型里按钮的「顺序布局」坐标，完全读不到本模组在 `IUIElement::Arrange` 层面做的 X 改写，因此预览永远锚定在按钮未被分流时的位置。
+
+修复机制：本模组现在在每次布局改写时记录每个按钮「视觉位置 − 原生位置」的位移量，并捕获预览窗口的创建（按窗口类名 `TaskListThumbnailWnd` / `XamlExplorerHostIslandWindow`，同时挂钩 `CreateWindowExW` 与 `CreateWindowInBand` 两条创建路径），在预览窗口的 `WM_WINDOWPOSCHANGING` 中把窗口 X 平移悬停按钮的同一位移量——无论任务栏内部用哪个模型矩形定位预览，最终落点都会跟随重排后的视觉位置；两组图标各自的预览按各自按钮的位移独立纠正，互不串位。未安装本模组分流（位移为 0）或预览属于副屏任务栏时，纠正自动退化为空操作。可在 Windhawk 日志中搜索 "Preview window subclassed"（预览窗口捕获成功）与 "Preview anchor corrected"（首次纠正生效）验证。
 
 ## 原作者说明
 
@@ -1076,6 +1092,20 @@ std::unordered_map<void*, double> g_lastArrangedX;
 // freshly-launched button first appears icon-only).
 std::unordered_map<void*, double> g_lastArrangedTaskListWidth;
 
+// Each repositioned element's displacement vs its native layout position -
+// plannedX (what we passed to IUIElement::Arrange) minus nativeX (what the
+// taskbar's own layout passed in), in repeater-local DIPs, keyed like
+// g_lastArrangedX. Written by IUIElement_Arrange_Hook on every rewritten
+// call, pruned by RecomputeLayoutPlan to the current plan's key set (see
+// the pruning there for the pointer-recycling rationale). Read by the hover
+// preview anchor correction (PreviewWndSubclassProc) to shift the thumbnail
+// flyout window by the same displacement as the button it is anchored to -
+// the flyout's anchor comes from the taskbar's legacy model, which never
+// sees our XAML-level rewrite. Same-thread maps: both the writer (Arrange
+// passes) and the reader (the preview window's own messages) run on the
+// taskbar thread.
+std::unordered_map<void*, double> g_arrangeDeltaX;
+
 // Set whenever something might have changed that g_lastArrangedX doesn't
 // reflect yet, at the point that change becomes visible on the taskbar
 // thread. Starts true so the first pass always computes a real plan.
@@ -1133,6 +1163,12 @@ HRESULT WINAPI IUIElement_Arrange_Hook(void* pThis,
         }
 
         g_passStats.repositioned++;
+        // Record the displacement this rewrite applies vs the native layout
+        // position - the hover preview anchor correction (see
+        // PreviewWndSubclassProc) shifts the thumbnail flyout window by the
+        // same amount as the button it is anchored to.
+        void* key = winrt::get_abi(element);
+        g_arrangeDeltaX[key] = it->second - rect.X;
         winrt::Windows::Foundation::Rect newRect = rect;
         newRect.X = it->second;
         return IUIElement_Arrange_Original(pThis, newRect);
@@ -1363,6 +1399,16 @@ void RecomputeLayoutPlan() {
         // single-O(n)-pass reasoning.
         PlanTaskListButtons(children, startCenterX, leftBoundLocal,
                             rightBoundLocal, newPlan, newTaskListWidths);
+
+        // Prune g_arrangeDeltaX down to this pass's live plan keys - same
+        // pointer-recycling rationale as g_lastSystemButtonContentWidth's
+        // pruning above (the map is keyed by raw ABI pointers with no
+        // reference held). Values themselves are refreshed by every arrange
+        // pass, so a pruned-surviving key's value is at most one pass old.
+        for (auto it = g_arrangeDeltaX.begin(); it != g_arrangeDeltaX.end();) {
+            it = newPlan.count(it->first) ? std::next(it)
+                                          : g_arrangeDeltaX.erase(it);
+        }
 
         g_lastArrangedX = std::move(newPlan);
         g_lastArrangedTaskListWidth = std::move(newTaskListWidths);
@@ -1598,6 +1644,389 @@ void InvalidateTaskbarLayout() {
 }
 
 // ============================================================================
+// Hover preview (thumbnail flyout) anchor correction
+// ============================================================================
+
+// Hovering a task list button pops up the thumbnail preview window. That
+// window is NOT positioned from the XAML visual tree this mod rearranges:
+// on 22H2 it is taskbar.dll's classic preview (CTaskListThumbnailWnd hosting
+// a Windows::Internal::Shell::XamlExplorerHost child window), and its anchor
+// rect is computed inside the taskbar's legacy task-list model - which still
+// lays the buttons out sequentially and never sees the X-level rewrite this
+// mod applies to IUIElement::Arrange. Result: the preview pops up above the
+// button's "logical" (unsplit) position instead of its visual one.
+//
+// Fix: catch the preview window's creation (class TaskListThumbnailWnd, and
+// the XamlExplorerHost island window it hosts on 22H2), subclass it, and on
+// every WM_WINDOWPOSCHANGING shift the incoming x by the same displacement
+// the hovered button received in the last arrange pass (g_arrangeDeltaX).
+// This corrects the final window position no matter which internal model
+// rect fed it, and degrades to a no-op when this mod didn't move anything.
+//
+// Threading: the preview window lives on the taskbar thread, so both the
+// WM_WINDOWPOSCHANGING reads and the Arrange-pass writes of the shared maps
+// happen on one thread - plain maps are fine. Subclass install/removal may
+// run on other threads (Windhawk's own), which
+// SetWindowSubclassFromAnyThread/RemoveWindowSubclassFromAnyThread handle.
+
+// Both known 22H2 preview host window classes: the legacy overlay window and
+// the XamlExplorerHost island window that hosts the XAML preview content.
+constexpr PCWSTR kPreviewWndClassNames[] = {
+    L"TaskListThumbnailWnd",
+    L"XamlExplorerHostIslandWindow",
+};
+
+bool IsPreviewWndClassName(PCWSTR className) {
+    if (!className || (uintptr_t)className <= 0xFFFF) {
+        // An atom (MAKEINTRESOURCE), not a string - never one of ours.
+        return false;
+    }
+    for (PCWSTR name : kPreviewWndClassNames) {
+        if (_wcsicmp(className, name) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Registered preview windows, for unload-time subclass removal (must happen
+// before Wh_ModUninit returns and this module's code is unmapped - a leaked
+// subclass would crash on the next message). Guarded by a mutex: install can
+// run on any thread (window creation, the init scan), removal runs on
+// Wh_ModBeforeUninit's thread.
+std::mutex g_previewWndsMutex;
+std::vector<HWND> g_previewWnds;
+
+LRESULT CALLBACK PreviewWndSubclassProc(HWND hWnd,
+                                        UINT uMsg,
+                                        WPARAM wParam,
+                                        LPARAM lParam,
+                                        DWORD_PTR dwRefData);
+
+void RegisterPreviewWnd(HWND hWnd) {
+    std::lock_guard<std::mutex> guard(g_previewWndsMutex);
+    if (std::find(g_previewWnds.begin(), g_previewWnds.end(), hWnd) ==
+        g_previewWnds.end()) {
+        g_previewWnds.push_back(hWnd);
+    }
+    Wh_Log(L"Preview window subclassed: %p", hWnd);
+}
+
+void UnregisterPreviewWnd(HWND hWnd) {
+    std::lock_guard<std::mutex> guard(g_previewWndsMutex);
+    std::erase(g_previewWnds, hWnd);
+}
+
+void RemovePreviewWndSubclasses() {
+    std::lock_guard<std::mutex> guard(g_previewWndsMutex);
+    for (HWND hWnd : g_previewWnds) {
+        WindhawkUtils::RemoveWindowSubclassFromAnyThread(hWnd,
+                                                        PreviewWndSubclassProc);
+    }
+    g_previewWnds.clear();
+}
+
+void SubclassPreviewWnd(HWND hWnd) {
+    if (WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd,
+                                                     PreviewWndSubclassProc,
+                                                     0)) {
+        RegisterPreviewWnd(hWnd);
+    } else {
+        Wh_Log(L"SetWindowSubclassFromAnyThread failed for preview %p", hWnd);
+    }
+}
+
+// Checks a freshly created window and subclasses it if it is a hover preview
+// host. Called from the CreateWindowExW/CreateWindowInBand hooks below - the
+// preview windows are created lazily on first hover, and may go through
+// either API (taskbar.dll imports both; tray/host windows are often created
+// in bands).
+void HandleCreatedWindowIfPreview(HWND hWnd, PCWSTR lpClassName) {
+    if (!hWnd || g_unloading || !IsPreviewWndClassName(lpClassName)) {
+        return;
+    }
+    SubclassPreviewWnd(hWnd);
+}
+
+using CreateWindowExW_t = decltype(&CreateWindowExW);
+CreateWindowExW_t CreateWindowExW_Original;
+HWND WINAPI CreateWindowExW_Hook(DWORD dwExStyle,
+                                 LPCWSTR lpClassName,
+                                 LPCWSTR lpWindowName,
+                                 DWORD dwStyle,
+                                 int X,
+                                 int Y,
+                                 int nWidth,
+                                 int nHeight,
+                                 HWND hWndParent,
+                                 HMENU hMenu,
+                                 HINSTANCE hInstance,
+                                 LPVOID lpParam) {
+    HWND hWnd = CreateWindowExW_Original(dwExStyle, lpClassName, lpWindowName,
+                                         dwStyle, X, Y, nWidth, nHeight,
+                                         hWndParent, hMenu, hInstance, lpParam);
+    HandleCreatedWindowIfPreview(hWnd, lpClassName);
+    return hWnd;
+}
+
+// Undocumented user32 export (present since Windows 10): same as
+// CreateWindowExW plus a final band parameter. Resolved dynamically so its
+// absence on any target never breaks the mod.
+using CreateWindowInBand_t = HWND(WINAPI*)(DWORD dwExStyle,
+                                           PCWSTR lpClassName,
+                                           PCWSTR lpWindowName,
+                                           DWORD dwStyle,
+                                           int X,
+                                           int Y,
+                                           int nWidth,
+                                           int nHeight,
+                                           HWND hWndParent,
+                                           HMENU hMenu,
+                                           HINSTANCE hInstance,
+                                           LPVOID lpParam,
+                                           DWORD dwBand);
+CreateWindowInBand_t CreateWindowInBand_Original;
+HWND WINAPI CreateWindowInBand_Hook(DWORD dwExStyle,
+                                    PCWSTR lpClassName,
+                                    PCWSTR lpWindowName,
+                                    DWORD dwStyle,
+                                    int X,
+                                    int Y,
+                                    int nWidth,
+                                    int nHeight,
+                                    HWND hWndParent,
+                                    HMENU hMenu,
+                                    HINSTANCE hInstance,
+                                    LPVOID lpParam,
+                                    DWORD dwBand) {
+    HWND hWnd = CreateWindowInBand_Original(dwExStyle, lpClassName,
+                                            lpWindowName, dwStyle, X, Y,
+                                            nWidth, nHeight, hWndParent, hMenu,
+                                            hInstance, lpParam, dwBand);
+    HandleCreatedWindowIfPreview(hWnd, lpClassName);
+    return hWnd;
+}
+
+// Explicit CALLBACK function for EnumWindows (x86 compatibility rule - no
+// captureless lambdas as WNDENUMPROC). Called at init for previews that
+// already exist (a hover may have happened before the mod loaded).
+BOOL CALLBACK PreviewWndEnumProc(HWND hWnd, LPARAM lParam) {
+    DWORD processId;
+    if (!GetWindowThreadProcessId(hWnd, &processId) ||
+        processId != GetCurrentProcessId()) {
+        return TRUE;
+    }
+
+    WCHAR className[64];
+    if (GetClassName(hWnd, className, ARRAYSIZE(className)) &&
+        IsPreviewWndClassName(className)) {
+        SubclassPreviewWnd(hWnd);
+    }
+
+    return TRUE;
+}
+
+// Resolves the hovered task list button and returns the displacement to
+// apply to the preview window, in physical pixels. Two signals, in order of
+// trust:
+// 1. The cursor position - when the preview shows or switches buttons, the
+//    pointer is over the hovered button's VISUAL location, so the plan entry
+//    whose [plannedX, plannedX + width) contains the cursor is the one.
+// 2. The window's own center vs each button's NATIVE center - used when the
+//    cursor left the taskbar (e.g. moved into the preview itself) while the
+//    taskbar still repositions the window. The preview is horizontally
+//    centered on its button in native coordinates, so the nearest native
+//    center identifies the button regardless of the cursor.
+// Returns 0 when no confident match exists (leave the position alone).
+double GetPreviewShiftPx(HWND hTaskbarWnd, HWND hWnd, WINDOWPOS* wp) {
+    if (g_lastArrangedTaskListWidth.empty()) {
+        return 0;
+    }
+
+    RECT taskbarRect;
+    if (!GetWindowRect(hTaskbarWnd, &taskbarRect)) {
+        return 0;
+    }
+
+    UINT dpi = GetDpiForWindow(hTaskbarWnd);
+    double dipPerPx = dpi ? (96.0 / dpi) : 1.0;
+    double pxPerDip = dpi ? (dpi / 96.0) : 1.0;
+
+    // Current window size (WINDOWPOS::cx is 0 when SWP_NOSIZE is set), and
+    // the incoming x as the new left edge.
+    RECT wndRect;
+    if (!GetWindowRect(hWnd, &wndRect)) {
+        return 0;
+    }
+    double wndWidth = wndRect.right - wndRect.left;
+    if (wndWidth <= 0) {
+        return 0;
+    }
+
+    // 1. Cursor over the taskbar -> match by planned (visual) rect.
+    POINT cursorPos;
+    if (GetCursorPos(&cursorPos) && cursorPos.x >= taskbarRect.left &&
+        cursorPos.x < taskbarRect.right && cursorPos.y >= taskbarRect.top &&
+        cursorPos.y < taskbarRect.bottom) {
+        double cursorDipX = (cursorPos.x - taskbarRect.left) * dipPerPx;
+        void* bestKey = nullptr;
+        double bestDist = 0;
+        for (const auto& [key, width] : g_lastArrangedTaskListWidth) {
+            auto planIt = g_lastArrangedX.find(key);
+            if (planIt == g_lastArrangedX.end()) {
+                continue;
+            }
+            double plannedLeft = planIt->second;
+            double dist = std::abs(cursorDipX - (plannedLeft + width / 2.0));
+            // Strict containment first, then nearest center as tie-break for
+            // overlapping (compressed) buttons.
+            if (cursorDipX < plannedLeft || cursorDipX >= plannedLeft + width) {
+                continue;
+            }
+            if (!bestKey || dist < bestDist) {
+                bestKey = key;
+                bestDist = dist;
+            }
+        }
+        if (bestKey) {
+            auto deltaIt = g_arrangeDeltaX.find(bestKey);
+            if (deltaIt != g_arrangeDeltaX.end()) {
+                return deltaIt->second * pxPerDip;
+            }
+            return 0;
+        }
+    }
+
+    // 2. Nearest native center to the window's own center.
+    double wndCenterDip =
+        ((wp->x + wndWidth / 2.0) - taskbarRect.left) * dipPerPx;
+    void* bestKey = nullptr;
+    double bestDist = 0;
+    double bestWidth = 0;
+    for (const auto& [key, width] : g_lastArrangedTaskListWidth) {
+        auto planIt = g_lastArrangedX.find(key);
+        if (planIt == g_lastArrangedX.end()) {
+            continue;
+        }
+        auto deltaIt = g_arrangeDeltaX.find(key);
+        if (deltaIt == g_arrangeDeltaX.end()) {
+            // Not repositioned by any arrange pass yet (e.g. added to the
+            // plan after the last pass ran) - no displacement known.
+            continue;
+        }
+        double nativeCenterDip =
+            planIt->second - deltaIt->second + width / 2.0;
+        double dist = std::abs(nativeCenterDip - wndCenterDip);
+        if (!bestKey || dist < bestDist) {
+            bestKey = key;
+            bestDist = dist;
+            bestWidth = width;
+        }
+    }
+    if (!bestKey) {
+        return 0;
+    }
+    // The anchor must plausibly belong to this button; a much larger distance
+    // means the plan doesn't describe this window (stale plan, foreign
+    // window on the same monitor) - leave it alone.
+    if (bestDist > std::max(bestWidth, 64.0)) {
+        return 0;
+    }
+    auto deltaIt = g_arrangeDeltaX.find(bestKey);
+    return deltaIt->second * pxPerDip;
+}
+
+void HandlePreviewPositionChanging(HWND hWnd, WINDOWPOS* wp) {
+    if (!wp || (wp->flags & SWP_NOMOVE)) {
+        return;
+    }
+
+    // Top-level windows only - a child window's WM_WINDOWPOSCHANGING carries
+    // client-relative coordinates that don't map to the taskbar space.
+    if (GetAncestor(hWnd, GA_ROOT) != hWnd) {
+        return;
+    }
+
+    // Primary taskbar's monitor only - secondary taskbars aren't rearranged
+    // by this mod and their previews must not be touched.
+    HWND hTaskbarWnd = g_hTaskbarWnd;
+    if (!hTaskbarWnd) {
+        return;
+    }
+    HMONITOR previewMonitor =
+        MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+    HMONITOR taskbarMonitor =
+        MonitorFromWindow(hTaskbarWnd, MONITOR_DEFAULTTONEAREST);
+    if (previewMonitor != taskbarMonitor) {
+        return;
+    }
+
+    double shiftPx = GetPreviewShiftPx(hTaskbarWnd, hWnd, wp);
+    if (shiftPx != 0) {
+        static bool loggedFirstCorrection;
+        if (!loggedFirstCorrection) {
+            loggedFirstCorrection = true;
+            Wh_Log(L"Preview anchor corrected by %.1f px (first correction)",
+                   shiftPx);
+        }
+        wp->x += (int)std::lround(shiftPx);
+    }
+}
+
+LRESULT CALLBACK PreviewWndSubclassProc(HWND hWnd,
+                                        UINT uMsg,
+                                        WPARAM wParam,
+                                        LPARAM lParam,
+                                        DWORD_PTR dwRefData) {
+    if (uMsg == WM_WINDOWPOSCHANGING) {
+        if (!g_unloading) {
+            HandlePreviewPositionChanging(hWnd, (WINDOWPOS*)lParam);
+        }
+    } else if (uMsg == WM_NCDESTROY) {
+        UnregisterPreviewWnd(hWnd);
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+bool HookPreviewWindowCreation() {
+    HMODULE user32Module = GetModuleHandle(L"user32.dll");
+    if (!user32Module) {
+        Wh_Log(L"user32.dll not loaded yet");
+        return false;
+    }
+
+    auto pCreateWindowExW =
+        (CreateWindowExW_t)GetProcAddress(user32Module, "CreateWindowExW");
+    if (!pCreateWindowExW) {
+        Wh_Log(L"Failed to resolve user32.dll!CreateWindowExW");
+        return false;
+    }
+    bool ok = WindhawkUtils::SetFunctionHook(pCreateWindowExW,
+                                             CreateWindowExW_Hook,
+                                             &CreateWindowExW_Original);
+
+    // Optional: band creation path. Not present on some configurations -
+    // absence only costs robustness, not functionality.
+    auto pCreateWindowInBand = (CreateWindowInBand_t)GetProcAddress(
+        user32Module, "CreateWindowInBand");
+    if (pCreateWindowInBand) {
+        ok = WindhawkUtils::SetFunctionHook(pCreateWindowInBand,
+                                            CreateWindowInBand_Hook,
+                                            &CreateWindowInBand_Original) &&
+             ok;
+    } else {
+        Wh_Log(L"user32.dll!CreateWindowInBand not available, skipping");
+    }
+
+    return ok;
+}
+
+void FindExistingPreviewWindows() {
+    EnumWindows(PreviewWndEnumProc, 0);
+}
+
+// ============================================================================
 // Module/symbol hooking
 // ============================================================================
 
@@ -1709,6 +2138,14 @@ BOOL Wh_ModInit() {
         return FALSE;
     }
 
+    // Preview window creation hooks - independent of the Taskbar.View.dll
+    // hooks, installed unconditionally so the thumbnail anchor correction
+    // works as soon as a preview window appears.
+    if (!HookPreviewWindowCreation()) {
+        Wh_Log(L"HookPreviewWindowCreation failed");
+        return FALSE;
+    }
+
     if (HMODULE taskbarViewModule = GetTaskbarViewModuleHandle()) {
         Wh_Log(L"Taskbar view module already loaded at init time");
         g_taskbarViewDllLoaded = true;
@@ -1753,6 +2190,10 @@ void Wh_ModAfterInit() {
     Wh_Log(L"g_hTaskbarWnd = %p, g_taskbarViewDllLoaded = %d",
            (HWND)g_hTaskbarWnd, (int)g_taskbarViewDllLoaded);
 
+    // A hover may have happened before this point - catch preview windows
+    // that already exist.
+    FindExistingPreviewWindows();
+
     InvalidateTaskbarLayout();
 }
 
@@ -1786,6 +2227,10 @@ void Wh_ModBeforeUninit() {
         WindhawkUtils::RemoveWindowSubclassFromAnyThread(
             hTaskbarWnd, TaskbarWndSubclassProc);
     }
+
+    // Same for the hover preview windows - a leaked subclass would call into
+    // unmapped code on the next preview message after unload.
+    RemovePreviewWndSubclasses();
 }
 
 void Wh_ModUninit() {

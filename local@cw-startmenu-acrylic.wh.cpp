@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-开始菜单样式美化
 // @description     Acrylic and transparent Start menu themes with adjustable color, blur, opacity and luminosity.
 // @description:zh-CN 为 Windows 11 开始菜单提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调。
-// @version         4.1.14
+// @version         4.2.0
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         StartMenuExperienceHost.exe
@@ -38,7 +38,7 @@
 
 - 背景颜色、模糊、不透明度、亮度预设，可与任意内置主题搭配。
 - 展开的文件夹面板可单独设置颜色、模糊、不透明度和亮度。
-- 可自定义开始菜单宽度和高度。
+- 可自定义开始菜单宽度和高度，支持全屏菜单（占满屏幕、自动避开任务栏）。
 - 应用名称可显示、隐藏或悬停时显示。
 - 文字颜色与其他 CW 模组共用同一套选项。
 - 搜索页（在开始菜单里打字后出现的页面）与开始菜单使用同一套玻璃、描边和文字颜色。
@@ -47,8 +47,8 @@
 
 - **主题**：默认「自定义玻璃」。其余为原版内置的社区主题，括号内为原名。
 - **控件深色/浅色**：解决浅色模式下开始菜单和搜索页出现白雾的问题，推荐保持「自动」。
-- **开始菜单宽度 / 高度**：单位为像素，0 为系统默认。
-- **自定义文件夹面板**：开启后，四项「文件夹：」设置才生效。
+- **尺寸与全屏**：「开始菜单宽度」单位为像素，不设上限，0 为系统默认；「开始菜单高度」单位为像素，最高 760，超出自动钳到 760，0 为系统默认（小屏幕下仍会按屏幕工作区自动钳制）；「全屏菜单」开启后开始菜单占满整个工作区（屏幕减去任务栏），开启时忽略宽度和高度设置。
+- **文件夹面板**：「自定义文件夹面板」开启后，四项「文件夹：」设置才生效。
 - **高级：搜索 WebView 样式 / 脚本**：作用于搜索面板中的网页内容，写法见附录。
 - **高级：样式常量 / 控件样式 / 资源变量**：用于编写自定义样式，语法见文末附录。一般无需修改。
 
@@ -62,6 +62,7 @@
 
 ## 更新日志
 
+- **4.2.0**：设置页重组：宽度和高度设置与新增的「全屏菜单」开关一起收进新分组「尺寸与全屏」（size.*），原「自定义文件夹面板」与四项「文件夹：」设置收进新分组「文件夹面板」（folders.*），其余设置不变；旧版本保存的宽高与文件夹面板设置自动沿用。新增「全屏菜单」开关（默认关闭）：开启后开始菜单占满整个工作区（屏幕减去任务栏），忽略宽度和高度设置。宽度不再设上限，可任意加大；高度上限改为 760（超出自动钳到 760，下限逻辑不变，小屏幕下仍按工作区自动钳制）。
 - **4.1.14**：模组显示名由「CW-开始菜单美化」改为「CW-开始菜单样式美化」（统一「美化」→「样式美化」命名）；功能与设置项不变。
 
 
@@ -565,79 +566,90 @@ from the **TranslucentTB** project.
     - show: "显示"
     - hide: "隐藏"
     - hover: "悬停时显示"
-- width: 0
-  $name: "Start menu width (px)"
-  $name:zh-CN: "开始菜单宽度（像素）"
-  $description: "Custom width in pixels. 0 uses the system default. Default: 0."
-  $description:zh-CN: "自定义宽度，单位为像素，0 为系统默认。默认 0。"
-- height: 0
-  $name: "Start menu height (px)"
-  $name:zh-CN: "开始菜单高度（像素）"
-  $description: "Custom height in pixels. 0 uses the system default. Default: 0."
-  $description:zh-CN: "自定义高度，单位为像素，0 为系统默认。默认 0。"
-- folderCustomEnabled: false
-  $name: "Custom folder panel"
-  $name:zh-CN: "自定义文件夹面板"
-  $description: "Give expanded folder panels their own color, blur and opacity. When off they follow the main panel. Default: off."
-  $description:zh-CN: "为展开的文件夹面板单独设置颜色、模糊和不透明度；关闭时跟随主面板。默认关闭。"
-- folderBgColorMode: "Default"
-  $name: "Folder: background color"
-  $name:zh-CN: "文件夹：背景颜色"
-  $description: "Tint of the folder panel. Only used when the custom folder panel is on. Default: follow main panel."
-  $description:zh-CN: "文件夹面板的色调，仅在开启自定义文件夹面板时生效。默认为跟随主面板。"
-  $options:
-    - Default: "跟随主面板"
-    - Accent: "系统强调色"
-    - GlassWhite: "透白"
-    - MistGrey: "雾灰"
-    - DeepBlack: "深黑"
-    - OceanBlue: "海蓝"
-    - AuroraCyan: "极光青"
-    - RosePink: "玫瑰粉"
-    - BordeauxRed: "酒红"
-    - ForestGreen: "森林绿"
-    - RoyalPurple: "皇家紫"
-    - SunsetOrange: "落日橙"
-    - ChampagneGold: "香槟金"
-    - MorandiSage: "莫兰迪绿"
-- folderBlurPreset: "20"
-  $name: "Folder: blur"
-  $name:zh-CN: "文件夹：模糊"
-  $description: "Blur strength of the folder panel, 0–60. Default: 20."
-  $description:zh-CN: "文件夹面板的模糊强度，范围 0–60。默认 20。"
-  $options:
-    - "0": "0：不模糊"
-    - "10": "10：轻微"
-    - "20": "20：中等"
-    - "30": "30：较强"
-    - "45": "45：强"
-    - "60": "60：最强"
-- folderOpacityPreset: "40"
-  $name: "Folder: opacity"
-  $name:zh-CN: "文件夹：不透明度"
-  $description: "Fill strength of the folder panel color, 0–100%. Default: 40%."
-  $description:zh-CN: "文件夹面板颜色的填充浓度，范围 0–100%。默认 40%。"
-  $options:
-    - "0": "0%：完全透明"
-    - "10": "10%：很薄"
-    - "25": "25%：较薄"
-    - "40": "40%：适中"
-    - "75": "75%：较厚"
-    - "90": "90%：很厚"
-    - "100": "100%：完全不透明"
-- folderLuminosityPreset: "100"
-  $name: "Folder: luminosity"
-  $name:zh-CN: "文件夹：亮度"
-  $description: "Luminosity layer strength of the folder panel, 0–150. Default: 100."
-  $description:zh-CN: "文件夹面板亮度层的强度，范围 0–150。默认 100。"
-  $options:
-    - "0": "0：最低"
-    - "25": "25：较低"
-    - "50": "50：中"
-    - "75": "75：较高"
-    - "100": "100：标准"
-    - "125": "125：高"
-    - "150": "150：最高"
+- size:
+    - width: 0
+      $name: "Start menu width (px)"
+      $name:zh-CN: "开始菜单宽度（像素）"
+      $description: "Custom width in pixels, no upper limit. 0 uses the system default. Default: 0."
+      $description:zh-CN: "自定义宽度，单位为像素，不设上限，可任意加大，0 为系统默认。默认 0。"
+    - height: 0
+      $name: "Start menu height (px)"
+      $name:zh-CN: "开始菜单高度（像素）"
+      $description: "Custom height in pixels, at most 760 (larger values are clamped to 760). 0 uses the system default. Default: 0."
+      $description:zh-CN: "自定义高度，单位为像素，最高 760（超出自动钳到 760），0 为系统默认。默认 0。"
+    - fullscreen: false
+      $name: "Full screen menu"
+      $name:zh-CN: "全屏菜单"
+      $description: "Show the Start menu full screen: it fills the work area (screen minus taskbar). The width and height above are ignored while this is on. Default: off."
+      $description:zh-CN: "开启后开始菜单全屏显示：占满整个工作区（屏幕减去任务栏）。开启时忽略上方的宽度和高度设置。默认关闭。"
+  $name: "Size and full screen"
+  $name:zh-CN: "尺寸与全屏"
+  $description: "Start menu width, height and full screen mode."
+  $description:zh-CN: "开始菜单的宽度、高度与全屏模式。"
+- folders:
+    - folderCustomEnabled: false
+      $name: "Custom folder panel"
+      $name:zh-CN: "自定义文件夹面板"
+      $description: "Give expanded folder panels their own color, blur and opacity. When off they follow the main panel. Default: off."
+      $description:zh-CN: "为展开的文件夹面板单独设置颜色、模糊和不透明度；关闭时跟随主面板。默认关闭。"
+    - folderBgColorMode: "Default"
+      $name: "Folder: background color"
+      $name:zh-CN: "文件夹：背景颜色"
+      $description: "Tint of the folder panel. Only used when the custom folder panel is on. Default: follow main panel."
+      $description:zh-CN: "文件夹面板的色调，仅在开启自定义文件夹面板时生效。默认为跟随主面板。"
+      $options:
+        - Default: "跟随主面板"
+        - Accent: "系统强调色"
+        - GlassWhite: "透白"
+        - MistGrey: "雾灰"
+        - DeepBlack: "深黑"
+        - OceanBlue: "海蓝"
+        - AuroraCyan: "极光青"
+        - RosePink: "玫瑰粉"
+        - BordeauxRed: "酒红"
+        - ForestGreen: "森林绿"
+        - RoyalPurple: "皇家紫"
+        - SunsetOrange: "落日橙"
+        - ChampagneGold: "香槟金"
+        - MorandiSage: "莫兰迪绿"
+    - folderBlurPreset: "20"
+      $name: "Folder: blur"
+      $name:zh-CN: "文件夹：模糊"
+      $description: "Blur strength of the folder panel, 0–60. Default: 20."
+      $description:zh-CN: "文件夹面板的模糊强度，范围 0–60。默认 20。"
+      $options:
+        - "0": "0：不模糊"
+        - "10": "10：轻微"
+        - "20": "20：中等"
+        - "30": "30：较强"
+        - "45": "45：强"
+        - "60": "60：最强"
+    - folderOpacityPreset: "40"
+      $name: "Folder: opacity"
+      $name:zh-CN: "文件夹：不透明度"
+      $description: "Fill strength of the folder panel color, 0–100%. Default: 40%."
+      $description:zh-CN: "文件夹面板颜色的填充浓度，范围 0–100%。默认 40%。"
+      $options:
+        - "0": "0%：完全透明"
+        - "10": "10%：很薄"
+        - "25": "25%：较薄"
+        - "40": "40%：适中"
+        - "75": "75%：较厚"
+        - "90": "90%：很厚"
+        - "100": "100%：完全不透明"
+    - folderLuminosityPreset: "100"
+      $name: "Folder: luminosity"
+      $name:zh-CN: "文件夹：亮度"
+      $description: "Luminosity layer strength of the folder panel, 0–150. Default: 100."
+      $description:zh-CN: "文件夹面板亮度层的强度，范围 0–150。默认 100。"
+      $options:
+        - "0": "0：最低"
+        - "25": "25：较低"
+        - "50": "50：中"
+        - "75": "75：较高"
+        - "100": "100：标准"
+        - "125": "125：高"
+        - "150": "150：最高"
 - styleConstants: [""]
   $name: "Advanced: style constants"
   $name:zh-CN: "高级：样式常量"
@@ -13961,6 +13973,67 @@ void CWAddSearchMaterialRules(const Theme* theme,
     }
 }
 
+// ── CW: 分组设置兼容读取（4.2.0）──────────────────────────────────────────
+//
+// 4.2.0 起宽高与文件夹面板设置移入分组（size.* / folders.*），旧版本保存的
+// 设置使用扁平键（width、folderBgColorMode、...）。Windhawk 保存设置时会一次
+// 写入全部键，因此「分组键是否存在」可以区分存储布局；deploy 脚本只种子了
+// 扁平的 width/height（无 folderBgColorMode），按未种子处理回退到扁平键。
+
+enum class CWSettingsLayout {
+    kUnseeded,  // 分组键与旧扁平键都不存在（如仅 deploy 种子了宽高）。
+    kLegacy,    // 旧版扁平布局。
+    kNested,    // 4.2.0 分组布局。
+};
+
+CWSettingsLayout CWGetSettingsLayout() {
+    string_setting_unique_ptr nested(
+        Wh_GetStringSetting(L"folders.folderBgColorMode"));
+    if (*nested.get()) {
+        return CWSettingsLayout::kNested;
+    }
+    string_setting_unique_ptr legacy(Wh_GetStringSetting(L"folderBgColorMode"));
+    return *legacy.get() ? CWSettingsLayout::kLegacy
+                         : CWSettingsLayout::kUnseeded;
+}
+
+// 按分组键读取 int 设置，旧布局读扁平键；两者都缺失（未种子）时优先分组键、
+// 取不到再回退扁平键（deploy 只种子扁平 width/height 的场景）。
+int CWGetIntSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
+    switch (CWGetSettingsLayout()) {
+        case CWSettingsLayout::kNested:
+            return Wh_GetIntSetting(nestedName);
+        case CWSettingsLayout::kLegacy:
+            return Wh_GetIntSetting(legacyName);
+        default: {
+            int nested = Wh_GetIntSetting(nestedName);
+            return nested ? nested : Wh_GetIntSetting(legacyName);
+        }
+    }
+}
+
+// 按分组键读取字符串设置，回退规则同上。返回 std::wstring 以自动释放。
+std::wstring CWGetStringSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
+    switch (CWGetSettingsLayout()) {
+        case CWSettingsLayout::kNested: {
+            string_setting_unique_ptr value(Wh_GetStringSetting(nestedName));
+            return std::wstring(value.get());
+        }
+        case CWSettingsLayout::kLegacy: {
+            string_setting_unique_ptr value(Wh_GetStringSetting(legacyName));
+            return std::wstring(value.get());
+        }
+        default: {
+            string_setting_unique_ptr nested(Wh_GetStringSetting(nestedName));
+            if (*nested.get()) {
+                return std::wstring(nested.get());
+            }
+            string_setting_unique_ptr legacy(Wh_GetStringSetting(legacyName));
+            return std::wstring(legacy.get());
+        }
+    }
+}
+
 void ProcessAllStylesFromSettings() {
     PCWSTR themeName = Wh_GetStringSetting(L"theme");
     const Theme* theme = nullptr;
@@ -14338,14 +14411,20 @@ void ProcessAllStylesFromSettings() {
     }
 
     // Folder panel custom brush
-    bool folderCustomEnabled = Wh_GetIntSetting(L"folderCustomEnabled");
+    bool folderCustomEnabled = CWGetIntSettingCompat(L"folders.folderCustomEnabled",
+                                                     L"folderCustomEnabled") != 0;
     if (folderCustomEnabled) {
-        PCWSTR folderBgColorMode = Wh_GetStringSetting(L"folderBgColorMode");
-        int folderBlurVal = Wh_GetIntSetting(L"folderBlurPreset");
-        int folderOpVal = Wh_GetIntSetting(L"folderOpacityPreset");
-        int folderLumVal = Wh_GetIntSetting(L"folderLuminosityPreset");
+        std::wstring folderBgColorMode = CWGetStringSettingCompat(
+            L"folders.folderBgColorMode", L"folderBgColorMode");
+        int folderBlurVal = CWGetIntSettingCompat(L"folders.folderBlurPreset",
+                                                  L"folderBlurPreset");
+        int folderOpVal = CWGetIntSettingCompat(L"folders.folderOpacityPreset",
+                                                L"folderOpacityPreset");
+        int folderLumVal = CWGetIntSettingCompat(L"folders.folderLuminosityPreset",
+                                                 L"folderLuminosityPreset");
 
-        const wchar_t* folderBgMode = folderBgColorMode ? folderBgColorMode : L"Default";
+        const wchar_t* folderBgMode =
+            folderBgColorMode.empty() ? L"Default" : folderBgColorMode.c_str();
 
         std::wstring folderColorStr = L"";
         if (wcscmp(folderBgMode, L"Accent") == 0) { folderColorStr = L"{ThemeResource SystemAccentColor}";
@@ -14433,8 +14512,6 @@ void ProcessAllStylesFromSettings() {
                 Wh_Log(L"Folder brush error: %S", ex.what());
             }
         }
-
-        Wh_FreeStringSetting(folderBgColorMode);
     }
 
     PCWSTR textColorMode = Wh_GetStringSetting(L"textColorMode");
@@ -15311,15 +15388,20 @@ std::atomic<bool> g_unloading;
 struct {
     int width;
     int height;
+    bool fullscreen;  // CW: 全屏菜单（4.2.0），占满工作区。
 } g_sizeSettings;
 
 void LoadSizeSettings() {
-    g_sizeSettings.width = Wh_GetIntSetting(L"width");
-    g_sizeSettings.height = Wh_GetIntSetting(L"height");
+    // CW: 4.2.0 起宽高在 size: 分组下（size.width / size.height），旧扁平键回退。
+    g_sizeSettings.width = CWGetIntSettingCompat(L"size.width", L"width");
+    g_sizeSettings.height = CWGetIntSettingCompat(L"size.height", L"height");
+    // CW: 全屏菜单（4.2.0 新增，无旧键）。
+    g_sizeSettings.fullscreen = Wh_GetIntSetting(L"size.fullscreen") != 0;
 }
 
-// CW: 把自定义尺寸钳制到屏幕工作区，避免开始菜单底部按钮排被推出屏幕外。
-double ClampToWorkArea(double value, bool isHeight) {
+// CW: 取主显示器工作区尺寸（DIP）。isHeight=true 返回高度，否则宽度；获取
+// 失败返回 0。工作区已自动扣除任务栏高度。
+double GetWorkAreaDip(bool isHeight) {
     try {
         double scale = 1.0;
         try {
@@ -15334,11 +15416,25 @@ double ClampToWorkArea(double value, bool isHeight) {
         }
         RECT workArea{};
         if (!SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0)) {
+            return 0.0;
+        }
+        double workAreaPixels =
+            isHeight ? (workArea.bottom - workArea.top)
+                     : (workArea.right - workArea.left);
+        return workAreaPixels / scale;
+    } catch (...) {
+        return 0.0;
+    }
+}
+
+// CW: 把自定义高度钳制到屏幕工作区，避免开始菜单底部按钮排被推出屏幕外。
+// 4.2.0 起仅高度使用：宽度不再设上限，高度另有 760 上限（见 GetEffectiveMenuHeight）。
+double ClampToWorkArea(double value, bool isHeight) {
+    try {
+        double workAreaDip = GetWorkAreaDip(isHeight);
+        if (workAreaDip <= 0) {
             return value;
         }
-        double workAreaDip = isHeight
-                                 ? (workArea.bottom - workArea.top) / scale
-                                 : (workArea.right - workArea.left) / scale;
         double limit = std::fmax(workAreaDip - 60.0, 200.0);  // CW: 预留窗口装饰余量
         if (value > limit) {
             Wh_Log(L"Size clamped to work area: %.0f -> %.0f", value, limit);
@@ -15348,6 +15444,42 @@ double ClampToWorkArea(double value, bool isHeight) {
     } catch (...) {
         return value;
     }
+}
+
+// CW: 用户设置高度的上限（4.2.0）：超过 760 钳到 760；下限逻辑不变（0 为系统默认）。
+constexpr double kCWMaxMenuHeight = 760.0;
+
+// CW: 实际应用的菜单宽度（DIP）。全屏时取工作区宽度（占满屏幕宽）；否则用
+// 用户设置——4.2.0 起宽度不设上限。0 表示用系统默认。
+double GetEffectiveMenuWidth() {
+    if (g_sizeSettings.fullscreen) {
+        double workAreaWidth = GetWorkAreaDip(false);
+        if (workAreaWidth > 0) {
+            return workAreaWidth;
+        }
+        Wh_Log(L"Fullscreen: work area unavailable, falling back to custom width");
+    }
+    return g_sizeSettings.width > 0 ? static_cast<double>(g_sizeSettings.width)
+                                    : 0.0;
+}
+
+// CW: 实际应用的菜单高度（DIP）。全屏时取工作区高度（已扣任务栏，不受 760
+// 上限约束）；否则用用户设置并钳制：上限 760，小屏幕下仍按工作区钳制（取
+// 较小者），下限逻辑不变。0 表示用系统默认。
+double GetEffectiveMenuHeight() {
+    if (g_sizeSettings.fullscreen) {
+        double workAreaHeight = GetWorkAreaDip(true);
+        if (workAreaHeight > 0) {
+            return workAreaHeight;
+        }
+        Wh_Log(L"Fullscreen: work area unavailable, falling back to custom height");
+    }
+    if (g_sizeSettings.height <= 0) {
+        return 0.0;
+    }
+    double height =
+        std::fmin(static_cast<double>(g_sizeSettings.height), kCWMaxMenuHeight);
+    return ClampToWorkArea(height, true);
 }
 
 namespace StartMenuUI {
@@ -15535,7 +15667,8 @@ void ApplyStyleClassicStartMenu(FrameworkElement content) {
     Wh_Log(L"Invalidating measure");
     startSizingFrame.InvalidateMeasure();
 
-    Wh_Log(L"Setting size: %dx%d", g_sizeSettings.width, g_sizeSettings.height);
+    Wh_Log(L"Setting size: %dx%d (fullscreen=%d)", g_sizeSettings.width,
+           g_sizeSettings.height, g_sizeSettings.fullscreen ? 1 : 0);
 
     if (g_unloading) {
         if (g_originalClassicWidth) {
@@ -15558,13 +15691,13 @@ void ApplyStyleClassicStartMenu(FrameworkElement content) {
         // startSizingFrame (the Canvas is full-screen).
         constexpr double kPadding = 12 * 2;
 
-        if (g_sizeSettings.width > 0) {
+        // CW: 全屏时宽取工作区宽；否则用用户设置（4.2.0 起不设上限）。
+        double width = GetEffectiveMenuWidth();
+        if (width > 0) {
             if (!g_originalClassicWidth) {
                 g_originalClassicWidth.emplace();
                 SaveWidth(startSizingFrame, *g_originalClassicWidth);
             }
-            double width = ClampToWorkArea(
-                static_cast<double>(g_sizeSettings.width), false);
             width = std::fmax(width - kPadding, 0);
             startSizingFrame.Width(width);
             startSizingFrame.MinWidth(width);
@@ -15595,13 +15728,13 @@ void ApplyStyleClassicStartMenu(FrameworkElement content) {
             }
         }
 
-        if (g_sizeSettings.height > 0) {
+        // CW: 全屏时高取工作区高（已扣任务栏）；否则用用户设置，上限 760。
+        double height = GetEffectiveMenuHeight();
+        if (height > 0) {
             if (!g_originalClassicHeight) {
                 g_originalClassicHeight.emplace();
                 SaveHeight(startSizingFrame, *g_originalClassicHeight);
             }
-            double height = ClampToWorkArea(
-                static_cast<double>(g_sizeSettings.height), true);
             height = std::fmax(height - kPadding, 0);
             startSizingFrame.Height(height);
             startSizingFrame.MinHeight(height);
@@ -15634,7 +15767,8 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
         return;
     }
 
-    Wh_Log(L"Setting size: %dx%d", g_sizeSettings.width, g_sizeSettings.height);
+    Wh_Log(L"Setting size: %dx%d (fullscreen=%d)", g_sizeSettings.width,
+           g_sizeSettings.height, g_sizeSettings.fullscreen ? 1 : 0);
 
     if (g_unloading) {
         if (g_originalMainMenuWidth) {
@@ -15652,7 +15786,9 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
     } else {
         constexpr int kMinWidth = 270;
 
-        if (g_sizeSettings.width > 0) {
+        // CW: 全屏时宽取工作区宽；否则用用户设置（4.2.0 起不设上限）。
+        double width = GetEffectiveMenuWidth();
+        if (width > 0) {
             if (!g_originalMainMenuWidth) {
                 g_originalMainMenuWidth.emplace();
                 SaveWidth(mainMenu, *g_originalMainMenuWidth);
@@ -15668,8 +15804,6 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
                 padding = frameRootActualWidth - mainMenuActualWidth;
             }
 
-            double width = ClampToWorkArea(
-                static_cast<double>(g_sizeSettings.width), false);
             width = static_cast<double>(std::fmax(width, kMinWidth));
             width = std::fmax(width - padding, kMinWidth);
             mainMenu.Width(width);
@@ -15680,13 +15814,13 @@ void ApplyStyleRedesignedStartMenu(FrameworkElement content) {
             g_originalMainMenuWidth.reset();
         }
 
-        if (g_sizeSettings.height > 0) {
+        // CW: 全屏时高取工作区高（已扣任务栏）；否则用用户设置，上限 760。
+        double height = GetEffectiveMenuHeight();
+        if (height > 0) {
             if (!g_originalFrameRootHeight) {
                 g_originalFrameRootHeight.emplace();
                 SaveHeight(frameRoot, *g_originalFrameRootHeight);
             }
-            double height =
-                ClampToWorkArea(static_cast<double>(g_sizeSettings.height), true);
             frameRoot.Height(height);
             frameRoot.MinHeight(height);
             frameRoot.MaxHeight(height);
