@@ -51,12 +51,30 @@ common_files = [
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
     'tools/CW-Beautify-StartupCheck.ps1',  # optional, installed only with -StartupCheck
     'tools/UAC-白名单管理.ps1',
+    'uninstall-gui.bat',
+    'uninstall-gui.ps1',
     'deploy-gui.bat',
     'deploy-gui.ps1',
     # 可选 mod（3 个，仅在部署时选择安装才启用）
     'optional/local@cw-windows-animations.wh.cpp',
     'optional/local@cw-live-video-wallpaper.wh.cpp',
     'optional/THIRD_PARTY_NOTICES.md',
+    'standalone/local@cw-desktop-marquee-fade.wh.cpp',
+    'standalone/local@cw-disk-usage-bar-customizer.wh.cpp',
+    'standalone/local@cw-drag-to-delete.wh.cpp',
+    'standalone/local@cw-explorer-details-better-file-sizes.wh.cpp',
+    'standalone/local@cw-explorer-double-click-up.wh.cpp',
+    'standalone/local@cw-explorer-info-bar-plus.wh.cpp',
+    'standalone/local@cw-extension-no-warning.wh.cpp',
+    'standalone/local@cw-file-explorer-content-animation.wh.cpp',
+    'standalone/local@cw-file-hover-info.wh.cpp',
+    'standalone/local@cw-hide-desktop-icon-text.wh.cpp',
+    'standalone/local@cw-logon-logoff-shutdown-sounds.wh.cpp',
+    'standalone/local@cw-smooth-desktop-icons-autohide.wh.cpp',
+    'standalone/local@cw-taskbar-clock-customization.wh.cpp',
+    'standalone/local@cw-tray-system-icons.wh.cpp',
+    'standalone/local@cw-win11-power-buttons.wh.cpp',
+    'standalone/local@cw-window-optimizer.wh.cpp',
     # DLC 额外内容（8 个 tool mod，引发 windhawk.exe 宿主进程、内存占用较高，
     # 由 deploy-dlc.ps1 单独安装、用户自选安装，主部署不扫描 dlc\ 目录）
     'dlc/local@cw-shake-find-cursor.wh.cpp',

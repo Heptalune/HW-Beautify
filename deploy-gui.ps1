@@ -6,8 +6,10 @@
 #    * deploy.bat + deploy.ps1 仍是「全量安装」：装入仓库根目录 + optional\ 的全部模组，
 #      并负责退役模组清理、旧 id 迁移、包内 Windhawk 安装引导等全量职责。
 #    * 本脚本（deploy-gui.bat + deploy-gui.ps1）是图形化选择器：
-#      按部位分组列出 根目录 / optional\ / dlc\ 的全部 local@*.wh.cpp，
+#      按部位分组列出 根目录 / optional\ / dlc\ / standalone\ 的全部 local@*.wh.cpp，
 #      用户勾选后「只安装勾选的模组」；未勾选的模组完全不触碰（不卸载、不改动）。
+#      standalone\ 是多合一融合模组的原始单独版本（历史独立版），归入
+#      「单模组版（融合版的原始单独形态）」分区，与对应融合模组二选一安装。
 #    * 启动时同步检测本机 Windhawk 已安装的模组：已装项在列表中置灰禁选、
 #      不占用勾选计数（如需重装/升级已装模组，请使用 deploy.bat 全量部署）。
 #    * 安装策略与 deploy.ps1 完全一致：只把模组源码与元数据装入 Windhawk，
@@ -243,12 +245,15 @@ function Find-WindhawkDir {
 
 # 分类规则（硬编码映射表，键为部署 id = 文件 BaseName）。
 # 分区顺序固定如下；dlc\ 目录下的模组无条件归入「DLC 额外内容」，
+# standalone\ 目录下的模组无条件归入「单模组版（融合版的原始单独形态）」，
 # optional\ 目录下的模组按映射归入对应部位分区并加【可选】标记；
 # 未出现在映射表里的模组归入「其他」分区（防未来新增模组遗漏）。
 $script:CategoryOrder = @(
     "任务栏", "开始菜单与通知中心", "文件管理器", "桌面", "窗口与右键菜单",
-    "系统工具", "DLC 额外内容", "其他"
+    "系统工具", "单模组版（融合版的原始单独形态）", "DLC 额外内容", "其他"
 )
+# standalone\ 分区名（Get-ModCatalog / Show-CatalogOnly / New-GuiForm 共用）
+$script:StandaloneCategory = "单模组版（融合版的原始单独形态）"
 $script:ModCategoryMap = @{
     # —— 任务栏 ——
     "local@cw-taskbar-acrylic"                    = "任务栏"   # CW-任务栏样式美化
@@ -284,6 +289,42 @@ $script:ModCategoryMap = @{
     "local@cw-modernized"                         = "系统工具"   # CW-现代化的Windows
     "local@cw-resource-redirect"                  = "系统工具"   # CW-资源重定向
     "local@cw-settings-styler"                    = "系统工具"   # CW-设置样式美化
+}
+
+# standalone\ 目录模组 → 对应融合模组（部署 id）映射表，用于悬浮提示注明
+# 「与融合版功能重叠，二选一安装」。值即融合模组的部署 id；唯一的例外是
+# local@cw-overhauled-alt-tab：它没有别的融合归宿，现役版本就是 dlc\ 里的
+# 同名模组，提示语按「DLC 现役版」特判（见 New-GuiForm / Show-CatalogOnly）。
+# 映射依据（deploy.ps1 退役注释与各版本 CHANGELOG）：
+#   * v2.5.0：框选淡出、图标平滑自动隐藏并入 更好的Windows（小细节）；
+#   * v2.6.0：隐藏桌面图标文字并入 更好的Windows；时钟自定义、托盘系统图标
+#     并入 托盘区域设置；窗口拖动/滑动排列/隐形边框三合一为 窗口优化；
+#   * v2.7.0：扩展名警告、双击返回上级、开始菜单电源按钮、拖动删除、
+#     登录/注销/关机声音、窗口优化 六者并入 更好的Windows（小细节）；
+#   * v2.7.1：大小列增强、悬停信息、内容动画、磁盘使用率条、信息栏增强、
+#     双击返回上级 六者融合为 更好的文件管理器。
+$script:StandaloneMergedMap = @{
+    # → CW-更好的Windows（小细节）
+    "local@cw-desktop-marquee-fade"               = "local@cw-desktop-quick-settings"
+    "local@cw-smooth-desktop-icons-autohide"      = "local@cw-desktop-quick-settings"
+    "local@cw-hide-desktop-icon-text"             = "local@cw-desktop-quick-settings"
+    "local@cw-win11-power-buttons"                = "local@cw-desktop-quick-settings"
+    "local@cw-drag-to-delete"                     = "local@cw-desktop-quick-settings"
+    "local@cw-logon-logoff-shutdown-sounds"       = "local@cw-desktop-quick-settings"
+    "local@cw-window-optimizer"                   = "local@cw-desktop-quick-settings"
+    # → CW-更好的文件管理器
+    "local@cw-extension-no-warning"               = "local@cw-file-explorer-plus"
+    "local@cw-explorer-double-click-up"           = "local@cw-file-explorer-plus"
+    "local@cw-explorer-details-better-file-sizes" = "local@cw-file-explorer-plus"
+    "local@cw-explorer-info-bar-plus"             = "local@cw-file-explorer-plus"
+    "local@cw-file-explorer-content-animation"    = "local@cw-file-explorer-plus"
+    "local@cw-file-hover-info"                    = "local@cw-file-explorer-plus"
+    "local@cw-disk-usage-bar-customizer"          = "local@cw-file-explorer-plus"
+    # → CW-托盘区域设置
+    "local@cw-taskbar-clock-customization"        = "local@cw-tray-area-settings"
+    "local@cw-tray-system-icons"                  = "local@cw-tray-area-settings"
+    # → DLC 现役版（同名模组，见「DLC 额外内容」分区）
+    "local@cw-overhauled-alt-tab"                 = "local@cw-overhauled-alt-tab"
 }
 
 # 解析单个模组源码头部的 WindhawkMod 元数据块。
@@ -344,12 +385,13 @@ function Get-ModMetadata ($file) {
     }
 }
 
-# 扫描 根目录 / optional\ / dlc\ 的全部 local@*.wh.cpp，解析元数据并归类。
+# 扫描 根目录 / optional\ / dlc\ / standalone\ 的全部 local@*.wh.cpp，解析元数据并归类。
 function Get-ModCatalog {
     $dirs = @(
-        @{ Path = $PSScriptRoot;                          Kind = "core" },
-        @{ Path = (Join-Path $PSScriptRoot "optional");   Kind = "optional" },
-        @{ Path = (Join-Path $PSScriptRoot "dlc");        Kind = "dlc" }
+        @{ Path = $PSScriptRoot;                              Kind = "core" },
+        @{ Path = (Join-Path $PSScriptRoot "optional");       Kind = "optional" },
+        @{ Path = (Join-Path $PSScriptRoot "dlc");            Kind = "dlc" },
+        @{ Path = (Join-Path $PSScriptRoot "standalone");     Kind = "standalone" }
     )
     $catalog = New-Object System.Collections.Generic.List[object]
     foreach ($d in $dirs) {
@@ -373,6 +415,12 @@ function Get-ModCatalog {
             if ($d.Kind -eq "dlc") {
                 # DLC 目录下的模组固定归入「DLC 额外内容」，不依赖映射表
                 $cat = "DLC 额外内容"
+            } elseif ($d.Kind -eq "standalone") {
+                # standalone 目录下的模组固定归入「单模组版（融合版的原始单独形态）」。
+                # 注：cw-overhauled-alt-tab 同时存在于 dlc\ 与 standalone\（历史原因：
+                # v2.7.1 曾从现代化的Windows 回退为 DLC 独立模组），两个分区会各列
+                # 一条同 id 条目；Invoke-InstallClicked 已按 id 去重（先勾选的生效）。
+                $cat = $script:StandaloneCategory
             } elseif ($script:ModCategoryMap.ContainsKey($fullId)) {
                 $cat = $script:ModCategoryMap[$fullId]
             } else {
@@ -412,9 +460,10 @@ function Show-CatalogOnly {
         exit 1
     }
     $groups = Get-CatalogByCategory $catalog
-    $coreCount = @($catalog | Where-Object { $_.Source -eq "core" }).Count
-    $optCount  = @($catalog | Where-Object { $_.Source -eq "optional" }).Count
-    $dlcCount  = @($catalog | Where-Object { $_.Source -eq "dlc" }).Count
+    $coreCount      = @($catalog | Where-Object { $_.Source -eq "core" }).Count
+    $optCount       = @($catalog | Where-Object { $_.Source -eq "optional" }).Count
+    $dlcCount       = @($catalog | Where-Object { $_.Source -eq "dlc" }).Count
+    $standaloneCount = @($catalog | Where-Object { $_.Source -eq "standalone" }).Count
 
     Write-Host "================================================"
     Write-Host "  CW-Beautify 模组安装选择器 - 模组清单（干跑模式，不安装）"
@@ -422,7 +471,8 @@ function Show-CatalogOnly {
     Write-Host "扫描目录：$PSScriptRoot"
     Write-Host "          $(Join-Path $PSScriptRoot 'optional')"
     Write-Host "          $(Join-Path $PSScriptRoot 'dlc')"
-    Write-Host "共 $($catalog.Count) 个模组：核心 $coreCount / 可选 $optCount / DLC $dlcCount"
+    Write-Host "          $(Join-Path $PSScriptRoot 'standalone')"
+    Write-Host "共 $($catalog.Count) 个模组：核心 $coreCount / 可选 $optCount / DLC $dlcCount / 单模组版 $standaloneCount"
 
     foreach ($cat in $groups.Keys) {
         $mods = $groups[$cat]
@@ -430,15 +480,22 @@ function Show-CatalogOnly {
         Write-Host ""
         if ($cat -eq "DLC 额外内容") {
             Write-Host "[$cat]  ⚠ DLC 为 tool mod：开启任意一个都会引发 windhawk.exe 宿主进程，内存占用较高，按需选用" -ForegroundColor Red
+        } elseif ($cat -eq $script:StandaloneCategory) {
+            Write-Host "[$cat]  ⚠ 以下是多合一融合模组的原始单独版本；与融合版功能重复，请勿同时安装/启用" -ForegroundColor Yellow
         } else {
             Write-Host "[$cat]" -ForegroundColor Cyan
         }
         foreach ($mod in $mods) {
             $incText = if ($mod.Includes.Count -gt 0) { $mod.Includes -join " | " } else { "（默认 explorer.exe）" }
-            $srcText = switch ($mod.Source) { "core" { "根目录" } "optional" { "optional" } "dlc" { "dlc" } default { $mod.Source } }
+            $srcText = switch ($mod.Source) { "core" { "根目录" } "optional" { "optional" } "dlc" { "dlc" } "standalone" { "standalone" } default { $mod.Source } }
             Write-Host "  [$($mod.Id)] $($mod.Name)  v$($mod.Version)  [$srcText]" -ForegroundColor White
             Write-Host "      注入: $incText" -ForegroundColor Gray
-            if ($mod.DescriptionFull) { Write-Host "      说明: $($mod.DescriptionFull)" -ForegroundColor Gray }
+            if ($mod.Source -eq "standalone") {
+                Write-Host "      ⚠ 与融合版功能重叠，二选一安装" -ForegroundColor Yellow
+                if ($mod.DescriptionFull) { Write-Host "      说明: $($mod.DescriptionFull)" -ForegroundColor Gray }
+            } elseif ($mod.DescriptionFull) {
+                Write-Host "      说明: $($mod.DescriptionFull)" -ForegroundColor Gray
+            }
         }
     }
     Write-Host ""
@@ -1354,10 +1411,39 @@ function Invoke-InstallClicked {
         return
     }
 
+    # 单模组版互斥防护：
+    #   * local@cw-overhauled-alt-tab 在 DLC 与单模组版分区各有一条同 id 条目，
+    #     按 id 去重，只安装先勾选的那个文件（重复条目在确认框中注明）；
+    #   * 单模组版与其对应融合模组同时勾选时，在确认框中提醒（不阻止，由用户定夺）。
+    $deduped = New-Object System.Collections.Generic.List[object]
+    $seenIds = New-Object 'System.Collections.Generic.HashSet[string]'
+    $dupNames = New-Object System.Collections.Generic.List[string]
+    foreach ($mod in $selected) {
+        if ($seenIds.Add("$($mod.Id)")) { $deduped.Add($mod) }
+        else { $dupNames.Add($mod.Name) }
+    }
+    $overlapNames = New-Object System.Collections.Generic.List[string]
+    foreach ($mod in $deduped) {
+        if ($mod.Source -ne "standalone") { continue }
+        $mergedId = $null
+        if ($script:StandaloneMergedMap.ContainsKey("$($mod.Id)")) { $mergedId = $script:StandaloneMergedMap["$($mod.Id)"] }
+        if (-not $mergedId -or "$mergedId" -eq "$($mod.Id)") { continue }
+        $mergedSel = @($deduped | Where-Object { "$($_.Id)" -eq "$mergedId" })
+        if ($mergedSel.Count -gt 0) { $overlapNames.Add("$($mod.Name) ←→ $($mergedSel[0].Name)") }
+    }
+
+    $selected = $deduped
     $names = ($selected | ForEach-Object { $_.Name }) -join "、"
     if ($names.Length -gt 300) { $names = $names.Substring(0, 300) + "…" }
+    $confirmNote = ""
+    if ($dupNames.Count -gt 0) {
+        $confirmNote += "`n`n注意：以下模组在多个分区重复出现，本次只安装先勾选的版本：`n  " + (($dupNames) -join "`n  ")
+    }
+    if ($overlapNames.Count -gt 0) {
+        $confirmNote += "`n`n⚠ 以下「单模组版」与其融合版被同时勾选，功能重叠，建议二选一：`n  " + (($overlapNames) -join "`n  ")
+    }
     $answer = [System.Windows.Forms.MessageBox]::Show($script:Form,
-        "即将安装 $($selected.Count) 个模组：`n$names`n`n安装会先停止 Windhawk 引擎与界面，完成后自动重启 Windhawk。`n未勾选的模组不会被改动（不卸载、不覆盖设置），已开启的模组开关状态保持不变。`n`n是否继续？",
+        "即将安装 $($selected.Count) 个模组：`n$names`n`n安装会先停止 Windhawk 引擎与界面，完成后自动重启 Windhawk。`n未勾选的模组不会被改动（不卸载、不覆盖设置），已开启的模组开关状态保持不变。$confirmNote`n`n是否继续？",
         "确认安装", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
     if ($answer -ne [System.Windows.Forms.DialogResult]::Yes) { return }
 
@@ -1408,6 +1494,10 @@ function New-GuiForm ($catalog) {
     }
     $script:InstalledCount   = @($catalog | Where-Object { $_.Installed }).Count
     $script:InstallableCount = $catalog.Count - $script:InstalledCount
+
+    # id → 中文名查找表：给单模组版条目的悬浮提示标注其对应融合模组的中文名
+    $nameById = @{}
+    foreach ($mod in $catalog) { $nameById["$($mod.Id)"] = $mod.Name }
 
     $script:ModChecks  = New-Object System.Collections.Generic.List[object]
     $script:Installing = $false
@@ -1505,12 +1595,23 @@ function New-GuiForm ($catalog) {
             Add-ContentRow $warn 8 2 0 2
         }
 
+        # 单模组版分区顶部灰字说明（与融合版功能重叠的互斥提醒）
+        if ($cat -eq $script:StandaloneCategory) {
+            $note = New-Object System.Windows.Forms.Label
+            $note.Text = "以下是多合一融合模组的原始单独版本；与融合版功能重复，请勿同时安装/启用"
+            $note.ForeColor = [System.Drawing.Color]::Gray
+            $note.AutoSize = $true
+            $note.Dock = 'Fill'
+            Add-ContentRow $note 8 2 0 2
+        }
+
         foreach ($mod in $mods) {
             # 复选框（默认不勾选；整行可点击）
             $cb = New-Object System.Windows.Forms.CheckBox
             $incText = if ($mod.Includes.Count -gt 0) { $mod.Includes -join " / " } else { "（默认 explorer.exe）" }
             $prefix = ""
             if ($mod.Source -eq "optional") { $prefix = "【可选】" }
+            if ($mod.Source -eq "standalone") { $prefix = "【单模组版】" }
             # 已安装的模组：复选框禁用（禁用后整行随系统置灰，徽标同为灰色）
             $badge = ""
             if ($mod.Installed) { $badge = "【已安装】" }
@@ -1522,6 +1623,19 @@ function New-GuiForm ($catalog) {
             $cb.add_CheckedChanged({ Update-CheckedCount })
             $tipText = $mod.DescriptionFull
             if (-not $tipText) { $tipText = "（未提供描述）" }
+            # 单模组版条目：悬浮提示注明与融合版互斥（标注对应融合模组的中文名）
+            $standaloneNote = ""
+            if ($mod.Source -eq "standalone") {
+                $standaloneNote = "⚠ 与融合版功能重叠，二选一安装。"
+                $mergedId = $null
+                if ($script:StandaloneMergedMap.ContainsKey("$($mod.Id)")) { $mergedId = $script:StandaloneMergedMap["$($mod.Id)"] }
+                if ($mergedId -and "$mergedId" -ne "$($mod.Id)" -and $nameById.ContainsKey("$mergedId")) {
+                    $standaloneNote = "⚠ 与融合版功能重叠，二选一安装（对应融合模组：$($nameById["$mergedId"])）。"
+                } elseif ($mergedId -and "$mergedId" -eq "$($mod.Id)") {
+                    $standaloneNote = "⚠ 与 DLC 现役版功能重叠（「DLC 额外内容」分区的同名模组），二选一安装。"
+                }
+                $tipText = "$standaloneNote`r`n`r`n$tipText"
+            }
             if ($mod.Installed) {
                 $tip.SetToolTip($cb, "已安装；如需重装/升级请使用 deploy.bat 全量部署。`r`n`r`n$tipText`r`n`r`n文件: $($mod.File.Name)")
             } else {
@@ -1745,7 +1859,7 @@ if (-not $form) {
         [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     exit 1
 }
-Write-GuiLog "已加载 $catalogCount 个模组（核心/可选/DLC）：可安装 $($script:InstallableCount) 个，已安装 $($script:InstalledCount) 个已置灰禁选。" "Gray"
+Write-GuiLog "已加载 $catalogCount 个模组（核心/可选/DLC/单模组版）：可安装 $($script:InstallableCount) 个，已安装 $($script:InstalledCount) 个已置灰禁选。" "Gray"
 Write-GuiLog "请在上方列表勾选后点击「仅安装勾选并启动 Windhawk」；如需重装/升级已装模组请使用 deploy.bat 全量部署。" "Gray"
 
 [void]$form.ShowDialog()
