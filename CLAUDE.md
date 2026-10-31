@@ -86,7 +86,7 @@ cw-windows-animations（窗口动画，可选）、cw-window-arrangement（窗�
 cw-alt-drag（窗口拖动）、cw-invisible-borders（隐形窗口边框）、cw-notificationcenter-acrylic（通知栏样式美化）。
 
 操作方式：全部模组 `windhawk-cli mod install --file <源码> --disabled` 编译并禁用后，
-对本清单逐个执行 `windhawk-cli --app-root <便携根> --yes mod enable <id>`。
+对本清单逐个执行 `windhawk-cli --app-root <便携根> --yes mod enable local@<id>`（注意必须带 local@ 前缀，否则报 Mod not installed）。
 
 ## 当前模组清单（v2.5.0，40 个 = 32 核心 + 2 可选 + 6 DLC 额外内容）
 
