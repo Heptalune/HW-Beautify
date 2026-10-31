@@ -2,9 +2,9 @@
 // @id              cw-centered-start-split-icons
 // @name            CW-开始按钮居中留空
 // @name:zh-CN      CW-开始按钮居中留空
-// @description     Pins the Start button to the true horizontal center of the primary display and splits taskbar app icons into two groups flanking it by a static name list, anchored tight against the Start button's edges (no window-position tracking; Windows 11 only; incompatible with "Start button always on the left")
-// @description:zh-CN 将「开始」按钮钉在主显示器真正的水平中央，并按静态名单把应用图标分成两组、分列开始按钮两侧、紧贴其边缘（不跟踪窗口位置、图标不随窗口移动换边；仅 Windows 11；与「开始按钮始终居左」模组互斥）。
-// @version         2.0.0
+// @description     Pins the Start button to the true horizontal center of the primary display and splits taskbar app icons into two balanced groups flanking it, assigned right/left alternately by appearance order and anchored tight against the Start button's edges (no window-position tracking; Windows 11 only; incompatible with "Start button always on the left")
+// @description:zh-CN 将「开始」按钮钉在主显示器真正的水平中央，并把应用图标按出现顺序左右交替分成两组均衡的图标簇、分列开始按钮两侧、紧贴其边缘（不跟踪窗口位置、图标不随窗口移动换边；仅 Windows 11；与「开始按钮始终居左」模组互斥）。
+// @version         2.1.0
 // @author          rick
 // @github          https://github.com/rycalvo
 // @include         explorer.exe
@@ -16,15 +16,16 @@
 // Source code is published under The GNU General Public License v3.0.
 
 // CW-Beautify 整合说明：本文件基于上游 1.0.x（rick，Taskbar Start Button
-// Centered Origin）做机制性重写（2.0.0「居中留空·纯布局」）。上游的全部动态
-// 跟踪机制已整体删除——窗口位置周期轮询线程、窗口矩形缓存与拖过中线换边判定、
-// 哨兵点击探测式「按钮 → 窗口句柄」解析、trackWindowPositions 开关、
-// taskListOrder 的 distance-from-center 排序、pinnedAppsAnchor 设置、
+// Centered Origin）做机制性重写（2.0.0「居中留空·纯布局」；2.1.0 再把 2.0.0
+// 的 leftApps/rightApps 静态名单分流改为按出现顺序的奇偶交替均衡分流）。上游
+// 的全部动态跟踪机制已整体删除——窗口位置周期轮询线程、窗口矩形缓存与拖过
+// 中线换边判定、哨兵点击探测式「按钮 → 窗口句柄」解析、trackWindowPositions
+// 开关、taskListOrder 的 distance-from-center 排序、pinnedAppsAnchor 设置、
 // unresolvedAppsDefaultSide 的 contralateral-to-system-buttons 选项——仅保留并
-// 打磨静态布局能力：开始按钮布局级钉在主显示器水平正中；应用图标按
-// leftApps/rightApps 静态名单（外加未匹配应用的默认侧）分流，紧贴开始按钮
-// 左/右缘向外排列，同侧内保持任务栏原有顺序；搜索/任务视图/小组件可留最左端
-// 或紧贴开始按钮。原版 mod：
+// 打磨静态布局能力：开始按钮布局级钉在主显示器水平正中；应用图标按任务栏
+// 原始顺序编号、奇偶交替分流到开始按钮右/左两侧（任意数量下两侧都有图标、
+// 数量差 ≤1），紧贴开始按钮左/右缘向外排列，同侧内保持任务栏原有顺序；
+// 搜索/任务视图/小组件可留最左端或紧贴开始按钮。原版 mod：
 // https://windhawk.net/mods/taskbar-centered-start-split-icons
 // x86 兼容性说明：FindCurrentProcessTaskbarWnd() 中存在「无捕获 lambda 直接传给
 // EnumWindows（WNDENUMPROC/stdcall 回调）」的写法，按 x86 兼容规则本应改为显式
@@ -36,24 +37,25 @@
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**rick**（[GitHub：rycalvo](https://github.com/rycalvo)，[Taskbar Start Button Centered Origin](https://windhawk.net/mods/taskbar-centered-start-split-icons)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）基于上游 1.0.x 机制性重写（2.0.0「居中留空·纯布局」）。
+> 原作者：**rick**（[GitHub：rycalvo](https://github.com/rycalvo)，[Taskbar Start Button Centered Origin](https://windhawk.net/mods/taskbar-centered-start-split-icons)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）基于上游 1.0.x 机制性重写（2.0.0「居中留空·纯布局」；2.1.0 把分流规则改为按出现顺序左右交替均衡排列）。
 
 # CW-开始按钮居中留空
 
-**开始按钮永远钉在主显示器屏幕真正的水平正中**（无论任务栏上有多少图标）；应用图标按**静态名单**分成两组，分列开始按钮两侧、**紧贴开始按钮的左右边缘**向外排列：
+**开始按钮永远钉在主显示器屏幕真正的水平正中**（无论任务栏上有多少图标）；应用图标按**出现顺序左右交替**分成两组数量均衡的图标簇，分列开始按钮两侧、**紧贴开始按钮的左右边缘**向外排列：
 
-- 在下方 `leftApps` 名单中（应用名称片段匹配）的应用 → 图标排在开始按钮**左侧**，紧贴其左缘。
-- 在下方 `rightApps` 名单中的应用 → 图标排在开始按钮**右侧**，紧贴其右缘。
-- 两份名单都未匹配到的应用 → 按 `unresolvedAppsDefaultSide` 归入左/右一侧。
-- 每一侧内部保持任务栏原有的排列顺序；两侧图标簇始终锚定开始按钮边缘，开始按钮不会因某侧图标变多而漂移。
+- 应用按钮按任务栏原始顺序编号，**奇偶交替分配到右/左两侧**：第 1 个 → 开始按钮**右侧**、第 2 个 → **左侧**、第 3 个 → 右侧……以此类推。
+- 无论开启多少个图标，两侧始终都有图标（只要有至少两个），且任意时刻两侧的数量差不超过 1——开始按钮永远被两侧图标簇对称地簇拥在正中，不会因某一侧图标变多而漂移。
+- 新启动或新固定的图标按其在任务栏中的顺序进入对应一侧；图标关闭后其余图标重新编号、重新均衡。
+- 分组按钮（「总是合并任务栏按钮」下的多窗口组）视为一个按钮参与编号；「从不合并」时同一应用的多个窗口各自作为独立按钮编号。
+- 每一侧内部保持任务栏原有的排列顺序。
 - 搜索、任务视图、小组件按钮可留在任务栏最左端，也可移到开始按钮旁边你偏好的一侧。
 
-**这是纯布局方案**：图标分流完全由静态名单决定，**图标不按窗口在屏幕上的实际位置动态换边**——把窗口从屏幕左边拖到右边，它的任务栏图标不会跟着移动。这是有意为之：本版本删除了上游为实现「窗口在哪边、图标就在哪边」所需的窗口位置周期轮询与哨兵点击探测，换来没有任何后台活动、行为完全可预期的静态布局。如果你需要按窗口实际位置动态分流的实现，请基于上游原版思路寻找其它模组。
+**这是纯布局方案**：图标分流完全由任务栏中的出现顺序决定，**图标不按窗口在屏幕上的实际位置动态换边**——把窗口从屏幕左边拖到右边，它的任务栏图标不会跟着移动。这是有意为之：本版本删除了上游为实现「窗口在哪边、图标就在哪边」所需的窗口位置周期轮询与哨兵点击探测，换来没有任何后台活动、行为完全可预期的静态布局。如果你需要按窗口实际位置动态分流的实现，请基于上游原版思路寻找其它模组。
 
 ## 功能
 
 - **开始按钮真居中**：无论图标数量多少，开始按钮始终钉在主显示器水平正中央。
-- **静态名单分流**：`leftApps`/`rightApps`（应用名称片段、不区分大小写）+ 未匹配应用的默认侧设置，决定每个图标在哪一侧；所有应用（运行中或仅固定）一律按此归类，规则恒定、随时可查。
+- **均衡交替分流**：应用图标按任务栏出现顺序奇偶交替分配到右/左两侧，任意数量下两侧都有图标、数量差 ≤1；图标增删后自动重新编号、重新均衡——仍完全由任务栏自身的布局失效驱动，无任何轮询。
 - **紧贴开始按钮**：两侧图标簇锚定开始按钮边缘、向外生长，同侧内保持任务栏原有顺序。
 - **系统按钮可调**：搜索/任务视图/小组件可留在最左端，或紧贴开始按钮（左/右侧可选）。
 - **无后台活动**：没有窗口位置轮询、没有后台定时器探测、没有窗口跟踪；布局完全由任务栏自身的布局过程驱动，设置改动即时生效。
@@ -73,13 +75,13 @@
 ## 已知局限
 
 - 某一侧图标过多时会压缩该侧间距硬挤下（图标仍按全尺寸渲染，真正拥挤时会视觉重叠），而不是像任务栏原生溢出那样隐藏或滚动；Windows 自带「任务栏已满时合并按钮」在本模组下不缩小图标（「总是合并」不受影响）。
-- 分类完全依据任务栏按钮的辅助功能名称（应用显示名）：某应用的显示名若与你填写的片段不匹配、或误匹配了另一侧的片段，图标就会落到默认侧/错误的一侧；同一应用的所有窗口（含「从不合并」时的多个按钮、以及「总是合并」下的分组按钮）分类必然相同。
+- 分流的编号依据按钮在任务栏中的当前顺序：任意图标的启动/关闭都会改变其后所有图标的编号，它们可能因此换到另一侧——这正是保持两侧均衡的代价与目的，不是错位；已固定但未运行的应用与运行中的应用按同一规则参与编号。
 - 任务栏自带的溢出按钮（拥挤时出现）保持原生位置，不参与分流布局。
 - 显示器被停用（设置、拔线或第三方熄屏工具）时任务栏按钮可能消失（「多显示器设置」未选「所有任务栏」时 Windows 自身即会如此），重新启用显示器不会触发；这是 Explorer/taskbar.dll 的原生行为，与本模组无关。
 
-## 从 1.x 升级
+## 从 1.x / 2.0.x 升级
 
-1.x 的全部动态能力在 2.0.0 中已整体移除，不再有对应设置：窗口位置轮询与拖过中线图标换边、按离中心线距离排序、`pinnedAppsAnchor`、`trackWindowPositions` 开关、`contralateral-to-system-buttons` 兜底选项。升级后请改用 `leftApps`/`rightApps`/`unresolvedAppsDefaultSide` 三个设置表达你想要的布局；若离开了动态换边不可接受，请改用基于上游原版思路的其它实现。
+1.x 的全部动态能力在 2.0.0 中已整体移除，不再有对应设置：窗口位置轮询与拖过中线图标换边、按离中心线距离排序、`pinnedAppsAnchor`、`trackWindowPositions` 开关、`contralateral-to-system-buttons` 兜底选项。2.1.0 又把 2.0.0 的静态名单分流改为按出现顺序均衡交替分流，`leftApps`/`rightApps`/`unresolvedAppsDefaultSide` 三个设置随之移除——现在无需任何配置，图标即按出现顺序左右交替、均衡地分列开始按钮两侧；若离开了动态换边不可接受，请改用基于上游原版思路的其它实现。
 
 ## 原作者说明
 
@@ -135,33 +137,6 @@
   $description: >-
     Only used when the placement above is "Right next to Start".
   $description:zh-CN: 仅当上一项设为「紧挨开始按钮」时生效。
-- leftApps: ""
-  $name: Apps to place on the left of Start
-  $name:zh-CN: 排在开始按钮左侧的应用
-  $description: >-
-    Comma-separated list of app name fragments (matched case-insensitively
-    against each taskbar button's accessible name, e.g. "chrome, notepad").
-    Every app whose name matches an entry here - running or not - is placed
-    on the left of the Start button, right next to it.
-  $description:zh-CN: 以逗号分隔的应用名称片段列表（与任务栏按钮的辅助功能名称不区分大小写地匹配，如 "chrome, notepad"）。名称匹配到任一片段的应用——无论是否正在运行——都会排在开始按钮左侧、紧贴其边缘。
-- rightApps: ""
-  $name: Apps to place on the right of Start
-  $name:zh-CN: 排在开始按钮右侧的应用
-  $description: Same idea as leftApps, but for the right side of Start.
-  $description:zh-CN: 与「排在开始按钮左侧的应用」同理，但作用于开始按钮右侧。
-- unresolvedAppsDefaultSide: left
-  $name: Default side for unlisted apps
-  $name:zh-CN: 未列入名单应用的默认侧
-  $options:
-    - left: Left of Start
-    - right: Right of Start
-  $options:zh-CN:
-    - left: 开始按钮左侧
-    - right: 开始按钮右侧
-  $description: >-
-    Fallback for any taskbar button whose accessible name isn't matched by
-    leftApps/rightApps above.
-  $description:zh-CN: 名称未被上方 leftApps/rightApps 匹配到的任务栏按钮的兜底归类。
 */
 // ==/WindhawkModSettings==
 
@@ -212,47 +187,8 @@ struct ModSettings {
     double gapPx;
     SystemButtonsPlacement systemButtonsPlacement;
     Side systemButtonsAdjacentSide;
-    std::vector<std::wstring> leftApps;
-    std::vector<std::wstring> rightApps;
-    Side unresolvedAppsDefaultSide;
 };
 ModSettings g_settings;
-
-// CharLowerBuffW, not towlower per-character: towlower only maps ASCII in
-// the default C locale, making leftApps/rightApps matching effectively
-// case-sensitive for any non-ASCII app name.
-std::wstring ToLower(std::wstring s) {
-    if (!s.empty()) {
-        CharLowerBuffW(s.data(), (DWORD)s.size());
-    }
-    return s;
-}
-
-// Splits a comma-separated settings string into trimmed, lowercased,
-// non-empty fragments for case-insensitive substring matching later.
-std::vector<std::wstring> ParseAppList(PCWSTR raw) {
-    std::vector<std::wstring> result;
-    std::wstring s(raw);
-    size_t start = 0;
-    while (start <= s.size()) {
-        size_t comma = s.find(L',', start);
-        size_t end = (comma == std::wstring::npos) ? s.size() : comma;
-
-        size_t first = s.find_first_not_of(L" \t", start);
-        size_t last = s.find_last_not_of(L" \t", end == start ? end : end - 1);
-        if (first != std::wstring::npos && first < end && last != std::wstring::npos &&
-            last >= first) {
-            result.push_back(ToLower(s.substr(first, last - first + 1)));
-        }
-
-        if (comma == std::wstring::npos) {
-            break;
-        }
-        start = comma + 1;
-    }
-
-    return result;
-}
 
 Side ParseSide(PCWSTR value, Side fallback) {
     if (wcscmp(value, L"right") == 0) {
@@ -283,15 +219,6 @@ ModSettings LoadSettingsFromStore() {
     auto adjacentSide =
         WindhawkUtils::StringSetting::make(L"systemButtonsAdjacentSide");
     s.systemButtonsAdjacentSide = ParseSide(adjacentSide, Side::Left);
-
-    s.leftApps =
-        ParseAppList(WindhawkUtils::StringSetting::make(L"leftApps"));
-    s.rightApps =
-        ParseAppList(WindhawkUtils::StringSetting::make(L"rightApps"));
-
-    auto unresolvedSide =
-        WindhawkUtils::StringSetting::make(L"unresolvedAppsDefaultSide");
-    s.unresolvedAppsDefaultSide = ParseSide(unresolvedSide, Side::Left);
 
     return s;
 }
@@ -537,7 +464,7 @@ XamlRoot GetTaskbarXamlRoot(HWND hTaskbarWnd) {
 }
 
 // ============================================================================
-// Element identification & static classification
+// Element identification & task list classification
 // ============================================================================
 
 enum class SystemButton {
@@ -575,60 +502,23 @@ bool IsTaskListButton(FrameworkElement element) {
     return winrt::get_class_name(element) == L"Taskbar.TaskListButton";
 }
 
-// Taskbar buttons expose their app's display name as an accessibility
-// property (used by screen readers); this is the app identifier the whole
-// static classification runs on. Works uniformly for running apps and for
-// pinned-but-not-running ones, which have no window to identify them by.
-// Note the inherent coarseness: with "Combine taskbar buttons" set to
-// "Never", two windows of the same app produce two TaskListButtons with
-// this same name, so they always classify to the same side.
-std::wstring GetButtonAccessibleName(FrameworkElement element) {
-    auto name = Automation::AutomationProperties::GetName(element);
-    if (!name.empty()) {
-        return ToLower(std::wstring(name.c_str()));
-    }
-
-    auto elementName = element.Name();
-    if (!elementName.empty()) {
-        return ToLower(std::wstring(elementName.c_str()));
-    }
-
-    return L"";
-}
-
-bool ContainsAnyFragment(const std::wstring& haystack,
-                         const std::vector<std::wstring>& needles) {
-    if (haystack.empty()) {
-        return false;
-    }
-
-    for (auto& needle : needles) {
-        if (!needle.empty() && haystack.find(needle) != std::wstring::npos) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// Static classification, the only kind this mod performs: an explicit
-// leftApps/rightApps name match wins, otherwise the configured default side
-// applies. There is deliberately no window-position input here - this
-// mod's icons do not follow windows across the screen. Skips the
-// accessible-name lookup entirely when both lists are empty (the default) -
-// this runs for every task-list button on every ArrangeOverride pass.
-Side ClassifyTaskListButton(FrameworkElement element) {
-    if (!g_settings.leftApps.empty() || !g_settings.rightApps.empty()) {
-        std::wstring name = GetButtonAccessibleName(element);
-        if (ContainsAnyFragment(name, g_settings.leftApps)) {
-            return Side::Left;
-        }
-        if (ContainsAnyFragment(name, g_settings.rightApps)) {
-            return Side::Right;
-        }
-    }
-
-    return g_settings.unresolvedAppsDefaultSide;
+// Balanced alternating split, the only classification this mod performs:
+// task list buttons are numbered by their position in the taskbar's own
+// order (taskListIndex, assigned by PlanTaskListButtons's traversal) and
+// alternate sides - the 1st button goes to the right of Start, the 2nd to
+// the left, the 3rd to the right again, and so on. Every count therefore
+// leaves icons on both sides (as soon as there are two), with the two
+// groups' sizes never differing by more than one, so Start stays flanked
+// no matter how many icons exist. Numbering is redone from scratch on
+// every plan recompute - driven by the existing g_planDirty/layout
+// invalidation machinery, no polling - so an app launching or exiting
+// re-balances both sides automatically. Grouped buttons (Windows' "Always
+// combine taskbar buttons") are one TaskListButton element each and count
+// as one button, same as every other. There is deliberately no
+// window-position input here - this mod's icons do not follow windows
+// across the screen.
+Side ClassifyTaskListButton(int taskListIndex) {
+    return (taskListIndex % 2 == 0) ? Side::Right : Side::Left;
 }
 
 // ============================================================================
@@ -878,10 +768,17 @@ void PlanTaskListButtons(const std::vector<FrameworkElement>& children,
                          std::unordered_map<void*, double>& outPlan,
                          std::unordered_map<void*, double>& outWidths) {
     std::vector<TaskListPlanEntry> entries;
+    // taskListIndex numbers the task list buttons by their position in the
+    // taskbar's own order (children is collected in repeater order), which
+    // ClassifyTaskListButton alternates sides off of. Counted over task
+    // list buttons only - system buttons interleaved in `children` must
+    // not shift the numbering when they appear or hide.
+    int taskListIndex = 0;
     for (int i = 0; i < (int)children.size(); i++) {
         if (IsTaskListButton(children[i])) {
-            entries.push_back({children[i], ClassifyTaskListButton(children[i]),
-                               FullFootprintWidth(children[i]), i});
+            entries.push_back(
+                {children[i], ClassifyTaskListButton(taskListIndex++),
+                 FullFootprintWidth(children[i]), i});
         }
     }
 
@@ -1912,8 +1809,8 @@ bool g_hasPendingSettings;
 ModSettings g_pendingSettings;
 
 // Applies a freshly-loaded settings struct on the taskbar's own thread,
-// since it reassigns leftApps/rightApps while a concurrent layout pass
-// could be reading them. If the taskbar window isn't resolved yet or its
+// since it reassigns g_settings while a concurrent layout pass could be
+// reading it. If the taskbar window isn't resolved yet or its
 // subclass isn't installed, stashes the settings above instead of
 // assigning g_settings directly here - a foreign-thread write to it could
 // otherwise race EnsureTaskbarWnd resolving the taskbar (and a layout pass

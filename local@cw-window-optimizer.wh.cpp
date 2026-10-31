@@ -1,16 +1,16 @@
 // ==WindhawkMod==
-// @id              cw-alt-drag
-// @name            CW-窗口拖动（Alt+拖动）
-// @name:zh-CN      CW-窗口拖动（Alt+拖动）
-// @description     Move or resize any window by holding Alt and dragging it from anywhere, without having to grab the title bar or the borders
-// @description:zh-CN 按住 Alt（触发键可自定义）从窗口任意位置拖动，即可移动或调整窗口大小，无需瞄准标题栏或边框。
-// @version         1.2
-// @author          m417z
+// @id              cw-window-optimizer
+// @name            CW-窗口优化
+// @name:zh-CN      CW-窗口优化
+// @description     Move or resize windows from anywhere with a custom trigger, slick sliding window arrangement with snapping, and invisible window borders that keep rounded corners
+// @description:zh-CN 窗口操作三合一：按住触发键即可从窗口任意位置拖动移动或调整大小（无需瞄准标题栏或边框）；窗口移动带顺滑的滑动动画与吸附对齐；窗口边框隐形且保留圆角。
+// @version         1.0.0
+// @author          m417z, Bo0ii
 // @github          https://github.com/m417z
-// @twitter         https://twitter.com/m417z
 // @homepage        https://m417z.com/
 // @include         *
-// @compilerOptions -lcomctl32
+// @exclude         devenv.exe
+// @compilerOptions -lcomctl32 -ldwmapi -luser32
 // ==/WindhawkMod==
 
 // Source code is published under The GNU General Public License v3.0.
@@ -20,18 +20,38 @@
 //
 // For pull requests, development takes place here:
 // https://github.com/m417z/my-windhawk-mods
-// CW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.1 逐字节一致。
-// 原版 mod：https://windhawk.net/mods/alt-drag
+//
+// CW-Beautify 整合说明：本模组由以下三个模组合并而成，三段代码分别置于
+// AltDrag / WinArrange / InvisBorders 命名空间，逻辑与各自上游保持一致；
+// 设置分为「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」三个可收起
+// 分组，设置键名原样保留、读取路径加 altDrag. / winArrange. / invisBorders.
+// 前缀相互隔离：
+//   1. 窗口拖动（Alt+拖动）：上游 AltDrag，原作者 m417z，GPL-3.0 许可证，
+//      原版链接 https://windhawk.net/mods/alt-drag （本包汉化版
+//      cw-alt-drag 1.2，代码与上游 1.1 一致）；
+//   2. 窗口排列：上游 Slick Window Arrangement，原作者 m417z，GPL-3.0
+//      许可证，原版链接
+//      https://windhawk.net/mods/slick-window-arrangement （本包汉化版
+//      cw-window-arrangement 1.0.3，代码与上游 1.0.2 一致）；
+//   3. 隐形窗口边框：上游 Invisible Window Borders，原作者 Bo0ii，MIT
+//      许可证（该功能代码部分按 MIT 许可发布），原版链接
+//      https://windhawk.net/mods/invisible-borders （本包汉化版
+//      cw-invisible-borders 1.0.1，代码与上游 1.0.0 一致）。
+// 整合包：CW-Beautify（作者 Heptalune）。
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**m417z**（[AltDrag](https://windhawk.net/mods/alt-drag)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，代码逻辑与上游 1.1 逐字节一致。
+> 原作者：**m417z**（AltDrag、Slick Window Arrangement，GPL-3.0）、**Bo0ii**（Invisible Window Borders，MIT）。本版由 CW-Beautify 整合包（作者 Heptalune）整合汉化，各功能代码逻辑与对应上游版本保持一致。
 
-# CW-窗口拖动（Alt+拖动）
+# CW-窗口优化
+
+窗口操作三合一：本模组把「窗口拖动（Alt+拖动）」「窗口滑动排列」与「隐形窗口边框」三个模组合并为一个，设置页按功能分为三个可收起分组。三者互相配合：按住触发键即可从窗口任意位置拖动移动或调整窗口大小，移动自带顺滑的滑动动画与吸附对齐，也可以按住 Alt 临时绕过吸附；窗口边框还可设为隐形、同时保留圆角。
+
+## 窗口拖动（Alt+拖动）
 
 按住 Alt 并在窗口的任意位置按下鼠标拖动，即可移动窗口；按住 Alt 用鼠标右键拖动，则可调整大小——跟随鼠标的那条边或角，是最靠近起拖位置的那条。不必再瞄准标题栏或窗口边框。
 
-鼠标键与修饰键都可以在模组设置里修改。每个触发键还能设置按住时长（延迟），短促的点击保持原有含义，只有按住不放才开始拖动。
+鼠标键与修饰键都可以在「窗口拖动（Alt+拖动）」分组里修改。每个触发键还能设置按住时长（延迟），短促的点击保持原有含义，只有按住不放才开始拖动。
 
 默认对所有程序生效。若要排除个别程序，请在本模组设置的「高级」选项卡里把它们加入自定义进程排除列表。
 
@@ -39,7 +59,7 @@
 
 ![演示](https://i.imgur.com/PY0arDE.gif)
 
-## 功能
+### 功能
 
 - **任意位置移动**：按住移动触发键（默认 Alt + 左键）在窗口内任意位置拖动即可移动窗口，走的是标题栏拖动的同一套系统流程，吸附、DWM 动画、最大化窗口处理一应俱全。
 - **任意位置调整大小**：按住调整触发键（默认 Alt + 右键）拖动即可调整窗口大小，跟随鼠标的边或角是最靠近起拖点的那条。
@@ -48,105 +68,258 @@
 - **无标题栏窗口**：可选拖动弹出菜单、工具提示、气泡这类没有标题栏的窗口。
 - **现代应用覆盖**：对使用指针输入（WM_POINTER）与组合托管内容（如 WinUI XAML 岛）的窗口同样生效。
 
-## 设置说明
+### 设置说明（「窗口拖动（Alt+拖动）」分组）
 
 - **移动触发**：移动窗口所用的鼠标键与修饰键组合。「延迟」是按下鼠标键后等待的毫秒数，到期才开始移动；更短的按压会作为点击交给窗口。默认 Alt + 左键、延迟 0。
 - **调整大小触发**：同上，作用于调整窗口大小。默认 Alt + 右键、延迟 0。
 - **拖动无标题栏的窗口**：默认关闭；开启后弹出菜单、工具提示与气泡等无标题栏窗口也能拖动。
 
-## 兼容性与已知问题
+### 兼容性与已知问题
 
-- 与 [Slick Window Arrangement](https://windhawk.net/mods/slick-window-arrangement) 模组可以共存，但该模组默认用 Alt 键临时禁用窗口吸附，因此按住 Alt 拖动时窗口不会吸附。想边拖边吸附，可把 Slick Window Arrangement 的「临时禁用吸附的按键」改成其他键，或改掉本模组使用的触发键。
+- 与本模组的「窗口排列」功能可以同时使用，但「窗口排列」默认按住 Alt 临时禁用窗口吸附，因此按住 Alt 拖动时窗口不会吸附。想边拖边吸附，可把「窗口排列」分组里的「临时禁用吸附的按键」改成其他键，或改掉本功能的触发键。
 - 模组注入所有进程；不想生效的程序请加入 Windhawk 模组设置「高级」选项卡的自定义进程排除列表，排除后其输入不受影响。
+
+## 窗口排列
+
+拖动、排列窗口原本是一件枯燥的事：窗口说停就停，想对齐全凭手感。「窗口排列」分组为窗口移动加上顺滑的滑动动画与吸附对齐，松手后窗口带着惯性缓缓滑停，靠近其他窗口时自动吸附整齐，让整个桌面操作更流畅悦目。在任意程序里拖动窗口都能生效。
+
+![演示动图](https://i.imgur.com/GB4guXU.gif)
+
+### 功能
+
+- **滑动动画**：松开鼠标后，窗口带着惯性继续滑行一小段再缓缓停下，而不是戛然而止。
+- **窗口吸附**：拖动窗口靠近其他窗口或屏幕工作区边缘时自动吸附对齐，排列窗口毫不费力。
+- **滑动中吸附**：惯性滑动过程中同样会吸附，滑到附近也能精确对齐。
+- **临时禁用吸附**：按住设定的按键组合（默认 Alt）拖动，可临时绕过吸附。
+- **工作区保护**：吸附与滑动都会保证窗口标题栏留在屏幕工作区内，避免窗口滑到够不着的位置。
+- **DPI 与多显示器适配**：吸附距离按所在窗口的 DPI 自动缩放；窗口滑动越过屏幕时会在工作区边缘反弹，也能顺势滑到相邻显示器。
+
+### 设置说明（「窗口排列」分组）
+
+- **拖动窗口时吸附**（默认开启）：拖动窗口时启用吸附对齐。
+- **吸附距离**（默认 25）：窗口靠近其他窗口多少像素内触发吸附，按窗口 DPI 自动缩放。
+- **临时禁用吸附的按键**：按住哪些键可临时禁用吸附；Ctrl 默认关、Alt 默认开、Shift 默认关。
+- **滑动动画**（默认开启）：窗口被拖动松手后继续保持惯性滑动。
+- **滑动时吸附窗口**（默认开启）：惯性滑动过程中也进行吸附对齐。
+- **滑动减速**（默认 15，取值 1-99）：数值越小，滑动动画持续越久。
+
+## 隐形窗口边框
+
+「隐形窗口边框」分组让窗口边框不可见，同时完整保留系统的窗口圆角效果。
+
+![效果对比](https://raw.githubusercontent.com/Bo0ii/windhawk-mods/main/invisible-borders/onoff.png)
+
+### 功能
+
+- **边框隐形**：去除边框颜色，同时保留窗口边框结构。
+- **保留圆角**：窗口框架保持完整，圆角渲染不受影响。
+- **全程序通用**：对所有应用程序生效。
+- **轻量高效**：性能开销极小。
+
+### 兼容性
+
+- Windows 10（1809 及更高版本）
+- Windows 11（所有版本）
+- 需要 DWM（桌面窗口管理器）处于启用状态
+
+### 支持
+
+问题反馈（英文）：<https://github.com/Bo0ii/windhawk-mods/issues>
 
 ## 致谢与许可
 
-- 本模组的创意来自 [AltDrag](https://stefansundin.github.io/altdrag/)。
-- 原版 mod：AltDrag，作者 [m417z](https://github.com/m417z)，GPL-3.0，原版链接：<https://windhawk.net/mods/alt-drag>。
-- 本汉化版同样以 GPL-3.0 发布。
+- **窗口拖动（Alt+拖动）**：原版 mod [AltDrag](https://windhawk.net/mods/alt-drag)，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证；创意来自 [Stefan Sundin 的 AltDrag](https://stefansundin.github.io/altdrag/)。
+- **窗口排列**：原版 mod [Slick Window Arrangement](https://windhawk.net/mods/slick-window-arrangement)，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证。
+- **隐形窗口边框**：原版 mod [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)，作者 [Bo0ii](https://github.com/Bo0ii)，MIT 许可证，源码仓库：<https://github.com/Bo0ii/windhawk-mods>。
+- **整合说明**：本模组由 CW-Beautify 整合包（作者 Heptalune）将上述三个模组合并而成：三段代码以命名空间（AltDrag / WinArrange / InvisBorders）隔离，设置分组化并在读取路径加 altDrag. / winArrange. / invisBorders. 前缀，元数据、说明与设置文案整合汉化，各功能代码逻辑与对应上游保持一致。m417z 的两个功能以 GPL-3.0 发布，Bo0ii 的功能以 MIT 许可证发布，各原作者署名与许可声明原样保留。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- moveTrigger:
-  - button: left
-    $name: Mouse button
-    $name:zh-CN: 鼠标键
-    $options:
-    - left: 左键
-    - right: 右键
-    - middle: 中键
-    - x1: X1（后退）键
-    - x2: X2（前进）键
-  - ctrl: false
-    $name: Ctrl
-    $name:zh-CN: Ctrl
-  - alt: true
-    $name: Alt
-    $name:zh-CN: Alt
-  - shift: false
-    $name: Shift
-    $name:zh-CN: Shift
-  - win: false
-    $name: Win
-    $name:zh-CN: Win
-  - delay: 0
-    $name: Delay
-    $name:zh-CN: 延迟
+- altDrag:
+  - moveTrigger:
+    - button: left
+      $name: Mouse button
+      $name:zh-CN: 鼠标键
+      $options:
+      - left: 左键
+      - right: 右键
+      - middle: 中键
+      - x1: X1（后退）键
+      - x2: X2（前进）键
+    - ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    - win: false
+      $name: Win
+      $name:zh-CN: Win
+    - delay: 0
+      $name: Delay
+      $name:zh-CN: 延迟
+      $description: >-
+        The time in milliseconds to hold the mouse button before the window
+        starts moving. A shorter press is passed to the window as a click.
+      $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始移动；更短的按压会作为点击交给窗口。
+    $name: Move trigger
+    $name:zh-CN: 移动触发
     $description: >-
-      The time in milliseconds to hold the mouse button before the window
-      starts moving. A shorter press is passed to the window as a click.
-    $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始移动；更短的按压会作为点击交给窗口。
-  $name: Move trigger
-  $name:zh-CN: 移动触发
-  $description: >-
-    The mouse button and the keys to hold for moving a window.
-  $description:zh-CN: 移动窗口时按住的鼠标键与修饰键组合。
-- sizeTrigger:
-  - button: right
-    $name: Mouse button
-    $name:zh-CN: 鼠标键
-    $options:
-    - left: 左键
-    - right: 右键
-    - middle: 中键
-    - x1: X1（后退）键
-    - x2: X2（前进）键
-  - ctrl: false
-    $name: Ctrl
-    $name:zh-CN: Ctrl
-  - alt: true
-    $name: Alt
-    $name:zh-CN: Alt
-  - shift: false
-    $name: Shift
-    $name:zh-CN: Shift
-  - win: false
-    $name: Win
-    $name:zh-CN: Win
-  - delay: 0
-    $name: Delay
-    $name:zh-CN: 延迟
+      The mouse button and the keys to hold for moving a window.
+    $description:zh-CN: 移动窗口时按住的鼠标键与修饰键组合。
+  - sizeTrigger:
+    - button: right
+      $name: Mouse button
+      $name:zh-CN: 鼠标键
+      $options:
+      - left: 左键
+      - right: 右键
+      - middle: 中键
+      - x1: X1（后退）键
+      - x2: X2（前进）键
+    - ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    - win: false
+      $name: Win
+      $name:zh-CN: Win
+    - delay: 0
+      $name: Delay
+      $name:zh-CN: 延迟
+      $description: >-
+        The time in milliseconds to hold the mouse button before the window
+        starts resizing. A shorter press is passed to the window as a click.
+      $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始调整大小；更短的按压会作为点击交给窗口。
+    $name: Resize trigger
+    $name:zh-CN: 调整大小触发
     $description: >-
-      The time in milliseconds to hold the mouse button before the window
-      starts resizing. A shorter press is passed to the window as a click.
-    $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始调整大小；更短的按压会作为点击交给窗口。
-  $name: Resize trigger
-  $name:zh-CN: 调整大小触发
+      The mouse button and the keys to hold for resizing a window. The edge or
+      corner which follows the mouse is the one closest to where the drag starts.
+    $description:zh-CN: 调整窗口大小时按住的鼠标键与修饰键组合。跟随鼠标的边或角，是最靠近起拖位置的那条。
+  - dragWindowsWithoutTitleBar: false
+    $name: Drag windows without a title bar
+    $name:zh-CN: 拖动无标题栏的窗口
+    $description: >-
+      Also drag windows without a title bar, such as popup menus, tooltips
+      and flyouts.
+    $description:zh-CN: 同时允许拖动没有标题栏的窗口，例如弹出菜单、工具提示和气泡。
+  $name: Window drag (Alt+drag)
+  $name:zh-CN: 窗口拖动（Alt+拖动）
   $description: >-
-    The mouse button and the keys to hold for resizing a window. The edge or
-    corner which follows the mouse is the one closest to where the drag starts.
-  $description:zh-CN: 调整窗口大小时按住的鼠标键与修饰键组合。跟随鼠标的边或角，是最靠近起拖位置的那条。
-- dragWindowsWithoutTitleBar: false
-  $name: Drag windows without a title bar
-  $name:zh-CN: 拖动无标题栏的窗口
+    Move or resize any window by holding the trigger keys and dragging it
+    from anywhere, without having to grab the title bar or the borders.
+  $description:zh-CN: >-
+    按住触发键从窗口任意位置拖动，即可移动或调整窗口大小，
+    无需瞄准标题栏或边框。
+- winArrange:
+  - SnapWindowsWhenDragging: true
+    $name: Snap windows when dragging
+    $name:zh-CN: 拖动窗口时吸附
+  - SnapWindowsDistance: 25
+    $name: Snap windows distance
+    $name:zh-CN: 吸附距离
+    $description: Set the required distance for windows to snap to other windows
+    $description:zh-CN: 设置窗口与其他窗口吸附时所需的距离
+  - KeysToDisableSnapping:
+    - Ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - Alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - Shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    $name: Keys to temporarily disable snapping
+    $name:zh-CN: 临时禁用吸附的按键
+    $description: A combination of keys that can be used to temporarily disable snapping
+    $description:zh-CN: 按住该组合键可临时禁用窗口吸附
+  - SlidingAnimation: true
+    $name: Sliding animation
+    $name:zh-CN: 滑动动画
+    $description: Keep sliding the window after it's being moved
+    $description:zh-CN: 窗口被拖动松手后继续保持惯性滑动
+  - SnapWindowsWhenSliding: true
+    $name: Snap windows when sliding
+    $name:zh-CN: 滑动时吸附窗口
+  - SlidingAnimationSlowdown: 15
+    $name: Sliding animation slowdown
+    $name:zh-CN: 滑动减速
+    $description: Set a smaller value for a sliding animation that lasts longer (between 1 and 99)
+    $description:zh-CN: 数值越小，滑动动画持续越久（取值 1 到 99 之间）
+  $name: Window arrangement
+  $name:zh-CN: 窗口排列
   $description: >-
-    Also drag windows without a title bar, such as popup menus, tooltips
-    and flyouts.
-  $description:zh-CN: 同时允许拖动没有标题栏的窗口，例如弹出菜单、工具提示和气泡。
+    Snap windows when dragging or sliding, and keep them sliding smoothly
+    with inertia after they are released.
+  $description:zh-CN: >-
+    拖动或滑动窗口时自动吸附对齐，窗口松手后带惯性顺滑滑动。
+- invisBorders:
+  - SpecialWindows: false
+    $name: Apply to Special Windows
+    $name:zh-CN: 应用到特殊窗口
+    $description: Also apply to special windows like dialogs
+    $description:zh-CN: 同时应用到对话框等特殊窗口
+  $name: Invisible window borders
+  $name:zh-CN: 隐形窗口边框
+  $description: >-
+    Make window borders invisible while keeping rounded corners.
+  $description:zh-CN: >-
+    将窗口边框设为隐形，同时保留圆角效果。
 */
 // ==/WindhawkModSettings==
+
+#include <commctrl.h>
+#include <dwmapi.h>
+#include <shellscalingapi.h>
+#include <shobjidl.h>
+#include <tlhelp32.h>
+#include <windhawk_api.h>
+#include <windowsx.h>
+
+#include <algorithm>
+#include <atomic>
+#include <bit>
+#include <cstdlib>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <set>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+// ============================================================================
+// 窗口拖动（Alt+拖动）
+//
+// 来自 CW-窗口拖动（Alt+拖动）1.2（上游 AltDrag 1.1，原作者 m417z，GPL-3.0，
+// 原版链接 https://windhawk.net/mods/alt-drag），代码逻辑与上游逐字节一致，
+// 仅做四类机械改动以并入本模组：
+//   1. 整体置于 AltDrag 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModUninit→Uninit、Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 altDrag. 前缀（moveTrigger→
+//      altDrag.moveTrigger 等），与「窗口排列」「隐形窗口边框」分组隔离；
+//   3. EnumThreadWindows/EnumWindows 两处无捕获 lambda 回调改为显式
+//      CALLBACK 函数（MarkHookedWindowEnumProc/UnmarkHookedWindowsEnumProc），
+//      保证 x86 目标可编译（WNDENUMPROC 为 stdcall）；
+//   4. 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽为 OnThreadDetach()，由
+//      本模组唯一的 DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+// 入口由本模组的 Wh_ModInit / Wh_ModUninit / Wh_ModSettingsChanged 统一调用，
+// 初始化失败时仅降级本功能，不影响其余功能。
+// ============================================================================
+namespace AltDrag {
 
 // A drag is started by taking the button press away from the target window as
 // it's retrieved from the message queue, and posting a request to the root
@@ -237,16 +410,6 @@
 // a drag is therefore masked by a low level keyboard hook of the thread
 // running the drag, the way AutoHotkey masks menu keys: it's swallowed and
 // sent again behind a tap of an unassigned key.
-
-#include <commctrl.h>
-
-#include <algorithm>
-#include <atomic>
-#include <bit>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <unordered_set>
 
 enum : DWORD {
     kModifierCtrl = 1 << 0,
@@ -711,6 +874,24 @@ void MarkHookedWindow(HWND hWnd) {
         Wh_Log(L"SetProp error for %08X: %u", (DWORD)(ULONG_PTR)hWnd,
                GetLastError());
     }
+}
+
+// x86 下 WNDENUMPROC 为 stdcall，无捕获 lambda 直接传入会报
+// "no known conversion ... __attribute__((stdcall))"；改为显式 CALLBACK 函数
+// （逻辑不变）。
+BOOL CALLBACK MarkHookedWindowEnumProc(HWND hWnd, LPARAM /*lParam*/) {
+    MarkHookedWindow(hWnd);
+    return TRUE;
+}
+
+// 同上：卸载时清除本进程窗口标记的枚举回调。
+BOOL CALLBACK UnmarkHookedWindowsEnumProc(HWND hWnd, LPARAM /*lParam*/) {
+    DWORD processId = 0;
+    GetWindowThreadProcessId(hWnd, &processId);
+    if (processId == GetCurrentProcessId()) {
+        RemoveProp(hWnd, kHookedWindowProp);
+    }
+    return TRUE;
 }
 
 // This thread's hooks are in place, another thread's are told by the mark.
@@ -2140,13 +2321,7 @@ void SetThreadHooksIfNeeded() {
 
     if (g_getMessageHook) {
         // The windows the thread has by now, later ones are marked as created.
-        EnumThreadWindows(
-            dwThreadId,
-            [](HWND hWnd, LPARAM) WINAPI -> BOOL {
-                MarkHookedWindow(hWnd);
-                return TRUE;
-            },
-            0);
+        EnumThreadWindows(dwThreadId, MarkHookedWindowEnumProc, 0);
     }
 
     guard.unlock();
@@ -2194,60 +2369,47 @@ BOOL WINAPI NtUserPeekMessage_Hook(MSG* pMsg,
         pMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg, flags);
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
-    switch (fdwReason) {
-        case DLL_PROCESS_ATTACH:
-            break;
+// 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽到这里，由本模组唯一的
+// DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+void OnThreadDetach() {
+    if (g_getMessageHook || g_callWndProcHook) {
+        std::lock_guard<std::mutex> guard(g_allThreadHooksMutex);
 
-        case DLL_THREAD_ATTACH:
-            break;
-
-        case DLL_THREAD_DETACH:
-            if (g_getMessageHook || g_callWndProcHook) {
-                std::lock_guard<std::mutex> guard(g_allThreadHooksMutex);
-
-                for (HHOOK hook : {g_getMessageHook, g_callWndProcHook}) {
-                    auto it = g_allThreadHooks.find(hook);
-                    if (it != g_allThreadHooks.end()) {
-                        UnhookWindowsHookEx(hook);
-                        g_allThreadHooks.erase(it);
-                    }
-                }
+        for (HHOOK hook : {g_getMessageHook, g_callWndProcHook}) {
+            auto it = g_allThreadHooks.find(hook);
+            if (it != g_allThreadHooks.end()) {
+                UnhookWindowsHookEx(hook);
+                g_allThreadHooks.erase(it);
             }
-
-            // The low level hooks and the overlay go away with their
-            // thread. The drag state is this thread's to clear, the hook
-            // being this thread's.
-            {
-                std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
-
-                if (g_lowLevelMouseHook &&
-                    GetCurrentThreadId() == g_lowLevelMouseHookThreadId) {
-                    g_lowLevelMouseHook = nullptr;
-                    g_llRootWnd = nullptr;
-                    g_llButton = 0;
-                    g_llDragging = false;
-                    g_llDragSetUp = false;
-                    g_llDragUpdatePosted = false;
-                    g_llDragOverlayWnd = nullptr;
-                }
-            }
-
-            {
-                std::lock_guard<std::mutex> guard(g_winKeyMaskHookMutex);
-
-                if (g_winKeyMaskHook &&
-                    GetCurrentThreadId() == g_winKeyMaskHookThreadId) {
-                    g_winKeyMaskHook = nullptr;
-                }
-            }
-            break;
-
-        case DLL_PROCESS_DETACH:
-            break;
+        }
     }
 
-    return TRUE;
+    // The low level hooks and the overlay go away with their
+    // thread. The drag state is this thread's to clear, the hook
+    // being this thread's.
+    {
+        std::lock_guard<std::mutex> guard(g_lowLevelMouseHookMutex);
+
+        if (g_lowLevelMouseHook &&
+            GetCurrentThreadId() == g_lowLevelMouseHookThreadId) {
+            g_lowLevelMouseHook = nullptr;
+            g_llRootWnd = nullptr;
+            g_llButton = 0;
+            g_llDragging = false;
+            g_llDragSetUp = false;
+            g_llDragUpdatePosted = false;
+            g_llDragOverlayWnd = nullptr;
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(g_winKeyMaskHookMutex);
+
+        if (g_winKeyMaskHook &&
+            GetCurrentThreadId() == g_winKeyMaskHookThreadId) {
+            g_winKeyMaskHook = nullptr;
+        }
+    }
 }
 
 int ButtonFromSetting(PCWSTR value) {
@@ -2290,13 +2452,13 @@ void LoadTriggerSettings(TriggerSettings& trigger, PCWSTR name) {
 }
 
 void LoadSettings() {
-    LoadTriggerSettings(g_settings.moveTrigger, L"moveTrigger");
-    LoadTriggerSettings(g_settings.sizeTrigger, L"sizeTrigger");
+    LoadTriggerSettings(g_settings.moveTrigger, L"altDrag.moveTrigger");
+    LoadTriggerSettings(g_settings.sizeTrigger, L"altDrag.sizeTrigger");
     g_settings.dragWindowsWithoutTitleBar =
-        Wh_GetIntSetting(L"dragWindowsWithoutTitleBar");
+        Wh_GetIntSetting(L"altDrag.dragWindowsWithoutTitleBar");
 }
 
-BOOL Wh_ModInit() {
+BOOL Init() {
     Wh_Log(L">");
 
     LoadSettings();
@@ -2328,7 +2490,7 @@ BOOL Wh_ModInit() {
     return TRUE;
 }
 
-void Wh_ModUninit() {
+void Uninit() {
     Wh_Log(L">");
 
     g_uninitializing = true;
@@ -2372,24 +2534,1478 @@ void Wh_ModUninit() {
     }
 
     // With the hooks gone, no window is marked from here on.
-    EnumWindows(
-        [](HWND hWnd, LPARAM) WINAPI -> BOOL {
-            DWORD processId = 0;
-            GetWindowThreadProcessId(hWnd, &processId);
-            if (processId == GetCurrentProcessId()) {
-                RemoveProp(hWnd, kHookedWindowProp);
-            }
-            return TRUE;
-        },
-        0);
+    EnumWindows(UnmarkHookedWindowsEnumProc, 0);
 
     // The class may outlive the window, and is then found in place next time.
     DestroyDragOverlay();
     UnregisterClass(kDragOverlayClassName, GetModuleHandle(nullptr));
 }
 
-void Wh_ModSettingsChanged() {
+void SettingsChanged() {
     Wh_Log(L">");
 
     LoadSettings();
+}
+
+}  // namespace AltDrag
+
+// ============================================================================
+// 窗口排列
+//
+// 来自 CW-窗口滑动排列 1.0.3（上游 Slick Window Arrangement 1.0.2，原作者
+// m417z，GPL-3.0，原版链接
+// https://windhawk.net/mods/slick-window-arrangement），代码逻辑与上游逐字节
+// 一致，仅做三类机械改动以并入本模组：
+//   1. 整体置于 WinArrange 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModUninit→Uninit、Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 winArrange. 前缀（SnapWindowsWhenDragging→
+//      winArrange.SnapWindowsWhenDragging 等），与其他两组设置键隔离；
+//   3. 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽为 OnThreadDetach()，由
+//      本模组唯一的 DllMain 统一调用。
+// 入口由本模组的 Wh_ModInit / Wh_ModUninit / Wh_ModSettingsChanged 统一调用，
+// 初始化失败时仅降级本功能，不影响其余功能。
+// ============================================================================
+namespace WinArrange {
+
+struct {
+    bool snapWindowsWhenDragging;
+    int snapWindowsDistance;
+    bool keysToDisableSnappingCtrl;
+    bool keysToDisableSnappingAlt;
+    bool keysToDisableSnappingShift;
+    bool slidingAnimation;
+    bool snapWindowsWhenSliding;
+    int slidingAnimationSlowdown;
+} g_settings;
+
+#ifndef SWP_STATECHANGED
+#define SWP_STATECHANGED 0x8000
+#endif
+
+typedef DPI_AWARENESS_CONTEXT (WINAPI *GetThreadDpiAwarenessContext_t)();
+GetThreadDpiAwarenessContext_t pGetThreadDpiAwarenessContext;
+
+typedef DPI_AWARENESS_CONTEXT (WINAPI *SetThreadDpiAwarenessContext_t)(DPI_AWARENESS_CONTEXT dpiContext);
+SetThreadDpiAwarenessContext_t pSetThreadDpiAwarenessContext;
+
+typedef DPI_AWARENESS (WINAPI *GetAwarenessFromDpiAwarenessContext_t)(DPI_AWARENESS_CONTEXT value);
+GetAwarenessFromDpiAwarenessContext_t pGetAwarenessFromDpiAwarenessContext;
+
+typedef UINT (WINAPI *GetDpiForSystem_t)();
+GetDpiForSystem_t pGetDpiForSystem;
+
+typedef UINT (WINAPI *GetDpiForWindow_t)(HWND hwnd);
+GetDpiForWindow_t pGetDpiForWindow;
+
+typedef BOOL (WINAPI *IsWindowArranged_t)(HWND hwnd);
+IsWindowArranged_t pIsWindowArranged;
+
+typedef HRESULT (WINAPI *GetDpiForMonitor_t)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
+GetDpiForMonitor_t pGetDpiForMonitor;
+
+// https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507
+BOOL IsWindowCloaked(HWND hwnd)
+{
+    BOOL isCloaked = FALSE;
+    return SUCCEEDED(DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED,
+        &isCloaked, sizeof(isCloaked))) && isCloaked;
+}
+
+BOOL GetWindowFrameBounds(HWND hWnd, LPRECT lpRect)
+{
+    if (FAILED(DwmGetWindowAttribute(hWnd, DWMWA_EXTENDED_FRAME_BOUNDS, lpRect, sizeof(*lpRect))) &&
+        !GetWindowRect(hWnd, lpRect)) {
+        return FALSE;
+    }
+
+    if (pGetThreadDpiAwarenessContext && pGetAwarenessFromDpiAwarenessContext &&
+        pGetAwarenessFromDpiAwarenessContext(pGetThreadDpiAwarenessContext()) == DPI_AWARENESS_PER_MONITOR_AWARE) {
+        // No scaling is needed.
+        return TRUE;
+    }
+
+    if (pSetThreadDpiAwarenessContext && pGetDpiForMonitor && pGetDpiForSystem) {
+        auto prevThreadDpiAwarenessContext =
+            pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+        HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+        OffsetRect(lpRect, -monitorInfo.rcMonitor.left, -monitorInfo.rcMonitor.top);
+
+        UINT dpiFromX, dpiFromY;
+        pGetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiFromX, &dpiFromY);
+        UINT dpiFrom = dpiFromX; // dpiFromX and dpiFromY are equal
+
+        pSetThreadDpiAwarenessContext(prevThreadDpiAwarenessContext);
+
+        UINT dpiTo = pGetDpiForSystem();
+
+        lpRect->left = MulDiv(lpRect->left, dpiTo, dpiFrom);
+        lpRect->top = MulDiv(lpRect->top, dpiTo, dpiFrom);
+        lpRect->right = MulDiv(lpRect->right, dpiTo, dpiFrom);
+        lpRect->bottom = MulDiv(lpRect->bottom, dpiTo, dpiFrom);
+
+        GetMonitorInfo(monitor, &monitorInfo);
+        OffsetRect(lpRect, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top);
+    }
+
+    return TRUE;
+}
+
+class WindowMagnet {
+public:
+    WindowMagnet(HWND hTargetWnd) {
+        CalculateMetrics(hTargetWnd);
+
+        InitialWndEnumProcParam enumParam;
+        enumParam.hTargetWnd = hTargetWnd;
+        EnumWindows(InitialWndEnumProc, (LPARAM)&enumParam);
+
+        for (auto it = enumParam.windowRects.rbegin(); it != enumParam.windowRects.rend(); ++it) {
+            const auto& rc = *it;
+
+            RemoveOverlappedTargets(magnetTargetsLeft, rc.left, rc.right, rc.top, rc.bottom);
+            RemoveOverlappedTargets(magnetTargetsTop, rc.top, rc.bottom, rc.left, rc.right);
+            RemoveOverlappedTargets(magnetTargetsRight, rc.left, rc.right, rc.top, rc.bottom);
+            RemoveOverlappedTargets(magnetTargetsBottom, rc.top, rc.bottom, rc.left, rc.right);
+
+            magnetTargetsLeft.emplace(rc.left, rc.top, rc.bottom);
+            magnetTargetsTop.emplace(rc.top, rc.left, rc.right);
+            magnetTargetsRight.emplace(rc.right, rc.top, rc.bottom);
+            magnetTargetsBottom.emplace(rc.bottom, rc.left, rc.right);
+        }
+
+        EnumDisplayMonitors(nullptr, nullptr, InitialMonitorEnumProc, (LPARAM)this);
+    }
+
+    void MagnetMove(HWND hSourceWnd, int* x, int* y, int* cx, int* cy) {
+        if (IsSnappingTemporarilyDisabled()) {
+            return;
+        }
+
+        CalculateMetrics(hSourceWnd);
+
+        RECT sourceRect = {
+            *x + windowBorderRect.left,
+            *y + windowBorderRect.top,
+            *x + *cx - windowBorderRect.right,
+            *y + *cy - windowBorderRect.bottom
+        };
+
+        int newX = *x;
+        int newY = *y;
+
+        long targetLeft = FindClosestTarget(magnetTargetsLeft,
+            sourceRect.right, sourceRect.top, sourceRect.bottom, magnetPixels);
+        long targetRight = FindClosestTarget(magnetTargetsRight,
+            sourceRect.left, sourceRect.top, sourceRect.bottom, magnetPixels);
+
+        if (targetLeft != LONG_MAX && targetRight != LONG_MAX &&
+            std::abs(targetLeft - sourceRect.right) < std::abs(targetRight - sourceRect.left)) {
+            newX = targetLeft - *cx + windowBorderRect.right;
+        }
+        else if (targetRight != LONG_MAX) {
+            newX = targetRight - windowBorderRect.left;
+        }
+        else if (targetLeft != LONG_MAX) {
+            newX = targetLeft - *cx + windowBorderRect.right;
+        }
+
+        long targetTop = FindClosestTarget(magnetTargetsTop,
+            sourceRect.bottom, sourceRect.left, sourceRect.right, magnetPixels);
+        long targetBottom = FindClosestTarget(magnetTargetsBottom,
+            sourceRect.top, sourceRect.left, sourceRect.right, magnetPixels);
+
+        if (targetTop != LONG_MAX && targetBottom != LONG_MAX &&
+            std::abs(targetTop - sourceRect.bottom) < std::abs(targetBottom - sourceRect.top)) {
+            newY = targetTop - *cy + windowBorderRect.bottom;
+        }
+        else if (targetBottom != LONG_MAX) {
+            newY = targetBottom - windowBorderRect.top;
+        }
+        else if (targetTop != LONG_MAX) {
+            newY = targetTop - *cy + windowBorderRect.bottom;
+        }
+
+        if (newX != *x || newY != *y) {
+            // Make sure the title bar is within a work area, otherwise
+            // the window might become undraggable.
+            RECT targetRect = {
+                newX + windowBorderRect.left,
+                newY + windowBorderRect.top,
+                newX + *cx - windowBorderRect.right,
+                newY + windowBorderRect.top + 1
+            };
+
+            if (IsRectInWorkArea(targetRect)) {
+                *x = newX;
+                *y = newY;
+            }
+        }
+    }
+
+private:
+    UINT windowDpi = -1;
+    bool windowMaximized = false;
+    RECT windowBorderRect{};
+
+    int magnetPixels;
+    std::set<std::tuple<long, long, long>> magnetTargetsLeft;
+    std::set<std::tuple<long, long, long>> magnetTargetsTop;
+    std::set<std::tuple<long, long, long>> magnetTargetsRight;
+    std::set<std::tuple<long, long, long>> magnetTargetsBottom;
+
+    void CalculateMetrics(HWND hTargetWnd) {
+        UINT prevWindowDpi = windowDpi;
+        windowDpi = pGetDpiForWindow ? pGetDpiForWindow(hTargetWnd) : 0;
+
+        bool prevWindowMaximized = windowMaximized;
+        windowMaximized = IsZoomed(hTargetWnd);
+
+        if (prevWindowDpi == windowDpi && prevWindowMaximized == windowMaximized) {
+            return;
+        }
+
+        RECT rect, frame;
+        if (GetWindowRect(hTargetWnd, &rect) && GetWindowFrameBounds(hTargetWnd, &frame)) {
+            windowBorderRect.left = frame.left - rect.left;
+            windowBorderRect.top = frame.top - rect.top;
+            windowBorderRect.right = rect.right - frame.right;
+            windowBorderRect.bottom = rect.bottom - frame.bottom;
+        }
+
+        magnetPixels = g_settings.snapWindowsDistance;
+        if (windowDpi) {
+            magnetPixels = MulDiv(magnetPixels, windowDpi, 96);
+        }
+    }
+
+    struct InitialWndEnumProcParam {
+        HWND hTargetWnd = nullptr;
+        std::vector<RECT> windowRects;
+    };
+
+    static BOOL CALLBACK InitialWndEnumProc(HWND hWnd, LPARAM lParam) {
+        auto& param = *(InitialWndEnumProcParam*)lParam;
+
+        if (hWnd == param.hTargetWnd) {
+            return TRUE;
+        }
+
+        if (!IsWindowVisible(hWnd) || IsWindowCloaked(hWnd) || IsIconic(hWnd)) {
+            return TRUE;
+        }
+
+        if (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW)) {
+            return TRUE;
+        }
+
+        RECT rc;
+        if (!GetWindowFrameBounds(hWnd, &rc)) {
+            return TRUE;
+        }
+
+        if (rc.left >= rc.right || rc.top >= rc.bottom) {
+            return TRUE;
+        }
+
+        param.windowRects.push_back(rc);
+
+        return TRUE;
+    }
+
+    static BOOL CALLBACK InitialMonitorEnumProc(HMONITOR monitor, HDC, LPRECT, LPARAM lParam) {
+        auto& windowMagnet = *(WindowMagnet*)lParam;
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+
+        auto& rc = monitorInfo.rcWork;
+
+        windowMagnet.magnetTargetsLeft.emplace(rc.right, rc.top, rc.bottom);
+        windowMagnet.magnetTargetsTop.emplace(rc.bottom, rc.left, rc.right);
+        windowMagnet.magnetTargetsRight.emplace(rc.left, rc.top, rc.bottom);
+        windowMagnet.magnetTargetsBottom.emplace(rc.top, rc.left, rc.right);
+
+        return TRUE;
+    }
+
+    static void RemoveOverlappedTargets(std::set<std::tuple<long, long, long>>& magnetTargets,
+        long start, long end, long otherAxisStart, long otherAxisEnd) {
+        for (auto it = magnetTargets.lower_bound({ start, otherAxisStart, otherAxisStart });
+            it != magnetTargets.end();) {
+            auto a = std::get<0>(*it);
+            auto b = std::get<1>(*it);
+            auto c = std::get<2>(*it);
+
+            if (a > end || (a == end && b > otherAxisEnd)) {
+                break;
+            }
+
+            if (otherAxisStart < c && otherAxisEnd > b) {
+                it = magnetTargets.erase(it);
+
+                if (otherAxisStart > b) {
+                    magnetTargets.emplace(a, b, otherAxisStart);
+                }
+
+                if (otherAxisEnd < c) {
+                    magnetTargets.emplace(a, otherAxisEnd, c);
+                }
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+
+    static long FindClosestTarget(const std::set<std::tuple<long, long, long>>& magnetTargets,
+        long source, long otherAxisStart, long otherAxisEnd, int magnetPixels) {
+        long target = LONG_MAX;
+
+        long iterStart = source - magnetPixels;
+        long iterEnd = source + magnetPixels;
+
+        for (auto it = magnetTargets.lower_bound({ iterStart, otherAxisStart, otherAxisStart });
+            it != magnetTargets.end();
+            ++it) {
+            auto a = std::get<0>(*it);
+            auto b = std::get<1>(*it);
+            auto c = std::get<2>(*it);
+
+            if (a > iterEnd || (a == iterEnd && b > otherAxisEnd)) {
+                break;
+            }
+
+            if (target != LONG_MAX) {
+                if (a == target) {
+                    continue;
+                }
+
+                if (std::abs(source - a) >= std::abs(source - target)) {
+                    break;
+                }
+            }
+
+            if (otherAxisStart < c && otherAxisEnd > b) {
+                target = a;
+            }
+        }
+
+        return target;
+    }
+
+    struct IsRectInWorkAreaMonitorEnumProcParam {
+        const RECT* rc;
+        bool inWorkArea;
+    };
+
+    static BOOL CALLBACK IsRectInWorkAreaMonitorEnumProc(HMONITOR monitor, HDC, LPRECT, LPARAM lParam) {
+        auto& param = *(IsRectInWorkAreaMonitorEnumProcParam*)lParam;
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+
+        auto& rcA = *param.rc;
+        auto& rcB = monitorInfo.rcWork;
+
+        if (rcA.left < rcB.right && rcA.right > rcB.left &&
+            rcA.top < rcB.bottom && rcA.bottom > rcB.top) {
+            param.inWorkArea = true;
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    static bool IsRectInWorkArea(const RECT& rc) {
+        IsRectInWorkAreaMonitorEnumProcParam param;
+        param.rc = &rc;
+        param.inWorkArea = false;
+        EnumDisplayMonitors(nullptr, nullptr, IsRectInWorkAreaMonitorEnumProc, (LPARAM)&param);
+        return param.inWorkArea;
+    }
+
+    static bool IsSnappingTemporarilyDisabled() {
+        if (!g_settings.keysToDisableSnappingCtrl &&
+            !g_settings.keysToDisableSnappingAlt &&
+            !g_settings.keysToDisableSnappingShift) {
+            return false;
+        }
+
+        return
+            (!g_settings.keysToDisableSnappingCtrl || GetKeyState(VK_CONTROL) < 0) &&
+            (!g_settings.keysToDisableSnappingAlt || GetKeyState(VK_MENU) < 0) &&
+            (!g_settings.keysToDisableSnappingShift || GetKeyState(VK_SHIFT) < 0);
+    }
+};
+
+class WindowMoving {
+public:
+    WindowMoving(HWND hTargetWnd) :
+        windowMagnet(hTargetWnd) {}
+
+    void PreProcessPos(HWND hTargetWnd, int* x, int* y, int* cx, int* cy) {
+        MovingState state = GetCurrentMovingState(hTargetWnd, *x, *y);
+
+        // If window state changes, e.g. the window is snapped, don't adjust its
+        // position, which could interfere with the snapping and doesn't make
+        // sense in general.
+        if (lastState && lastState->isMaximized == state.isMaximized &&
+            lastState->isMinimized == state.isMinimized &&
+            lastState->isArranged == state.isArranged) {
+            // Adjust window pos, which can be off in the DPI contexts:
+            // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE
+            // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+
+            int lastDeltaX = GET_X_LPARAM(lastState->messagePos) - lastState->x;
+            int lastDeltaY = GET_Y_LPARAM(lastState->messagePos) - lastState->y;
+
+            int deltaX = GET_X_LPARAM(state.messagePos) - state.x;
+            int deltaY = GET_Y_LPARAM(state.messagePos) - state.y;
+
+            state.x -= lastDeltaX - deltaX;
+            state.y -= lastDeltaY - deltaY;
+
+            *x = state.x;
+            *y = state.y;
+        }
+
+        lastState = state;
+
+        windowMagnet.MagnetMove(hTargetWnd, x, y, cx, cy);
+    }
+
+    void ForgetLastPos() {
+        lastState.reset();
+    }
+
+    WindowMagnet& GetWindowMagnet() {
+        return windowMagnet;
+    }
+
+private:
+    struct MovingState {
+        bool isMinimized;
+        bool isMaximized;
+        bool isArranged;
+        DWORD messagePos;
+        int x;
+        int y;
+    };
+
+    static MovingState GetCurrentMovingState(HWND hTargetWnd, int x, int y) {
+        return MovingState{
+            .isMinimized = !!IsMaximized(hTargetWnd),
+            .isMaximized = !!IsMinimized(hTargetWnd),
+            .isArranged = pIsWindowArranged && !!pIsWindowArranged(hTargetWnd),
+            .messagePos = GetMessagePos(),
+            .x = x,
+            .y = y,
+        };
+    }
+
+    std::optional<MovingState> lastState;
+    WindowMagnet windowMagnet;
+};
+
+class WindowMove {
+public:
+    WindowMove() {}
+
+    void Reset() {
+        lastState.reset();
+        for (auto& snapshotItem : snapshot) {
+            snapshotItem = nullptr;
+        }
+    }
+
+    void UpdateWithNewPos(HWND hTargetWnd, int x, int y) {
+        DWORD tickCount = GetTickCount();
+
+        if (snapshot[0] && tickCount - snapshot[0]->tickCount >= 100) {
+            // Waited for too long, reset.
+            Reset();
+        }
+
+        WindowState state = GetWindowState(hTargetWnd);
+        if (lastState && (state.isMinimized != lastState->isMinimized ||
+                          state.isMaximized != lastState->isMaximized ||
+                          state.isArranged != lastState->isArranged)) {
+            // Window state changed, e.g. it was snapped, reset.
+            Reset();
+        }
+
+        lastState = state;
+
+        if (!snapshot[0]) {
+            snapshot[0] = &snapshotStorage[0];
+        }
+        else if (!snapshot[1]) {
+            snapshot[1] = &snapshotStorage[0];
+            snapshot[0] = &snapshotStorage[1];
+        }
+
+        if (snapshot[1] && tickCount - snapshot[1]->tickCount >= 100) {
+            if (!snapshot[2]) {
+                snapshot[2] = &snapshotStorage[2];
+            }
+
+            auto* temp = snapshot[2];
+            snapshot[2] = snapshot[1];
+            snapshot[1] = snapshot[0];
+            snapshot[0] = temp;
+        }
+
+        snapshot[0]->tickCount = tickCount;
+        snapshot[0]->x = x;
+        snapshot[0]->y = y;
+    }
+
+    bool CompleteMove(int* x, int* y, double* velocityX, double* velocityY) {
+        if (!snapshot[0] || !snapshot[1]) {
+            return false;
+        }
+
+        if (GetTickCount() - snapshot[0]->tickCount >= 100) {
+            return false;
+        }
+
+        auto* winMoveLast = snapshot[0];
+        auto* winMovePrev = snapshot[2] ? snapshot[2] : snapshot[1];
+
+        int tickCountDiff = winMoveLast->tickCount - winMovePrev->tickCount;
+        if (tickCountDiff <= 0) {
+            return false;
+        }
+
+        *x = winMoveLast->x;
+        *y = winMoveLast->y;
+
+        // Velocity in client coordinates per second.
+        *velocityX = 1000.0 * (winMoveLast->x - winMovePrev->x) / tickCountDiff;
+        *velocityY = 1000.0 * (winMoveLast->y - winMovePrev->y) / tickCountDiff;
+
+        return true;
+    }
+
+private:
+    struct WindowState {
+        bool isMinimized;
+        bool isMaximized;
+        bool isArranged;
+    };
+
+    struct MoveSnapshot {
+        DWORD tickCount;
+        int x, y;
+    };
+
+    static WindowState GetWindowState(HWND hTargetWnd) {
+        return WindowState{
+            .isMinimized = !!IsMaximized(hTargetWnd),
+            .isMaximized = !!IsMinimized(hTargetWnd),
+            .isArranged = pIsWindowArranged && !!pIsWindowArranged(hTargetWnd),
+        };
+    }
+
+    std::optional<WindowState> lastState;
+    MoveSnapshot snapshotStorage[3];
+    MoveSnapshot* snapshot[3]{};
+};
+
+struct WindowSlideTimer {
+public:
+    WindowSlideTimer(TIMERPROC proc, int cursorX, int cursorY, int x, int y, double velocityX, double velocityY, std::optional<WindowMagnet> windowMagnet) :
+        cursorPoint{ cursorX, cursorY }, x((double)x), y((double)y), velocityX(velocityX), velocityY(velocityY), windowMagnet(std::move(windowMagnet)) {
+        timerId = SetTimer(nullptr, 0, 10, proc);
+
+        HMONITOR monitor = MonitorFromPoint(cursorPoint, MONITOR_DEFAULTTONEAREST);
+
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+        GetMonitorInfo(monitor, &monitorInfo);
+        CopyRect(&workArea, &monitorInfo.rcWork);
+    }
+
+    ~WindowSlideTimer() {
+        KillTimer(nullptr, timerId);
+    }
+
+    WindowSlideTimer(const WindowSlideTimer&) = delete;
+    WindowSlideTimer(WindowSlideTimer&&) = delete;
+    WindowSlideTimer& operator=(const WindowSlideTimer&) = delete;
+    WindowSlideTimer& operator=(WindowSlideTimer&&) = delete;
+
+    UINT_PTR GetTimerId() const {
+        return timerId;
+    }
+
+    bool SlideNextFrame(HWND hWnd) {
+        RECT rect;
+        GetWindowRect(hWnd, &rect);
+        if (frame != 0) {
+            // If the window's position or size changed, stop timer.
+            if (
+                lastX != rect.left ||
+                lastY != rect.top ||
+                lastCx != rect.right - rect.left ||
+                lastCy != rect.bottom - rect.top
+            ) {
+                return false;
+            }
+        }
+
+        int prevX = (int)x;
+        int prevY = (int)y;
+
+        // The default timer resolution on Windows is 15.6 ms.
+        x += velocityX / (1000.0 / 15.6);
+        y += velocityY / (1000.0 / 15.6);
+
+        int currentX = (int)x;
+        int currentY = (int)y;
+
+        if (currentX == prevX && currentY == prevY) {
+            return false;
+        }
+
+        POINT anchor{ currentX + cursorPoint.x, currentY + cursorPoint.y };
+        if (!PtInRect(&workArea, anchor)) {
+            bool foundNewMonitor = false;
+
+            HMONITOR monitor = MonitorFromPoint(anchor, MONITOR_DEFAULTTONULL);
+            if (monitor) {
+                MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+                GetMonitorInfo(monitor, &monitorInfo);
+                if (PtInRect(&monitorInfo.rcWork, anchor)) {
+                    foundNewMonitor = true;
+                    CopyRect(&workArea, &monitorInfo.rcWork);
+                }
+            }
+
+            if (!foundNewMonitor) {
+                if (anchor.x < workArea.left) {
+                    x = workArea.left - cursorPoint.x;
+                    velocityX = -velocityX * .05;
+                }
+                else if (anchor.x > workArea.right) {
+                    x = workArea.right - cursorPoint.x;
+                    velocityX = -velocityX * .05;
+                }
+
+                if (anchor.y < workArea.top) {
+                    y = workArea.top - cursorPoint.y;
+                    velocityY = -velocityY * .05;
+                }
+                else if (anchor.y > workArea.bottom) {
+                    y = workArea.bottom - cursorPoint.y;
+                    velocityY = -velocityY * .05;
+                }
+
+                currentX = (int)x;
+                currentY = (int)y;
+            }
+        }
+
+        int slidingAnimationSlowdown = g_settings.slidingAnimationSlowdown;
+        if (slidingAnimationSlowdown < 1) {
+            slidingAnimationSlowdown = 1;
+        }
+        else if (slidingAnimationSlowdown > 99) {
+            slidingAnimationSlowdown = 99;
+        }
+
+        double slowdownMultiplier = (100 - g_settings.slidingAnimationSlowdown) / 100.0;
+
+        velocityX *= slowdownMultiplier;
+        velocityY *= slowdownMultiplier;
+
+        if (windowMagnet) {
+            int magnetX = currentX;
+            int magnetY = currentY;
+            int cx = rect.right - rect.left;
+            int cy = rect.bottom - rect.top;
+            windowMagnet->MagnetMove(hWnd, &magnetX, &magnetY, &cx, &cy);
+
+            if (magnetX != currentX) {
+                x = magnetX;
+                currentX = magnetX;
+                velocityX = 0.0;
+            }
+
+            if (magnetY != currentY) {
+                y = magnetY;
+                currentY = magnetY;
+                velocityY = 0.0;
+            }
+        }
+
+        SetWindowPos(hWnd, nullptr, currentX, currentY, 0, 0,
+            SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+
+        lastX = currentX;
+        lastY = currentY;
+        lastCx = rect.right - rect.left;
+        lastCy = rect.bottom - rect.top;
+
+        frame++;
+        return frame < 50;
+    }
+
+private:
+    UINT_PTR timerId;
+    int frame = 0;
+    POINT cursorPoint;
+    RECT workArea;
+    double x, y;
+    double velocityX, velocityY;
+    int lastX, lastY, lastCx, lastCy;
+    std::optional<WindowMagnet> windowMagnet;
+};
+
+std::atomic<bool> g_uninitializing;
+std::atomic<int> g_hookRefCount;
+thread_local std::unordered_map<HWND, WindowMoving> g_winMoving;
+thread_local std::unordered_map<HWND, WindowMove> g_winMove;
+thread_local std::unordered_map<HWND, WindowSlideTimer> g_winSlideTimers;
+
+UINT g_unsubclassRegisteredMessage = RegisterWindowMessage(
+    L"Windhawk_Unsubclass_slick-window-arrangement");
+std::mutex g_subclassedWindowsMutex;
+std::unordered_set<HWND> g_subclassedWindows;
+
+thread_local HHOOK g_callWndProcHook;
+std::mutex g_allCallWndProcHooksMutex;
+std::unordered_set<HHOOK> g_allCallWndProcHooks;
+
+LRESULT CALLBACK SubclassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
+auto hookRefCountScope() {
+    g_hookRefCount++;
+    return std::unique_ptr<decltype(g_hookRefCount), void(*)(decltype(g_hookRefCount)*)>{
+        &g_hookRefCount, [](auto hookRefCount) {
+            (*hookRefCount)--;
+        }};
+}
+
+void UnsubclassWindow(HWND hWnd)
+{
+    RemoveWindowSubclass(hWnd, SubclassWndProc, 0);
+
+    std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+
+    auto it = g_subclassedWindows.find(hWnd);
+    if (it != g_subclassedWindows.end()) {
+        g_subclassedWindows.erase(it);
+    }
+}
+
+bool KillWindowSlideTimer(HWND hWnd)
+{
+    auto it = g_winSlideTimers.find(hWnd);
+    if (it == g_winSlideTimers.end()) {
+        return false;
+    }
+
+    g_winSlideTimers.erase(it);
+    return true;
+}
+
+void CALLBACK WindowSlideTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idTimer, DWORD dwTime)
+{
+    auto it = g_winSlideTimers.begin();
+    for (; it != g_winSlideTimers.end(); ++it) {
+        auto& timer = it->second;
+        if (timer.GetTimerId() == idTimer) {
+            break;
+        }
+    }
+
+    if (it == g_winSlideTimers.end()) {
+        return;
+    }
+
+    HWND hTargetWnd = it->first;
+    auto& timer = it->second;
+
+    if (!timer.SlideNextFrame(hTargetWnd)) {
+        g_winSlideTimers.erase(it);
+        UnsubclassWindow(hTargetWnd);
+    }
+}
+
+void OnEnterSizeMove(HWND hWnd)
+{
+    KillWindowSlideTimer(hWnd);
+
+    if (g_settings.snapWindowsWhenDragging) {
+        g_winMoving.try_emplace(hWnd, hWnd);
+    }
+
+    if (g_settings.slidingAnimation) {
+        g_winMove.try_emplace(hWnd);
+    }
+}
+
+void OnExitSizeMove(HWND hWnd)
+{
+    bool unsubclass = true;
+    auto winMovingIt = g_winMoving.find(hWnd);
+    auto winMoveIt = g_winMove.find(hWnd);
+
+    if (winMoveIt != g_winMove.end()) {
+        auto& windowMove = winMoveIt->second;
+
+        int x, y;
+        double velocityX, velocityY;
+        if (windowMove.CompleteMove(&x, &y, &velocityX, &velocityY)) {
+            DWORD messagePos = GetMessagePos();
+
+            g_winSlideTimers.try_emplace(hWnd,
+                WindowSlideTimerProc,
+                GET_X_LPARAM(messagePos) - x,
+                GET_Y_LPARAM(messagePos) - y,
+                x,
+                y,
+                velocityX,
+                velocityY,
+                !g_settings.snapWindowsWhenSliding
+                    ? std::nullopt
+                    : std::optional(winMovingIt != g_winMoving.end()
+                        ? std::move(winMovingIt->second.GetWindowMagnet())
+                        : WindowMagnet(hWnd)));
+
+            unsubclass = false;
+        }
+
+        g_winMove.erase(winMoveIt);
+    }
+
+    if (winMovingIt != g_winMoving.end()) {
+        g_winMoving.erase(winMovingIt);
+    }
+
+    if (unsubclass) {
+        UnsubclassWindow(hWnd);
+    }
+}
+
+void OnWindowPosChanging(HWND hWnd, WINDOWPOS* windowPos)
+{
+    if ((windowPos->flags & (SWP_NOSIZE | SWP_NOMOVE)) == (SWP_NOSIZE | SWP_NOMOVE)) {
+        return;
+    }
+
+    RECT rc;
+    if (!GetWindowRect(hWnd, &rc)) {
+        return;
+    }
+
+    int x = (windowPos->flags & SWP_NOMOVE) ? rc.left : windowPos->x;
+    int y = (windowPos->flags & SWP_NOMOVE) ? rc.top : windowPos->y;
+    int cx = (windowPos->flags & SWP_NOSIZE) ? (rc.right - rc.left) : windowPos->cx;
+    int cy = (windowPos->flags & SWP_NOSIZE) ? (rc.bottom - rc.top) : windowPos->cy;
+
+    bool posChanged = rc.left != x || rc.top != y;
+    bool sizeChanged = rc.right - rc.left != cx || rc.bottom - rc.top != cy;
+
+    if (!posChanged && !sizeChanged) {
+        return;
+    }
+
+    auto it = g_winMoving.find(hWnd);
+    if (it == g_winMoving.end()) {
+        return;
+    }
+
+    auto& windowMoving = it->second;
+    if (posChanged && !sizeChanged) {
+        windowMoving.PreProcessPos(hWnd, &x, &y, &cx, &cy);
+
+        if (!(windowPos->flags & SWP_NOMOVE)) {
+            windowPos->x = x;
+            windowPos->y = y;
+        }
+
+        if (!(windowPos->flags & SWP_NOSIZE)) {
+            windowPos->cx = cx;
+            windowPos->cy = cy;
+        }
+    }
+    else {
+        // Maybe support resize one day...
+        windowMoving.ForgetLastPos();
+    }
+}
+
+void OnWindowPosChanged(HWND hWnd, const WINDOWPOS* windowPos)
+{
+    auto it = g_winMove.find(hWnd);
+    if (it == g_winMove.end()) {
+        // SWP_STATECHANGED is set when the state changes, e.g. the window is
+        // maximized.
+        // 0x00300000 is set when the window is snapped, e.g. with Win+left.
+        if ((windowPos->flags & SWP_STATECHANGED) || (windowPos->flags & 0x00300000)) {
+            if (KillWindowSlideTimer(hWnd)) {
+                UnsubclassWindow(hWnd);
+            }
+        }
+
+        return;
+    }
+
+    auto& windowMove = it->second;
+
+    if ((windowPos->flags & SWP_NOMOVE) || !(windowPos->flags & SWP_NOSIZE)) {
+        // Somethings that's not a move happened, reset.
+        windowMove.Reset();
+        return;
+    }
+
+    windowMove.UpdateWithNewPos(hWnd, windowPos->x, windowPos->y);
+}
+
+void OnSysCommand(HWND hWnd, WPARAM command)
+{
+    switch (command) {
+    case SC_SIZE:
+    case SC_MOVE:
+    case SC_MINIMIZE:
+    case SC_MAXIMIZE:
+    case SC_CLOSE:
+    case SC_MOUSEMENU:
+    case SC_KEYMENU:
+    case SC_RESTORE:
+        {
+            if (KillWindowSlideTimer(hWnd)) {
+                UnsubclassWindow(hWnd);
+            }
+        }
+        break;
+    }
+}
+
+void OnNcDestroy(HWND hWnd)
+{
+    KillWindowSlideTimer(hWnd);
+    UnsubclassWindow(hWnd);
+}
+
+LRESULT CALLBACK SubclassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+    auto hookScope = hookRefCountScope();
+
+    switch (uMsg) {
+    case WM_ENTERSIZEMOVE:
+        OnEnterSizeMove(hWnd);
+        break;
+
+    case WM_EXITSIZEMOVE:
+        OnExitSizeMove(hWnd);
+        break;
+
+    case WM_WINDOWPOSCHANGING:
+        OnWindowPosChanging(hWnd, (WINDOWPOS*)lParam);
+        break;
+
+    case WM_WINDOWPOSCHANGED:
+        OnWindowPosChanged(hWnd, (const WINDOWPOS*)lParam);
+        break;
+
+    case WM_SYSCOMMAND:
+        OnSysCommand(hWnd, wParam);
+        break;
+
+    case WM_NCDESTROY:
+        OnNcDestroy(hWnd);
+        break;
+
+    default:
+        if (uMsg == g_unsubclassRegisteredMessage) {
+            KillWindowSlideTimer(hWnd);
+            RemoveWindowSubclass(hWnd, SubclassWndProc, 0);
+        }
+        break;
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (nCode != HC_ACTION) {
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+    const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+
+    if (cwp->message == WM_ENTERSIZEMOVE) {
+        WCHAR className[32];
+        if (GetClassName(GetAncestor(cwp->hwnd, GA_ROOT), className, ARRAYSIZE(className)) &&
+            (wcsicmp(className, L"Shell_TrayWnd") == 0 || wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0)) {
+            // Skip the taskbar as it causes wired
+            // behavior and doesn't make sense in general.
+        }
+        else {
+            std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+            if (!g_uninitializing && SetWindowSubclass(cwp->hwnd, SubclassWndProc, 0, 0)) {
+                g_subclassedWindows.insert(cwp->hwnd);
+            }
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+void SetWindowHookForUiThreadIfNeeded(HWND hWnd)
+{
+    if (!g_callWndProcHook && IsWindowVisible(GetAncestor(hWnd, GA_ROOT))) {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+        if (!g_uninitializing) {
+            DWORD dwThreadId = GetCurrentThreadId();
+            HHOOK callWndProcHook = SetWindowsHookEx(WH_CALLWNDPROC, CallWndProc, nullptr, dwThreadId);
+            if (callWndProcHook) {
+                Wh_Log(L"SetWindowsHookEx succeeded for thread %u", dwThreadId);
+                g_callWndProcHook = callWndProcHook;
+                g_allCallWndProcHooks.insert(callWndProcHook);
+            }
+            else {
+                Wh_Log(L"SetWindowsHookEx error for thread %u: %u", dwThreadId, GetLastError());
+            }
+        }
+    }
+}
+
+using DispatchMessageA_t = decltype(&DispatchMessageA);
+DispatchMessageA_t pOriginalDispatchMessageA;
+LRESULT WINAPI DispatchMessageAHook(CONST MSG *lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (lpMsg && lpMsg->hwnd) {
+        SetWindowHookForUiThreadIfNeeded(lpMsg->hwnd);
+    }
+
+    return pOriginalDispatchMessageA(lpMsg);
+}
+
+using DispatchMessageW_t = decltype(&DispatchMessageW);
+DispatchMessageW_t pOriginalDispatchMessageW;
+LRESULT WINAPI DispatchMessageWHook(CONST MSG *lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (lpMsg && lpMsg->hwnd) {
+        SetWindowHookForUiThreadIfNeeded(lpMsg->hwnd);
+    }
+
+    return pOriginalDispatchMessageW(lpMsg);
+}
+
+using IsDialogMessageA_t = decltype(&IsDialogMessageA);
+IsDialogMessageA_t pOriginalIsDialogMessageA;
+LRESULT WINAPI IsDialogMessageAHook(HWND hDlg, LPMSG lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (hDlg) {
+        SetWindowHookForUiThreadIfNeeded(hDlg);
+    }
+
+    return pOriginalIsDialogMessageA(hDlg, lpMsg);
+}
+
+using IsDialogMessageW_t = decltype(&IsDialogMessageW);
+IsDialogMessageW_t pOriginalIsDialogMessageW;
+LRESULT WINAPI IsDialogMessageWHook(HWND hDlg, LPMSG lpMsg)
+{
+    auto hookScope = hookRefCountScope();
+
+    if (hDlg) {
+        SetWindowHookForUiThreadIfNeeded(hDlg);
+    }
+
+    return pOriginalIsDialogMessageW(hDlg, lpMsg);
+}
+
+// 原模组 DllMain 的 DLL_THREAD_DETACH 分支抽到这里，由本模组唯一的
+// DllMain 统一调用（合并前的两个模组各有一份 DllMain）。
+void OnThreadDetach() {
+    if (g_callWndProcHook) {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+
+        auto it = g_allCallWndProcHooks.find(g_callWndProcHook);
+        if (it != g_allCallWndProcHooks.end()) {
+            UnhookWindowsHookEx(g_callWndProcHook);
+            g_allCallWndProcHooks.erase(it);
+        }
+    }
+}
+
+void LoadSettings()
+{
+    g_settings.snapWindowsWhenDragging = Wh_GetIntSetting(L"winArrange.SnapWindowsWhenDragging");
+    g_settings.snapWindowsDistance = Wh_GetIntSetting(L"winArrange.SnapWindowsDistance");
+    g_settings.keysToDisableSnappingCtrl = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Ctrl");
+    g_settings.keysToDisableSnappingAlt = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Alt");
+    g_settings.keysToDisableSnappingShift = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Shift");
+    g_settings.slidingAnimation = Wh_GetIntSetting(L"winArrange.SlidingAnimation");
+    g_settings.snapWindowsWhenSliding = Wh_GetIntSetting(L"winArrange.SnapWindowsWhenSliding");
+    g_settings.slidingAnimationSlowdown = Wh_GetIntSetting(L"winArrange.SlidingAnimationSlowdown");
+}
+
+BOOL Init()
+{
+    Wh_Log(L"Init");
+
+    LoadSettings();
+
+    HMODULE hUser32 = LoadLibrary(L"user32.dll");
+    if (hUser32) {
+        pGetThreadDpiAwarenessContext = (GetThreadDpiAwarenessContext_t)GetProcAddress(hUser32, "GetThreadDpiAwarenessContext");
+        pSetThreadDpiAwarenessContext = (SetThreadDpiAwarenessContext_t)GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
+        pGetAwarenessFromDpiAwarenessContext = (GetAwarenessFromDpiAwarenessContext_t)GetProcAddress(hUser32, "GetAwarenessFromDpiAwarenessContext");
+        pGetDpiForSystem = (GetDpiForSystem_t)GetProcAddress(hUser32, "GetDpiForSystem");
+        pGetDpiForWindow = (GetDpiForWindow_t)GetProcAddress(hUser32, "GetDpiForWindow");
+        pIsWindowArranged = (IsWindowArranged_t)GetProcAddress(hUser32, "IsWindowArranged");
+    }
+
+    HMODULE hShcore = LoadLibrary(L"shcore.dll");
+    if (hShcore) {
+        pGetDpiForMonitor = (GetDpiForMonitor_t)GetProcAddress(hShcore, "GetDpiForMonitor");
+    }
+
+    // DispatchMessageA, DispatchMessageW could hopefully be enough to detect a message loop, but
+    // DispatchMessageWorker, which implements DispatchMessageA, DispatchMessageW, is sometimes
+    // called directly by functions such as DialogBoxParam.
+    Wh_SetFunctionHook((void*)DispatchMessageA, (void*)DispatchMessageAHook, (void**)&pOriginalDispatchMessageA);
+    Wh_SetFunctionHook((void*)DispatchMessageW, (void*)DispatchMessageWHook, (void**)&pOriginalDispatchMessageW);
+    Wh_SetFunctionHook((void*)IsDialogMessageA, (void*)IsDialogMessageAHook, (void**)&pOriginalIsDialogMessageA);
+    Wh_SetFunctionHook((void*)IsDialogMessageW, (void*)IsDialogMessageWHook, (void**)&pOriginalIsDialogMessageW);
+
+    return TRUE;
+}
+
+void Uninit()
+{
+    Wh_Log(L"Uninit");
+
+    g_uninitializing = true;
+
+    std::unordered_set<HWND> subclassedWindows;
+    {
+        std::lock_guard<std::mutex> guard(g_subclassedWindowsMutex);
+        subclassedWindows = std::move(g_subclassedWindows);
+        g_subclassedWindows.clear();
+    }
+
+    for (HWND hWnd : subclassedWindows) {
+        SendMessage(hWnd, g_unsubclassRegisteredMessage, 0, 0);
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
+
+        for (HHOOK hook : g_allCallWndProcHooks) {
+            UnhookWindowsHookEx(hook);
+        }
+
+        g_allCallWndProcHooks.clear();
+    }
+
+    while (g_hookRefCount > 0) {
+        Sleep(200);
+    }
+}
+
+void SettingsChanged()
+{
+    Wh_Log(L"SettingsChanged");
+
+    LoadSettings();
+}
+
+}  // namespace WinArrange
+
+// ============================================================================
+// 隐形窗口边框
+//
+// 来自 CW-隐形窗口边框 1.0.1（上游 Invisible Window Borders 1.0.0，原作者
+// Bo0ii，MIT，原版链接 https://windhawk.net/mods/invisible-borders），代码
+// 逻辑与上游逐字节一致，仅做两类机械改动以并入本模组：
+//   1. 整体置于 InvisBorders 命名空间，入口改名：Wh_ModInit→Init、
+//      Wh_ModAfterInit→AfterInit、Wh_ModBeforeUninit→BeforeUninit、
+//      Wh_ModSettingsChanged→SettingsChanged；
+//   2. 设置键名原样保留，读取路径加 invisBorders. 前缀（SpecialWindows→
+//      invisBorders.SpecialWindows），与其他两组设置键隔离。
+// 入口由本模组的 Wh_ModInit / Wh_ModAfterInit / Wh_ModBeforeUninit /
+// Wh_ModSettingsChanged 统一调用（本功能无独立的 Uninit 清理，边框还原在
+// BeforeUninit 完成）。
+// ============================================================================
+namespace InvisBorders {
+
+// Special DWM color values
+#ifndef DWMWA_COLOR_NONE
+#define DWMWA_COLOR_NONE 0xFFFFFFFE
+#endif
+
+const COLORREF BorderInvisible = DWMWA_COLOR_NONE;  // No border color
+const COLORREF ColorDefault = DWMWA_COLOR_DEFAULT;
+
+bool SpecialWindows = false;
+
+BOOL IsValidWindow(HWND hWnd) {
+    DWORD dwStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
+    // Better exclude context menus
+    return (dwStyle & WS_THICKFRAME) == WS_THICKFRAME ||
+           (dwStyle & WS_CAPTION) == WS_CAPTION ||
+           (SpecialWindows && (dwStyle & WS_OVERLAPPED) == WS_OVERLAPPED && (dwStyle & WS_POPUP) != WS_POPUP);
+}
+
+using DwmSetWindowAttribute_t = decltype(&DwmSetWindowAttribute);
+DwmSetWindowAttribute_t DwmSetWindowAttribute_orig;
+HRESULT WINAPI DwmSetWindowAttribute_hook(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute) {
+    if (dwAttribute == DWMWA_BORDER_COLOR && IsValidWindow(hwnd)) {
+        Wh_Log(L"Intercepted DWMWA_BORDER_COLOR - setting to invisible");
+        // Override with invisible border
+        return DwmSetWindowAttribute_orig(hwnd, dwAttribute, &BorderInvisible, sizeof(BorderInvisible));
+    }
+
+    return DwmSetWindowAttribute_orig(hwnd, dwAttribute, pvAttribute, cbAttribute);
+}
+
+void SetBorderInvisible(HWND hWnd)
+{
+    if (!IsValidWindow(hWnd))
+        return;
+
+    Wh_Log(L"Setting invisible border");
+    DwmSetWindowAttribute_orig(hWnd, DWMWA_BORDER_COLOR, &BorderInvisible, sizeof(BorderInvisible));
+}
+
+using DefWindowProcA_t = decltype(&DefWindowProcA);
+DefWindowProcA_t DefWindowProcA_orig;
+LRESULT WINAPI DefWindowProcA_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefWindowProcA_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_ACTIVATE:
+        case WM_NCACTIVATE:
+        case WM_DWMCOLORIZATIONCOLORCHANGED:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefWindowProcW_t = decltype(&DefWindowProcW);
+DefWindowProcW_t DefWindowProcW_orig;
+LRESULT WINAPI DefWindowProcW_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefWindowProcW_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_ACTIVATE:
+        case WM_NCACTIVATE:
+        case WM_DWMCOLORIZATIONCOLORCHANGED:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefDlgProcA_t = decltype(&DefDlgProcA);
+DefDlgProcA_t DefDlgProcA_orig;
+LRESULT WINAPI DefDlgProcA_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefDlgProcA_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_NCACTIVATE:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+using DefDlgProcW_t = decltype(&DefDlgProcW);
+DefDlgProcW_t DefDlgProcW_orig;
+LRESULT WINAPI DefDlgProcW_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT result = DefDlgProcW_orig(hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg) {
+        case WM_NCACTIVATE:
+            SetBorderInvisible(hWnd);
+            break;
+    }
+
+    return result;
+}
+
+BOOL CALLBACK EnableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
+    DWORD pid = lParam;
+
+    DWORD wPid = 0;
+    GetWindowThreadProcessId(hWnd, &wPid);
+
+    if (pid == wPid) {
+        SetBorderInvisible(hWnd);
+    }
+
+    return TRUE;
+}
+
+BOOL CALLBACK DisableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
+    DWORD pid = lParam;
+    DWORD wPid = 0;
+    GetWindowThreadProcessId(hWnd, &wPid);
+
+    if (pid == wPid && IsValidWindow(hWnd))
+        DwmSetWindowAttribute_orig(hWnd, DWMWA_BORDER_COLOR, &ColorDefault, sizeof(ColorDefault));
+
+    return TRUE;
+}
+
+BOOL Init() {
+    Wh_Log(L"Init - Invisible Borders");
+
+    SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
+
+    Wh_SetFunctionHook(
+        (void *)DwmSetWindowAttribute,
+        (void *)DwmSetWindowAttribute_hook,
+        (void **)&DwmSetWindowAttribute_orig);
+
+    Wh_SetFunctionHook(
+        (void *)DefWindowProcW,
+        (void *)DefWindowProcW_hook,
+        (void **)&DefWindowProcW_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefWindowProcA,
+        (void *)DefWindowProcA_hook,
+        (void **)&DefWindowProcA_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefDlgProcW,
+        (void *)DefDlgProcW_hook,
+        (void **)&DefDlgProcW_orig
+    );
+
+    Wh_SetFunctionHook(
+        (void *)DefDlgProcA,
+        (void *)DefDlgProcA_hook,
+        (void **)&DefDlgProcA_orig
+    );
+
+    return TRUE;
+}
+
+void AfterInit() {
+    Wh_Log(L"AfterInit - Applying invisible borders");
+    EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+}
+
+void BeforeUninit() {
+    Wh_Log(L"BeforeUninit - Restoring default borders");
+    EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
+}
+
+void SettingsChanged() {
+    Wh_Log(L"SettingsChanged");
+    EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
+    SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
+    EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+}
+
+}  // namespace InvisBorders
+
+// ============================================================================
+// 模组入口（Windhawk 调用）
+//
+// 三个功能各自独立初始化/卸载/设置重载，由以下入口统一接入；某一功能初始化
+// 失败时仅降级该功能，不影响其余功能（与 CW-任务栏动画 的合并策略一致）。
+// ============================================================================
+
+BOOL Wh_ModInit() {
+    Wh_Log(L">");
+
+    // 窗口拖动（Alt+拖动）：初始化失败时只记录日志，不阻断其余功能。
+    if (!AltDrag::Init()) {
+        Wh_Log(L"AltDrag (window drag) init failed, continuing without it");
+    }
+
+    // 窗口排列：初始化失败时只记录日志，不阻断其余功能。
+    if (!WinArrange::Init()) {
+        Wh_Log(L"WinArrange (window arrangement) init failed, continuing "
+               L"without it");
+    }
+
+    // 隐形窗口边框：初始化失败时只记录日志，不阻断其余功能。
+    if (!InvisBorders::Init()) {
+        Wh_Log(L"InvisBorders (invisible borders) init failed, continuing "
+               L"without it");
+    }
+
+    return TRUE;
+}
+
+void Wh_ModAfterInit() {
+    Wh_Log(L">");
+
+    InvisBorders::AfterInit();
+}
+
+void Wh_ModBeforeUninit() {
+    Wh_Log(L">");
+
+    InvisBorders::BeforeUninit();
+}
+
+void Wh_ModUninit() {
+    Wh_Log(L">");
+
+    AltDrag::Uninit();
+    WinArrange::Uninit();
+}
+
+void Wh_ModSettingsChanged() {
+    Wh_Log(L">");
+
+    AltDrag::SettingsChanged();
+    WinArrange::SettingsChanged();
+    InvisBorders::SettingsChanged();
+}
+
+// 合并前的两个模组（窗口拖动、窗口排列）各有一份 DllMain，本模组只保留
+// 唯一一份：线程退出时分别清理两者的线程级钩子状态。
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
+    switch (fdwReason) {
+        case DLL_PROCESS_ATTACH:
+            break;
+
+        case DLL_THREAD_ATTACH:
+            break;
+
+        case DLL_THREAD_DETACH:
+            AltDrag::OnThreadDetach();
+            WinArrange::OnThreadDetach();
+            break;
+
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+
+    return TRUE;
 }

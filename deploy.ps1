@@ -365,7 +365,14 @@ $retiredMods = @(
     "local@cw-pointer-afterimage", "local@cw-better-volume-mixer",
     "local@cw-macos-style-dock",
     # v2.5.0 合并退役：框选淡出与图标平滑自动隐藏并入关于桌面的快捷设置 1.1.0
-    "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide"
+    "local@cw-desktop-marquee-fade", "local@cw-smooth-desktop-icons-autohide",
+    # v2.6.0：缩略图设置按用户要求移除；隐藏桌面图标文字与箭头并入快捷设置；
+    # 窗口拖动/滑动排列/隐形边框并入窗口优化；时钟/托盘图标并入托盘区域设置；
+    # 文件夹选择/运行对话框并入现代化的
+    "local@cw-taskbar-thumbnail-settings", "local@cw-hide-desktop-icon-text",
+    "local@cw-alt-drag", "local@cw-window-arrangement", "local@cw-invisible-borders",
+    "local@cw-taskbar-clock-customization", "local@cw-tray-system-icons",
+    "local@cw-modern-folder-picker", "local@cw-modern-run-dialog"
     # 注：cw-file-operation-styler 在 v2.1.0 周期移除、v2.3.0 重新整合回归；
     # cw-better-volume-mixer 曾于 v2.3.0 回归、v2.5.0 再次按用户要求移除。
 )
@@ -489,23 +496,17 @@ $optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpape
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
     "local@cw-explorer-styler", "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-animation", "local@cw-window-arrangement",
+    "local@cw-taskbar-animation", "local@cw-window-optimizer",
     "local@cw-extension-no-warning",
+    "local@cw-custom-context-menu", "local@cw-fluent-context-menu",
     "local@cw-file-hover-info", "local@cw-settings-styler",
-    "local@cw-alt-drag",
-    "local@cw-custom-context-menu",
-    "local@cw-invisible-borders",
-    "local@cw-taskbar-thumbnail-settings",
-    "local@cw-desktop-quick-settings", "local@cw-fluent-context-menu",
-    "local@cw-modern-run-dialog", "local@cw-file-operation-styler",
-    "local@cw-drag-to-delete",
-    "local@cw-taskbar-button-click", "local@cw-taskbar-clock-customization",
-    "local@cw-modern-folder-picker", "local@cw-winui-context-menu-animation",
-    "local@cw-file-explorer-content-animation", "local@cw-no-focus-rectangle",
-    "local@cw-win11-power-buttons", "local@cw-logon-logoff-shutdown-sounds",
-    "local@cw-explorer-double-click-up", "local@cw-hide-desktop-icon-text",
-    "local@cw-centered-start-split-icons", "local@cw-tray-system-icons",
-    "local@cw-explorer-details-better-file-sizes"
+    "local@cw-modernized",
+    "local@cw-drag-to-delete", "local@cw-taskbar-button-click",
+    "local@cw-explorer-double-click-up", "local@cw-file-operation-styler",
+    "local@cw-no-focus-rectangle", "local@cw-win11-power-buttons",
+    "local@cw-logon-logoff-shutdown-sounds",
+    "local@cw-desktop-quick-settings", "local@cw-centered-start-split-icons",
+    "local@cw-tray-area-settings", "local@cw-explorer-details-better-file-sizes"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
 $dlcModIds = @(
@@ -680,6 +681,8 @@ foreach ($file in $files) {
             Set-RegValueIfMissing $settingsPath "unifyFlyouts" 0 DWord $label
         }
         Set-RegValueIfMissing $settingsPath "look.theme" "TranslucentTaskbar" String $label
+        # 4.5.0：等比缩放提为顶层设置（基线 52/32/44/16/32 固定参与缩放）
+        Set-RegValueIfMissing $settingsPath "ProportionalScale" "100" String $label
         Set-RegValueIfMissing $settingsPath "maximized.enabled" 0 DWord $label
         # 4.4.0 重组「任务栏尺寸与缩放」分组（size.* 前缀）：旧扁平键与
         # look.ProportionalScale 的已存值迁移到新键（仅新键缺失时写入，不覆盖）。
@@ -898,6 +901,16 @@ foreach ($file in $files) {
         Set-RegValueIfMissing $settingsPath "menuStyle" "fluent" String $label
         Set-RegValueIfMissing $settingsPath "CompactMode" 0 DWord $label
         Set-RegValueIfMissing $settingsPath "Transparent" 1 DWord $label
+    }
+
+    if ($id -eq "local@cw-win11-power-buttons") {
+        $label = "Win11 Power Buttons"
+        Set-RegValueIfMissing $settingsPath "enableShutdown" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "enableRestart" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "enableSignout" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "enableSleep" 1 DWord $label
+        Set-RegValueIfMissing $settingsPath "enableHibernate" 0 DWord $label
+        Set-RegValueIfMissing $settingsPath "enableLock" 0 DWord $label
     }
 
     if ($id -eq "local@cw-desktop-quick-settings") {

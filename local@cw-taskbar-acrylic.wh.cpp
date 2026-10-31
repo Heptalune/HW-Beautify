@@ -2,9 +2,9 @@
 // @id              cw-taskbar-acrylic
 // @name            CW-任务栏样式美化
 // @name:zh-CN      CW-任务栏样式美化
-// @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also controls taskbar height and icon size.
-// @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并整合任务栏高度与图标大小控制。
-// @version         4.4.1
+// @description     Acrylic, blurred and transparent taskbar themes with adjustable color, blur, opacity and luminosity. Also supports proportional scaling of the taskbar size.
+// @description:zh-CN 为 Windows 11 任务栏提供亚克力与透明背景，颜色、模糊、不透明度和亮度可调；并支持任务栏尺寸等比缩放。
+// @version         4.5.0
 // @author          Heptalune & m417z
 // @github          https://github.com/Heptalune
 // @include         explorer.exe
@@ -35,10 +35,8 @@
 ## 功能
 
 - 背景颜色、模糊、不透明度、亮度预设，可与任意内置主题搭配。
-- 设置按区分组；「统一设置」开启时，托盘溢出面板和音量/亮度浮窗跟随任务栏背景，关闭后可单独调节。
-- 「任务栏尺寸与缩放」分组：任务栏高度、图标大小、按钮宽度单项微调，配合「等比缩放」一键整体缩放（包默认值 52/32/44/16/32）。
-- 可选「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，更好看到也更好点，悬停出桌面预览的行为不变。
-- 可选「最大化时加深背景」：某个显示器上有最大化窗口时，该显示器的任务栏改用更实的背景。
+- 设置按区分组；托盘溢出面板和音量/亮度浮窗一律跟随任务栏背景美化。
+- 「等比缩放」：按百分比把任务栏高度、图标大小与按钮宽度（包默认基线 52/32/44/16/32）一起缩放。
 - 文字颜色与其他 CW 模组共用同一套选项。
 - 可选任务栏空白处点击穿透，适合 Dock 风格主题。
 
@@ -47,12 +45,9 @@
 设置分为以下几个区：
 
 - **主题与文字**：主题、背景颜色、文字颜色。主题默认「自定义玻璃」，其余为原版内置的社区主题，括号内为原名，可在附录中查看截图。
-- **任务栏尺寸与缩放**：任务栏高度、图标大小、任务栏按钮宽度、小图标大小、小任务栏按钮宽度 5 个单项设置（包默认 52/32/44/16/32），以及「等比缩放」——按百分比把这几项一起缩放，单项值为基础。另有「显示桌面按钮全高」：把最右侧的「显示桌面」小竖条撑到与任务栏同高，竖条高度可跟随任务栏高度（-1，随等比缩放联动）或手动指定 0-200 像素；悬停该区域仍会显示桌面预览。
-- **任务栏背景**：模糊、不透明度、亮度。主要作用于「自定义玻璃」等使用通用背景的主题；液态玻璃使用自己的固定参数，这几项基本不起作用。
-- **统一设置**：默认开启，托盘溢出面板和音量/亮度浮窗跟随「任务栏背景」的三项，下方两个区被忽略。想单独调节时关闭。
-- **托盘溢出面板 / 音量/亮度浮窗**：分别对应托盘图标放不下时弹出的面板，以及调节音量、亮度时出现的滑条。仅在关闭「统一设置」后生效。
-- **最大化时**：开启「最大化时加深背景」后，下方三项才生效；切换到其他虚拟桌面的窗口不计入。同样主要作用于「自定义玻璃」类主题。
-- **旧版设置**：4.2.5 及更早版本保存的设置会继续生效（此时「统一设置」视为关闭，保留原来单独调的弹窗参数），直到在设置页保存一次，之后改用新的分组设置。
+- **等比缩放**：按百分比把任务栏高度、图标大小与按钮宽度（包默认基线 52/32/44/16/32）一起缩放，100 为不缩放。
+- **任务栏背景**：模糊、不透明度、亮度。主要作用于「自定义玻璃」等使用通用背景的主题；液态玻璃使用自己的固定参数，这几项基本不起作用。托盘溢出面板和音量/亮度浮窗一律跟随任务栏背景。
+- **旧版设置**：4.2.5 及更早版本保存的旧扁平键（主题与背景三项）会继续生效，直到在设置页保存一次；4.4.x 的「统一设置」与托盘溢出面板/音量浮窗/最大化的独立参数不再读取，这些表面一律跟随任务栏背景；「显示桌面按钮全高 / 显示桌面竖条高度」已迁至 CW-托盘区域设置模组。
 - **高级：XAML 诊断冲突处理**：默认允许其他程序共存；开机后托盘图标不透明时可改为「阻止其他程序」。
 - **高级：样式常量 / 控件样式 / 资源变量**：用于编写自定义样式，语法见文末附录。一般无需修改。
 
@@ -63,6 +58,7 @@
 - 原版主题按旧版任务栏编写，在 v1.10 基础上托盘区域的显示可能略有差异。
 
 ## 更新日志
+- **4.5.0**：设置瘦身：「任务栏尺寸与缩放」分组只留「等比缩放」并升为顶层设置（键名 ProportionalScale，按 size.ProportionalScale → look.ProportionalScale → ProportionalScale 的原优先顺序读取，旧保存值仍兼容；任务栏高度/图标大小/按钮宽度 5 个单项设置删除，代码改用包默认基线 52/32/44/16/32 参与等比缩放换算）；删除「托盘溢出面板」「音量/亮度浮窗」「最大化时」三组设置与「统一设置」开关，托盘溢出面板、音量/亮度浮窗与最大化时一律跟随任务栏背景美化（等价于原来统一设置开启的状态）；「显示桌面按钮全高 / 显示桌面竖条高度」两个设置及其 Rectangle#ShowDesktopPipe@CommonStates 注入实现整段迁至新模组 CW-托盘区域设置（cw-tray-area-settings，键名 showDesktop.FullHeight / showDesktop.ButtonHeight）。
 - **4.4.1**：修复「显示桌面按钮全高」开启后无效的问题。原因：竖条（Rectangle#ShowDesktopPipe）的尺寸由 ShowDesktopStack/IconView 模板的 CommonStates 状态机掌控，原实现用普通规则在元素创建时一次性写入 Height/MinHeight，元素创建后的首次 GoToState 会把状态里的尺寸值重新盖回去，一次性赋值随即失效（上游 Aero Peek 议题 #854 中普通写法「被无视」、@CommonStates 写法生效为同一现象）。修复镜像两处成熟实现：样式目标改为 Rectangle#ShowDesktopPipe@CommonStates（上游 SunValley 主题 Height=500 的全高写法，样式进入视觉状态桶后模组会在每次状态切换后重新断言）；属性改用 MinHeight+MaxHeight（镜像 tray-system-icons 模组 showDesktopButtonWidth 的 MinWidth+MaxWidth 技法，Min/Max 在布局层优先于 Height，状态机与悬停动画碰不到，模板若用 MaxHeight 钉死竖条也一并覆盖）。功能行为不变：默认跟随任务栏高度，0-200 手动指定，悬停预览行为不受影响（CW 汉化版修复）。
 - **4.4.0**：新增「任务栏尺寸与缩放」分组：「等比缩放」从「主题与文字」移入该组（设置键 look.ProportionalScale 改为 size.ProportionalScale，旧键保存的值仍兼容，deploy 会自动迁移），并恢复任务栏高度/图标大小/任务栏按钮宽度/小图标大小/小任务栏按钮宽度 5 个单项设置（4.3.1 曾移除，键名加 size. 前缀，deploy 会自动迁移旧扁平键，行为与 4.3.0 一致：等比缩放以单项值为基础）；新增「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，悬停出桌面预览的行为不变，高度可跟随任务栏高度或手动指定（CW 汉化版新增/调整）。
 - **4.3.1**：设置精简：删除任务栏高度/图标大小/按钮宽度等 5 个单项设置，只保留「等比缩放」并移入「主题与文字」大类（设置键 look.ProportionalScale）；代码对缺失键回退到包默认值（52/32/44/16/32），任务栏高度不会塌陷（CW 汉化版调整）。
@@ -690,80 +686,23 @@ from the **TranslucentTB** project.
   $name:zh-CN: "主题与文字"
   $description: "Overall theme, background tint and text color."
   $description:zh-CN: "整体主题、背景色调和文字颜色。"
-- size:
-    - ProportionalScale: "100"
-      $name: Proportional scale
-      $name:zh-CN: 等比缩放
-      $description: >-
-        Scales the taskbar height, icon size and button widths declared
-        below together by this percentage. 100 means no extra scaling.
-      $description:zh-CN: 把下方设置的任务栏高度、图标大小与按钮宽度一起按百分比等比缩放，100 为不缩放。与单项设置叠加生效。
-      $options:
-        - "80": "80%"
-        - "90": "90%"
-        - "100": "100%"
-        - "110": "110%"
-        - "125": "125%"
-        - "150": "150%"
-        - "175": "175%"
-        - "200": "200%"
-    - TaskbarHeight: 52
-      $name: Taskbar height
-      $name:zh-CN: 任务栏高度
-      $description: >-
-        The height, in pixels, of the taskbar (Windows 11 default: 48)
-      $description:zh-CN: 任务栏的高度（像素）。Windows 11 默认 48。
-    - IconSize: 32
-      $name: Icon size
-      $name:zh-CN: 图标大小
-      $description: >-
-        The size, in pixels, of icons on the taskbar (Windows 11 default: 24)
-      $description:zh-CN: 任务栏图标的尺寸（像素）。Windows 11 默认 24。
-    - TaskbarButtonWidth: 44
-      $name: Taskbar button width
-      $name:zh-CN: 任务栏按钮宽度
-      $description: >-
-        The width, in pixels, of the taskbar buttons (Windows 11 default: 44)
-      $description:zh-CN: 任务栏按钮的宽度（像素）。Windows 11 默认 44。
-    - IconSizeSmall: 16
-      $name: Small icon size
-      $name:zh-CN: 小图标大小
-      $description: >-
-        The size, in pixels, of small icons on the taskbar (Windows 11 default: 16)
+- ProportionalScale: "100"
+  $name: Proportional scale
+  $name:zh-CN: 等比缩放
+  $description: >-
+    Scales the taskbar height, icon size and button widths (package defaults:
+    52/32/44/16/32) together by this percentage. 100 means no extra scaling.
+  $description:zh-CN: 把任务栏高度、图标大小与按钮宽度（包默认基线 52/32/44/16/32）一起按百分比等比缩放，100 为不缩放。
+  $options:
+    - "80": "80%"
+    - "90": "90%"
+    - "100": "100%"
+    - "110": "110%"
+    - "125": "125%"
+    - "150": "150%"
+    - "175": "175%"
+    - "200": "200%"
 
-        Used in newer Windows 11 builds with support for small taskbar icons (around
-        July 2025)
-      $description:zh-CN: 任务栏小图标的尺寸（像素）。Windows 11 默认 16。用于 2025 年 7 月前后起支持小任务栏图标的新版 Windows 11。
-    - TaskbarButtonWidthSmall: 32
-      $name: Small taskbar button width
-      $name:zh-CN: 小任务栏按钮宽度
-      $description: >-
-        The width, in pixels, of the small taskbar buttons (Windows 11 default: 32)
-
-        Used in newer Windows 11 builds with support for small taskbar icons (around
-        July 2025)
-      $description:zh-CN: 小任务栏按钮的宽度（像素）。Windows 11 默认 32。用于支持小任务栏图标的新版 Windows 11。
-    - ShowDesktopFullHeight: false
-      $name: Full-height Show desktop bar
-      $name:zh-CN: 显示桌面按钮全高
-      $description: >-
-        Stretch the small vertical "Show desktop" bar at the far right end of
-        the taskbar to the full taskbar height. Hovering the area still shows
-        the desktop preview (Aero Peek). Default: off.
-      $description:zh-CN: 把任务栏最右边的「显示桌面」小竖条撑到与任务栏同高，不再是小小一截。悬停该区域仍会显示桌面预览（Aero Peek）。默认关闭。
-    - ShowDesktopButtonHeight: -1
-      $name: Show desktop bar height
-      $name:zh-CN: 显示桌面竖条高度
-      $description: >-
-        Height of the "Show desktop" bar, in pixels. -1 follows the taskbar
-        height (it scales together with the proportional scale); 0-200 sets
-        an explicit height. Only used while "Full-height Show desktop bar"
-        is on.
-      $description:zh-CN: 「显示桌面」竖条的高度（像素）。-1 表示跟随任务栏高度（随等比缩放联动）；0-200 为手动指定。仅在开启「显示桌面按钮全高」后生效。
-  $name: "Taskbar size and scaling"
-  $name:zh-CN: "任务栏尺寸与缩放"
-  $description: "Taskbar height, icon and button sizes, proportional scaling, and the Show desktop bar."
-  $description:zh-CN: "任务栏高度、图标与按钮大小、等比缩放，以及「显示桌面」竖条。"
 - taskbar:
     - blurPreset: "30"
       $name: "Blur"
@@ -808,150 +747,7 @@ from the **TranslucentTB** project.
   $name:zh-CN: "任务栏背景"
   $description: "Blur, opacity and luminosity of the taskbar background. Mainly for Custom Glass and other themes that use the shared background; Liquid Glass uses its own fixed values."
   $description:zh-CN: "任务栏背景的模糊、不透明度和亮度。主要作用于「自定义玻璃」等使用通用背景的主题，液态玻璃使用自己的固定参数，这几项基本不起作用。"
-- unifyFlyouts: true
-  $name: "Unify flyouts"
-  $name:zh-CN: "统一设置"
-  $description: "The overflow panel and the volume/brightness OSD use the taskbar background's blur, opacity and luminosity; their own groups below are ignored. Default: on."
-  $description:zh-CN: "托盘溢出面板和音量/亮度浮窗跟随「任务栏背景」的模糊、不透明度和亮度，下方两组各自的设置被忽略。默认开启。"
-- tray:
-    - blurPreset: "30"
-      $name: "Blur"
-      $name:zh-CN: "模糊"
-      $description: "Blur strength of the overflow icon panel, independent of the taskbar, 0–60. Default: 30."
-      $description:zh-CN: "溢出图标面板的模糊强度，独立于任务栏本身，范围 0–60。默认 30。"
-      $options:
-        - "0": "0：不模糊"
-        - "10": "10：轻微"
-        - "20": "20：中等"
-        - "30": "30：较强"
-        - "45": "45：强"
-        - "60": "60：最强"
-    - opacityPreset: "50"
-      $name: "Opacity"
-      $name:zh-CN: "不透明度"
-      $description: "Fill strength of the overflow icon panel (the flyout shown when tray icons do not fit, not the clock), 0–100%. Default: 50%."
-      $description:zh-CN: "溢出图标面板（托盘图标放不下时弹出的面板，不是时钟）的颜色浓度，范围 0–100%。默认 50%。"
-      $options:
-        - "0": "0%：完全透明"
-        - "10": "10%：很薄"
-        - "25": "25%：较薄"
-        - "50": "50%：适中"
-        - "75": "75%：较厚"
-        - "90": "90%：很厚"
-        - "100": "100%：完全不透明"
-    - luminosityPreset: "20"
-      $name: "Luminosity"
-      $name:zh-CN: "亮度"
-      $description: "Luminosity layer strength of the overflow icon panel, 0–150. Default: 20."
-      $description:zh-CN: "溢出图标面板亮度层的强度，范围 0–150。默认 20。"
-      $options:
-        - "0": "0：最低"
-        - "20": "20：低"
-        - "25": "25：较低"
-        - "50": "50：中"
-        - "75": "75：较高"
-        - "100": "100：标准"
-        - "125": "125：高"
-        - "150": "150：最高"
-  $name: "Overflow panel"
-  $name:zh-CN: "托盘溢出面板"
-  $description: "The panel shown when tray icons do not fit (not the clock). Ignored while \"Unify flyouts\" is on."
-  $description:zh-CN: "托盘图标放不下时弹出的面板（不是时钟）。开启「统一设置」时忽略此组。"
-- volume:
-    - blurPreset: "30"
-      $name: "Blur"
-      $name:zh-CN: "模糊"
-      $description: "Blur strength of the volume/brightness slider, 0–60. Default: 30."
-      $description:zh-CN: "音量/亮度滑条的模糊强度，范围 0–60。默认 30。"
-      $options:
-        - "0": "0：不模糊"
-        - "10": "10：轻微"
-        - "20": "20：中等"
-        - "30": "30：较强"
-        - "45": "45：强"
-        - "60": "60：最强"
-    - opacityPreset: "50"
-      $name: "Opacity"
-      $name:zh-CN: "不透明度"
-      $description: "Fill strength of the slider shown when changing volume or brightness (not the Win+A panel), 0–100%. Default: 50%."
-      $description:zh-CN: "调节音量或亮度时弹出的滑条（不是 Win+A 面板）的颜色浓度，范围 0–100%。默认 50%。"
-      $options:
-        - "0": "0%：完全透明"
-        - "10": "10%：很薄"
-        - "25": "25%：较薄"
-        - "50": "50%：适中"
-        - "75": "75%：较厚"
-        - "90": "90%：很厚"
-        - "100": "100%：完全不透明"
-    - luminosityPreset: "20"
-      $name: "Luminosity"
-      $name:zh-CN: "亮度"
-      $description: "Luminosity layer strength of the volume/brightness slider, 0–150. Default: 20."
-      $description:zh-CN: "音量/亮度滑条亮度层的强度，范围 0–150。默认 20。"
-      $options:
-        - "0": "0：最低"
-        - "20": "20：低"
-        - "25": "25：较低"
-        - "50": "50：中"
-        - "75": "75：较高"
-        - "100": "100：标准"
-        - "125": "125：高"
-        - "150": "150：最高"
-  $name: "Volume/brightness OSD"
-  $name:zh-CN: "音量/亮度浮窗"
-  $description: "The slider shown when changing volume or brightness (not the Win+A panel). Ignored while \"Unify flyouts\" is on."
-  $description:zh-CN: "调节音量或亮度时弹出的滑条（不是 Win+A 面板）。开启「统一设置」时忽略此组。"
-- maximized:
-    - enabled: false
-      $name: "Maximized window layer"
-      $name:zh-CN: "最大化时加深背景"
-      $description: "When a monitor has a maximized window, its taskbar switches to the denser background defined by the three settings below. Default: off."
-      $description:zh-CN: "某个显示器上有最大化窗口时，该显示器的任务栏改用下方三项定义的更实的背景。默认关闭。"
-    - blur: "24"
-      $name: "Blur"
-      $name:zh-CN: "模糊"
-      $description: "Used only when the maximized window layer is on, 0–60. Default: 24."
-      $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–60。默认 24。"
-      $options:
-        - "0": "0：不模糊"
-        - "10": "10：轻微"
-        - "20": "20：中等"
-        - "24": "24：中等偏强"
-        - "30": "30：较强"
-        - "45": "45：强"
-        - "60": "60：最强"
-    - opacity: "72"
-      $name: "Opacity"
-      $name:zh-CN: "不透明度"
-      $description: "Used only when the maximized window layer is on, 0–100%. Default: 72%."
-      $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–100%。默认 72%。"
-      $options:
-        - "0": "0%：完全透明"
-        - "10": "10%：很薄"
-        - "25": "25%：较薄"
-        - "50": "50%：适中"
-        - "72": "72%：较厚"
-        - "85": "85%：厚"
-        - "90": "90%：很厚"
-        - "100": "100%：完全不透明"
-    - luminosity: "20"
-      $name: "Luminosity"
-      $name:zh-CN: "亮度"
-      $description: "Used only when the maximized window layer is on, 0–150. Default: 20."
-      $description:zh-CN: "仅在开启「最大化时加深背景」后生效，范围 0–150。默认 20。"
-      $options:
-        - "0": "0：最低"
-        - "20": "20：低"
-        - "25": "25：较低"
-        - "50": "50：中"
-        - "75": "75：较高"
-        - "100": "100：标准"
-        - "125": "125：高"
-        - "150": "150：最高"
-  $name: "Maximized window"
-  $name:zh-CN: "最大化时"
-  $description: "Denser taskbar background on monitors with a maximized window. Mainly for Custom Glass and other themes that use the shared background."
-  $description:zh-CN: "有最大化窗口时让任务栏背景更实。主要作用于「自定义玻璃」等使用通用背景的主题。"
+
 - styleConstants: [""]
   $name: "Advanced: style constants"
   $name:zh-CN: "高级：样式常量"
@@ -12698,9 +12494,6 @@ struct {
     XamlDiagnosticsHandling xamlDiagnosticsHandling;
 } g_settings;
 
-// CW: the maximizedTaskbarLayer setting, read by the UI threads.
-std::atomic<bool> g_zenMaxLayerEnabled;
-
 // https://stackoverflow.com/a/51274008
 template <auto fn>
 struct deleter_from_fn {
@@ -19350,8 +19143,7 @@ void HandleClickThroughElement(FrameworkElement element) {
 // UWPSpy handles system XAML islands.
 void HandleClickThroughIslandRoot(
     winrt::Windows::Foundation::IInspectable const& inspectable) {
-    // CW: the maximized layer also maps XamlRoots to their windows.
-    if (!g_settings.clickThroughTaskbar && !g_zenMaxLayerEnabled) {
+    if (!g_settings.clickThroughTaskbar) {
         return;
     }
 
@@ -19698,538 +19490,6 @@ void HandleVirtualizingRepeater(ElementId elementId, FrameworkElement element) {
 
 void MergeResourceVariables();
 
-// CW: maximized window layer (maximizedTaskbarLayer).
-//
-// While a maximized window is on a monitor, the taskbar on that monitor uses a
-// denser background brush (maximizedLayer* settings). ProcessAllStylesFromSettings
-// replaces the theme's main background constant with the style variable
-// {{CWTaskbarRuntimeBgBrush}}. The mod publishes that variable in every
-// XamlRoot's StyleVariableState (one XamlRoot per taskbar) under a synthetic
-// owner id, and the upstream variable code re-applies just the styles that use
-// it whenever the value changes.
-//
-// One background thread tracks which monitors have a maximized window, from
-// filtered WinEvents with a trailing debounce, and wakes the UI threads only
-// when that set changes. The UI threads map each XamlRoot to its monitor
-// (cached, re-resolved when the displays change) and update the variable.
-
-constexpr WCHAR kCWRuntimeBgBrushVariable[] = L"CWTaskbarRuntimeBgBrush";
-constexpr ElementId kCWRuntimeBgBrushOwner = static_cast<ElementId>(~0ULL);
-
-// Only set while the layer is in use on this thread (enabled when the styles
-// were processed). Empty otherwise, in which case the brush is a constant.
-thread_local std::wstring g_zenBaseBgBrush;
-thread_local std::wstring g_zenMaximizedBgBrush;
-
-std::mutex g_zenMaxMutex;
-// Guarded by g_zenMaxMutex.
-bool g_zenMaxActive;
-std::vector<HMONITOR> g_zenMaxMonitors;  // Sorted, unique.
-unsigned g_zenMaxDisplayEpoch;
-std::vector<winrt::weak_ref<winrt::Windows::System::DispatcherQueue>>
-    g_zenMaxDispatchers;
-size_t g_zenMaxPendingCallbacks;
-std::condition_variable g_zenMaxPendingCallbacksCv;
-
-void CWMaxLayerRequestRefresh();
-
-struct CWMaxRootMonitor {
-    winrt::weak_ref<XamlRoot> xamlRoot;
-    HMONITOR monitor = nullptr;
-    unsigned displayEpoch = 0;
-    int resolveAttempts = 0;
-};
-
-thread_local std::list<CWMaxRootMonitor> g_zenMaxRootMonitors;
-thread_local winrt::Windows::System::DispatcherQueue g_zenMaxDispatcher{
-    nullptr};
-
-// The island of a new taskbar can report its root before its content is
-// attached, so the XamlRoot can't be matched to a window right away. Ask for a
-// few refreshes, ~120 ms apart, to resolve it later.
-constexpr int kCWMaxResolveAttempts = 10;
-
-HMONITOR CWMaxMonitorForXamlRoot(XamlRoot const& xamlRoot,
-                                  unsigned displayEpoch) {
-    g_zenMaxRootMonitors.remove_if([](CWMaxRootMonitor const& entry) {
-        return !entry.xamlRoot.get();
-    });
-
-    CWMaxRootMonitor* entry = nullptr;
-    for (auto& candidate : g_zenMaxRootMonitors) {
-        if (candidate.xamlRoot.get() == xamlRoot) {
-            entry = &candidate;
-            break;
-        }
-    }
-    if (!entry) {
-        entry = &g_zenMaxRootMonitors.emplace_back();
-        entry->xamlRoot = xamlRoot;
-    }
-
-    if (entry->displayEpoch != displayEpoch) {
-        entry->displayEpoch = displayEpoch;
-        entry->monitor = nullptr;
-        entry->resolveAttempts = 0;
-    }
-
-    if (!entry->monitor) {
-        HWND islandHwnd = ResolveClickThroughIslandHwnd(xamlRoot);
-        HWND rootHwnd = islandHwnd ? GetAncestor(islandHwnd, GA_ROOT) : nullptr;
-        if (rootHwnd) {
-            entry->monitor =
-                MonitorFromWindow(rootHwnd, MONITOR_DEFAULTTONEAREST);
-        } else if (entry->resolveAttempts < kCWMaxResolveAttempts) {
-            entry->resolveAttempts++;
-            CWMaxLayerRequestRefresh();
-        }
-    }
-
-    return entry->monitor;
-}
-
-StyleVariableValue CWRuntimeBgBrushValue(
-    StyleVariableState* state,
-    const std::vector<HMONITOR>& maximizedMonitors,
-    unsigned displayEpoch) {
-    bool maximized = false;
-    if (auto xamlRoot = state->xamlRoot.get()) {
-        HMONITOR monitor = CWMaxMonitorForXamlRoot(xamlRoot, displayEpoch);
-        maximized = monitor && std::binary_search(maximizedMonitors.begin(),
-                                                  maximizedMonitors.end(),
-                                                  monitor);
-    }
-
-    StyleVariableValue value;
-    value.stringForm = maximized ? g_zenMaximizedBgBrush : g_zenBaseBgBrush;
-    value.substitutable = true;
-    return value;
-}
-
-void CWMaxSnapshot(std::vector<HMONITOR>* maximizedMonitors,
-                    unsigned* displayEpoch) {
-    std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-    *maximizedMonitors = g_zenMaxMonitors;
-    *displayEpoch = g_zenMaxDisplayEpoch;
-}
-
-bool CWHasRuntimeBgBrushCapture(StyleVariableState* state) {
-    auto it = state->variables.find(kCWRuntimeBgBrushVariable);
-    if (it == state->variables.end()) {
-        return false;
-    }
-    return std::any_of(it->second.begin(), it->second.end(),
-                       [](const StyleVariableCapture& capture) {
-                           return capture.elementId == kCWRuntimeBgBrushOwner;
-                       });
-}
-
-// Called by ApplyCustomizations for each element before its styles are
-// resolved, so the variable is defined before any style of a new XamlRoot reads
-// it.
-void CWEnsureRuntimeBgBrushVariable(StyleVariableState* state) {
-    if (g_zenBaseBgBrush.empty() || CWHasRuntimeBgBrushCapture(state)) {
-        return;
-    }
-
-    std::vector<HMONITOR> maximizedMonitors;
-    unsigned displayEpoch;
-    CWMaxSnapshot(&maximizedMonitors, &displayEpoch);
-
-    state->variables[kCWRuntimeBgBrushVariable].push_back(
-        {kCWRuntimeBgBrushOwner,
-         CWRuntimeBgBrushValue(state, maximizedMonitors, displayEpoch)});
-}
-
-// Runs on a UI thread, from a dispatcher callback.
-void CWMaxLayerRefreshCurrentThread() {
-    if (!g_initializedForThread || g_zenBaseBgBrush.empty()) {
-        return;
-    }
-
-    std::vector<HMONITOR> maximizedMonitors;
-    unsigned displayEpoch;
-    CWMaxSnapshot(&maximizedMonitors, &displayEpoch);
-
-    const std::wstring varName = kCWRuntimeBgBrushVariable;
-
-    // Propagation runs XAML work which can re-enter; the pin keeps the states
-    // from being reaped, and std::list keeps the iteration valid if one is
-    // added.
-    StyleVariableStatePin statePin;
-    for (auto& state : g_styleVariableState) {
-        if (!CWHasRuntimeBgBrushCapture(&state)) {
-            continue;
-        }
-        SetStyleVariableIfChangedAndPropagate(
-            &state, varName, kCWRuntimeBgBrushOwner,
-            CWRuntimeBgBrushValue(&state, maximizedMonitors, displayEpoch));
-    }
-}
-
-// Called from InitializeForCurrentThread, after the styles were processed.
-void CWMaxLayerRegisterCurrentThread() {
-    if (g_zenBaseBgBrush.empty() || g_zenMaxDispatcher) {
-        return;
-    }
-
-    try {
-        g_zenMaxDispatcher =
-            winrt::Windows::System::DispatcherQueue::GetForCurrentThread();
-    } catch (...) {
-        Wh_Log(L"Error %08X", winrt::to_hresult());
-    }
-    if (!g_zenMaxDispatcher) {
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-    g_zenMaxDispatchers.push_back(winrt::make_weak(g_zenMaxDispatcher));
-}
-
-// Called from UninitializeForCurrentThread.
-void CWMaxLayerUnregisterCurrentThread() {
-    g_zenMaxRootMonitors.clear();
-    g_zenBaseBgBrush.clear();
-    g_zenMaximizedBgBrush.clear();
-
-    auto dispatcher = std::move(g_zenMaxDispatcher);
-    g_zenMaxDispatcher = nullptr;
-    if (!dispatcher) {
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-    std::erase_if(g_zenMaxDispatchers, [&dispatcher](const auto& weak) {
-        auto registered = weak.get();
-        return !registered || registered == dispatcher;
-    });
-}
-
-// Same scheme as TrackImageRetryCallback: counts a callback handed to a
-// dispatcher, so that CWMaxLayerStop can wait until it ran or was dropped.
-std::shared_ptr<void> CWMaxTrackCallback() {
-    {
-        std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-        if (!g_zenMaxActive) {
-            return nullptr;
-        }
-        g_zenMaxPendingCallbacks++;
-    }
-
-    return std::shared_ptr<void>(&g_zenMaxPendingCallbacks, [](void*) {
-        {
-            std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-            g_zenMaxPendingCallbacks--;
-        }
-        g_zenMaxPendingCallbacksCv.notify_all();
-    });
-}
-
-void CWMaxDispatchToUiThreads() {
-    std::vector<winrt::Windows::System::DispatcherQueue> dispatchers;
-    {
-        std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-        if (!g_zenMaxActive) {
-            return;
-        }
-        for (auto& weak : g_zenMaxDispatchers) {
-            if (auto dispatcher = weak.get()) {
-                dispatchers.push_back(std::move(dispatcher));
-            }
-        }
-        std::erase_if(g_zenMaxDispatchers,
-                      [](const auto& weak) { return !weak.get(); });
-    }
-
-    for (auto& dispatcher : dispatchers) {
-        auto callbackRef = CWMaxTrackCallback();
-        if (!callbackRef) {
-            return;
-        }
-        try {
-            dispatcher.TryEnqueue(
-                [callbackRef]() { CWMaxLayerRefreshCurrentThread(); });
-        } catch (...) {
-            Wh_Log(L"Error %08X", winrt::to_hresult());
-        }
-    }
-}
-
-// The tracking thread. Everything in CWMaxThreadState is only touched on it.
-
-constexpr UINT kCWMaxMsgRefresh = WM_APP + 1;  // wParam: force a UI refresh.
-constexpr UINT kCWMaxDebounceMs = 120;
-// A window which keeps firing events (e.g. an app animating a maximized
-// window) must not postpone the update forever.
-constexpr DWORD kCWMaxMaxDelayMs = 500;
-
-struct CWMaxThreadState {
-    // Windows whose events can change the result: the counted maximized windows
-    // and the taskbars.
-    std::unordered_set<HWND> trackedWindows;
-    std::vector<std::pair<HWND, HMONITOR>> taskbars;  // Sorted.
-    UINT_PTR timer = 0;
-    DWORD pendingSince = 0;
-    bool forcePending = false;
-};
-
-CWMaxThreadState* g_zenMaxThreadState;
-HANDLE g_zenMaxThread;  // Guarded by g_zenLifecycleMutex.
-std::atomic<DWORD> g_zenMaxThreadId;
-
-bool CWMaxIsOwnTaskbarWindow(HWND hWnd) {
-    DWORD processId = 0;
-    if (!GetWindowThreadProcessId(hWnd, &processId) ||
-        processId != GetCurrentProcessId()) {
-        return false;
-    }
-    WCHAR className[32];
-    return GetClassName(hWnd, className, ARRAYSIZE(className)) &&
-           (_wcsicmp(className, L"Shell_TrayWnd") == 0 ||
-            _wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0);
-}
-
-bool CWMaxIsCountedMaximizedWindow(HWND hWnd) {
-    if (!IsWindowVisible(hWnd) || IsIconic(hWnd) || !IsZoomed(hWnd)) {
-        return false;
-    }
-    if (GetWindowLongPtr(hWnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW) {
-        return false;
-    }
-    // Windows on other virtual desktops, and some suspended apps, are cloaked.
-    DWORD cloaked = 0;
-    if (SUCCEEDED(DwmGetWindowAttribute(hWnd, DWMWA_CLOAKED, &cloaked,
-                                        sizeof(cloaked))) &&
-        cloaked) {
-        return false;
-    }
-    return true;
-}
-
-void CWMaxRecompute(bool force) {
-    auto& threadState = *g_zenMaxThreadState;
-
-    struct EnumResult {
-        std::vector<HMONITOR> monitors;
-        std::vector<std::pair<HWND, HMONITOR>> taskbars;
-        std::unordered_set<HWND> trackedWindows;
-    } result;
-
-    EnumWindows(
-        [](HWND hWnd, LPARAM lParam) -> BOOL {
-            auto& out = *reinterpret_cast<EnumResult*>(lParam);
-            if (CWMaxIsOwnTaskbarWindow(hWnd)) {
-                out.taskbars.push_back(
-                    {hWnd, MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST)});
-                out.trackedWindows.insert(hWnd);
-            } else if (CWMaxIsCountedMaximizedWindow(hWnd)) {
-                out.monitors.push_back(
-                    MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST));
-                out.trackedWindows.insert(hWnd);
-            }
-            return TRUE;
-        },
-        reinterpret_cast<LPARAM>(&result));
-
-    std::sort(result.monitors.begin(), result.monitors.end());
-    result.monitors.erase(
-        std::unique(result.monitors.begin(), result.monitors.end()),
-        result.monitors.end());
-    std::sort(result.taskbars.begin(), result.taskbars.end());
-
-    // A taskbar that appeared, went away or moved to another monitor means the
-    // displays changed, and the cached XamlRoot monitors are stale.
-    bool displaysChanged = result.taskbars != threadState.taskbars;
-    threadState.taskbars = std::move(result.taskbars);
-    threadState.trackedWindows = std::move(result.trackedWindows);
-
-    bool monitorsChanged;
-    {
-        std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-        monitorsChanged = result.monitors != g_zenMaxMonitors;
-        if (monitorsChanged) {
-            g_zenMaxMonitors = std::move(result.monitors);
-        }
-        if (displaysChanged) {
-            g_zenMaxDisplayEpoch++;
-        }
-    }
-
-    if (monitorsChanged || displaysChanged || force) {
-        CWMaxDispatchToUiThreads();
-    }
-}
-
-void CWMaxScheduleRecompute(bool force) {
-    auto& threadState = *g_zenMaxThreadState;
-    threadState.forcePending |= force;
-
-    DWORD now = GetTickCount();
-    if (threadState.timer) {
-        if (now - threadState.pendingSince >= kCWMaxMaxDelayMs) {
-            return;  // Let the pending timer fire.
-        }
-        KillTimer(nullptr, threadState.timer);
-    } else {
-        threadState.pendingSince = now;
-    }
-    threadState.timer = SetTimer(nullptr, 0, kCWMaxDebounceMs, nullptr);
-}
-
-void CALLBACK CWMaxWinEventProc(HWINEVENTHOOK,
-                                 DWORD event,
-                                 HWND hWnd,
-                                 LONG idObject,
-                                 LONG idChild,
-                                 DWORD,
-                                 DWORD) {
-    if (!hWnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF ||
-        !g_zenMaxThreadState) {
-        return;
-    }
-
-    if (g_zenMaxThreadState->trackedWindows.contains(hWnd)) {
-        CWMaxScheduleRecompute(false);
-        return;
-    }
-
-    // An untracked window can't change the result by going away.
-    if (event == EVENT_OBJECT_DESTROY || event == EVENT_OBJECT_HIDE ||
-        event == EVENT_SYSTEM_MINIMIZESTART || event == EVENT_OBJECT_CLOAKED) {
-        return;
-    }
-
-    if (GetAncestor(hWnd, GA_ROOT) != hWnd) {
-        return;
-    }
-
-    if (IsZoomed(hWnd) || CWMaxIsOwnTaskbarWindow(hWnd)) {
-        CWMaxScheduleRecompute(false);
-    }
-}
-
-DWORD WINAPI CWMaxThreadProc(LPVOID parameter) {
-    HANDLE readyEvent = static_cast<HANDLE>(parameter);
-
-    CWMaxThreadState threadState;
-    g_zenMaxThreadState = &threadState;
-
-    // Create the message queue before anyone can post to it.
-    MSG msg;
-    PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
-
-    constexpr std::pair<DWORD, DWORD> kEventRanges[] = {
-        {EVENT_SYSTEM_MINIMIZESTART, EVENT_SYSTEM_MINIMIZEEND},
-        {EVENT_OBJECT_DESTROY, EVENT_OBJECT_HIDE},
-        {EVENT_OBJECT_LOCATIONCHANGE, EVENT_OBJECT_LOCATIONCHANGE},
-        {EVENT_OBJECT_CLOAKED, EVENT_OBJECT_UNCLOAKED},
-    };
-    HWINEVENTHOOK hooks[ARRAYSIZE(kEventRanges)]{};
-    for (size_t i = 0; i < ARRAYSIZE(kEventRanges); i++) {
-        hooks[i] = SetWinEventHook(kEventRanges[i].first,
-                                   kEventRanges[i].second, nullptr,
-                                   CWMaxWinEventProc, 0, 0,
-                                   WINEVENT_OUTOFCONTEXT);
-        if (!hooks[i]) {
-            Wh_Log(L"SetWinEventHook failed: %u", GetLastError());
-        }
-    }
-
-    g_zenMaxThreadId = GetCurrentThreadId();
-    SetEvent(readyEvent);
-
-    CWMaxRecompute(/*force=*/true);
-
-    // WinEvent callbacks are delivered from within GetMessage.
-    while (GetMessage(&msg, nullptr, 0, 0) > 0) {
-        if (msg.hwnd) {
-            DispatchMessage(&msg);
-        } else if (msg.message == kCWMaxMsgRefresh) {
-            CWMaxScheduleRecompute(msg.wParam != 0);
-        } else if (msg.message == WM_TIMER &&
-                   msg.wParam == threadState.timer) {
-            KillTimer(nullptr, threadState.timer);
-            threadState.timer = 0;
-            bool force = threadState.forcePending;
-            threadState.forcePending = false;
-            CWMaxRecompute(force);
-        }
-    }
-
-    for (HWINEVENTHOOK hook : hooks) {
-        if (hook) {
-            UnhookWinEvent(hook);
-        }
-    }
-    if (threadState.timer) {
-        KillTimer(nullptr, threadState.timer);
-    }
-
-    g_zenMaxThreadState = nullptr;
-    return 0;
-}
-
-// Asks the tracking thread to recompute and refresh all UI threads. Can be
-// called from any thread; a no-op when the thread isn't running.
-void CWMaxLayerRequestRefresh() {
-    if (DWORD threadId = g_zenMaxThreadId) {
-        PostThreadMessage(threadId, kCWMaxMsgRefresh, TRUE, 0);
-    }
-}
-
-// Start / stop are called with g_zenLifecycleMutex held.
-void CWMaxLayerStart() {
-    if (g_zenMaxThread) {
-        return;
-    }
-
-    HANDLE readyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-    if (!readyEvent) {
-        Wh_Log(L"CreateEvent failed: %u", GetLastError());
-        return;
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-        g_zenMaxActive = true;
-    }
-
-    g_zenMaxThread =
-        CreateThread(nullptr, 0, CWMaxThreadProc, readyEvent, 0, nullptr);
-    if (g_zenMaxThread) {
-        HANDLE handles[] = {readyEvent, g_zenMaxThread};
-        WaitForMultipleObjects(ARRAYSIZE(handles), handles, FALSE, INFINITE);
-    } else {
-        Wh_Log(L"CreateThread failed: %u", GetLastError());
-        std::lock_guard<std::mutex> lock(g_zenMaxMutex);
-        g_zenMaxActive = false;
-    }
-
-    CloseHandle(readyEvent);
-}
-
-void CWMaxLayerStop() {
-    if (g_zenMaxThread) {
-        g_zenMaxThreadId = 0;
-        DWORD threadId = GetThreadId(g_zenMaxThread);
-        while (WaitForSingleObject(g_zenMaxThread, 0) == WAIT_TIMEOUT) {
-            PostThreadMessage(threadId, WM_QUIT, 0, 0);
-            WaitForSingleObject(g_zenMaxThread, 100);
-        }
-        CloseHandle(g_zenMaxThread);
-        g_zenMaxThread = nullptr;
-    }
-
-    std::unique_lock<std::mutex> lock(g_zenMaxMutex);
-    g_zenMaxActive = false;
-    g_zenMaxMonitors.clear();
-    // Callbacks already queued to the UI threads run (or are dropped) first,
-    // since the module may be unloaded next.
-    g_zenMaxPendingCallbacksCv.wait(
-        lock, [] { return g_zenMaxPendingCallbacks == 0; });
-}
-
 void ApplyCustomizations(ElementId elementId,
                          FrameworkElement element,
                          PCWSTR fallbackClassName) {
@@ -20261,8 +19521,6 @@ void ApplyCustomizations(ElementId elementId,
                winrt::get_class_name(element).c_str());
         return;
     }
-
-    CWEnsureRuntimeBgBrushVariable(state);
 
     auto resolved = FindElementPropertyOverrides(element, fallbackClassName);
     if (resolved.overridesPerVSG.empty() && resolved.captures.empty()) {
@@ -21421,9 +20679,10 @@ std::optional<bool> IsOsFeatureEnabled(UINT32 featureId) {
 //
 // The theme's main background constant (the first of kCWBgConstantNames that
 // the theme defines) is rebuilt from the presets. Its tint color is kept unless
-// a color preset is chosen. The tray overflow panel and the volume / brightness
-// flyouts get their own TrayBgBrush / VolumeBgBrush constants, which the
-// TranslucentTaskbar theme uses.
+// a color preset is chosen. CW 4.5.0: the tray overflow panel and the
+// volume / brightness flyouts always follow the taskbar background - their own
+// TrayBgBrush / VolumeBgBrush constants are set to the same brush (referenced
+// by the TranslucentTaskbar theme).
 
 constexpr PCWSTR kCWBgConstantNames[] = {
     L"CommonBgBrush",     L"Apple_Background", L"CWBg",
@@ -21516,20 +20775,6 @@ int CWGetIntSettingCompat(PCWSTR nestedName, PCWSTR legacyName) {
             return Wh_GetIntSetting(legacyName);
         default:
             return Wh_GetIntSetting(nestedName) || Wh_GetIntSetting(legacyName);
-    }
-}
-
-// Whether the flyouts follow the taskbar background. Off for settings saved
-// by older versions, which had no such option, so that their separate flyout
-// values keep working.
-bool CWUnifyFlyouts() {
-    switch (CWGetSettingsLayout()) {
-        case CWSettingsLayout::kNested:
-            return Wh_GetIntSetting(L"unifyFlyouts") != 0;
-        case CWSettingsLayout::kLegacy:
-            return false;
-        default:
-            return true;
     }
 }
 
@@ -21674,49 +20919,20 @@ void CWApplyBrushPresets(StyleConstants& styleConstants) {
 
     std::wstring baseBrush = CWBuildBgBrush(blur, opacity, color, luminosity);
 
-    // With the maximized layer, the background is the runtime variable, which
-    // switches between the two brushes per taskbar.
-    g_zenBaseBgBrush.clear();
-    g_zenMaximizedBgBrush.clear();
-    if (g_zenMaxLayerEnabled) {
-        g_zenMaximizedBgBrush = CWBuildBgBrush(
-            CWGetIntSettingInRange(L"maximized.blur", L"maximizedLayerBlur", 0, 100, 24),
-            CWGetIntSettingInRange(L"maximized.opacity", L"maximizedLayerOpacity", 0, 100, 72),
-            color,
-            CWGetIntSettingInRange(L"maximized.luminosity", L"maximizedLayerLuminosity", 0, 150, 20));
-        g_zenBaseBgBrush = std::move(baseBrush);
-        baseBrush =
-            std::wstring(L"{{") + kCWRuntimeBgBrushVariable + L"}}";
-    }
-
     if (bgConstant) {
-        bgConstant->second = std::move(baseBrush);
+        bgConstant->second = baseBrush;
     } else {
         CWAddStyleConstantIfMissing(styleConstants, L"CommonBgBrush",
                                      std::move(baseBrush));
     }
 
-    bool unifyFlyouts = CWUnifyFlyouts();
-    auto panelBrush = [&](PCWSTR group, PCWSTR legacyPrefix) {
-        if (unifyFlyouts) {
-            return CWBuildBgBrush(blur, opacity, color, luminosity);
-        }
-        auto get = [&](PCWSTR key, PCWSTR legacyKey, int maxValue,
-                       int fallback) {
-            std::wstring nested = std::wstring(group) + L"." + key;
-            std::wstring legacy = std::wstring(legacyPrefix) + legacyKey;
-            return CWGetIntSettingInRange(nested.c_str(), legacy.c_str(), 0,
-                                           maxValue, fallback);
-        };
-        return CWBuildBgBrush(
-            get(L"blurPreset", L"BlurPreset", 100, blur),
-            get(L"opacityPreset", L"OpacityPreset", 100, opacity), color,
-            get(L"luminosityPreset", L"LuminosityPreset", 150, luminosity));
-    };
+    // CW 4.5.0: 托盘溢出面板与音量/亮度浮窗一律跟随任务栏背景（原「统一设置」
+    // 开启时的行为成为唯一行为），删除按各自设置单独生成的分支；两个常量仍按需
+    // 补上，以继续驱动主题（TranslucentTaskbar）中引用它们的样式。
     CWAddStyleConstantIfMissing(styleConstants, L"TrayBgBrush",
-                                 panelBrush(L"tray", L"tray"));
+                                CWBuildBgBrush(blur, opacity, color, luminosity));
     CWAddStyleConstantIfMissing(styleConstants, L"VolumeBgBrush",
-                                 panelBrush(L"volume", L"volume"));
+                                CWBuildBgBrush(blur, opacity, color, luminosity));
 
     if (blur == 0) {
         try {
@@ -21730,18 +20946,18 @@ void CWApplyBrushPresets(StyleConstants& styleConstants) {
     }
 }
 
-// CW 4.4.0: snapshot of the "Taskbar size and scaling" group settings, filled
-// by TBIS_LoadSettings (further below) and read by CWAddExtraStyles while
-// building styles; the type is defined here because CWAddExtraStyles comes
-// first in this file.
+// CW 4.5.0: snapshot of the proportional-scaling sizes (fixed package
+// baselines scaled by ProportionalScale), filled by TBIS_LoadSettings (further
+// below) and read by the TBIS hooks; the type is defined here because the CW
+// sections above come first in this file. The "Show desktop" bar settings
+// (showDesktopFullHeight / showDesktopButtonHeight) were moved to the
+// cw-tray-area-settings mod together with their CWAddExtraStyles injection.
 struct TBIS_Settings {
     int taskbarHeight;
     int iconSize;
     int taskbarButtonWidth;
     int iconSizeSmall;
     int taskbarButtonWidthSmall;
-    bool showDesktopFullHeight;
-    int showDesktopButtonHeight;
 };
 // Defined in the TBIS section further below.
 extern TBIS_Settings TBIS_g_settings;
@@ -21766,43 +20982,9 @@ void CWAddExtraStyles() {
             }
         }
 
-        // CW: 「显示桌面」小竖条撑到任务栏同高（消除默认的小小一截）。
-        // 只改 Rectangle#ShowDesktopPipe 这个视觉矩形的高度，输入热区仍在
-        // ShowDesktopStack/按钮上，悬停出桌面预览（Aero Peek）的行为不变。
-        //
-        // 4.4.1 修复「开启后无效」：竖条的尺寸由 ShowDesktopStack/IconView
-        // 模板的 CommonStates 状态机掌控。原实现用普通规则在元素创建时一次性
-        // 写入 Height/MinHeight，元素创建后的首次 GoToState 会把状态里的尺寸
-        // 值（以及可能存在的 MaxHeight 钉死值）重新盖回来，一次性赋值随即被
-        // 抵消——上游 Aero Peek 议题 #854 里普通写法被“无视”、@CommonStates
-        // 写法生效，是同一现象（上游 SunValley 主题 Height=500 也走
-        // @CommonStates）。修复镜像两处成熟实现：
-        //   1. 目标加 @CommonStates：样式落入视觉状态桶，模组会注册
-        //      CurrentStateChanged，每次状态切换（含首次）之后重新断言；
-        //   2. 属性改用 MinHeight+MaxHeight（镜像 tray-system-icons 模组
-        //      showDesktopButtonWidth 的 MinWidth+MaxWidth 技法）：Min/Max 在
-        //      布局层优先于 Height，状态机与悬停动画都碰不到 Min/Max，无需
-        //      跟 Height 抢值；模板若用 MaxHeight 钉死竖条也一并被覆盖。
-        // 即便个别系统上竖条自身不带 CommonStates 状态组（@ 桶退化为普通
-        // 桶），Min/Max 一次性写入后也没有任何状态值能再抵消它。
-        // 样式在每次设置变更后随样式重建即时刷新；加在主题样式之后，可压过
-        // 主题里对竖条的固定尺寸，用户自定义样式仍可再覆盖。
-        if (TBIS_g_settings.showDesktopFullHeight) {
-            int pipeHeight = TBIS_g_settings.showDesktopButtonHeight;
-            if (pipeHeight < 0) {
-                // -1 (default): follow the computed taskbar height, which
-                // already includes the proportional scale.
-                pipeHeight = TBIS_g_settings.taskbarHeight;
-            } else if (pipeHeight > 200) {
-                pipeHeight = 200;
-            }
-            std::wstring pipeHeightStr = std::to_wstring(pipeHeight);
-            AddElementCustomizationRules(
-                L"Rectangle#ShowDesktopPipe@CommonStates",
-                {L"MinHeight=" + pipeHeightStr,
-                 L"MaxHeight=" + pipeHeightStr,
-                 L"VerticalAlignment=Center"});
-        }
+        // CW 4.5.0: 「显示桌面」竖条全高的注入段已整段迁至新模组
+        // CW-托盘区域设置（cw-tray-area-settings），对应设置键
+        // showDesktop.FullHeight / showDesktop.ButtonHeight，本模组不再注入。
     } catch (...) {
         Wh_Log(L"Error %08X", winrt::to_hresult());
     }
@@ -22078,9 +21260,6 @@ void UninitializeResourceVariables() {
 }
 
 void UninitializeForCurrentThread() {
-    // CW: no more maximized layer refreshes for this thread.
-    CWMaxLayerUnregisterCurrentThread();
-
     // Drop the click-through subclasses before restoring the windows below.
     // ClearClickThroughRegions calls SetWindowRgn, which sends
     // WM_WINDOWPOSCHANGED synchronously, and a still-attached subclass would
@@ -22193,8 +21372,6 @@ void InitializeForCurrentThread() {
     EnsureTaskbarSurfaceSubclasses();
 
     ProcessAllStylesFromSettings();
-
-    CWMaxLayerRegisterCurrentThread();
 
     g_initializedForThread = true;
 }
@@ -22844,8 +22021,6 @@ void StopStatsTimer() {
 
 void LoadSettings() {
     g_settings.clickThroughTaskbar = Wh_GetIntSetting(L"clickThroughTaskbar");
-    g_zenMaxLayerEnabled =
-        CWGetIntSettingCompat(L"maximized.enabled", L"maximizedTaskbarLayer") != 0;
 
     PCWSTR xamlDiagnosticsHandling =
         Wh_GetStringSetting(L"xamlDiagnosticsHandling");
@@ -25138,29 +24313,20 @@ LRESULT WINAPI SendMessageTimeoutW_Hook(HWND hWnd,
 }
 
 void TBIS_LoadSettings() {
-    // CW 4.4.0: the individual height/icon/width settings are back, in the
-    // "Taskbar size and scaling" group (size.*). Wh_GetIntSetting returns 0
-    // for missing keys, so fall back to the package defaults to keep the
-    // taskbar from collapsing.
-    TBIS_g_settings.taskbarHeight = Wh_GetIntSetting(L"size.TaskbarHeight");
-    if (TBIS_g_settings.taskbarHeight <= 0) TBIS_g_settings.taskbarHeight = 52;
-    TBIS_g_settings.iconSize = Wh_GetIntSetting(L"size.IconSize");
-    if (TBIS_g_settings.iconSize <= 0) TBIS_g_settings.iconSize = 32;
-    TBIS_g_settings.taskbarButtonWidth =
-        Wh_GetIntSetting(L"size.TaskbarButtonWidth");
-    if (TBIS_g_settings.taskbarButtonWidth <= 0)
-        TBIS_g_settings.taskbarButtonWidth = 44;
-    TBIS_g_settings.iconSizeSmall = Wh_GetIntSetting(L"size.IconSizeSmall");
-    if (TBIS_g_settings.iconSizeSmall <= 0) TBIS_g_settings.iconSizeSmall = 16;
-    TBIS_g_settings.taskbarButtonWidthSmall =
-        Wh_GetIntSetting(L"size.TaskbarButtonWidthSmall");
-    if (TBIS_g_settings.taskbarButtonWidthSmall <= 0)
-        TBIS_g_settings.taskbarButtonWidthSmall = 32;
+    // CW 4.5.0: 单项设置（size.TaskbarHeight / IconSize / TaskbarButtonWidth /
+    // IconSizeSmall / TaskbarButtonWidthSmall）已删除，直接使用包默认基线
+    //（52/32/44/16/32）参与等比缩放换算（换算逻辑不变）。
+    TBIS_g_settings.taskbarHeight = 52;
+    TBIS_g_settings.iconSize = 32;
+    TBIS_g_settings.taskbarButtonWidth = 44;
+    TBIS_g_settings.iconSizeSmall = 16;
+    TBIS_g_settings.taskbarButtonWidthSmall = 32;
 
     // CW: 等比缩放——把任务栏高度、图标大小与按钮宽度一起按百分比缩放。
     // 未设置（0）与 100 都表示不缩放；范围限制在 50%-300%。
-    // CW 4.4.0: moved into the size group; fall back to the 4.3.1 grouped
-    // key and the 4.3.0 flat key for saves deploy hasn't migrated yet.
+    // CW 4.5.0: 「等比缩放」升为顶层设置（ProportionalScale），仍按
+    // size.ProportionalScale → look.ProportionalScale → 顶层 ProportionalScale
+    // 的顺序回退读取，4.4.x 及更早保存的值继续生效（优先顺序不变）。
     int scalePercent = Wh_GetIntSetting(L"size.ProportionalScale");
     if (!scalePercent) {
         scalePercent = Wh_GetIntSetting(L"look.ProportionalScale");
@@ -25184,12 +24350,6 @@ void TBIS_LoadSettings() {
         TBIS_g_settings.taskbarButtonWidthSmall =
             MulDiv(TBIS_g_settings.taskbarButtonWidthSmall, scalePercent, 100);
     }
-
-    // CW 4.4.0: 「显示桌面」小竖条撑到任务栏同高。
-    TBIS_g_settings.showDesktopFullHeight =
-        Wh_GetIntSetting(L"size.ShowDesktopFullHeight") != 0;
-    TBIS_g_settings.showDesktopButtonHeight =
-        Wh_GetIntSetting(L"size.ShowDesktopButtonHeight");
 }
 
 HWND TBIS_FindCurrentProcessTaskbarWnd() {
@@ -26189,10 +25349,6 @@ void Wh_ModAfterInit() {
     if (initialize) {
         InitializeSettingsAndTap();
     }
-
-    if (g_zenMaxLayerEnabled) {
-        CWMaxLayerStart();
-    }
 }
 
 void Wh_ModUninit() {
@@ -26209,10 +25365,6 @@ void Wh_ModUninit() {
     CWStopTapRetry();
 
     std::lock_guard<std::mutex> lifecycleLock(g_zenLifecycleMutex);
-
-    // Before the UI threads are uninitialized, and waits for the refreshes
-    // already queued to them.
-    CWMaxLayerStop();
 
     HWND restartExplorerPromptWindow = g_restartExplorerPromptWindow;
     if (restartExplorerPromptWindow) {
@@ -26292,14 +25444,5 @@ void Wh_ModSettingsChanged() {
 
     if (initialize) {
         InitializeSettingsAndTap();
-    }
-
-    if (g_zenMaxLayerEnabled) {
-        CWMaxLayerStart();
-        // The UI threads were reinitialized, so refresh them even if the
-        // maximized windows didn't change.
-        CWMaxLayerRequestRefresh();
-    } else {
-        CWMaxLayerStop();
     }
 }

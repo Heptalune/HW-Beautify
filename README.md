@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能调任务栏高度与图标大小、滚动调音量（系统/分应用/混合器）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换成 Fluent 右键菜单，以及运行对话框、文件操作、桌面图标等一整套细节美化。一共 40 个 mod（32 核心 + 2 可选 + 6 DLC 额外内容），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能等比缩放任务栏、滚动调音量（系统/分应用）、快捷键切换播放设备、Alt+拖动窗口、加 macOS 风格的 Dock 悬停动画、一键换成 Fluent 右键菜单，以及运行对话框、文件操作、桌面图标等一整套细节美化。一共 34 个 mod（26 核心 + 2 可选 + 6 DLC 额外内容），一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 ## 效果预览
 
@@ -11,7 +11,7 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ## Mod 介绍
 
-32 个核心 mod 加 2 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。合并与整合模组的设置页均按功能拆分为**可收起的分组**。
+26 个核心 mod 加 2 个可选 mod。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。合并与整合模组的设置页均按功能拆分为**可收起的分组**。
 
 另有 6 个 **DLC 额外内容**（见下方专节），由 `deploy-dlc.bat` 单独添加，不随主部署装入。
 
@@ -30,9 +30,9 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 给 Windows 11 任务栏换上亚克力、模糊或透明背景，颜色、模糊、不透明度和亮度都可调。
 
 * 默认主题「自定义玻璃」，可切换「液态玻璃」及 30 多款社区主题（Dock 风格、Windows 7、Sun Valley 等）。
-* Win+X 菜单、托盘溢出面板、音量/亮度浮窗一起换成玻璃，没有额外描边，圆角与系统一致。
-* 可选「最大化时加深背景」；可选任务栏空白处点击穿透。
-* 「任务栏尺寸与缩放」分组（4.4.0 起）：任务栏高度、图标大小、按钮宽度等 5 项单项设置（含新版系统的小图标模式）+「等比缩放」一键整体缩放 +「显示桌面按钮全高」——把任务栏最右的「显示桌面」小竖条撑到与任务栏同高，更好看也更好点；图标默认 24×24 是从 32×32 缩小的、会发糊，本模组可直接用原始清晰度的图标。
+* Win+X 菜单、托盘溢出面板、音量/亮度浮窗一起换成玻璃，没有额外描边，圆角与系统一致；4.5.0 起这些表面与最大化时一律无条件跟随任务栏背景美化（相应独立分组已删除）。
+* 「等比缩放」（4.5.0 起为顶层设置）：把任务栏高度、图标大小与按钮宽度（包默认基线 52/32/44/16/32）一起按百分比整体缩放，100 为不缩放；单项尺寸设置已随之移除。图标默认 24×24 是从 32×32 缩小的、会发糊，本模组可直接用原始清晰度的图标。
+* 可选任务栏空白处点击穿透；「显示桌面」按钮的全高/竖条高度设置已迁往 CW-托盘区域设置。
 * 基于 m417z 的 Windows 11 Taskbar Styler（GPL-3.0）深度修改；任务栏高度与图标大小部分整合自 m417z 的 Taskbar height and icon size。
 
 ### CW-开始菜单样式美化
@@ -59,12 +59,13 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ### CW-关于桌面的快捷设置
 
-桌面相关快捷功能的合集模组（v2.3.0 起由「显示桌面按钮预览」与「桌面双击隐藏图标」合并而成，v2.5.0 起再并入「桌面框选淡出」与「桌面图标平滑自动隐藏」两个模组），设置分三个可收起分组：
+桌面相关快捷功能的合集模组（v2.3.0 起由「显示桌面按钮预览」与「桌面双击隐藏图标」合并而成，v2.5.0 起再并入「桌面框选淡出」与「桌面图标平滑自动隐藏」，v2.6.0 起再并入「隐藏桌面图标文字与箭头」），设置分四个可收起分组：
 
 * **显示桌面按钮预览**：悬停任务栏最右「显示桌面」按钮时，显示窗口的 Aero Peek 预览，找回 Windows 10 时代的小窗预览体验。**前提**：系统需开启「启用 Peek」（`HKCU\Software\Microsoft\Windows\DWM\EnableAeroPeek`）。
 * **桌面图标隐藏设置**（原「双击隐藏桌面图标」，1.1.0 起更名）：双击桌面空白处显示或隐藏图标；闲置自动隐藏默认开启，5 秒没有键盘鼠标操作就隐藏（3–60 秒可调），4.2.0 起改用系统「显示桌面图标」命令实现（状态与系统菜单同步）。
 * **平滑自动隐藏**（原独立模组并入，动画方式、与系统开关方式并存）：桌面图标闲置后以平滑淡入淡出动画隐藏、点击显示、双击隐藏，延时与动画时长可调；与上面双击切换的系统开关机制并存，按需搭配使用。
 * **桌面框选淡出**（原独立模组并入）：桌面拖框选择松开鼠标时，框选矩形平滑淡出消散，取代生硬消失；动画速度、时长与填充/边框颜色可调。
+* **纯净化图标**（1.3.0 起新增，原「隐藏桌面图标文字与箭头」并入）：隐藏桌面图标的文字标签（文件夹名保留显示）、实时移除快捷方式小箭头与 UAC 管理员盾牌角标；盾牌隐藏默认关闭。
 
 ### CW-任务栏音量控制
 
@@ -79,31 +80,25 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 ### CW-任务栏动画
 
-任务栏动画合集（2.1.0 起由「Dock 动画」与「任务栏秒显」合并而成，2.2.0 起再并入弹性药丸，2.4.0 起再并入最大化自动隐藏任务栏）：
+任务栏动画合集（2.1.0 起由「Dock 动画」与「任务栏秒显」合并而成，2.2.0 起再并入弹性指示条，2.4.0 起再并入最大化自动隐藏任务栏）：
 
 * **任务栏图标动画**：macOS 风格的任务栏图标悬停放大（三种动画曲线、相邻图标让位、
   空闲「呼吸」可调、弹跳抬升幅度与防裁剪保护、顶部任务栏镜像等），设置在「任务栏图标动画」分组。
 * **任务栏显示动画**：去掉自动隐藏任务栏的显示延迟，出现/隐藏动画可选
   （无、滑动、弹性、回弹、淡入淡出等）；2.4.0 起本分组还包含**窗口最大化时自动隐藏任务栏**（原独立模组并入，默认关闭）——仅当有窗口最大化或贴近任务栏时才隐藏任务栏，平时保持可见。
-* **任务栏指示条动画**（2.2.0 起并入，原独立模组退役）：为当前活动项注入一条带弹性
-  动画的滑动指示条，设置在「任务栏指示条动画」分组。
+* **任务栏指示条动画**（2.2.0 起并入，原「弹性药丸」模组退役）：为当前活动项注入一条带弹性
+  动画的滑动指示条，设置在「任务栏指示条动画」分组；2.4.1 起设置页统一称「指示条」。
+* 2.4.1 深度修复两个失效：指示条无动画（引擎下载的 PDB 与 DLL 的 age 不匹配导致符号解析全部失败、指示条钩子从未挂上，已修复 PDB 并新增符号解析失败的自愈重试）与图标弹跳/悬停放大失效（Windows 更新后指针事件不再路由进原虚重写，新增 AddHandler 兜底订阅）。
 * 三套功能相互独立，可只用其一。
-
-### CW-窗口滑动排列
-
-拖动窗口时吸附排列，配合顺滑的滑动动画。
-
-* 拖动窗口到屏幕边缘/其他窗口时自动吸附，距离可调；按住 Alt 临时禁用吸附。
-* 松手后窗口以滑动动画归位，速度可调。
 
 ### CW-Fluent 右键菜单
 
 把桌面和资源管理器左侧文件夹树的右键菜单换成 Win11 Fluent 风格（WinUI2 MenuFlyout、亚克力背景），菜单项、图标与命令返回值和原生菜单完全一致。
 
-* 三种菜单样式随时切换：Fluent（本模组渲染）/ Win11 原生 / Win10 经典。
+* 三种菜单样式随时切换（0.3.0 起）：**Win 11（Fluent）**（本模组渲染，原「Fluent 样式」更名）/ **Win 10（Fluent）**（经典完整菜单 + Fluent 视觉，新增）/ **Win 10 经典**（委托系统原生经典菜单）。
+* 0.3.0 起「Win 10 经典」改为直接委托系统原生完整经典菜单——补全 BandZip/WinRAR 等第三方扩展条目（此前从现代菜单数据渲染会缺条目）。
 * 亚克力背景、跟随系统深浅色；紧凑模式可选。
 * 项目作者原创：基于对闭源 FluentContextMenu v0.5.0 的静态逆向净室重写，未复制其代码。
-* 0.2.2 修复点击 Win11「显示更多选项」后二级经典菜单被遮挡的图层错误与桌面无响应问题。
 * 与 CW-自定义右键菜单 互斥，只开一个。
 
 ### CW-关闭扩展名修改警告
@@ -112,11 +107,14 @@ CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，�
 
 * 关闭警告后改错扩展名不会再被提醒，请谨慎重命名。
 
-### CW-窗口拖动（Alt+拖动）
+### CW-窗口优化
 
-Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键拖动调整大小。
+窗口管理三合一融合模组（v2.6.0 起由「CW-窗口拖动」「CW-窗口滑动排列」「CW-隐形窗口边框」三个模组收拢而成），设置分三个可收起分组：
 
-* 触发键可自定义；保留短按点击；支持拖动无标题栏的窗口。
+* **窗口拖动（Alt+拖动）**：Linux 风格手势——按住 Alt 左键拖动移动窗口、右键拖动调整大小；触发键可自定义，保留短按点击，支持无标题栏窗口。
+* **窗口排列**：拖动窗口到屏幕边缘/其他窗口时自动吸附排列，松手后以滑动动画归位，距离与速度可调；按住 Alt 临时禁用吸附。
+* **隐形窗口边框**：窗口四周边框隐形，同时保留系统圆角，窗口轮廓更干净。
+* 来源：m417z AltDrag 与 Slick Window Arrangement（GPL-3.0）、Bo0ii Invisible Window Borders（MIT），由本整合包三合一融合整合。
 
 ### CW-自定义右键菜单
 
@@ -138,29 +136,13 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * 内置多款社区主题（紧凑、经典搜索框、窗口玻璃、半透明等），也支持自定义控件样式。
 * 与任务栏/开始菜单等 styler 模组同一套「样式常量/控件样式/资源变量」语法。
 
-### CW-隐形窗口边框
+### CW-现代化的
 
-让窗口四周边框隐形，同时保留系统圆角，窗口轮廓更干净。
+把系统里残留的老式对话框换成现代 Fluent 风格的融合模组（v2.6.0 起由「CW-现代文件夹选择对话框」与「CW-现代运行对话框」两个模组收拢而成）：
 
-* 基于 [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)（作者 Bo0ii）汉化整合。
-
-### CW-任务栏缩略图设置
-
-任务栏缩略图相关设置的合集模组（v2.3.0 起由「任务栏缩略图即时预览」与「任务栏缩略图大小」合并而成，v2.5.0 起再并入缩略图拖动排序），设置分三个可收起分组：
-
-* **缩略图即时预览**：悬停任务栏图标时预览立即出现，不用等系统延迟；点击外部或悬停开始按钮立即关闭。**需要 Windows 11 24H2 及以上**（22H2/23H2 上该组自动停用，属预期行为）。
-* **缩略图大小**：按百分比缩放新版任务栏悬停缩略图（CW 版默认 200%），也可开启绝对尺寸模式按像素指定；基于 [Taskbar Thumbnail Size](https://windhawk.net/mods/taskbar-thumbnail-size)（作者 m417z，GPL-3.0）。
-* **缩略图排序**（1.1.0 起并入）：按住任务栏缩略图用鼠标左键拖动，即可重新排列同一应用分组的缩略图顺序，窗口在任务栏上的实际顺序同步更新；基于 [Taskbar Thumbnail Reorder](https://windhawk.net/mods/taskbar-thumbnail-reorder)（作者 m417z，GPL-3.0）。
-* 即时预览部分基于 [Instant Taskbar Thumbnail Previews](https://windhawk.net/mods/instant-taskbar-thumbnail-previews)（作者 Alchemy，MIT）。
-* 1.1.0 修复 22H2 上「开启后没有效果」的问题：原延迟加载钩子转换失败会静默失效，现改为失败自动重试并在引擎日志响明原因；此前遇到该问题的，更新后重开一次模组开关即可触发自愈。
-
-### CW-现代运行对话框
-
-把 Windows 10/11 的经典「运行」对话框换成现代 Fluent 风格：液态玻璃质感、DirectWrite 排版、输入时应用建议、历史记录即时执行。
-
-* 表面主题（玻璃/模糊/纯色）、明暗模式、模糊浓度可调；历史条数与时间戳可定制。
-* 支持多语言界面（含简体中文）；可选任务栏图标点击动作与点击外部关闭。
-* 基于 [Modern Run Dialog UI For Windows 10 & 11](https://windhawk.net/mods/modern-run-dialog-ui)（作者 caotu2k5）汉化整合。
+* **文件夹选择器现代化**：把过时、难用的旧式「浏览文件夹」对话框替换为现代风格的文件夹选择对话框，目录层级一目了然；原对话框的标题与起始根目录原样带入，创建失败时自动回退原对话框。**对所有进程生效**。
+* **运行对话框 Fluent 化**：把经典「运行」对话框换成现代 Fluent 风格——液态玻璃质感、DirectWrite 排版、输入时应用建议、历史记录即时执行；表面主题（玻璃/模糊/纯色）、明暗模式、模糊浓度可调（`runDialog.*` 设置分组）。**仅在 explorer.exe 内生效**。
+* 来源：aubymori Modernize Folder Picker Dialog（MIT 惯例）、caotu2k5 Modern Run Dialog UI（上游未标注许可），由本整合包融合整合、署名保留。
 
 ### CW-文件操作样式美化
 
@@ -184,20 +166,14 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * 中键点击时按住 Ctrl（默认）强制结束任务，组合键可调整或禁用；合并为一组的多个窗口可选「关闭所有窗口」（默认）或「仅关闭前台窗口」。
 * 基于 [Middle click to close on the taskbar](https://windhawk.net/mods/taskbar-button-click)（作者 m417z，GPL-3.0）汉化整合。
 
-### CW-任务栏时钟自定义
+### CW-托盘区域设置
 
-全面自定义任务栏时钟：日期与时间格式，在时钟上显示新闻、天气、网速、CPU/内存/GPU/电池等性能指标或媒体播放信息，字体与颜色也可改（v2.2.0 移除后回归）。
+任务栏托盘区域设置的融合模组（v2.6.0 起由「CW-任务栏时钟自定义」「CW-托盘系统图标调整」两个模组与「CW-任务栏样式美化」的显示桌面按钮设置收拢而成），三大块设置：
 
-* 时间、日期、星期格式完全自定义，支持顶行、底行等多行自定义文本；Win11 22H2+ 可调时钟字体、字号、颜色。
-* 天气由 wttr.in 提供，新闻可配置任意 RSS/网页源。
-* 基于 [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization)（作者 m417z，GPL-3.0）汉化整合。
-
-### CW-现代文件夹选择对话框
-
-把过时、难用的旧式「浏览文件夹」对话框替换为现代风格的文件夹选择对话框，目录层级一目了然。
-
-* 原对话框的标题与起始根目录原样带入；现代对话框创建失败时自动回退原对话框。
-* 无任何设置，启用即生效；基于 [Modernize Folder Picker Dialog](https://windhawk.net/mods/modernize-folder-picker-dialog)（作者 aubymori，MIT 惯例）汉化整合。
+* **时钟定制**（26 项顶层设置原样保留）：日期与时间格式完全自定义，支持顶行、底行等多行自定义文本；可在时钟上显示新闻（任意 RSS/网页源）、天气（wttr.in）、网速、CPU/内存/GPU/电池等性能指标或媒体播放信息；Win11 22H2+ 可调时钟字体、字号、颜色。
+* **托盘系统图标**：隐藏或灰化音量、网络、电池、麦克风、位置（GPS）、Recall、语言栏、通知铃铛等系统图标；通知铃铛可「无新通知时隐藏」，电池图标可改灰度显示。
+* **显示桌面按钮**：自任务栏样式美化 4.5.0 迁入——把任务栏最右的「显示桌面」小竖条撑到与任务栏同高（全高）或按像素指定高度。
+* 来源：m417z Taskbar Clock Customization 与 Taskbar tray system icon tweaks（均 GPL-3.0），由本整合包三合一融合整合。仅支持 Windows 11。
 
 ### CW-WinUI 右键菜单动画
 
@@ -226,6 +202,7 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 在 Windows 11 开始菜单添加可自定义的一键电源按钮：点击图标直接关机、重启、注销、睡眠、休眠或锁定，无需再弹二级菜单确认。
 
 * 显示哪些按钮、排列顺序与对齐方式可自由调整；可选执行前确认防误触。仅支持 Windows 11。
+* 1.0.4 起每个按钮有独立的启用开关：关机/重启/注销/睡眠默认开，休眠/锁定默认关；实际显示 = 排序名单 ∩ 启用开关。
 * 基于 [Windows 11 Start Menu Power Buttons](https://windhawk.net/mods/win11-power-buttons)（作者 Hakuuyosei/灵弦，MIT 惯例）汉化整合。
 
 ### CW-登录注销关机音效
@@ -242,26 +219,13 @@ Linux 风格的窗口管理手势：按住 Alt 左键拖动移动窗口、右键
 * 同时适配经典列表视图与 Windows 11 默认 DirectUI 视图；多标签页、多窗口互不干扰。
 * 无任何设置，启用即生效；基于 [Explorer Double Click Up](https://windhawk.net/mods/explorer-double-click-up)（作者 wrldspawn，GPL-3.0）汉化整合。
 
-### CW-隐藏桌面图标文字与箭头
+### CW-开始按钮居中留空
 
-隐藏桌面图标的文字标签（文件夹名保留显示），并实时移除快捷方式小箭头，让桌面更清爽。
+把「开始」按钮钉在主显示器屏幕真正的水平中央，应用图标按**出现顺序左右交替**分成两组数量均衡的图标簇，分列开始按钮两侧、紧贴其边缘向外排列（2.0.0 重写为纯布局方案、2.1.0 分流改为均衡交替）。
 
-* 与 CW-关于桌面的快捷设置 分工不同、互不冲突：本模组管图标的显示样式（文字/箭头），后者管图标的整体隐藏与恢复，可同时开启搭配使用。
-* 基于 [Hide Desktop Icon Text and Shortcut Arrows](https://windhawk.net/mods/hide-desktop-icon-text)（作者 kivsak，MIT 惯例）汉化整合。
-
-### CW-开始按钮居中分流
-
-把「开始」按钮钉在主显示器屏幕真正的水平中央，并把运行中应用的任务栏按钮按窗口位于屏幕中心线的哪一侧分成两组、分列开始按钮两侧。
-
-* 窗口拖过中线图标跟随换边；搜索/任务视图/小组件按钮可留在最左端或贴到开始按钮旁边。仅支持 Windows 11（主显示器）。
+* 图标按任务栏原始顺序编号、奇偶交替分配到开始按钮右/左两侧（第 1 个在右、第 2 个在左……）；任意数量下两侧都有图标、数量差 ≤1，图标增删后自动重新均衡——无需任何名单配置。
+* 搜索、任务视图、小组件按钮可留在任务栏最左端，也可移到开始按钮旁边。仅支持 Windows 11（主显示器）。
 * 基于 [Taskbar Start Button Centered Origin](https://windhawk.net/mods/taskbar-centered-start-split-icons)（作者 rick，GPL-3.0）汉化整合。
-
-### CW-托盘系统图标调整
-
-隐藏或调整任务栏托盘区的系统图标：音量、网络、电池、麦克风、位置（GPS）、Recall、语言栏、通知铃铛，以及「显示桌面」按钮（v2.2.0 移除后回归）。
-
-* 通知铃铛可「无新通知时隐藏」；电池图标可改灰度显示；「显示桌面」按钮宽度 0–800 像素可调。仅支持 Windows 11。
-* 基于 [Taskbar tray system icon tweaks](https://windhawk.net/mods/taskbar-tray-system-icon-tweaks)（作者 m417z，GPL-3.0）汉化整合。
 
 ### CW-文件大小列增强
 
@@ -341,8 +305,8 @@ DLC 是本套件的「额外内容包」，类比游戏的 DLC：**不在主部�
 
 | 文件 | 适合谁 |
 | --- | --- |
-| `CW-Beautify_OneKeyDeploy_v2.5.0.zip` | **大多数人选这个**。内含 Windhawk 安装器、主套件与 DLC |
-| `CW-Beautify_OneKeyDeploy_v2.5.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
+| `CW-Beautify_OneKeyDeploy_v2.6.0.zip` | **大多数人选这个**。内含 Windhawk 安装器、主套件与 DLC |
+| `CW-Beautify_OneKeyDeploy_v2.6.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
 
 ## 安装
 
@@ -367,6 +331,8 @@ v2.4.0 起 8 个 tool mod（晃动找指针、现代 Alt+Tab 切换器、窗口�
 
 v2.5.0 变化：新增 13 个核心模组；「桌面框选淡出」与「桌面图标平滑自动隐藏」并入「CW-关于桌面的快捷设置」（两个旧模组会被自动卸载，对应效果改在快捷设置里开启）；「CW-托盘系统图标调整」「CW-任务栏时钟自定义」回归；「CW-任务栏样式美化」4.4.0 新增「任务栏尺寸与缩放」分组；「CW-任务栏缩略图设置」1.1.0 修复 22H2 上无效果的问题并新增「缩略图排序」分组；「CW-Fluent 右键菜单」0.2.2 修复「显示更多选项」二级经典菜单图层问题。指针残影拖尾、增强音量混合器（DLC）与 MacOS 风格 Dock（可选）按用户要求移除，会被自动卸载。
 
+v2.6.0 变化：移除「CW-任务栏缩略图设置」（多轮修复后实测仍无效，按用户要求移除）；四处合并把 9 个模组收拢为 3 个——「CW-隐藏桌面图标文字与箭头」并入「CW-关于桌面的快捷设置 1.3.0」（新「纯净化图标」分组，默认关盾牌隐藏）、「CW-窗口拖动 + CW-窗口滑动排列 + CW-隐形窗口边框」合并为「CW-窗口优化 1.0.0」、「CW-任务栏时钟自定义 + CW-托盘系统图标调整」合并为「CW-托盘区域设置 1.0.0」（并承接任务栏样式美化的显示桌面按钮设置）、「CW-现代文件夹选择对话框 + CW-现代运行对话框」合并为「CW-现代化的 1.0.0」；「CW-任务栏样式美化」4.5.0 大幅瘦身（尺寸单项设置删除、只留顶层「等比缩放」；托盘溢出面板/音量亮度浮窗/最大化时表面无条件跟随任务栏背景）；「CW-任务栏动画」2.4.1 深度修复指示条无动画与图标弹跳失效；「CW-开始按钮居中留空」2.1.0 分流改「按出现顺序左右交替」；「CW-开始菜单电源按钮」1.0.4 新增 6 个逐按钮启用开关；「CW-Fluent 右键菜单」0.3.0 重做样式体系（Win 11（Fluent）/Win 10（Fluent）/Win 10 经典）。被移除与被合并的 9 个旧模组会被自动卸载，对应功能改在承接模组里开启。
+
 从 v4.1 升级的旧用户：先双击 **`tools/uninstall-ExplorerBlurMica.bat`**，再运行 `deploy.bat`。
 
 ## 卸载
@@ -386,27 +352,27 @@ v2.5.0 变化：新增 13 个核心模组；「桌面框选淡出」与「桌面
 *   **开机后文件管理器顶部不透明**：等几秒会自动补挂；还不行就在 Windhawk 里把「CW-文件管理器样式美化」关掉再打开。
 *   **文件管理器不透明、命令栏发黑**：只用「CW-文件管理器样式美化」，不要同时开 ExplorerBlurMica。
 *   **开机后托盘图标不透明**：在「CW-任务栏样式美化」的「高级：XAML 诊断冲突处理」里改成「阻止其他程序」。TranslucentTB 等同类软件会和美化 mod 抢 XAML 诊断，建议不要同时用。
-*   **任务栏高度/图标大小调了没反应**：高度与图标大小已整合进「CW-任务栏样式美化」，直接在它的设置里调，保存即生效。
-*   **Dock 动画图标被裁切**：降低「最大缩放」（130% 以下），在「CW-任务栏样式美化」里加高任务栏效果更好。
+*   **任务栏高度/图标大小调了没反应**：单项高度/图标大小设置已随 4.5.0 移除，请用「CW-任务栏样式美化」顶层的「等比缩放」整体调整（按固定基线 52/32/44/16/32 等比缩放），保存即生效。
+*   **Dock 动画图标被裁切**：降低「最大缩放」（130% 以下），用「CW-任务栏样式美化」的「等比缩放」整体放大任务栏效果更好。
 *   **滚动调音量没反应**：部分笔记本触控板不支持在任务栏上滚动，可改用「双指捏合」手势。
 *   **快捷键切换播放设备没反应**：确认快捷键没被其他程序占用（可在 Windhawk 日志里看到注册失败提示）；换成 Ctrl+Alt+Q 等组合试试。
 *   **Mac 灵动岛与「CW-任务栏样式美化」想一起用**：灵动岛的「任务栏」模式选「windowsApps」或「windows」，两者分别管上下两条，避免同时接管任务栏。
 *   **DLC 是什么 / 为什么单列**：6 个 DLC 模组都是 tool mod（挂在 windhawk.exe 进程），开启任意一个都会让 Windhawk 启动模组宿主进程，内存占用不可预计；主套件的 mod 都注入系统进程、无常驻宿主。所以 DLC 单独添加（`deploy-dlc.bat`）、默认关闭、按需开启。不开任何 DLC 模组就没有这个宿主进程。
 *   **升级后 DLC 模组还会更新吗**：会——运行 `deploy-dlc.bat` 即可刷新 DLC 模组；`uninstall.bat` 也会一并清理它们。
 
-问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.5.0.md`。
+问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.6.0.md`。
 
 ## 致谢与许可证
 
 CW-Beautify 以 GNU General Public License v3.0 发布。
 
 *   Windhawk 和任务栏、开始菜单、通知中心、文件管理器的上游 Styler mod：m417z（GPL-3.0）。
-*   任务栏音量控制（含并入的分应用音量）、窗口滑动排列、关闭扩展名修改警告、设置样式美化、窗口拖动（AltDrag）、显示桌面按钮预览（并入关于桌面的快捷设置）、任务栏缩略图大小（并入任务栏缩略图设置）、最大化自动隐藏任务栏（并入任务栏动画）：m417z（GPL-3.0）。
+*   任务栏音量控制（含并入的分应用音量）、关闭扩展名修改警告、设置样式美化、显示桌面按钮预览（并入关于桌面的快捷设置）、最大化自动隐藏任务栏（并入任务栏动画）：m417z（GPL-3.0）。
 *   任务栏秒显：Bo0ii（GPL-3.0）；文件操作样式美化、文件操作美化：digART（GPL-3.0）；文件悬停信息：HaVeN80（MIT/未标注）。
-*   任务栏动画（Dock 动画 + 秒显 + 弹性药丸 + 最大化自动隐藏四合一）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、Lockframe（GPL-3.0）、m417z；Mac 灵动岛与 Dock、窗口切换动画（Vista 风格）：caliberda（GPL-3.0/MIT）。
-*   音量混合器：0Allu；自定义右键菜单：BOLT（MIT）；隐形窗口边框：Bo0ii（MIT）；任务栏缩略图即时预览（并入任务栏缩略图设置）：Alchemy（MIT）。
-*   现代运行对话框：caotu2k5；现代 Alt+Tab 切换器：IMiloDev（MIT）；拖拽删除文件：iMAboud（MIT）；桌面框选淡出（并入关于桌面的快捷设置）：angel_lov（MIT）；桌面图标平滑自动隐藏（并入关于桌面的快捷设置）：HeyOkay（MIT）；Windows 灵动岛：Himanshu（MIT）。
-*   v2.5.0 新增：任务栏按钮中键关闭、任务栏时钟自定义、托盘系统图标调整、文件大小列增强：m417z（GPL-3.0）；现代文件夹选择对话框：aubymori（MIT 惯例）；WinUI 右键菜单动画、文件管理器内容动画：crazyboyybs（MIT）；去焦点虚线框：ItsProfessional（MIT 惯例）；开始菜单电源按钮：Hakuuyosei/灵弦（MIT 惯例）；登录注销关机音效：Toru the Red Fox（MIT 惯例）；双击返回上级：wrldspawn（GPL-3.0）；隐藏桌面图标文字与箭头：kivsak（MIT 惯例）；开始按钮居中分流：rick（GPL-3.0）。
+*   任务栏动画（Dock 动画 + 秒显 + 弹性指示条 + 最大化自动隐藏四合一）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、Lockframe（GPL-3.0）、m417z；Mac 灵动岛与 Dock、窗口切换动画（Vista 风格）：caliberda（GPL-3.0/MIT）。
+*   音量混合器：0Allu；自定义右键菜单：BOLT（MIT）；现代 Alt+Tab 切换器：IMiloDev（MIT）；拖拽删除文件：iMAboud（MIT）；桌面框选淡出（并入关于桌面的快捷设置）：angel_lov（MIT）；桌面图标平滑自动隐藏（并入关于桌面的快捷设置）：HeyOkay（MIT）；Windows 灵动岛：Himanshu（MIT）。
+*   任务栏按钮中键关闭、文件大小列增强：m417z（GPL-3.0）；WinUI 右键菜单动画、文件管理器内容动画：crazyboyybs（MIT）；去焦点虚线框：ItsProfessional（MIT 惯例）；开始菜单电源按钮：Hakuuyosei/灵弦（MIT 惯例）；登录注销关机音效：Toru the Red Fox（MIT 惯例）；双击返回上级：wrldspawn（GPL-3.0）；开始按钮居中留空：rick（GPL-3.0）。
+*   v2.6.0 融合模组——窗口优化（原窗口拖动 + 窗口滑动排列 + 隐形窗口边框）：m417z AltDrag、Slick Window Arrangement（GPL-3.0），Bo0ii Invisible Window Borders（MIT）；托盘区域设置（原任务栏时钟自定义 + 托盘系统图标调整 + 任务栏样式美化显示桌面按钮段）：m417z（GPL-3.0）；现代化的（原现代文件夹选择对话框 + 现代运行对话框）：aubymori（MIT 惯例）、caotu2k5（上游未标注许可）；关于桌面的快捷设置 1.3.0「纯净化图标」段（原隐藏桌面图标文字与箭头）：kivsak（MIT 惯例）。
 *   窗口动画：ReDrag（MIT）；macOS 神奇效果：Abdullah Masood、Potassiumuncher；晃动找指针：Darius Vernelis、Jaali。
 *   媒体设备快速切换参考 AudioSwitcher（xenolightning，MS-PL）重新实现。
 *   套件深度修改、汉化与桌面双击隐藏图标（并入关于桌面的快捷设置）：Heptalune（GPL-3.0）。
@@ -414,4 +380,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 40 Windhawk mods (32 core + 2 optional + 6 DLC) as of v2.5.0, localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); the 6 tool mods (which host a windhawk.exe process with higher memory usage) are a self-contained "DLC" added via `deploy-dlc.bat`. Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names, v2.3.0 migrates regrouped settings keys). Uninstall: `uninstall.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 34 Windhawk mods (26 core + 2 optional + 6 DLC) as of v2.6.0, localized into Simplified Chinese. Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); the 6 tool mods (which host a windhawk.exe process with higher memory usage) are a self-contained "DLC" added via `deploy-dlc.bat`. Upgrading keeps toggles and settings (v2.0.0 auto-migrates old theme names, v2.3.0/v2.5.0 migrate regrouped settings keys; v2.6.0 folds 9 mods into 3 fusion mods and auto-uninstalls the retired ones). Uninstall: `uninstall.bat`. License: GPL-3.0.

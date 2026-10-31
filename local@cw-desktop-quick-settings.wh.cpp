@@ -2,41 +2,44 @@
 // @id              cw-desktop-quick-settings
 // @name            CW-关于桌面的快捷设置
 // @name:zh-CN      CW-关于桌面的快捷设置
-// @description     Aero Peek when hovering the "Show Desktop" button, desktop icon hiding through the system "Show desktop icons" toggle (double-click / idle auto-hide, optional smooth fade transition), and a fade-out for the desktop marquee selection
-// @description:zh-CN 桌面快捷开关与显示合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出。
-// @version         1.2.0
-// @author          m417z, Heptalune, angel_lov, HeyOkay
+// @description     Aero Peek when hovering the "Show Desktop" button, desktop icon hiding through the system "Show desktop icons" toggle (double-click / idle auto-hide, optional smooth fade transition), a fade-out for the desktop marquee selection, and desktop icon purification (hide icon text labels, shortcut arrows and UAC shield badges)
+// @description:zh-CN 桌面快捷开关与显示合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）。
+// @version         1.3.0
+// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
 // @include         explorer.exe
 // @architecture    x86-64
-// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lversion -luser32 -lgdi32 -luxtheme -lwinmm
+// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：本模组由以下四个功能合并而成：
+// CW-Beautify 整合说明：本模组由以下五个功能合并而成：
 //   1.「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4，GPL-3.0）；
 //   2.「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；
 //   3.「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade 1.0.0，MIT，
 //      https://windhawk.net/mods/desktop-marquee-fade）；
 //   4.「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide
-//      0.14.2，MIT，https://windhawk.net/mods/smooth-desktop-icons-auto-hide）。
-// 各部分代码分别以 Peek*/ToggleIcons*/Marquee*/SmoothIcons* 前缀隔离全局符号与
-// 函数，独立初始化与卸载。
+//      0.14.2，MIT，https://windhawk.net/mods/smooth-desktop-icons-auto-hide）；
+//   5.「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and
+//      Shortcut Arrows 1.6.0，MIT 惯例，
+//      https://windhawk.net/mods/hide-desktop-icon-text）。
+// 各部分代码分别以 Peek*/ToggleIcons*/Marquee*/SmoothIcons*/Purity* 前缀隔离
+// 全局符号与函数，独立初始化与卸载。
 // 1.2.0 起（按用户要求）：第 4 项不再作为独立隐藏机制——其闲置自动隐藏、
 // 单击/拖入显示、双击立即隐藏等触发逻辑全部移除，只保留其绘制技术（对桌面
 // SysListView32 绘制过程的接管与 alpha 混合）作为纯动画绘制器（SmoothIcons*
 // 段）；桌面图标的隐藏机制只有系统「显示桌面图标」开关一种（ToggleIcons），
 // 本模组每次触发切换时在其上叠加一次淡出/淡入过渡动画。
 // 设置键为 peek.*、toggleIcons.*（动画设置为组内顶层的 toggleIcons.animate /
-// toggleIcons.animationDuration）与 marquee.* 前缀。
-// ToggleIcons 与 SmoothIcons 都需要挂钩 CreateWindowExW，由文件末尾的共享钩子
-// 统一安装一次并分发，避免对同一 API 重复挂钩。
+// toggleIcons.animationDuration）、marquee.* 与 purity.* 前缀。
+// ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 CreateWindowExW，由文件末尾的
+// 共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
 
 // ==WindhawkModReadme==
 /*
 # CW-关于桌面的快捷设置
 
-桌面快捷开关与显示合集，把原来多个独立模组合并为一个：悬停任务栏「显示桌面」按钮时的 Aero Peek 桌面速览、双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画），以及桌面框选矩形的淡出动画。直接运行在 `explorer.exe` 中，不需要额外的后台程序。
+桌面快捷开关与显示合集，把原来多个独立模组合并为一个：悬停任务栏「显示桌面」按钮时的 Aero Peek 桌面速览、双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）、桌面框选矩形的淡出动画，以及桌面图标纯净化（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）。直接运行在 `explorer.exe` 中，不需要额外的后台程序。
 
 ## 功能一：显示桌面按钮预览（Aero Peek）
 
@@ -98,9 +101,28 @@
 - 「使用自定义颜色」只作用于淡出覆盖层，拖动过程中的实时框选矩形仍为系统配色。
 - 卸载或停用本模组时会等待动画线程退出并清理全部覆盖层窗口，正常情况无残留。
 
+## 功能四：纯净化图标（隐藏文字/箭头/盾牌）
+
+由独立模组「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例）并入。隐藏桌面图标的文字标签（文件夹名保留显示），实时移除桌面快捷方式图标上的标准小箭头，并可选移除 UAC 管理员盾牌角标，让桌面更加清爽。
+
+功能细节：
+
+- **隐藏图标文字**：隐藏桌面文件与快捷方式的文字标签，文件夹名称保留显示。
+- **移除快捷方式箭头**：实时移除快捷方式小箭头覆盖图标，无需注册表修改或管理员权限。
+- **隐藏 UAC 管理员盾牌**（默认关闭）：移除需要管理员权限的程序及其快捷方式图标上的蓝黄色盾牌角标，同样无需注册表修改或管理员权限。
+
+注意事项：
+
+- 快捷方式箭头的移除作用于整个资源管理器会话（箭头覆盖层位于共享的系统图标列表中）。
+- 关闭该功能或停用模组后，箭头要等资源管理器重启或图标缓存刷新后才会恢复。
+- **安全提示**：UAC 盾牌是「该程序需要管理员权限」的可视提醒。隐藏盾牌后，将无法从桌面图标上直观分辨哪些程序会以管理员身份运行，请在知情的前提下开启；关闭该功能或停用模组后，盾牌要等资源管理器重启或图标缓存刷新后才会恢复。
+- 隐藏 UAC 盾牌同样作用于整个资源管理器进程（系统图标列表与图标合成路径为进程内共享），资源管理器窗口里的盾牌角标也会被隐藏；个别经 SHGetFileInfo 获取「带覆盖图标」的界面可能一并失去覆盖合成。
+- 已知限制：文件夹判定通过比对绘制的文字与实际桌面文件夹名称实现，若某个「文件」与桌面上的某个「文件夹」完全同名，该文件的文字标签同样会被保留。
+- 与「桌面图标隐藏设置」的分工：本功能只负责图标**显示样式**的纯净化（文字/箭头/盾牌的显隐）；「桌面图标隐藏设置」负责图标的**整体隐藏与恢复**。两者管理维度不同、互不冲突，可以同时开启搭配使用（例如：图标整体显示时由本功能隐藏文字与箭头，需要时再用双击一键整体隐藏图标）。
+
 ## 设置说明
 
-设置页分为「显示桌面按钮预览」「桌面图标隐藏设置」与「桌面框选淡出」三个可收起分组，各分组内设置项的详细说明见设置界面提示文字。「桌面图标隐藏设置」分组内的隐藏机制只有系统「显示桌面图标」开关一种，「切换时平滑动画」与「动画时长」为其可选的过渡效果。
+设置页分为「显示桌面按钮预览」「桌面图标隐藏设置」「桌面框选淡出」与「纯净化图标」四个可收起分组，各分组内设置项的详细说明见设置界面提示文字。「桌面图标隐藏设置」分组内的隐藏机制只有系统「显示桌面图标」开关一种，「切换时平滑动画」与「动画时长」为其可选的过渡效果；「纯净化图标」分组负责桌面图标显示样式的纯净化（隐藏文字/箭头/盾牌），与图标的整体隐藏互不影响。
 
 ## 致谢与许可
 
@@ -108,21 +130,24 @@
 - 「双击隐藏桌面图标」为 CW-Beautify 整合包作者 Heptalune 的原创 mod。
 - 「桌面框选淡出」原版 mod：Desktop Marquee Fade，作者 [angel_lov](https://github.com/Twilight0Sparkle)，MIT 许可证，原版链接：<https://windhawk.net/mods/desktop-marquee-fade>，源码：<https://github.com/ramensoftware/windhawk-mods>。
 - 「平滑自动隐藏」原版 mod：Smooth Desktop Icons Auto-Hide，作者 [HeyOkay](https://github.com/HeyOkay)，MIT 许可证，原版链接：<https://windhawk.net/mods/smooth-desktop-icons-auto-hide>，源码：<https://github.com/ramensoftware/windhawk-mods/blob/main/mods/smooth-desktop-icons-auto-hide.wh.cpp>。1.2.0 起其独立隐藏机制已按用户要求移除，仅保留其绘制技术用于切换过渡动画。
-- 本模组整体以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）整合维护；并入的两个 MIT 模组保留其原作者署名与 MIT 许可声明。
+- 「纯净化图标」原版 mod：Hide Desktop Icon Text and Shortcut Arrows，作者 [kivsak](https://github.com/kivsak)，源码内未附许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/hide-desktop-icon-text>。
+- 本模组整体以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）整合维护；并入的三个 MIT 模组保留其原作者署名与 MIT 许可声明。
 
 ## 变更记录
 
+- **1.3.0**：并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例，汉化版 1.6.0），成为第四个可收起分组「纯净化图标」（Purity）：隐藏桌面图标文字（保留文件夹名）、移除快捷方式小箭头，并可选择性隐藏 UAC 管理员盾牌角标（默认关闭，安全提示见功能四）。设置项迁移为 `purity.hideText` / `purity.hideArrows` / `purity.hideShields`（对应原模组 `hide_text` / `hide_arrows` / `hide_shields`，默认值不变）；原模组的 CreateWindowExW 钩子并入文件末尾的共享钩子统一分发，SHChangeNotify 先通知后补丁的初始化时序按上游实测结论原样保留，设置变更时对纯净化图标段单独复刻原版「重载后重新通知+补丁+重绘」的收尾。原独立模组源码文件（`local@cw-hide-desktop-icon-text.wh.cpp`）移除，由本模组统一提供。旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
 - **1.2.0**：按用户要求重构「桌面图标隐藏设置」：移除 1.1.0 并入的独立平滑隐藏机制（SmoothIcons 的闲置自动隐藏、单击/拖入显示、双击立即隐藏等触发与看护逻辑全部删除），桌面图标的隐藏机制只保留原系统开关方式（双击切换、闲置自动隐藏、任意输入恢复，隐藏效果与原版完全一致）；SmoothIcons 段精简为纯动画绘制器，只保留其绘制技术（接管桌面 SysListView32 绘制并做 alpha 混合）。在此基础上新增「切换时平滑动画」（`toggleIcons.animate`，默认开启）与「动画时长」（`toggleIcons.animationDuration`，50-1000 毫秒，默认 250，复用原 animationDuration 文案）两项设置：本模组每次触发切换时播放一次淡出/淡入过渡（隐藏方向先动画、结束后才放行系统切换命令；显示方向切换立即生效、图标从透明淡入）。删除 `toggleIcons.smooth` 子组，动画设置移入 `toggleIcons` 组顶层；旧设置键 `toggleIcons.smooth.*` 不再读取。
 - **1.1.0**：并入「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT，汉化版 1.0.1）与「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide，MIT，汉化版 0.14.3）两个独立模组，原作者署名与原版链接并入致谢；两组设置分别迁移为 `marquee.*` 与 `toggleIcons.smooth.*` 前缀（平滑自动隐藏作为「桌面图标隐藏设置」分组内的子分组，设置默认值保持上游默认、自动隐藏开启）；「双击隐藏桌面图标」分组更名为「桌面图标隐藏设置」（Desktop icon hiding settings），分组内系统开关双击隐藏与平滑自动隐藏两种机制并存，机制差异与共存建议见功能三；原两个独立模组源码文件（`local@cw-desktop-marquee-fade.wh.cpp`、`local@cw-smooth-desktop-icons-autohide.wh.cpp`）移除，由本模组统一提供。旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
 - **1.0.0**：由「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）合并成模组。
 
 ## CW-Beautify 整合说明
 
-- 本模组由 CW-Beautify 整合包（作者 Heptalune）先后合并四个功能：1.0.0 合并「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；1.1.0 并入「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT）与「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide，MIT）；1.2.0 按用户要求移除平滑自动隐藏的独立机制，其绘制技术保留为切换过渡动画。
-- 四部分代码分别以 Peek、ToggleIcons、Marquee、SmoothIcons 前缀隔离全局符号与函数，独立初始化与卸载，互不干扰；一处功能初始化失败时仅记录日志并降级，不影响其他功能。ToggleIcons 与 SmoothIcons 都需要挂钩 `CreateWindowExW`，本模组只安装一次共享钩子并把新建窗口分发给两者，避免对同一 API 重复挂钩。
+- 本模组由 CW-Beautify 整合包（作者 Heptalune）先后合并五个功能：1.0.0 合并「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4）与「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；1.1.0 并入「CW-桌面框选淡出」（上游 angel_lov Desktop Marquee Fade，MIT）与「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide，MIT）；1.2.0 按用户要求移除平滑自动隐藏的独立机制，其绘制技术保留为切换过渡动画；1.3.0 并入「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and Shortcut Arrows，MIT 惯例）。
+- 五部分代码分别以 Peek、ToggleIcons、Marquee、SmoothIcons、Purity 前缀隔离全局符号与函数，独立初始化与卸载，互不干扰；一处功能初始化失败时仅记录日志并降级，不影响其他功能。ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 `CreateWindowExW`，本模组只安装一次共享钩子并把新建窗口分发给三者，避免对同一 API 重复挂钩。
 - SmoothIcons 段自 1.2.0 起精简为纯动画绘制器（绘制接管 + alpha 混合 + 淡入淡出），不再包含任何触发/闲置/看护逻辑；与 ToggleIcons 的衔接点为三个切换函数（双击切换 / 闲置自动隐藏 / 任意输入恢复）调用的 `SmoothIconsBeginHideTransition` / `SmoothIconsBeginShowTransition` / `SmoothIconsIsHidePending` / `SmoothIconsCancelHideTransition` 接口。
-- 设置键分别为 `peek.*`（悬停延迟）、`toggleIcons.*`（系统开关双击隐藏、闲置自动隐藏，以及切换过渡动画 `toggleIcons.animate` / `toggleIcons.animationDuration`）与 `marquee.*`（桌面框选淡出）。旧模组的设置不会自动迁移到本模组，安装后请在设置页重新确认数值。
-- 除 1.2.0 按用户要求重构的桌面图标隐藏部分外，其余功能代码逻辑与各自原版保持一致，仅做符号隔离、设置键前缀与入口统一接入调整。
+- Purity 段（纯净化图标）完整保留上游 kivsak 1.6.0 的实现：DrawTextW / DrawThemeTextEx 文字隐藏钩子、系统图像列表 overlay 补丁（快捷方式箭头与 UAC 盾牌）、SHGetFileInfoW / SHGetStockIconInfo 提取期合成拦截钩子与 IShellFolder 文件夹名缓存；SHChangeNotify 先通知后打图像列表补丁的初始化时序按上游实测结论原样保留。
+- 设置键分别为 `peek.*`（悬停延迟）、`toggleIcons.*`（系统开关双击隐藏、闲置自动隐藏，以及切换过渡动画 `toggleIcons.animate` / `toggleIcons.animationDuration`）、`marquee.*`（桌面框选淡出）与 `purity.*`（`purity.hideText` / `purity.hideArrows` / `purity.hideShields`，纯净化图标）。旧模组的设置不会自动迁移到本模组，安装后请在设置页重新确认数值。
+- 除 1.2.0 按用户要求重构的桌面图标隐藏部分与 1.3.0 的符号隔离/设置键前缀/共享钩子接入/设置变更收尾适配外，其余功能代码逻辑与各自原版保持一致。
 */
 // ==/WindhawkModReadme==
 
@@ -243,13 +268,51 @@
   $description:zh-CN: >-
     桌面框选矩形在松开鼠标按钮后以平滑动画淡出消散。由独立模组
     「桌面框选淡出」（原作者 angel_lov，MIT）并入。
+- purity:
+  - hideText: true
+    $name: Hide desktop icon text
+    $name:zh-CN: 隐藏桌面图标文字
+    $description: Hides text labels for files and shortcuts on the desktop (keeps folder names).
+    $description:zh-CN: 隐藏桌面文件与快捷方式的文字标签（保留文件夹名称）。
+  - hideArrows: true
+    $name: Remove shortcut arrows
+    $name:zh-CN: 移除快捷方式箭头
+    $description: Removes the shortcut arrow overlay from icons (applies to the whole Explorer session).
+    $description:zh-CN: 移除图标上的快捷方式小箭头（作用于整个资源管理器会话）。
+  - hideShields: false
+    $name: Hide UAC shield badges
+    $name:zh-CN: 隐藏 UAC 管理员盾牌
+    $description: >-
+      Removes the UAC administrator shield badge from icons (applies to the whole
+      Explorer session). The shield indicates which programs run as administrator.
+    $description:zh-CN: >-
+      移除图标上的 UAC 管理员盾牌角标（作用于整个资源管理器会话）。
+      注意：盾牌是管理员权限的可视提醒，隐藏后无法从桌面直观分辨哪些程序以管理员身份运行。
+  $name: Desktop icon purification
+  $name:zh-CN: 纯净化图标
+  $description: >-
+    Hide desktop icon text labels (keeps folder names), remove shortcut arrow
+    overlays and UAC shield badges for a cleaner desktop. Merged from the
+    standalone mod "Hide Desktop Icon Text and Shortcut Arrows" by kivsak
+    (MIT). UAC shield badges are off by default: the shield is a visual
+    reminder that a program requires administrator privileges.
+  $description:zh-CN: >-
+    隐藏桌面图标的文字标签（保留文件夹名称），并移除快捷方式小箭头与
+    UAC 管理员盾牌角标，让桌面更清爽。由独立模组「隐藏桌面图标文字与箭头」
+    （原作者 kivsak，MIT 惯例）并入。UAC 盾牌角标默认关闭：盾牌是「该程序
+    需要管理员权限」的可视提醒，隐藏后将无法从桌面直观分辨哪些程序会以
+    管理员身份运行，请在知情的前提下开启。
 */
 // ==/WindhawkModSettings==
 
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <commoncontrols.h>
 #include <shellapi.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <objbase.h>
 #include <oleidl.h>
 #include <uxtheme.h>
 #include <mmsystem.h>
@@ -258,9 +321,14 @@
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <cstring>
 #include <functional>
 #include <map>
 #include <optional>
+#include <string>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 #undef GetCurrentTime
 
@@ -272,12 +340,13 @@ using namespace winrt::Windows::UI::Xaml;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并级共享状态：各功能初始化成功标志。文件末尾的共享 CreateWindowExW 钩子
-// 按这两个标志把新建窗口分发给 ToggleIcons / SmoothIcons 的处理函数。
+// 按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity 的处理函数。
 // 标志在 Wh_ModInit / 卸载流程内设置（Wh_SetFunctionHook 为延迟生效，钩子在
 // Wh_ModInit 返回后才应用，此处无数据竞争）。
 // ─────────────────────────────────────────────────────────────────────────────
 std::atomic<bool> g_QuickSettingsToggleIconsActive{false};
 std::atomic<bool> g_QuickSettingsSmoothIconsActive{false};
+std::atomic<bool> g_QuickSettingsPurityActive{false};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 功能一：显示桌面按钮预览（Peek*）
@@ -3015,11 +3084,509 @@ void SmoothIconsNotifySettingsChanged() {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 共享 CreateWindowExW 钩子（ToggleIcons 与 SmoothIcons 共用）
+// 功能五：纯净化图标（Purity*）
+// 来源：kivsak Hide Desktop Icon Text and Shortcut Arrows 1.6.0（MIT 惯例），
+// 原版链接：https://windhawk.net/mods/hide-desktop-icon-text（源码内未附许可
+// 声明，按 Windhawk 官方模组仓库规则视为 MIT 许可）。
+// 上游 @architecture 声明仅 x86-64；经复核其全部回调（桌面列表子类过程与
+// DrawTextW / DrawThemeTextEx / SHGetFileInfoW / SHGetStockIconInfo /
+// CreateWindowExW 钩子）均为显式 CALLBACK/WINAPI 函数，无无捕获 lambda 直传
+// WINAPI/stdcall 回调的情况，无需 x86 兼容修复；并入后 CreateWindowExW 挂钩
+// 由文件末尾的共享钩子统一安装与分发，本段只保留创建后的分发处理函数。
+// 全局符号与函数统一加 Purity 前缀以与其他功能隔离；设置键迁移为 purity.*
+// 前缀（purity.hideText / purity.hideArrows / purity.hideShields）。
+// 机制概要：
+//   • 文字隐藏：桌面 SysListView32 绘制期间置 thread_local 标记，DrawTextW /
+//     DrawThemeTextEx 钩子对「非桌面文件夹名」的标签置空（文件夹名经
+//     IShellFolder 枚举缓存保留显示）。
+//   • 箭头/盾牌：PurityPatchOverlayImageLists 把系统图像列表中快捷方式箭头 overlay
+//     槽位与 SIID_SHIELD 图像项原位替换为空白图标；另挂钩 SHGetFileInfoW
+//     （剥离 SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX，拦截提取期合成——Win11
+//     桌面可见盾牌的关键层）与 SHGetStockIconInfo（SIID_SHIELD 直接返回空白）。
+//   • 初始化时序（上游 2.5.0 实测结论，原样保留）：SHChangeNotify 必须先于
+//     图像列表补丁（通知会重建图像列表，先打补丁会被整体丢弃）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+static thread_local bool PurityIsDrawingDesktop = false;
+
+static struct {
+    bool hideText;
+    bool hideArrows;
+    bool hideShields;
+} PuritySettings;
+
+// 桌面文件夹显示名缓存（隐藏文字时用于保留文件夹名）。
+static std::unordered_set<std::wstring> PurityFolderNames;
+static DWORD PurityLastUpdateTick = 0;
+
+// SHGetStockIconInfo 钩子用的空白盾牌图标缓存：[0] = 标准尺寸，[1] = 小尺寸。
+// 在初始化/设置重载时按需预创建（避免在钩子内懒初始化产生线程竞争）。
+static HICON PurityBlankShieldIcon[2] = { nullptr, nullptr };
+
+// ---------------------------------------------------------------------------
+// Window helpers
+// ---------------------------------------------------------------------------
+
+static HWND PurityFindChild(HWND parent, LPCWSTR cls, LPCWSTR win) {
+    if (!parent) return nullptr;
+    return FindWindowEx(parent, nullptr, cls, win);
+}
+
+static bool PurityIsDesktopFolderView(HWND hWnd) {
+    WCHAR buf[64];
+
+    if (!GetClassName(hWnd, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"SysListView32")) return false;
+    if (!GetWindowText(hWnd, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"FolderView")) return false;
+
+    HWND defView = GetAncestor(hWnd, GA_PARENT);
+    if (!defView) return false;
+    if (!GetClassName(defView, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"SHELLDLL_DefView")) return false;
+
+    HWND top = GetAncestor(defView, GA_PARENT);
+    if (!top) return false;
+    if ((!GetClassName(top, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"Progman")) &&
+        top != GetShellWindow()) {
+        return false;
+    }
+    return true;
+}
+
+static HWND PurityGetDesktopFolderView() {
+    HWND lv = PurityFindChild(PurityFindChild(GetShellWindow(), L"SHELLDLL_DefView", L""),
+                              L"SysListView32", L"FolderView");
+    if (!lv) return nullptr;
+
+    DWORD pid = 0;
+    if (!GetWindowThreadProcessId(lv, &pid) || pid != GetCurrentProcessId()) return nullptr;
+    return lv;
+}
+
+// ---------------------------------------------------------------------------
+// Folder name cache
+// ---------------------------------------------------------------------------
+
+static void PurityUpdateFolderCache() {
+    DWORD now = GetTickCount();
+    if (PurityLastUpdateTick != 0 && now - PurityLastUpdateTick < 1000) return;
+    PurityLastUpdateTick = now;
+
+    std::unordered_set<std::wstring> fresh;
+
+    IShellFolder* pDesktop = nullptr;
+    if (SUCCEEDED(SHGetDesktopFolder(&pDesktop))) {
+        IEnumIDList* pEnum = nullptr;
+        if (SUCCEEDED(pDesktop->EnumObjects(nullptr, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum))) {
+            LPITEMIDLIST pidl = nullptr;
+            while (pEnum->Next(1, &pidl, nullptr) == S_OK) {
+                SFGAOF attr = SFGAO_FOLDER | SFGAO_STREAM;
+                if (SUCCEEDED(pDesktop->GetAttributesOf(1, (LPCITEMIDLIST*)&pidl, &attr)) &&
+                    (attr & SFGAO_FOLDER) && !(attr & SFGAO_STREAM)) {
+                    STRRET str;
+                    if (SUCCEEDED(pDesktop->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str))) {
+                        WCHAR name[MAX_PATH];
+                        if (SUCCEEDED(StrRetToBufW(&str, pidl, name, MAX_PATH))) {
+                            fresh.insert(name);
+                        }
+                    }
+                }
+                CoTaskMemFree(pidl);
+            }
+            pEnum->Release();
+        }
+        pDesktop->Release();
+    }
+
+    PurityFolderNames = std::move(fresh);
+}
+
+static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
+    if (!PuritySettings.hideText) return false;
+    std::wstring s(text, cch == -1 ? wcslen(text) : cch);
+    return PurityFolderNames.count(s) == 0;
+}
+
+// ---------------------------------------------------------------------------
+// Subclass
+// ---------------------------------------------------------------------------
+
+static LRESULT CALLBACK PurityDesktopListSubclass(HWND hWnd, UINT uMsg, WPARAM wParam,
+                                                  LPARAM lParam, DWORD_PTR dwRefData) {
+    if (uMsg == WM_PAINT && PuritySettings.hideText) {
+        PurityUpdateFolderCache();
+        PurityIsDrawingDesktop = true;
+        LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        PurityIsDrawingDesktop = false;
+        return res;
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+// ---------------------------------------------------------------------------
+// Hooks
+// ---------------------------------------------------------------------------
+
+using PurityDrawTextW_t = decltype(&DrawTextW);
+static PurityDrawTextW_t PurityDrawTextW_Original;
+int WINAPI PurityDrawTextW_Hook(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format) {
+    if (PurityIsDrawingDesktop && lpchText && PurityShouldHideLabel(lpchText, cchText)) {
+        return PurityDrawTextW_Original(hdc, L"", 0, lprc, format);
+    }
+    return PurityDrawTextW_Original(hdc, lpchText, cchText, lprc, format);
+}
+
+using PurityDrawThemeTextEx_t = HRESULT (WINAPI*)(HTHEME, HDC, int, int, LPCWSTR, int, DWORD, LPRECT, const void*);
+static PurityDrawThemeTextEx_t PurityDrawThemeTextEx_Original;
+HRESULT WINAPI PurityDrawThemeTextEx_Hook(HTHEME hTheme, HDC hdc, int iPartId, int iStateId,
+                                          LPCWSTR pszText, int cchText, DWORD dwTextFlags,
+                                          LPRECT pRect, const void* pOptions) {
+    if (PurityIsDrawingDesktop && pszText && PurityShouldHideLabel(pszText, cchText)) {
+        return PurityDrawThemeTextEx_Original(hTheme, hdc, iPartId, iStateId, L"", 0,
+                                              dwTextFlags, pRect, pOptions);
+    }
+    return PurityDrawThemeTextEx_Original(hTheme, hdc, iPartId, iStateId, pszText, cchText,
+                                          dwTextFlags, pRect, pOptions);
+}
+
+// ---------------------------------------------------------------------------
+// Shortcut arrow & UAC shield removal (image list patching)
+// ---------------------------------------------------------------------------
+
+#ifndef IDO_SHGIOI_LINK
+#define IDO_SHGIOI_LINK 0x0FFFFFFE
+#endif
+
+static HICON PurityCreateTransparentIcon(int cx, int cy) {
+    if (cx <= 0 || cy <= 0) return nullptr;
+
+    BITMAPV5HEADER bi = {};
+    bi.bV5Size        = sizeof(bi);
+    bi.bV5Width       = cx;
+    bi.bV5Height      = cy;
+    bi.bV5Planes      = 1;
+    bi.bV5BitCount    = 32;
+    bi.bV5Compression = BI_BITFIELDS;
+    bi.bV5RedMask     = 0x00FF0000;
+    bi.bV5GreenMask   = 0x0000FF00;
+    bi.bV5BlueMask    = 0x000000FF;
+    bi.bV5AlphaMask   = 0xFF000000;
+
+    HDC hdc = GetDC(nullptr);
+    void* bits = nullptr;
+    HBITMAP hColor = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, &bits, nullptr, 0);
+    ReleaseDC(nullptr, hdc);
+    if (!hColor) return nullptr;
+
+    if (bits) {
+        memset(bits, 0, (size_t)cx * cy * 4);
+    }
+
+    int rowBytes = ((cx + 15) / 16) * 2;
+    std::vector<BYTE> maskBits((size_t)rowBytes * cy, 0xFF);
+    HBITMAP hMask = CreateBitmap(cx, cy, 1, 1, maskBits.data());
+
+    ICONINFO ii = {};
+    ii.fIcon    = TRUE;
+    ii.hbmColor = hColor;
+    ii.hbmMask  = hMask;
+    HICON hIcon = CreateIconIndirect(&ii);
+
+    DeleteObject(hColor);
+    if (hMask) DeleteObject(hMask);
+    return hIcon;
+}
+
+// 把箭头/盾牌的 overlay 槽位与 SIID_SHIELD 系统图像项替换为空白图标。
+// 机制说明（上游 1.6.0 调研结论）：
+//  - 箭头：overlay 槽位由 SHGetIconOverlayIndex(nullptr, IDO_SHGIOI_LINK) 解析，
+//    置空槽位图即可让绘制期/提取期引用该槽位的箭头全部消失（上游 1.5.0 原机制）；
+//  - 盾牌：源图标位置（shell32,77 / imageres,77 / imageres,78）同样注册在 overlay
+//    表中，可置空对应槽位；同时把 SIID_SHIELD 在系统图像列表中的图像项原位替换
+//    为空白（ReplaceIcon 保持索引不变）。但 Win11 桌面可见的盾牌主要来自提取期
+//    合成（见下方 SHGetFileInfoW 钩子），本函数与其配合使用。
+static void PurityPatchOverlayImageLists() {
+    HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
+    if (!hShell32) return;
+
+    auto pSHGetImageList = (HRESULT(WINAPI*)(int, REFIID, void**))
+        GetProcAddress(hShell32, "SHGetImageList");
+    auto pSHGetIconOverlayIndex = (int(WINAPI*)(LPCWSTR, int))
+        GetProcAddress(hShell32, "SHGetIconOverlayIndexW");
+    if (!pSHGetImageList || !pSHGetIconOverlayIndex) return;
+
+    int linkOverlay = -1;
+    if (PuritySettings.hideArrows) {
+        linkOverlay = pSHGetIconOverlayIndex(nullptr, IDO_SHGIOI_LINK);
+    }
+
+    // 盾牌 overlay 槽位：三个源图标位置逐一解析，解析失败（<=0）的跳过。
+    int shieldOverlays[3] = { -1, -1, -1 };
+    // SIID_SHIELD 在系统图像列表中的图像索引：大图/小图两类列表分别解析。
+    int shieldSysIdxLarge = -1;
+    int shieldSysIdxSmall = -1;
+    if (PuritySettings.hideShields) {
+        static const struct { LPCWSTR path; int id; } kShieldSources[] = {
+            { L"shell32.dll", 77 },
+            { L"imageres.dll", 77 },
+            { L"imageres.dll", 78 },
+        };
+        for (int i = 0; i < 3; i++) {
+            shieldOverlays[i] = pSHGetIconOverlayIndex(kShieldSources[i].path, kShieldSources[i].id);
+        }
+
+        SHSTOCKICONINFO sii = {};
+        sii.cbSize = sizeof(sii);
+        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
+            shieldSysIdxLarge = sii.iSysImageIndex;
+        }
+        SHSTOCKICONINFO siiSmall = {};
+        siiSmall.cbSize = sizeof(siiSmall);
+        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON, &siiSmall))) {
+            shieldSysIdxSmall = siiSmall.iSysImageIndex;
+        }
+    }
+
+    if (linkOverlay <= 0 && shieldOverlays[0] <= 0 && shieldOverlays[1] <= 0 &&
+        shieldOverlays[2] <= 0 && shieldSysIdxLarge < 0 && shieldSysIdxSmall < 0) {
+        return;
+    }
+
+    static const GUID PurityIidImageList =
+        {0x46eb5926, 0x582e, 0x4017, {0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x09, 0x50}};
+
+    const int sizes[] = { 1, 0, 2, 3, 4 }; // SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE, SHIL_SYSSMALL, SHIL_JUMBO
+    for (int shil : sizes) {
+        IImageList* piml = nullptr;
+        if (FAILED(pSHGetImageList(shil, PurityIidImageList, (void**)&piml)) || !piml) {
+            continue;
+        }
+
+        // 小尺寸类图像列表（SHIL_SMALL / SHIL_SYSSMALL）用小盾牌索引，其余用大盾牌索引。
+        bool isSmallList = (shil == 1 || shil == 3);
+        int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
+
+        int cx = 0, cy = 0;
+        if (SUCCEEDED(piml->GetIconSize(&cx, &cy)) && cx > 0 && cy > 0) {
+            if (HICON hBlank = PurityCreateTransparentIcon(cx, cy)) {
+                int idx = -1;
+                if (SUCCEEDED(piml->ReplaceIcon(-1, hBlank, &idx)) && idx >= 0) {
+                    if (PuritySettings.hideArrows && linkOverlay > 0) {
+                        piml->SetOverlayImage(idx, linkOverlay);
+                    }
+                    if (PuritySettings.hideShields) {
+                        for (int i = 0; i < 3; i++) {
+                            if (shieldOverlays[i] > 0) {
+                                piml->SetOverlayImage(idx, shieldOverlays[i]);
+                            }
+                        }
+                    }
+                }
+                if (PuritySettings.hideShields && shieldSysIdx >= 0) {
+                    int replacedIdx = -1;
+                    piml->ReplaceIcon(shieldSysIdx, hBlank, &replacedIdx);
+                }
+                DestroyIcon(hBlank);
+            }
+        }
+        piml->Release();
+    }
+}
+
+// ---------------------------------------------------------------------------
+// UAC shield bake-in interception（提取期合成拦截）
+// Win11 上桌面可见的 UAC 盾牌在图标提取期经 SHGetFileInfo(SHGFI_ADDOVERLAYS |
+// SHGFI_OVERLAYINDEX) 被合成进 HICON 位图本体，不出现独立的 overlay 绘制调用，
+// 因此图像列表补丁（PurityPatchOverlayImageLists）对已合成部分无效；在源头剥离
+// 这两个标志即可让 shell 返回未合成的干净图标（上游 2.5.0 称之为「盾牌的真正
+// 杀手」）。
+// ---------------------------------------------------------------------------
+
+using PuritySHGetFileInfoW_t = decltype(&SHGetFileInfoW);
+static PuritySHGetFileInfoW_t PuritySHGetFileInfoW_Original;
+DWORD_PTR WINAPI PuritySHGetFileInfoW_Hook(LPCWSTR pszPath, DWORD dwFileAttributes,
+                                           SHFILEINFOW* psfi, UINT cbFileInfo, UINT uFlags) {
+    if (PuritySettings.hideShields) {
+        // SHGFI_ADDOVERLAYS 会把已注册的 overlay（含 UAC 盾牌）烘焙进返回的 HICON；
+        // SHGFI_OVERLAYINDEX 把 overlay 序号编码进 iIcon 高位。一并剥离即得到干净图标。
+        // 仅在 hideShields 开启时剥离，保证与「移除快捷方式箭头」互相独立。
+        uFlags &= ~(SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX);
+    }
+    return PuritySHGetFileInfoW_Original(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
+}
+
+using PuritySHGetStockIconInfo_t = decltype(&SHGetStockIconInfo);
+static PuritySHGetStockIconInfo_t PuritySHGetStockIconInfo_Original;
+HRESULT WINAPI PuritySHGetStockIconInfo_Hook(SHSTOCKICONID siid, UINT uFlags, SHSTOCKICONINFO* psii) {
+    HRESULT hr = PuritySHGetStockIconInfo_Original(siid, uFlags, psii);
+
+    // 直接请求 SIID_SHIELD 图标句柄的调用方（工具栏、按钮装饰等）改为拿到空白图标。
+    if (PuritySettings.hideShields && SUCCEEDED(hr) && siid == SIID_SHIELD && psii &&
+        (uFlags & SHGSI_ICON) && psii->hIcon) {
+        int slot = (uFlags & SHGSI_SMALLICON) ? 1 : 0;
+        if (PurityBlankShieldIcon[slot]) {
+            DestroyIcon(psii->hIcon);
+            psii->hIcon = CopyIcon(PurityBlankShieldIcon[slot]);
+        }
+    }
+    return hr;
+}
+
+static void PurityInitBlankShieldIcons() {
+    if (!PurityBlankShieldIcon[0]) {
+        PurityBlankShieldIcon[0] = PurityCreateTransparentIcon(GetSystemMetrics(SM_CXICON),
+                                                               GetSystemMetrics(SM_CYICON));
+    }
+    if (!PurityBlankShieldIcon[1]) {
+        PurityBlankShieldIcon[1] = PurityCreateTransparentIcon(GetSystemMetrics(SM_CXSMICON),
+                                                               GetSystemMetrics(SM_CYSMICON));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
+
+static void PurityLoadSettings() {
+    PuritySettings.hideText = Wh_GetIntSetting(L"purity.hideText") != 0;
+    PuritySettings.hideArrows = Wh_GetIntSetting(L"purity.hideArrows") != 0;
+    PuritySettings.hideShields = Wh_GetIntSetting(L"purity.hideShields") != 0;
+}
+
+// ---------------------------------------------------------------------------
+// New desktop window dispatch — called by the shared CreateWindowExW hook
+// （原独立版 CreateWindowExW 钩子的创建后处理段；挂钩本体见文件末尾共享钩子）
+// ---------------------------------------------------------------------------
+
+static void PurityOnCreatedWindow(HWND hWnd, LPCWSTR lpClassName, HWND hWndParent) {
+    // 与原版一致：对每个新建窗口做桌面 FolderView 完整判定（类名/窗口文字/
+    // 父链/Progman 归属）。lpClassName 与 hWndParent 仅与其他功能的分发函数
+    // 保持同构，本功能的判定在 PurityIsDesktopFolderView 内自行完成。
+    UNREFERENCED_PARAMETER(lpClassName);
+    UNREFERENCED_PARAMETER(hWndParent);
+
+    if (hWnd && PurityIsDesktopFolderView(hWnd)) {
+        WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, PurityDesktopListSubclass, 0);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
+static BOOL PurityInit() {
+    Wh_Log(L"[CW] === PurityInit ===");
+    PurityLoadSettings();
+
+    // 空白盾牌图标需在安装钩子前就绪（钩子安装后即可被任意线程调用）。
+    if (PuritySettings.hideShields) {
+        PurityInitBlankShieldIcons();
+    }
+
+    if (HMODULE hUser32 = GetModuleHandle(L"user32.dll")) {
+        if (auto p = (PurityDrawTextW_t)GetProcAddress(hUser32, "DrawTextW"))
+            WindhawkUtils::SetFunctionHook(p, PurityDrawTextW_Hook, &PurityDrawTextW_Original);
+    }
+
+    if (HMODULE hUxTheme = GetModuleHandle(L"uxtheme.dll")) {
+        if (auto p = (PurityDrawThemeTextEx_t)GetProcAddress(hUxTheme, "DrawThemeTextEx"))
+            WindhawkUtils::SetFunctionHook(p, PurityDrawThemeTextEx_Hook, &PurityDrawThemeTextEx_Original);
+    }
+
+    if (HMODULE hShell32 = GetModuleHandle(L"shell32.dll")) {
+        if (auto p = (PuritySHGetFileInfoW_t)GetProcAddress(hShell32, "SHGetFileInfoW"))
+            WindhawkUtils::SetFunctionHook(p, PuritySHGetFileInfoW_Hook, &PuritySHGetFileInfoW_Original);
+        if (auto p = (PuritySHGetStockIconInfo_t)GetProcAddress(hShell32, "SHGetStockIconInfo"))
+            WindhawkUtils::SetFunctionHook(p, PuritySHGetStockIconInfo_Hook, &PuritySHGetStockIconInfo_Original);
+    }
+
+    // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
+    // 与 ToggleIcons / SmoothIcons 共用一次挂钩），这里不再重复安装。
+    g_QuickSettingsPurityActive = true;
+    Wh_Log(L"[CW] Init complete");
+    return TRUE;
+}
+
+static void PurityAfterInit() {
+    Wh_Log(L"[CW] === PurityAfterInit ===");
+
+    // 注意时序：SHChangeNotify 会刷新图标缓存并触发系统图像列表重建，必须先通知、
+    // 后打图像列表补丁，否则补丁会被整体丢弃（上游 2.5.0 实测结论）。
+    if (PuritySettings.hideArrows || PuritySettings.hideShields) {
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+        PurityPatchOverlayImageLists();
+    }
+
+    if (HWND hDesktop = PurityGetDesktopFolderView()) {
+        WindhawkUtils::SetWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass, 0);
+        int count = ListView_GetItemCount(hDesktop);
+        if (count > 0) {
+            ListView_RedrawItems(hDesktop, 0, count - 1);
+        }
+        InvalidateRect(hDesktop, nullptr, TRUE);
+        UpdateWindow(hDesktop);
+    }
+}
+
+static void PurityNotifySettingsChanged() {
+    Wh_Log(L"[CW] Purity settings changed");
+
+    // 与独立版行为对齐：独立版任何设置变更都会整模组重载（Wh_ModInit /
+    // Wh_ModAfterInit 重跑，重新执行 SHChangeNotify + 图像列表补丁并重绘桌面）。
+    // 合并版为免其他分组的设置改动也触发图标缓存刷新，仅在纯净化图标开关
+    // 实际变化时复刻该收尾。
+    bool prevHideText = PuritySettings.hideText;
+    bool prevHideArrows = PuritySettings.hideArrows;
+    bool prevHideShields = PuritySettings.hideShields;
+
+    PurityLoadSettings();
+
+    if (PuritySettings.hideText != prevHideText ||
+        PuritySettings.hideArrows != prevHideArrows ||
+        PuritySettings.hideShields != prevHideShields) {
+        // 运行中新开启盾牌隐藏时补建空白图标（SHGetStockIconInfo 钩子依赖）。
+        if (PuritySettings.hideShields) {
+            PurityInitBlankShieldIcons();
+        }
+
+        if (PuritySettings.hideArrows || PuritySettings.hideShields) {
+            SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+            PurityPatchOverlayImageLists();
+        }
+
+        // 强制重绘桌面，让文字隐藏等变化立即可见。
+        if (HWND hDesktop = PurityGetDesktopFolderView()) {
+            InvalidateRect(hDesktop, nullptr, TRUE);
+            UpdateWindow(hDesktop);
+        }
+    }
+}
+
+static void PurityUninit() {
+    Wh_Log(L"[CW] === PurityUninit ===");
+    g_QuickSettingsPurityActive = false;
+
+    if (HWND hDesktop = PurityGetDesktopFolderView()) {
+        WindhawkUtils::RemoveWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass);
+        InvalidateRect(hDesktop, nullptr, TRUE);
+        UpdateWindow(hDesktop);
+    }
+
+    for (int i = 0; i < 2; i++) {
+        if (PurityBlankShieldIcon[i]) {
+            DestroyIcon(PurityBlankShieldIcon[i]);
+            PurityBlankShieldIcon[i] = nullptr;
+        }
+    }
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons 与 Purity 共用）
 //
-// 两个功能都需要捕获新建的桌面窗口（SHELLDLL_DefView / SysListView32）。
-// 为避免在同一 mod 内对同一目标 API 安装两个钩子，这里只安装一次，由共享钩子
-// 按各功能的启用状态把创建结果分发给两个功能的处理函数。
+// 三个功能都需要捕获新建的桌面窗口（SHELLDLL_DefView / SysListView32）。
+// 为避免在同一 mod 内对同一目标 API 安装多个钩子，这里只安装一次，由共享钩子
+// 按各功能的启用状态把创建结果分发给三个功能的处理函数。
 // ─────────────────────────────────────────────────────────────────────────────
 
 using QuickSettingsCreateWindowExW_t = decltype(&CreateWindowExW);
@@ -3053,23 +3620,26 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
         if (g_QuickSettingsToggleIconsActive) {
             ToggleIconsOnCreatedWindow(hWnd, lpClassName, hWndParent);
         }
+        if (g_QuickSettingsPurityActive) {
+            PurityOnCreatedWindow(hWnd, lpClassName, hWndParent);
+        }
     }
 
     return hWnd;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 合并入口：Peek、ToggleIcons、Marquee 与 SmoothIcons 独立初始化与卸载，
-// 一处失败不影响其他功能。
+// 合并入口：Peek、ToggleIcons、Marquee、SmoothIcons 与 Purity 独立初始化与
+// 卸载，一处失败不影响其他功能。
 // ─────────────────────────────────────────────────────────────────────────────
 BOOL Wh_ModInit() {
     Wh_Log(L">");
 
     // 先安装共享 CreateWindowExW 钩子（Wh_SetFunctionHook 为延迟生效，
-    // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的两个功能。
+    // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的三个功能。
     bool createWindowHookOk = QuickSettingsInstallCreateWindowExWHook() != FALSE;
     if (!createWindowHookOk) {
-        Wh_Log(L"Shared CreateWindowExW hook failed, disabling ToggleIcons/SmoothIcons");
+        Wh_Log(L"Shared CreateWindowExW hook failed, disabling ToggleIcons/SmoothIcons/Purity");
     }
 
     bool peekOk = PeekInit() != FALSE;
@@ -3092,8 +3662,15 @@ BOOL Wh_ModInit() {
         Wh_Log(L"SmoothIcons init failed, continuing without it");
     }
 
-    return (peekOk || toggleIconsOk || marqueeOk || smoothIconsOk) ? TRUE
-                                                                   : FALSE;
+    // Purity 对新建桌面窗口的捕获同样经由共享 CreateWindowExW 钩子；其文字/
+    // 提取期钩子在本段内部独立安装。
+    bool purityOk = createWindowHookOk && PurityInit() != FALSE;
+    if (!purityOk) {
+        Wh_Log(L"Purity init failed, continuing without it");
+    }
+
+    return (peekOk || toggleIconsOk || marqueeOk || smoothIconsOk || purityOk) ? TRUE
+                                                                               : FALSE;
 }
 
 void Wh_ModAfterInit() {
@@ -3101,6 +3678,7 @@ void Wh_ModAfterInit() {
 
     PeekAfterInit();
     SmoothIconsAfterInit();
+    PurityAfterInit();
 }
 
 void Wh_ModBeforeUninit() {
@@ -3118,6 +3696,7 @@ void Wh_ModUninit() {
     ToggleIconsUninit();
     SmoothIconsUninit();
     MarqueeUninit();
+    PurityUninit();
 }
 
 void Wh_ModSettingsChanged() {
@@ -3128,4 +3707,5 @@ void Wh_ModSettingsChanged() {
     ToggleIconsUpdateAllTimers();
     MarqueeLoadSettings();
     SmoothIconsNotifySettingsChanged();
+    PurityNotifySettingsChanged();
 }

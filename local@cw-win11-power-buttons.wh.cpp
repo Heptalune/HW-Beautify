@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-开始菜单电源按钮
 // @description     Adds customizable one-click Shut down, Restart, Sign out, Sleep, Hibernate, and Lock buttons to the Windows 11 Start menu, replacing the default power flyout.
 // @description:zh-CN 添加可配置的一键关机/重启/注销/睡眠/休眠/锁定按钮到 Windows 11 开始菜单，替换默认的电源按钮二级菜单。
-// @version         1.0.3
+// @version         1.0.4
 // @author          Hakuuyosei
 // @author:zh-CN    灵弦
 // @github          https://github.com/ahzvenol
@@ -13,8 +13,10 @@
 // @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -Wl,--export-all-symbols -luser32 -lwtsapi32 -lpowrprof
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.0.2 逐字节一致，
-// 仅含以下 x86 兼容修复（无捕获 lambda 不得直传 WINAPI/stdcall 回调类型，否则 x86
+// CW-Beautify 整合说明：汉化元数据、说明与设置文案；1.0.3 版代码与上游 1.0.2 逐字节一致，
+// 1.0.4 按用户要求新增逐按钮启用开关（enableShutdown / enableRestart / enableSignout /
+// enableSleep / enableHibernate / enableLock，「启用什么就显示什么」，仅影响 BuildButtons
+// 的显示过滤，见 LoadSettings 与变更记录）；其余代码仅含以下 x86 兼容修复（无捕获 lambda 不得直传 WINAPI/stdcall 回调类型，否则 x86
 // 目标报 "no known conversion ... __attribute__((stdcall))" 无法编译；上游正是因此
 // 声明 @architecture x86-64，以下 5 处改动均行为不变）：
 //   1. CallOnWindowThread 中 SetWindowsHookEx(WH_CALLWNDPROC) 的钩子回调由无捕获
@@ -43,6 +45,7 @@
 
 - **一键电源操作**：支持关机、重启、注销、睡眠、休眠、锁定六种操作，点击即执行。
 - **按钮与排序可自定义**：自由选择显示哪些按钮及其排列顺序，重复项自动忽略。
+- **逐按钮启用开关（启用什么就显示什么）**：六种操作各有独立的启用开关（关机/重启/注销/睡眠默认启用，休眠/锁定默认关闭）。只有既列入「按钮与排序」数组、又开启了对应启用开关的按钮才会显示——两个条件取交集：只启用关机和重启，就只显示这两个按钮，排序也只在它们之间生效；启用开关打开但未列入数组的按钮同样不显示。
 - **对齐方式可选**：按钮组支持左对齐、居中、右对齐。
 - **执行前确认（可选）**：可开启确认对话框，防止误触。
 - **中英文自适应**：按钮提示与确认对话框按系统界面语言自动显示中文或英文（原版内置）。
@@ -56,10 +59,15 @@
 - 仅支持 Windows 11（依赖 Win11 开始菜单的 XAML 结构与 Segoe Fluent Icons 图标字体；Windows 10 的开始菜单结构不同，不适用）。
 - 按钮图标取自 Segoe Fluent Icons 字体（Windows 11 内置）。
 
+## 变更记录
+
+- **1.0.4**：新增逐按钮启用开关（「启用什么就显示什么」）：设置新增 `enableShutdown` / `enableRestart` / `enableSignout` / `enableSleep` / `enableHibernate` / `enableLock` 六个开关（默认关机/重启/注销/睡眠启用、休眠/锁定关闭，与「按钮与排序」的默认列表一致）。「按钮与排序」数组仍决定按钮顺序，但只有既列入数组、又开启对应启用开关的按钮才会显示（顺序与启用取交集）——例如只启用关机和重启就只显示这两个按钮，排序也只排这两个；启用开关打开但未列入数组的按钮同样不显示。设置变更即时生效（沿用原有重载路径）。
+- **1.0.3**：CW-Beautify 汉化整合（上游 Hakuuyosei win11-power-buttons 1.0.2，补丁版本号 +1）：元数据、说明与设置文案中文化；x86 兼容修复——5 处直传 stdcall 回调类型的无捕获 lambda 改为显式 `static ... CALLBACK/WINAPI` 函数，并移除上游 `@architecture x86-64` 单架构声明，启用 x86 + x64 双架构编译。
+
 ## 汉化说明
 
 - 本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：元数据、说明与设置文案均已中文化；按钮提示与确认框文案沿用原版内置的中文支持。
-- 代码与上游 1.0.2 逐字节一致，仅做 x86 兼容修复：将 5 处直传 stdcall 回调类型（HOOKPROC / WNDENUMPROC / ThreadCallProc_t）的无捕获 lambda 改为显式 `static ... CALLBACK/WINAPI` 函数，并移除上游 `@architecture x86-64` 单架构声明以启用 x86 + x64 双架构编译。
+- 1.0.3 版代码与上游 1.0.2 逐字节一致，仅做 x86 兼容修复：将 5 处直传 stdcall 回调类型（HOOKPROC / WNDENUMPROC / ThreadCallProc_t）的无捕获 lambda 改为显式 `static ... CALLBACK/WINAPI` 函数，并移除上游 `@architecture x86-64` 单架构声明以启用 x86 + x64 双架构编译；1.0.4 新增逐按钮启用开关（`enableShutdown` 等六项，仅影响按钮显示过滤，见「变更记录」），不涉及任何回调改动。
 
 ## 支持
 
@@ -95,11 +103,47 @@
   $description: Show a confirmation dialog before executing power actions.
   $description:zh-CN: 在执行电源操作前显示确认对话框。
 
+- enableShutdown: true
+  $name: Enable shutdown button
+  $name:zh-CN: 启用关机按钮
+  $description: Show the shutdown button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示关机按钮（还需在「按钮与排序」中列出才会显示）。
+
+- enableRestart: true
+  $name: Enable restart button
+  $name:zh-CN: 启用重启按钮
+  $description: Show the restart button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示重启按钮（还需在「按钮与排序」中列出才会显示）。
+
+- enableSignout: true
+  $name: Enable sign out button
+  $name:zh-CN: 启用注销按钮
+  $description: Show the sign out button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示注销按钮（还需在「按钮与排序」中列出才会显示）。
+
+- enableSleep: true
+  $name: Enable sleep button
+  $name:zh-CN: 启用睡眠按钮
+  $description: Show the sleep button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示睡眠按钮（还需在「按钮与排序」中列出才会显示）。
+
+- enableHibernate: false
+  $name: Enable hibernate button
+  $name:zh-CN: 启用休眠按钮
+  $description: Show the hibernate button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示休眠按钮（还需在「按钮与排序」中列出才会显示）。
+
+- enableLock: false
+  $name: Enable lock button
+  $name:zh-CN: 启用锁定按钮
+  $description: Show the lock button (it must also be listed in "Buttons & Order" to appear).
+  $description:zh-CN: 显示锁定按钮（还需在「按钮与排序」中列出才会显示）。
+
 - buttons: [sleep, signout, restart, shutdown]
   $name:zh-CN: 按钮与排序
   $name: Buttons & Order
-  $description: Select which buttons to display and their order. Duplicates are ignored.
-  $description:zh-CN: 选择要显示的按钮以及它们的顺序，重复项会被忽略。
+  $description: Select which buttons to display and their order. Duplicates are ignored. Only buttons that are both listed here and enabled (see the switches above) are shown.
+  $description:zh-CN: 选择要显示的按钮以及它们的顺序，重复项会被忽略。只有既列入本列表、又开启了对应启用开关的按钮才会显示（顺序与启用取交集）。
   $options:
     - shutdown: Shut down
     - restart: Restart
@@ -161,6 +205,14 @@ static std::mutex g_settingsMutex;
 
 struct Settings {
     wux::HorizontalAlignment alignment = wux::HorizontalAlignment::Right;
+    // 逐按钮启用开关（CW 1.0.4）：默认值与上游默认 buttons 数组 [sleep, signout,
+    // restart, shutdown] 对齐——关机/重启/注销/睡眠启用，休眠/锁定关闭。
+    bool enableShutdown = true;
+    bool enableRestart = true;
+    bool enableSignout = true;
+    bool enableSleep = true;
+    bool enableHibernate = false;
+    bool enableLock = false;
     std::vector<std::wstring> buttonKeywords;
 };
 
@@ -190,6 +242,14 @@ static void LoadSettings() {
 
     Wh_FreeStringSetting(alignmentStr);
 
+    // 逐按钮启用开关（CW 1.0.4，「启用什么就显示什么」）：
+    g_settings.enableShutdown = Wh_GetIntSetting(L"enableShutdown") != 0;
+    g_settings.enableRestart = Wh_GetIntSetting(L"enableRestart") != 0;
+    g_settings.enableSignout = Wh_GetIntSetting(L"enableSignout") != 0;
+    g_settings.enableSleep = Wh_GetIntSetting(L"enableSleep") != 0;
+    g_settings.enableHibernate = Wh_GetIntSetting(L"enableHibernate") != 0;
+    g_settings.enableLock = Wh_GetIntSetting(L"enableLock") != 0;
+
     g_settings.buttonKeywords.clear();
     // 'buttons' is defined as an array of strings in settings.
     // Iterates up to a reasonable limit or until an empty/missing entry is encountered.
@@ -207,9 +267,13 @@ static void LoadSettings() {
             g_settings.buttonKeywords.push_back(std::move(item));
     }
 
-    Wh_Log(L"Settings loaded: alignment=%d, confirm=%d, buttons=%s",
+    Wh_Log(L"Settings loaded: alignment=%d, confirm=%d, "
+           L"enable[shutdown=%d, restart=%d, signout=%d, sleep=%d, hibernate=%d, lock=%d], "
+           L"buttons=%s",
            static_cast<int>(g_settings.alignment),
            Wh_GetIntSetting(L"confirm_before_action") != 0,
+           g_settings.enableShutdown, g_settings.enableRestart, g_settings.enableSignout,
+           g_settings.enableSleep, g_settings.enableHibernate, g_settings.enableLock,
            JoinStrings(g_settings.buttonKeywords).c_str());
 }
 
@@ -249,7 +313,22 @@ struct ButtonConfig {
 
 static std::vector<ButtonConfig> g_buttons;
 
-// Maps configuration keywords to actionable button definitions, ensuring uniqueness
+// CW 1.0.4 逐按钮启用开关：对应开关是否打开（调用方需已持有 g_settingsMutex）。
+static bool IsActionEnabled(const Settings& settings, PowerAction action) {
+    switch (action) {
+        case PowerAction::Shutdown:  return settings.enableShutdown;
+        case PowerAction::Restart:   return settings.enableRestart;
+        case PowerAction::SignOut:   return settings.enableSignout;
+        case PowerAction::Sleep:     return settings.enableSleep;
+        case PowerAction::Hibernate: return settings.enableHibernate;
+        case PowerAction::Lock:      return settings.enableLock;
+    }
+    return false;
+}
+
+// Maps configuration keywords to actionable button definitions, ensuring uniqueness.
+// CW 1.0.4：buttons 数组只决定顺序，实际显示取「列入数组」与「启用开关打开」的交集——
+// 数组里有但开关关闭的不显示，开关打开但数组里没列的也不显示。
 static void BuildButtons() {
     std::lock_guard<std::mutex> lock(g_settingsMutex);
 
@@ -258,7 +337,8 @@ static void BuildButtons() {
 
     for (const auto& keyword : g_settings.buttonKeywords) {
         for (const auto& def : g_buttonDefinitions) {
-            if (def.keyword == keyword && seen.insert(def.action).second) {
+            if (def.keyword == keyword && IsActionEnabled(g_settings, def.action) &&
+                seen.insert(def.action).second) {
                 g_buttons.push_back({def.action, def.glyph});
                 break;
             }

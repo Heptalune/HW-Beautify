@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-Fluent 右键菜单
 // @description     Replaces the desktop and Explorer folder-tree context menus with a Fluent (WinUI2 MenuFlyout, acrylic) menu. Clean-room reimplementation based on static analysis of FluentContextMenu v0.5.0.
 // @description:zh-CN 把桌面和资源管理器左树的右键菜单换成 Fluent（WinUI2 MenuFlyout、亚克力）菜单；基于对 FluentContextMenu v0.5.0 的静态逆向分析净室重写。
-// @version         0.2.2
+// @version         0.3.0
 // @author          Heptalune
 // @license         GPL-3.0
 // @include         explorer.exe
@@ -28,15 +28,18 @@
 ## 功能
 
 - **只接管桌面 + 资源管理器左树**：其他窗口的右键菜单不受影响。
-- **三种菜单样式**（设置里随时切换）：Fluent（本模组渲染）/ Win11 原生（直通系统）/ Win10 经典（强制经典菜单）。
-- **亚克力背景 + 跟随系统深浅色**：MenuFlyout 使用 AcrylicBrush，主题跟随系统。
-- **紧凑模式**：更小的内边距与字号（仅 Fluent 样式生效）。
+- **三种菜单样式**（设置里随时切换）：
+  - **Win 11（Fluent）**：本模组的 Fluent 飞出菜单，渲染 shell 交给 `TrackPopupMenu` 的菜单数据（Win11 现代菜单 presenter 不干预）；
+  - **Win 10（Fluent）**：先拦截 Win11 现代菜单 presenter（强制 shell 走经典菜单构建链，与「Win 10 经典」同机制），再用本模组的 Fluent 管线渲染完整经典条目集——「经典内容 + Fluent 皮」（亚克力/圆角）；
+  - **Win 10 经典**：委托系统原生弹出完整经典菜单。0.2.x 时代经典菜单曾出现条目比原生少的问题（第三方 shell 扩展缺失），现按服务 GUID 拦截 presenter（不再受 Windows 更新变更查询 IID 影响，如 KB5052093 曾改过 IID），保证弹出的始终是带全部条目（含 WinRAR、Bandizip 等第三方扩展）的经典菜单；弹出的菜单由系统原生渲染，不经过本模组的 Fluent 管线。
+- **亚克力背景 + 跟随系统深浅色**：MenuFlyout 使用 AcrylicBrush，主题跟随系统（仅 Fluent 两种样式）。
+- **紧凑模式**：更小的内边距与字号（仅 Fluent 两种样式生效）。
 - **完整保留 shell 行为**：菜单生命周期消息完整重放，shell 状态机不受影响；图标优先使用 shell 预渲染位图。
 
 ## 与其他右键菜单模组的关系
 
 - 与 **CW-自定义右键菜单** 互斥：两者都接管右键菜单，**只开一个**。
-- 本模组菜单样式选「win10」时使用与经典菜单相同的拦截机制，同样不要与 CW-自定义右键菜单同开。
+- 本模组菜单样式选「Win 10 经典」或「Win 10（Fluent）」时使用与经典菜单相同的 presenter 拦截机制，同样不要与 CW-自定义右键菜单同开。
 
 ## 工作原理（与原版 FluentContextMenu 一致的机制）
 
@@ -46,14 +49,18 @@
 4. 独立 XAML 线程：OS Application 对象（合并 WinUI2 XamlControlsResources 获得 Fluent 视觉）→ DispatcherQueue → 隐藏 100x100 `WS_POPUP|WS_EX_NOACTIVATE` 宿主窗 + `DesktopWindowXamlSource`（XAML Islands，原生接口 QI 自 IDesktopWindowXamlSourceNative / Native2）；
 5. 构建 `MenuFlyout`（MenuFlyoutItem / SubItem / Separator，图标 WriteableBitmap，主题跟随注册表 `AppsUseLightTheme`，AcrylicBrush 亚克力背景）；
 6. 调用线程泵消息等待菜单关闭，选中项命令 ID 沿原 TrackPopupMenu 语义返回；坐标 = ScreenToClient（宿主）/ GetDpiForWindow（宿主）/96 转 DIP 后 ShowAt；点击外部 / 失活 / Esc 取消返回 0；关闭后向 owner 重放 WM_EXITMENULOOP 复位 shell 状态（与原版一致）。
+7. **经典样式（Win 10 经典 / Win 10（Fluent））**：钩 `shcore!IUnknown_QueryService`，对 `CDefView::TryGetContextMenuPresenter` 的 presenter 查询（服务 GUID `{B306C5B1-…}`）返回 E_FAIL——已在该 DLL（22621.4745）静态验证 E_FAIL 与 E_NOINTERFACE 等同走经典回退分支——shell 随即走完整经典菜单构建链并把带全部条目的 HMENU 交给 `TrackPopupMenu`：Win 10 经典直接原生放行；Win 10（Fluent）则拦截该 HMENU 交给 Fluent 管线自绘。
 
 ## 已知事项
 
-- 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。
-- 菜单样式选「win10」时依赖对 Win11 XAML presenter 的拦截，系统更新后可能需要跟随适配。
+- 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。经典样式下每次弹出会记录放行的条目数，presenter 拦截会记录被拦的查询 IID，可与真实右键对比核对条目完整性。
+- 0.2.x 的「Win11 原生（直通）」选项已从设置列表移除；此前保存的 `win11` 值仍按直通处理，在设置里切换到任一样式后即被覆盖。
+- 菜单样式选经典两种之一时依赖对 Win11 XAML presenter 的拦截（按服务 GUID 匹配，不依赖具体 IID），系统更新后理论上无需跟随适配；若行为异常请查看日志中 `presenter:` 行。
+- 「Win 10（Fluent）」与「Win 11（Fluent）」在当前 Windows 11 22H2 上渲染内容一致（`TrackPopupMenu` 携带的 HMENU 本就是完整经典条目集），两者差异在数据源保障：前者先拦截 presenter，确保数据始终来自经典菜单构建链（对未来改动现代菜单数据模型的系统更新更稳健）。
 
 ## 更新记录
 
+- **0.3.0**：菜单样式重组为三选项：原「Fluent 样式（本 mod）」改名「Win 11（Fluent）」；新增「Win 10（Fluent）」——拦截 Win11 现代菜单 presenter 拿到完整经典条目集后由本模组 Fluent 管线（亚克力/圆角）自绘，即「经典内容 + Fluent 皮」；「Win 10 经典」落实完整委托：presenter 查询改按服务 GUID 拦截（不再受 KB 更新变更 IID 影响，修复 0.2.x 下经典菜单可能缺失 WinRAR/Bandizip 等第三方 shell 扩展条目的问题），TrackPopupMenu 原生放行由系统弹出完整经典菜单，桌面与资源管理器两种宿主一致，并新增放行条目数日志便于核对。「Win11 原生（直通）」选项从设置列表移除（历史保存值仍兼容处理）。
 - **0.2.2**：修复点击 Win11 菜单「显示更多选项」后经典二级菜单的显示问题。此前该二级菜单会被本模组再次接管渲染成飞出菜单，而飞出窗口显示时未被提升 Z 序：资源管理器里菜单被主窗口遮挡（图层错误），桌面上则完全被盖住、看起来无响应或反应极慢。现在检测到 Win11 现代菜单正在收起（其 XAML 弹窗仍可见且覆盖菜单弹出点）时，直接放行原生 TrackPopupMenu，经典二级菜单在桌面与资源管理器两种宿主下都以前台顶层正常弹出、不经过本模组的飞出/消息泵逻辑；另为飞出菜单窗口显示时增加 Z 序提升兜底（TOPMOST→NOTOPMOST 弹跳，不激活窗口），保证任何残余接管路径下菜单也不会被宿主窗口遮挡。
 - **0.2.1**：随 CW-Beautify v2.2.0 收编的初始整合版本。
 
@@ -70,24 +77,27 @@
   $name: Menu style
   $name:zh-CN: 菜单样式
   $description: >-
-    fluent = WinUI2 MenuFlyout (this mod's Fluent menu); win11 = pass through
-    to the native Windows 11 menu; win10 = force the classic Windows 10 menu
-    (blocks the Win11 XAML presenter, same mechanism as the classic-menu mod).
-  $description:zh-CN: fluent=Fluent(WinUI2 MenuFlyout)样式;win11=直通系统原生 Win11 菜单;win10=强制 Win10 经典菜单(拦截 Win11 XAML presenter,与经典菜单 mod 同原理)。
+    fluent = Win 11 (Fluent): this mod's Fluent flyout rendering the menu data
+    the shell hands to TrackPopupMenu; win10fluent = Win 10 (Fluent): the full
+    classic menu item set (the Win11 modern menu presenter is blocked first,
+    same mechanism as win10) rendered by this mod's Fluent pipeline; win10 =
+    Win 10 classic: delegate to the native classic menu with the complete item
+    set (third-party shell extensions included), popped up by the shell itself.
+  $description:zh-CN: fluent=Win 11(Fluent):本模组的 Fluent 飞出菜单,渲染 shell 交给 TrackPopupMenu 的菜单数据;win10fluent=Win 10(Fluent):完整经典菜单条目集由本模组 Fluent 管线渲染(先拦截 Win11 现代菜单 presenter,与 win10 同机制);win10=Win 10 经典:委托系统原生弹出完整经典菜单(条目完整,含第三方 shell 扩展)。
   $options:
-  - fluent: Fluent 样式(本 mod)
-  - win11: Win11 原生
-  - win10: Win10 经典
+  - fluent: Win 11（Fluent）
+  - win10fluent: Win 10（Fluent）
+  - win10: Win 10 经典
 - CompactMode: false
   $name: Compact mode
   $name:zh-CN: 紧凑模式
-  $description: Denser menu items (smaller padding and font), like the original config.ini CompactMode. Only affects the fluent style.
-  $description:zh-CN: 更紧凑的菜单项(更小的内边距与字号),对应原版 config.ini 的 CompactMode。仅对 fluent 样式生效。
+  $description: Denser menu items (smaller padding and font), like the original config.ini CompactMode. Only affects the fluent styles (Win 11 (Fluent) and Win 10 (Fluent)).
+  $description:zh-CN: 更紧凑的菜单项(更小的内边距与字号),对应原版 config.ini 的 CompactMode。仅对 Fluent 两种样式(Win 11(Fluent)/Win 10(Fluent))生效。
 - Transparent: true
   $name: Acrylic background
   $name:zh-CN: 亚克力背景
-  $description: Use an acrylic brush for the menu background, like the original config.ini Transparent. Only affects the fluent style.
-  $description:zh-CN: 菜单背景使用亚克力画刷,对应原版 config.ini 的 Transparent。仅对 fluent 样式生效。
+  $description: Use an acrylic brush for the menu background, like the original config.ini Transparent. Only affects the fluent styles (Win 11 (Fluent) and Win 10 (Fluent)).
+  $description:zh-CN: 菜单背景使用亚克力画刷,对应原版 config.ini 的 Transparent。仅对 Fluent 两种样式(Win 11(Fluent)/Win 10(Fluent))生效。
 */
 // ==/WindhawkModSettings==
 
@@ -171,9 +181,11 @@ static volatile LONG g_hookLogCount = 0;
     } while (0)
 
 enum MenuStyle {
-    MENU_STYLE_FLUENT = 0,
-    MENU_STYLE_WIN11 = 1,
-    MENU_STYLE_WIN10 = 2,
+    MENU_STYLE_FLUENT = 0,       // Win 11 (Fluent): mod flyout, modern presenter left alone
+    MENU_STYLE_WIN11 = 1,        // deprecated: pass through to the native menu (kept for
+                                 // settings saved before 0.3.0; hidden from the options list)
+    MENU_STYLE_WIN10 = 2,        // Win 10 classic: presenter blocked + native classic menu
+    MENU_STYLE_WIN10_FLUENT = 3, // Win 10 (Fluent): presenter blocked + mod flyout
 };
 
 struct {
@@ -184,7 +196,9 @@ struct {
 
 void LoadSettings() {
     PCWSTR style = Wh_GetStringSetting(L"menuStyle");
-    if (wcscmp(style, L"win11") == 0) {
+    if (wcscmp(style, L"win10fluent") == 0) {
+        g_settings.menuStyle = MENU_STYLE_WIN10_FLUENT;
+    } else if (wcscmp(style, L"win11") == 0) {
         g_settings.menuStyle = MENU_STYLE_WIN11;
     } else if (wcscmp(style, L"win10") == 0) {
         g_settings.menuStyle = MENU_STYLE_WIN10;
@@ -197,13 +211,41 @@ void LoadSettings() {
     g_settings.transparent = Wh_GetIntSetting(L"Transparent");
 }
 
+// Classic menu styles: the Win11 modern menu presenter is blocked so the shell
+// builds and shows the classic Win32 menu chain (the only path that aggregates
+// third-party shell extension items like WinRAR/Bandizip), and the tree pane's
+// Win11 mini menu is off.
+static bool IsClassicMenuStyle() {
+    return g_settings.menuStyle == MENU_STYLE_WIN10 ||
+           g_settings.menuStyle == MENU_STYLE_WIN10_FLUENT;
+}
+
+// Fluent-rendered styles: this mod's XAML flyout replaces the menu.
+static bool IsFlyoutMenuStyle() {
+    return g_settings.menuStyle == MENU_STYLE_FLUENT ||
+           g_settings.menuStyle == MENU_STYLE_WIN10_FLUENT;
+}
+
 // ============================================================================
-// Win11 XAML presenter bypass (blocks the Win11 menu in win10 style only)
+// Win11 XAML presenter bypass (classic styles: win10 / win10fluent)
 // ============================================================================
 
 // Same mechanism as m417z's classic-context-menu mod: make
 // CDefView::TryGetContextMenuPresenter fail so the shell falls back to the
 // classic Win32 menu, and keep the tree view's mini (new) menu off.
+//
+// Verified statically on shell32 10.0.22621.4745: the query is issued via the
+// delay import api-ms-win-shcore-comhelpers-l1-1-0.dll (resolved to
+// shcore!IUnknown_QueryService), and its failure codes E_NOINTERFACE /
+// E_FAIL / 0x80004001 / ERROR_MOD_NOT_FOUND all take the same classic-menu
+// fallback branch, so returning E_FAIL reliably yields the classic menu.
+//
+// Matching is by service GUID only: this GUID has exactly one reference in
+// shell32 (the presenter query itself), and Windows updates have changed the
+// queried IID once already (KB5052093 on 24H2) — an IID allowlist would
+// silently stop matching after such an update and the modern menu would
+// reappear in the classic styles (missing third-party items). The blocked
+// IID is logged for diagnostics.
 
 using IUnknown_QueryService_t = decltype(&IUnknown_QueryService);
 IUnknown_QueryService_t IUnknown_QueryService_Original;
@@ -212,22 +254,22 @@ HRESULT WINAPI IUnknown_QueryService_Hook(IUnknown* punk,
                                           const GUID& guidService,
                                           const IID& riid,
                                           void** ppvOut) {
-    if (g_settings.menuStyle == MENU_STYLE_WIN10) {
-        // GUIDs from shell32.dll, CDefView::TryGetContextMenuPresenter.
+    if (IsClassicMenuStyle()) {
+        // From shell32.dll, CDefView::TryGetContextMenuPresenter.
         constexpr GUID guidServiceTarget = {
             0xb306c5b1, 0xb4f2, 0x473c,
             {0xb6, 0xff, 0x70, 0x1b, 0x24, 0x6c, 0xe2, 0xd2}};
-        constexpr GUID riidTarget = {
-            0x706461d1, 0xac5f, 0x4730,
-            {0xbf, 0xe3, 0xca, 0xc6, 0xca, 0xd5, 0xef, 0x5e}};
-        // Changed in KB5052093 (Windows 11 24H2).
-        constexpr GUID riidTarget2 = {
-            0x37a472f7, 0x63cf, 0x4ccf,
-            {0xa8, 0x8b, 0x52, 0x31, 0xa3, 0xc7, 0xd8, 0xb6}};
 
-        if (IsEqualGUID(guidService, guidServiceTarget) &&
-            (IsEqualGUID(riid, riidTarget) ||
-             IsEqualGUID(riid, riidTarget2))) {
+        if (IsEqualGUID(guidService, guidServiceTarget)) {
+            HOOK_LOG(L"presenter: query disallowed, riid="
+                     L"{%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%"
+                     L"%02hhX%02hhX%02hhX}",
+                     (unsigned long)riid.Data1, (unsigned short)riid.Data2,
+                     (unsigned short)riid.Data3, (unsigned char)riid.Data4[0],
+                     (unsigned char)riid.Data4[1], (unsigned char)riid.Data4[2],
+                     (unsigned char)riid.Data4[3], (unsigned char)riid.Data4[4],
+                     (unsigned char)riid.Data4[5], (unsigned char)riid.Data4[6],
+                     (unsigned char)riid.Data4[7]);
             return E_FAIL;  // force the classic menu
         }
     }
@@ -239,7 +281,7 @@ using CNscTree_ShouldShowMiniMenu_t = bool(WINAPI*)(void* pThis, void* param1);
 CNscTree_ShouldShowMiniMenu_t CNscTree_ShouldShowMiniMenu_Original;
 
 bool WINAPI CNscTree_ShouldShowMiniMenu_Hook(void* pThis, void* param1) {
-    if (g_settings.menuStyle == MENU_STYLE_WIN10) {
+    if (IsClassicMenuStyle()) {
         return false;
     }
     return CNscTree_ShouldShowMiniMenu_Original(pThis, param1);
@@ -1298,12 +1340,24 @@ static void DumpMenuLevel(HMENU menu, const char* tag) {
 // Returns the selected command id, or -1 to fall through to the original.
 static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
                                   HWND hwnd) {
-    // Style gate: fluent is the only style this mod renders. win11/win10
-    // styles pass the original TrackPopupMenu through (win10 additionally
-    // blocks the Win11 XAML presenter below, so the shell builds the classic
-    // menu in the first place).
-    if (g_settings.menuStyle != MENU_STYLE_FLUENT) {
-        HOOK_LOG(L"gate: style=%d passthrough", g_settings.menuStyle);
+    // Style gate. Two styles render the flyout (fluent / win10fluent); the
+    // others pass the original TrackPopupMenu through. In the classic style
+    // (win10) the Win11 XAML presenter is blocked above (IUnknown_QueryService
+    // hook), so this TrackPopupMenu call carries the full classic menu — the
+    // chain that aggregates third-party shell extension items (WinRAR,
+    // Bandizip, ...) which the modern menu hides behind "Show more options".
+    // Handing it to the original function therefore pops up the complete
+    // native classic menu, rendered entirely by the shell (requirement:
+    // "Win 10 classic = delegate to the full native classic menu chain").
+    // The item count is logged so a real right-click can be verified against
+    // the log.
+    if (!IsFlyoutMenuStyle()) {
+        if (g_settings.menuStyle == MENU_STYLE_WIN10) {
+            HOOK_LOG(L"gate: style=classic passthrough, items=%d",
+                     menu ? GetMenuItemCount(menu) : -1);
+        } else {
+            HOOK_LOG(L"gate: style=%d passthrough", g_settings.menuStyle);
+        }
         return -1;
     }
 
@@ -1517,7 +1571,7 @@ BOOL Wh_ModInit() {
     }
 
     // Presenter bypass hooks: installed pass-through; they only act when the
-    // user selects the win10 classic style.
+    // user selects a classic menu style (win10 / win10fluent).
     InitPresenterBypassHooks();
 
     g_winuiThread = CreateThread(nullptr, 0, WinUIThreadProc, nullptr, 0,

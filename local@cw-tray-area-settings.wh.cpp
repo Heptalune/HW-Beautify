@@ -1,10 +1,10 @@
 // ==WindhawkMod==
-// @id              cw-taskbar-clock-customization
-// @name            CW-任务栏时钟自定义
-// @name:zh-CN      CW-任务栏时钟自定义
-// @description     Custom date/time format, news feed, weather, performance metrics (upload/download speed, CPU, RAM, GPU, battery), media player info, custom fonts and colors, and more
-// @description:zh-CN 自定义任务栏时钟：日期时间格式、新闻与天气、网速和 CPU/内存/电池等性能指标、自定义字体与颜色。
-// @version         1.8.2
+// @id              cw-tray-area-settings
+// @name            CW-托盘区域设置
+// @name:zh-CN      CW-托盘区域设置
+// @description     Custom taskbar clock (date/time formats, news feed, weather, performance metrics, media player info), tray system icon tweaks (hide/grayscale, "Show desktop" button width), and a full-height "Show desktop" bar.
+// @description:zh-CN 任务栏托盘区域三合一设置：时钟深度定制（日期时间格式、新闻、天气、性能指标、媒体信息）、托盘系统图标隐藏与灰化（含「显示桌面」按钮宽度）、显示桌面按钮全高。
+// @version         1.0.0
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -21,28 +21,50 @@
 //
 // For pull requests, development takes place here:
 // https://github.com/m417z/my-windhawk-mods
-// CW-Beautify 整合说明：基于上游 Taskbar Clock Customization 1.8.1（作者 m417z）汉化整合；
-// 汉化元数据、说明与设置文案，补丁版本号在上游基础上 +1（1.8.1 → 1.8.2）。
-// 代码改动共两处，均为 x86 兼容修复（无捕获 lambda 传入 WINAPI/stdcall 回调类型在 i686
-// 下无法编译，改为显式 static ... CALLBACK 函数，运行逻辑不变）：
-//   1. FindCurrentProcessTaskbarWnd：EnumWindows（WNDENUMPROC 为 stdcall）回调改为
-//      显式 FindTaskbarWndEnumProc；
-//   2. ApplySettingsWin10：EnumThreadWindows 回调链改为显式
-//      ApplySettingsWin10EnumThreadWndProc / ApplySettingsWin10EnumSecondaryWnd。
-// 上游 @architecture 声明为 x86-64（原版仅支持 64 位 Windows 10/11），引擎从不在 32 位下
-// 编译该模组，本仓库 dev\compile-verify.ps1 亦按声明跳过 x86 目标；上述修复使本地 i686
-// 编译验证同样可通过。
-// 原版 mod：https://windhawk.net/mods/taskbar-clock-customization
+// CW-Beautify 整合说明（v1.0.0）：本模组由 CW-Beautify 整合包（作者 Heptalune）将
+// 三个同源作品合并而成，均基于 m417z 的原版 mod（GPL-3.0）：
+//   1. 时钟段 —— Taskbar Clock Customization 1.8.1（m417z），沿用 CW-任务栏时钟
+//      自定义 1.8.2 的全部功能与设置（26 个顶层设置键保持原样，避免大规模改代码）；
+//      其两处 x86 兼容修复原样保留（FindTaskbarWndEnumProc、
+//      ApplySettingsWin10EnumThreadWndProc / ApplySettingsWin10EnumSecondaryWnd）。
+//   2. 托盘图标段 —— Taskbar tray system icon tweaks 1.3.1（m417z），沿用
+//      CW-托盘系统图标调整 1.3.2 的全部功能；设置键加 trayIcons. 前缀收进
+//      「托盘系统图标」分组，代码读取同步；代码整体置于 TrayIcons 命名空间与
+//      时钟段隔离；其三处 x86 兼容修复原样保留
+//      （FindCurrentProcessTaskbarWndEnumProc、RunFromWindowThreadCallWndProc、
+//      ApplySettingsInTaskbarThread）。
+//   3. 显示桌面段 —— 自 CW-任务栏样式美化（cw-taskbar-acrylic）4.4.1 迁出：
+//      「显示桌面按钮全高 / 显示桌面竖条高度」两个设置及其实现，设置键改为
+//      showDesktop.FullHeight / showDesktop.ButtonHeight。原实现经由 Taskbar
+//      Styler 框架注入 Rectangle#ShowDesktopPipe@CommonStates 的
+//      MinHeight/MaxHeight；本模组不带 styler 框架，改在托盘图标的加载/应用路径
+//      上直接写元素本地值——Min/Max 在布局层优先于 Height，模板的 CommonStates
+//      状态机与悬停动画都碰不到 Min/Max，一次性写入即可长期生效；-1 仍表示跟随
+//      任务栏高度（按实际任务栏窗口高度换算 DIP）。
+// 三段各自独立初始化/卸载/设置重载，合并后的 Wh_ModInit 等入口按段调用；托盘
+// 图标段与显示桌面段仅支持 Windows 11，Windows 10 上自动跳过（时钟段继续工作）。
+// 上游 @architecture 声明为 x86-64，引擎从不在 32 位下编译该模组；上述 x86 兼容
+// 修复使本地 i686 编译验证同样可通过。
+// 原版 mod：
+//   https://windhawk.net/mods/taskbar-clock-customization
+//   https://windhawk.net/mods/taskbar-tray-system-icon-tweaks
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**m417z**（[Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：汉化元数据、说明与设置文案，补丁版本号在上游基础上 +1（1.8.1 → 1.8.2）；代码除两处 x86 兼容修复（不改变任何运行逻辑，见文件头整合说明）外与上游 1.8.1 逐字节一致。
+> 原作者：**m417z**。本模组由 CW-Beautify 整合包（作者 Heptalune）将 m417z 的两个原版 mod 与一个源自其作品的功能段合并而成，均以 GPL-3.0 许可发布：
+> - [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization)（GPL-3.0）——时钟自定义段。
+> - [Taskbar tray system icon tweaks](https://windhawk.net/mods/taskbar-tray-system-icon-tweaks)（GPL-3.0）——托盘系统图标段。
+> - 显示桌面按钮段迁自 CW-任务栏样式美化 4.4.1（基于 m417z 的 [Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler)，GPL-3.0）。
 
-# CW-任务栏时钟自定义
+# CW-托盘区域设置
+
+任务栏托盘区域三合一设置：深度定制任务栏时钟、隐藏或灰化托盘系统图标、把任务栏最右侧的「显示桌面」小竖条撑到全高。
+
+## 一、时钟自定义
 
 全面自定义任务栏时钟：自定义日期与时间格式，在时钟上显示新闻、天气、网速、CPU、内存、GPU、电池等性能指标或媒体播放信息，并可自定义字体与颜色。
 
-仅支持 Windows 10 64 位与 Windows 11。效果截图（来自原版页面）：
+支持 Windows 10 64 位与 Windows 11。效果截图（来自原版页面）：
 
 ![News screenshot](https://i.imgur.com/p03o9l7.png) \
 _新闻（默认设置）_
@@ -53,7 +75,7 @@ _天气_
 ![System performance metrics screenshot](https://i.imgur.com/QhyYv0D.png) \
 _系统性能指标_
 
-## 功能
+### 时钟功能
 
 - **自定义时间与日期**：时间、日期、星期格式完全自定义（Windows 格式化语法），支持多组附加格式（用 `;` 分隔），可为每个日期格式指定区域设置（语言）。
 - **多行自定义文本**：顶行、底行（任务栏足够大时）、中行（仅 Windows 10）、悬停提示附加行均可填写含占位符的文本。
@@ -63,7 +85,7 @@ _系统性能指标_
 - **媒体播放信息**：显示正在播放的标题、艺术家、专辑与播放状态图标（需支持 GSMTC 的播放器）。
 - **自定义文本样式**：Windows 11 22H2 及更新版本可修改时钟文本的字体、字号、字重、颜色、对齐、字符间距与行高。
 
-## 设置说明
+### 时钟设置说明
 
 - **显示秒数**：默认开启。
 - **时间格式 / 日期格式**：`%time%`、`%date%` 使用的格式，留空用系统默认；用 `;` 分隔可定义附加格式（对应 %time2%、%date2% 等）。语法见设置项中的微软文档链接。
@@ -85,10 +107,9 @@ _系统性能指标_
 - **顶行样式 / 底行样式**（Windows 11 22H2+）：文本颜色（颜色名或 RGB/ARGB 码）、对齐、字号、字体、字重、字形、拉伸、字符间距、行高。
 - **在 Windows 11 上自定义旧版任务栏**：使用 ExplorerPatcher 等工具时开启。
 
-## 兼容性与已知问题
+### 时钟兼容性与已知问题
 
 - 仅支持 Windows 10 64 位与 Windows 11；文本样式自定义需 Windows 11 22H2 及更新版本。
-- 注入 explorer.exe。
 - 天气由 wttr.in 提供、新闻来自配置的网页源，网络受限或源失效时对应内容可能为空。
 - `%battery_time%` 与 `%power%` 若始终为 0，可能需要在 BIOS 中启用电池时间上报（原作者说明）。
 - `%media_*%` 需要支持 GSMTC 的媒体播放器。
@@ -149,12 +170,59 @@ _系统性能指标_
 * `%web<n>_full%` - 设置中配置的完整网页内容，`<n>` 为网页内容条目编号。
 * `%newline%` 或 `%n%` - 换行。
 
+## 二、托盘系统图标
+
+隐藏或调整任务栏托盘区的系统图标：音量、网络、电池、麦克风、位置（GPS）、Studio Effects、Recall、语言栏、通知铃铛（始终隐藏，或仅在没有新通知时隐藏），以及「显示桌面」按钮宽度。还可以让电池图标以灰度显示，替代彩色样式。
+
+仅支持 Windows 11。
+
+![演示](https://i.imgur.com/YfO676m.gif)
+
+### 托盘功能
+
+- **隐藏托盘系统图标**：音量、网络、电池、麦克风、位置（GPS）、Studio Effects、Recall。
+- **隐藏语言栏**：任务栏右侧输入指示器的主图标（如「ENG」「中」）。
+- **隐藏语言补充图标**：输入法状态小图标，如全角/半角、假名、中英文模式、输入法已禁用等状态。
+- **隐藏通知铃铛**：可始终隐藏，或仅在没有新通知（且未开启「勿扰模式」）时隐藏。
+- **调整「显示桌面」按钮宽度**：可在 0-800 像素之间调整（默认 12），调小即可近似隐藏。
+- **电池图标灰度显示**：以标准文字颜色渲染电池图标，替代彩色（如绿色/黄色）样式。
+
+### 托盘设置说明
+
+- **各隐藏开关**（音量、网络、电池、麦克风、位置、Studio Effects、Recall、语言栏、语言补充图标）：默认全部关闭，即保留原图标。
+- **电池图标灰度显示**：默认关闭；开启后电池图标改用标准文字颜色显示。
+- **隐藏通知铃铛图标**：默认「从不」；可选「无新通知时隐藏」「无新通知且未开启勿扰模式时隐藏」或「始终隐藏」。
+- **「显示桌面」按钮宽度**：默认 12（像素），实际应用时会被限制在 0-800 之间。
+
+### 托盘兼容性与已知问题
+
+- 仅支持 Windows 11。
+- **Recall、Studio Effects 等图标仅 Windows 11 存在**：这些图标只在相应的 Windows 11 版本/配置下出现（如已登录 Microsoft 账户并启用 Recall、系统带有 Studio Effects 的设备）。系统上没有对应图标时，相关开关不会有任何效果，属于正常现象。
+
+## 三、显示桌面按钮
+
+把任务栏最右边的「显示桌面」小竖条（Rectangle#ShowDesktopPipe）撑到与任务栏同高，不再是小小一截；悬停该区域仍会显示桌面预览（Aero Peek）。竖条高度默认 -1（跟随任务栏实际高度），也可手动指定 0-200 像素。该功能迁自 CW-任务栏样式美化 4.4.1，仅支持 Windows 11。
+
+### 显示桌面设置说明
+
+- **显示桌面按钮全高**：默认关闭；开启后竖条撑到任务栏全高。
+- **显示桌面竖条高度**：默认 -1（跟随任务栏高度）；0-200 为手动指定的像素高度。仅在开启「显示桌面按钮全高」后生效。
+
+## 兼容性总览
+
+- 注入 `explorer.exe`。
+- 时钟段：Windows 10 64 位与 Windows 11；文本样式自定义需 Windows 11 22H2 及更新版本。
+- 托盘系统图标段与显示桌面按钮段：仅 Windows 11；Windows 10 上这两段自动跳过，时钟段照常工作。
+- **Recall、Studio Effects 等图标仅 Windows 11 存在**：系统上没有对应图标时，相关开关不会有任何效果，属于正常现象。
+- 停用或卸载模组后，被隐藏的图标会恢复显示，「显示桌面」竖条恢复原尺寸。
+
 ## 致谢与许可
 
-- 原模组 [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization) 由 **m417z** 开发，感谢其杰出工作。
+- 原模组 [Taskbar Clock Customization](https://windhawk.net/mods/taskbar-clock-customization) 与 [Taskbar tray system icon tweaks](https://windhawk.net/mods/taskbar-tray-system-icon-tweaks) 由 **m417z** 开发，感谢其杰出工作。
+- 显示桌面按钮段迁自 CW-任务栏样式美化（CW-Beautify 整合包，基于 m417z 的 Windows 11 Taskbar Styler）。
 - Bug 反馈与功能请求请到上游仓库提 issue：<https://github.com/ramensoftware/windhawk-mods/issues>；开发在 <https://github.com/m417z/my-windhawk-mods> 进行。
 - 本模组源代码以 GNU General Public License v3.0（GPL-3.0）发布。
-- 本汉化版由 CW-Beautify 整合包（作者 Heptalune）维护。
+- 本整合版由 CW-Beautify 整合包（作者 Heptalune）维护。
 */
 // ==/WindhawkModReadme==
 
@@ -654,6 +722,129 @@ _系统性能指标_
     Enable this option to customize the old taskbar on Windows 11 (if using
     ExplorerPatcher or a similar tool).
   $description:zh-CN: 使用 ExplorerPatcher 或类似工具时，开启此选项以自定义 Windows 11 的旧版任务栏。
+- trayIcons:
+    - hideVolumeIcon: false
+      $name: Hide volume icon
+      $name:zh-CN: 隐藏音量图标
+      $description: Hide the volume (speaker) icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的音量（扬声器）图标。
+    - hideNetworkIcon: false
+      $name: Hide network icon
+      $name:zh-CN: 隐藏网络图标
+      $description: Hide the network (Wi-Fi/Ethernet) icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的网络（Wi-Fi/以太网）图标。
+    - hideBatteryIcon: false
+      $name: Hide battery icon
+      $name:zh-CN: 隐藏电池图标
+      $description: Hide the battery icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的电池图标。
+    - grayscaleBatteryIcon: false
+      $name: Grayscale battery icon
+      $name:zh-CN: 电池图标灰度显示
+      $description: >-
+        Show the battery icon using the standard text color instead of its
+        colored (e.g. green/yellow) variant.
+      $description:zh-CN: 使用标准文字颜色显示电池图标，而不是彩色（例如绿色/黄色）样式。
+    - hideMicrophoneIcon: false
+      $name: Hide microphone icon
+      $name:zh-CN: 隐藏麦克风图标
+      $description: Hide the microphone (in use) icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的麦克风（使用中）图标。
+    - hideGeolocationIcon: false
+      $name: Hide location (e.g. GPS) icon
+      $name:zh-CN: 隐藏位置（如 GPS）图标
+      $description: Hide the location (e.g. GPS) icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的位置（如 GPS）图标。
+    - hideStudioEffectsIcon: false
+      $name: Hide Studio Effects icon
+      $name:zh-CN: 隐藏 Studio Effects 图标
+      $description: >-
+        Hide the Studio Effects (Windows Studio Effects) icon in the taskbar
+        tray. The icon only exists on Windows 11 devices with Studio Effects
+        support.
+      $description:zh-CN: >-
+        隐藏任务栏托盘上的 Studio Effects（Windows 录音室特效）图标。该图标仅存在于
+        支持 Studio Effects 的 Windows 11 设备上。
+    - hideRecallIcon: false
+      $name: Hide Recall icon
+      $name:zh-CN: 隐藏 Recall 图标
+      $description: >-
+        Hide the Recall icon in the taskbar tray. The icon only exists on
+        Windows 11 devices with Recall enabled.
+      $description:zh-CN: >-
+        隐藏任务栏托盘上的 Recall 图标。该图标仅存在于已启用 Recall 的 Windows 11
+        设备上。
+    - hideLanguageBar: false
+      $name: Hide language bar
+      $name:zh-CN: 隐藏语言栏
+      $description: >-
+        Hide the main icon of the language bar (input indicator) in the taskbar
+        tray, e.g. "ENG".
+      $description:zh-CN: 隐藏任务栏托盘上语言栏（输入指示器）的主图标，如「ENG」「中」。
+    - hideLanguageSupplementaryIcons: false
+      $name: Hide language supplementary icons
+      $name:zh-CN: 隐藏语言补充图标
+      $description: >-
+        Hide the input method supplementary status icons, e.g. half/full width,
+        kana, Chinese/English mode, input method disabled.
+      $description:zh-CN: >-
+        隐藏输入法状态的补充小图标，如全角/半角、假名、中英文模式、输入法已禁用等。
+    - hideBellIcon: never
+      $name: Hide bell icon
+      $name:zh-CN: 隐藏通知铃铛图标
+      $description: Hide the notification bell icon in the taskbar tray.
+      $description:zh-CN: 隐藏任务栏托盘上的通知铃铛图标。
+      $options:
+      - never: 从不
+      - whenInactive: 无新通知时隐藏
+      - whenInactiveAndNoDnd: >-
+          无新通知且未开启「勿扰模式」时隐藏
+      - always: 始终隐藏
+    - showDesktopButtonWidth: 12
+      $name: '"Show desktop" button width'
+      $name:zh-CN: 「显示桌面」按钮宽度
+      $description: >-
+        Width of the "Show desktop" button, clamped to 0-800 (default 12). Set
+        a small value to effectively hide the button.
+      $description:zh-CN: >-
+        「显示桌面」按钮的宽度，实际应用时限制在 0-800 之间（默认 12）。调小即可
+        近似隐藏该按钮。
+  $name: Tray system icons
+  $name:zh-CN: 托盘系统图标
+  $description: >-
+    Hide or grayscale the tray system icons, and adjust the "Show desktop"
+    button width. Windows 11 only.
+  $description:zh-CN: >-
+    隐藏或灰化托盘系统图标，并可调整「显示桌面」按钮宽度。仅支持 Windows 11。
+- showDesktop:
+    - FullHeight: false
+      $name: Full-height Show desktop bar
+      $name:zh-CN: 显示桌面按钮全高
+      $description: >-
+        Stretch the small vertical "Show desktop" bar at the far right end of
+        the taskbar to the full taskbar height. Hovering the area still shows
+        the desktop preview (Aero Peek). Default: off.
+      $description:zh-CN: >-
+        把任务栏最右边的「显示桌面」小竖条撑到与任务栏同高，不再是小小一截。悬停
+        该区域仍会显示桌面预览（Aero Peek）。默认关闭。
+    - ButtonHeight: -1
+      $name: Show desktop bar height
+      $name:zh-CN: 显示桌面竖条高度
+      $description: >-
+        Height of the "Show desktop" bar, in pixels. -1 follows the taskbar
+        height; 0-200 sets an explicit height. Only used while "Full-height
+        Show desktop bar" is on.
+      $description:zh-CN: >-
+        「显示桌面」竖条的高度（像素）。-1 表示跟随任务栏高度；0-200 为手动指定。
+        仅在开启「显示桌面按钮全高」后生效。
+  $name: Show desktop button
+  $name:zh-CN: 显示桌面按钮
+  $description: >-
+    Make the far-right "Show desktop" bar full-height. Migrated from
+    CW-任务栏样式美化. Windows 11 only.
+  $description:zh-CN: >-
+    把任务栏最右侧的「显示桌面」竖条撑到全高，可手动指定高度。迁自
+    CW-任务栏样式美化。仅支持 Windows 11。
 */
 // ==/WindhawkModSettings==
 
@@ -664,6 +855,7 @@ using WindhawkUtils::StringSetting;
 #include <algorithm>
 #include <atomic>
 #include <functional>
+#include <list>
 #include <mutex>
 #include <optional>
 #include <regex>
@@ -695,7 +887,10 @@ using namespace std::string_view_literals;
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Interop.h>
 #include <winrt/Windows.UI.Xaml.Markup.h>
+#include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Windows.UI.Xaml.Automation.h>
+#include <winrt/Windows.UI.Xaml.h>
 #include <winrt/base.h>
 
 using namespace winrt::Windows::UI::Xaml;
@@ -6381,7 +6576,7 @@ void ApplySettings() {
     }
 }
 
-BOOL Wh_ModInit() {
+BOOL Clock_Wh_ModInit() {
     Wh_Log(L">");
 
     if (HMODULE hUser32 = LoadLibraryEx(L"user32.dll", nullptr,
@@ -6516,7 +6711,7 @@ BOOL Wh_ModInit() {
     return TRUE;
 }
 
-void Wh_ModAfterInit() {
+void Clock_Wh_ModAfterInit() {
     Wh_Log(L">");
 
     if (g_winVersion >= WinVersion::Win11 && !g_systemTrayModuleHooked) {
@@ -6540,7 +6735,7 @@ void Wh_ModAfterInit() {
     ApplySettings();
 }
 
-void Wh_ModBeforeUninit() {
+void Clock_Wh_ModBeforeUninit() {
     Wh_Log(L">");
 
     if (g_winVersion < WinVersion::Win11) {
@@ -6597,7 +6792,7 @@ void StopFormattingBackgroundWork() {
     MediaSessionUninit();
 }
 
-void Wh_ModUninit() {
+void Clock_Wh_ModUninit() {
     Wh_Log(L">");
 
     StopFormattingBackgroundWork();
@@ -6610,7 +6805,7 @@ void Wh_ModUninit() {
     ApplySettings();
 }
 
-BOOL Wh_ModSettingsChanged(BOOL* bReload) {
+BOOL Clock_Wh_ModSettingsChanged(BOOL* bReload) {
     Wh_Log(L">");
 
     StopFormattingBackgroundWork();
@@ -6631,6 +6826,2171 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
     }
 
     ApplySettings();
+
+    return TRUE;
+}
+
+// ============================================================================
+// CW-Beautify v1.0.0 段：显示桌面按钮（ShowDesktopBtn 前缀隔离）
+//
+// 自 CW-任务栏样式美化（cw-taskbar-acrylic）4.4.1 迁出，设置键
+// showDesktop.FullHeight / showDesktop.ButtonHeight。原实现经由 Taskbar Styler
+// 框架注入 Rectangle#ShowDesktopPipe@CommonStates 的 MinHeight/MaxHeight；本模组
+// 不携带 styler 框架，改在托盘图标的加载/应用路径（见下方 TrayIcons 段的
+// ApplyShowDesktopStyle）上直接写元素本地值。Min/Max 在布局层优先于 Height，
+// ShowDesktopStack/IconView 模板的 CommonStates 状态机与悬停动画都碰不到
+// Min/Max，一次性写入即可长期生效（与下方托盘图标段 showDesktopButtonWidth 的
+// MinWidth+MaxWidth 技法同一原理，即 acrylic 4.4.1 修复所镜像的技法）。
+// -1（默认）仍表示跟随任务栏高度，按实际任务栏窗口高度换算 DIP。
+// ============================================================================
+namespace ShowDesktopBtn {
+
+using GetDpiForWindow_t = UINT(WINAPI*)(HWND hwnd);
+GetDpiForWindow_t pGetDpiForWindow;
+
+bool g_fullHeight = false;
+int g_buttonHeight = -1;
+
+// CW-Beautify x86 兼容：WNDENUMPROC 为 stdcall 回调，无捕获 lambda 无法隐式
+// 转换，改为显式 static CALLBACK 函数（与时钟段、托盘图标段同一修复方式）。
+static BOOL CALLBACK FindCurrentProcessTaskbarWndEnumProc(HWND hWnd,
+                                                          LPARAM lParam) {
+    DWORD dwProcessId;
+    WCHAR className[32];
+    if (GetWindowThreadProcessId(hWnd, &dwProcessId) &&
+        dwProcessId == GetCurrentProcessId() &&
+        GetClassName(hWnd, className, ARRAYSIZE(className)) &&
+        _wcsicmp(className, L"Shell_TrayWnd") == 0) {
+        *reinterpret_cast<HWND*>(lParam) = hWnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+HWND FindCurrentProcessTaskbarWnd() {
+    HWND hTaskbarWnd = nullptr;
+
+    EnumWindows(FindCurrentProcessTaskbarWndEnumProc,
+                reinterpret_cast<LPARAM>(&hTaskbarWnd));
+
+    return hTaskbarWnd;
+}
+
+// 任务栏实际高度（DIP，96 DPI 基准），供 -1（跟随任务栏高度）换算。
+int GetTaskbarHeightDips() {
+    HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd();
+    if (!hTaskbarWnd) {
+        return 48;
+    }
+
+    RECT rc{};
+    if (!GetWindowRect(hTaskbarWnd, &rc) || rc.bottom <= rc.top) {
+        return 48;
+    }
+
+    UINT dpi = 96;
+    if (pGetDpiForWindow) {
+        dpi = pGetDpiForWindow(hTaskbarWnd);
+    }
+    if (!dpi) {
+        dpi = 96;
+    }
+
+    int height = MulDiv(rc.bottom - rc.top, 96, (int)dpi);
+    return height > 0 ? height : 48;
+}
+
+int GetEffectivePipeHeight() {
+    int pipeHeight = g_buttonHeight;
+    if (pipeHeight < 0) {
+        // -1 (默认)：跟随任务栏实际高度。
+        pipeHeight = GetTaskbarHeightDips();
+    } else if (pipeHeight > 200) {
+        pipeHeight = 200;
+    }
+    return pipeHeight;
+}
+
+// Local MinHeight/MaxHeight/VerticalAlignment values replaced by the height
+// override, nullopt for a property that had no local value.
+struct PipeHeightState {
+    winrt::weak_ref<FrameworkElement> element;
+    std::optional<double> savedMinHeight;
+    std::optional<double> savedMaxHeight;
+    std::optional<VerticalAlignment> savedVerticalAlignment;
+};
+
+std::vector<PipeHeightState> g_pipeHeightStates;
+
+void LoadSettings() {
+    g_fullHeight = Wh_GetIntSetting(L"showDesktop.FullHeight") != 0;
+    g_buttonHeight = Wh_GetIntSetting(L"showDesktop.ButtonHeight");
+}
+
+// Restores the original values and clears the state. The apply path
+// (ApplyShowDesktopStyle) re-applies the override while the feature is on and
+// the mod isn't unloading, mirroring the show desktop width handling.
+void RestoreAll() {
+    for (auto& state : g_pipeHeightStates) {
+        auto element = state.element.get();
+        if (!element) {
+            continue;
+        }
+        if (state.savedMinHeight) {
+            element.MinHeight(*state.savedMinHeight);
+        } else {
+            element.ClearValue(FrameworkElement::MinHeightProperty());
+        }
+        if (state.savedMaxHeight) {
+            element.MaxHeight(*state.savedMaxHeight);
+        } else {
+            element.ClearValue(FrameworkElement::MaxHeightProperty());
+        }
+        if (state.savedVerticalAlignment) {
+            element.VerticalAlignment(*state.savedVerticalAlignment);
+        } else {
+            element.ClearValue(FrameworkElement::VerticalAlignmentProperty());
+        }
+    }
+    g_pipeHeightStates.clear();
+}
+
+// Called by the tray section for the Rectangle#ShowDesktopPipe of the
+// "Show desktop" stack. A null element only drops stale states.
+void ApplyStyle(FrameworkElement pipeElement) {
+    // Drop any state for elements that no longer exist.
+    std::erase_if(g_pipeHeightStates, [](const PipeHeightState& s) {
+        return !s.element.get();
+    });
+
+    if (!pipeElement || !g_fullHeight) {
+        return;
+    }
+
+    bool managed = false;
+    for (const auto& state : g_pipeHeightStates) {
+        if (state.element.get() == pipeElement) {
+            managed = true;
+            break;
+        }
+    }
+
+    if (!managed) {
+        PipeHeightState state;
+        state.element = pipeElement;
+        state.savedMinHeight =
+            pipeElement.ReadLocalValue(FrameworkElement::MinHeightProperty())
+                .try_as<double>();
+        state.savedMaxHeight =
+            pipeElement.ReadLocalValue(FrameworkElement::MaxHeightProperty())
+                .try_as<double>();
+        auto localAlignment = pipeElement.ReadLocalValue(
+            FrameworkElement::VerticalAlignmentProperty());
+        if (localAlignment && localAlignment != DependencyProperty::UnsetValue()) {
+            try {
+                state.savedVerticalAlignment =
+                    winrt::unbox_value<VerticalAlignment>(localAlignment);
+            } catch (...) {
+            }
+        }
+        g_pipeHeightStates.push_back(std::move(state));
+    }
+
+    int pipeHeight = GetEffectivePipeHeight();
+    Wh_Log(L"Show desktop pipe, height=%d", pipeHeight);
+
+    pipeElement.MinHeight((double)pipeHeight);
+    pipeElement.MaxHeight((double)pipeHeight);
+    pipeElement.VerticalAlignment(VerticalAlignment::Center);
+}
+
+void Init() {
+    if (HMODULE hUser32 = LoadLibraryEx(L"user32.dll", nullptr,
+                                        LOAD_LIBRARY_SEARCH_SYSTEM32)) {
+        pGetDpiForWindow =
+            (GetDpiForWindow_t)GetProcAddress(hUser32, "GetDpiForWindow");
+    }
+
+    LoadSettings();
+}
+
+void SettingsChanged() {
+    LoadSettings();
+}
+
+void Uninit() {
+    g_pipeHeightStates.clear();
+}
+
+}  // namespace ShowDesktopBtn
+
+// ============================================================================
+// CW-Beautify v1.0.0 段：托盘系统图标（TrayIcons 前缀隔离）
+//
+// 即 CW-托盘系统图标调整（m417z Taskbar tray system icon tweaks 1.3.1，
+// GPL-3.0）的全部代码，整体置于本命名空间与时钟段隔离；设置键加 trayIcons.
+// 前缀（LoadSettings 内同步）。x86 兼容修复（无捕获 lambda 传入 stdcall/
+// WINAPI 回调类型改为显式 static CALLBACK/WINAPI 函数）原样保留。
+// 「显示桌面」竖条的全高处理交由上方 ShowDesktopBtn 段完成。
+// ============================================================================
+namespace TrayIcons {
+
+enum class TrayIcons_HideBellIcon {
+    never,
+    whenInactive,
+    whenInactiveAndNoDnd,
+    always,
+};
+
+struct {
+    bool hideVolumeIcon;
+    bool hideNetworkIcon;
+    bool hideBatteryIcon;
+    bool grayscaleBatteryIcon;
+    bool hideMicrophoneIcon;
+    bool hideGeolocationIcon;
+    bool hideStudioEffectsIcon;
+    bool hideRecallIcon;
+    bool hideLanguageBar;
+    bool hideLanguageSupplementaryIcons;
+    TrayIcons_HideBellIcon hideBellIcon;
+    int showDesktopButtonWidth;
+} TrayIcons_g_settings;
+
+std::atomic<bool> TrayIcons_g_systemTrayModuleHooked;
+std::atomic<bool> TrayIcons_g_unloading;
+
+using TrayIcons_FrameworkElementLoadedEventRevoker = winrt::impl::event_revoker<
+    IFrameworkElement,
+    &winrt::impl::abi<IFrameworkElement>::type::remove_Loaded>;
+
+[[clang::no_destroy]] std::optional<
+    std::list<TrayIcons_FrameworkElementLoadedEventRevoker>> TrayIcons_g_autoRevokerList{
+    std::in_place};
+
+winrt::weak_ref<Controls::TextBlock> TrayIcons_g_mainStackInnerTextBlock;
+int64_t TrayIcons_g_mainStackTextChangedToken;
+
+winrt::weak_ref<FrameworkElement> TrayIcons_g_bellSystemTrayIconElement;
+int64_t TrayIcons_g_bellAutomationNameChangedToken;
+
+winrt::weak_ref<FrameworkElement> TrayIcons_g_controlCenterStackPanel;
+winrt::event_token TrayIcons_g_controlCenterStackPanelSizeChangedToken;
+
+struct TrayIcons_BatteryTextBlockState {
+    winrt::weak_ref<Controls::TextBlock> textBlock;
+    Media::Brush savedForeground{nullptr};
+    int64_t foregroundChangedToken{0};
+};
+
+[[clang::no_destroy]] std::optional<std::vector<TrayIcons_BatteryTextBlockState>>
+    TrayIcons_g_batteryTextBlockStates{std::in_place};
+
+// Local MinWidth/MaxWidth values replaced by the show desktop width override,
+// nullopt for a property that had no local value.
+struct TrayIcons_ShowDesktopWidthState {
+    winrt::weak_ref<FrameworkElement> element;
+    std::optional<double> savedMinWidth;
+    std::optional<double> savedMaxWidth;
+};
+
+std::vector<TrayIcons_ShowDesktopWidthState> TrayIcons_g_showDesktopWidthStates;
+
+// CW-Beautify x86 兼容：WNDENUMPROC 为 stdcall 回调，上游此处为无捕获 lambda，无法隐式
+// 转换，改为显式 static 函数（逻辑不变）。
+static BOOL CALLBACK TrayIcons_FindCurrentProcessTaskbarWndEnumProc(HWND hWnd,
+                                                          LPARAM lParam) {
+    DWORD dwProcessId;
+    WCHAR className[32];
+    if (GetWindowThreadProcessId(hWnd, &dwProcessId) &&
+        dwProcessId == GetCurrentProcessId() &&
+        GetClassName(hWnd, className, ARRAYSIZE(className)) &&
+        _wcsicmp(className, L"Shell_TrayWnd") == 0) {
+        *reinterpret_cast<HWND*>(lParam) = hWnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+HWND TrayIcons_FindCurrentProcessTaskbarWnd() {
+    HWND hTaskbarWnd = nullptr;
+
+    EnumWindows(TrayIcons_FindCurrentProcessTaskbarWndEnumProc,
+                reinterpret_cast<LPARAM>(&hTaskbarWnd));
+
+    return hTaskbarWnd;
+}
+
+FrameworkElement TrayIcons_EnumParentElements(
+    FrameworkElement element,
+    std::function<bool(FrameworkElement)> enumCallback) {
+    auto parent = element;
+    while (true) {
+        parent = Media::VisualTreeHelper::GetParent(parent)
+                     .try_as<FrameworkElement>();
+        if (!parent) {
+            return nullptr;
+        }
+
+        if (enumCallback(parent)) {
+            return parent;
+        }
+    }
+}
+
+FrameworkElement TrayIcons_GetParentElementByName(FrameworkElement element, PCWSTR name) {
+    return TrayIcons_EnumParentElements(element, [name](FrameworkElement parent) {
+        return parent.Name() == name;
+    });
+}
+
+bool TrayIcons_IsChildOfElementByName(FrameworkElement element, PCWSTR name) {
+    return !!TrayIcons_GetParentElementByName(element, name);
+}
+
+FrameworkElement TrayIcons_GetParentElementByClassName(FrameworkElement element,
+                                             PCWSTR className) {
+    return TrayIcons_EnumParentElements(element, [className](FrameworkElement parent) {
+        return winrt::get_class_name(parent) == className;
+    });
+}
+
+bool TrayIcons_IsChildOfElementByClassName(FrameworkElement element, PCWSTR className) {
+    return !!TrayIcons_GetParentElementByClassName(element, className);
+}
+
+FrameworkElement TrayIcons_EnumChildElements(
+    FrameworkElement element,
+    std::function<bool(FrameworkElement)> enumCallback) {
+    int childrenCount = Media::VisualTreeHelper::GetChildrenCount(element);
+
+    for (int i = 0; i < childrenCount; i++) {
+        auto child = Media::VisualTreeHelper::GetChild(element, i)
+                         .try_as<FrameworkElement>();
+        if (!child) {
+            Wh_Log(L"Failed to get child %d of %d", i + 1, childrenCount);
+            continue;
+        }
+
+        if (enumCallback(child)) {
+            return child;
+        }
+    }
+
+    return nullptr;
+}
+
+FrameworkElement TrayIcons_FindChildByName(FrameworkElement element, PCWSTR name) {
+    return TrayIcons_EnumChildElements(element, [name](FrameworkElement child) {
+        return child.Name() == name;
+    });
+}
+
+FrameworkElement TrayIcons_FindChildByClassName(FrameworkElement element,
+                                      PCWSTR className) {
+    return TrayIcons_EnumChildElements(element, [className](FrameworkElement child) {
+        return winrt::get_class_name(child) == className;
+    });
+}
+
+// https://stackoverflow.com/a/3382894
+std::wstring TrayIcons_StringToHex(std::wstring_view input) {
+    static const WCHAR kHexDigits[] = L"0123456789ABCDEF";
+
+    std::wstring output;
+    output.reserve(input.length() * 5);
+    for (WCHAR c : input) {
+        output.push_back(kHexDigits[(c >> 12) & 15]);
+        output.push_back(kHexDigits[(c >> 8) & 15]);
+        output.push_back(kHexDigits[(c >> 4) & 15]);
+        output.push_back(kHexDigits[c & 15]);
+        output.push_back(L' ');
+    }
+
+    if (!output.empty() && output.back() == L' ') {
+        output.resize(output.length() - 1);
+    }
+
+    return output;
+}
+
+enum class TrayIcons_SystemTrayIconIdent {
+    kUnknown,
+    kNone,
+    kVolume,
+    kNetwork,
+    kBattery,
+    kMicrophone,
+    kGeolocation,
+    kMicrophoneAndGeolocation,
+    kBellEmpty,
+    kBellEmptyDnd,
+    kBellFull,
+    kBellFullDnd,
+    kLanguage,
+    kStudioEffects,
+    kRecall,
+};
+
+TrayIcons_SystemTrayIconIdent TrayIcons_IdentifySystemTrayIconFromText(std::wstring_view text) {
+    switch (text.length()) {
+        case 0:
+            return TrayIcons_SystemTrayIconIdent::kNone;
+
+        case 1:
+            break;
+
+        default:
+            return TrayIcons_SystemTrayIconIdent::kUnknown;
+    }
+
+    switch (text[0]) {
+        case L'\uE74F':  // Mute
+        case L'\uE992':  // Volume0
+        case L'\uE993':  // Volume1
+        case L'\uE994':  // Volume2
+        case L'\uE995':  // Volume3
+        case L'\uEA85':  // VolumeDisabled
+        case L'\uEBC5':  // VolumeBars
+            return TrayIcons_SystemTrayIconIdent::kVolume;
+
+        case L'\uE709':  // Airplane
+        case L'\uE7F4':  // TVMonitor
+        case L'\uE839':  // Ethernet
+        case L'\uE86C':  // SignalBars1
+        case L'\uE86D':  // SignalBars2
+        case L'\uE86E':  // SignalBars3
+        case L'\uE86F':  // SignalBars4
+        case L'\uE870':  // SignalBars5
+        case L'\uEAA1':  // Drinks
+        case L'\uEAA2':  // DropShot
+        case L'\uEAA3':  // FlavorProfile
+        case L'\uEAA4':  // Float
+        case L'\uEAA5':  // FluteGlass
+        case L'\uEAA8':  // GobletGlass
+        case L'\uEC1E':  // SignalRoaming
+        case L'\uEC3C':  // MobWifi1
+        case L'\uEC3D':  // MobWifi2
+        case L'\uEC3E':  // MobWifi3
+        case L'\uEC3F':  // MobWifi4
+        case L'\uF384':  // NetworkOffline
+        case L'\uF8C0':  // SysLocationArrow
+        case L'\uF8C1':  // SysMicrophone
+        case L'\uF8C2':  // SysVideo
+        case L'\uF8C3':  // SysWifi4
+        case L'\uF8C4':  // SysWifi3
+        case L'\uF8C5':  // SysWifi2
+        case L'\uF8C6':  // SysWifi1
+        case L'\uF8C7':  // SysSignalBars5
+        case L'\uF8C8':  // SysSignalBars4
+        case L'\uF8C9':  // SysSignalBars3
+        case L'\uF8CA':  // SysSignalBars2
+        case L'\uF8CB':  // SysSignalBars1
+        case L'\uF8CC':  // SysNetworkOffline
+            return TrayIcons_SystemTrayIconIdent::kNetwork;
+
+        // Charging levels.
+        case L'\uE3C1':  // Private Use
+        case L'\uE3C2':  // Private Use
+        case L'\uE3C3':  // Private Use
+        case L'\uE3C4':  // Private Use
+        case L'\uE3C5':  // Private Use
+        case L'\uE3C6':  // Private Use
+        case L'\uE3C7':  // Private Use
+        case L'\uE3C8':  // Private Use
+        case L'\uE3C9':  // Private Use
+        case L'\uE3CA':  // Private Use
+        case L'\uE3CB':  // Private Use
+        case L'\uE408':  // Private Use
+        case L'\uE409':  // Private Use
+        case L'\uE40A':  // Private Use
+        case L'\uE40B':  // Private Use
+        case L'\uE40C':  // Private Use
+        case L'\uE40D':  // Private Use
+        case L'\uE40E':  // Private Use
+        case L'\uE40F':  // Private Use
+        case L'\uE410':  // Private Use
+        case L'\uE411':  // Private Use
+        case L'\uE412':  // Private Use
+        case L'\uE413':  // Private Use
+        case L'\uE414':  // Private Use
+        case L'\uE415':  // Private Use
+        case L'\uE416':  // Private Use
+        case L'\uE417':  // Private Use
+        case L'\uE418':  // Private Use
+        case L'\uE419':  // Private Use
+        case L'\uE41A':  // Private Use
+        case L'\uE41B':  // Private Use
+        case L'\uE41C':  // Private Use
+        case L'\uE41D':  // Private Use
+        case L'\uEBA0':  // MobBattery0
+        case L'\uEBA1':  // MobBattery1
+        case L'\uEBA2':  // MobBattery2
+        case L'\uEBA3':  // MobBattery3
+        case L'\uEBA4':  // MobBattery4
+        case L'\uEBA5':  // MobBattery5
+        case L'\uEBA6':  // MobBattery6
+        case L'\uEBA7':  // MobBattery7
+        case L'\uEBA8':  // MobBattery8
+        case L'\uEBA9':  // MobBattery9
+        case L'\uEBAA':  // MobBattery10
+        case L'\uEBAB':  // MobBatteryCharging0
+        case L'\uEBAC':  // MobBatteryCharging1
+        case L'\uEBAD':  // MobBatteryCharging2
+        case L'\uEBAE':  // MobBatteryCharging3
+        case L'\uEBAF':  // MobBatteryCharging4
+        case L'\uEBB0':  // MobBatteryCharging5
+        case L'\uEBB1':  // MobBatteryCharging6
+        case L'\uEBB2':  // MobBatteryCharging7
+        case L'\uEBB3':  // MobBatteryCharging8
+        case L'\uEBB4':  // MobBatteryCharging9
+        case L'\uEBB5':  // MobBatteryCharging10
+        case L'\uEBB6':  // MobBatterySaver0
+        case L'\uEBB7':  // MobBatterySaver1
+        case L'\uEBB8':  // MobBatterySaver2
+        case L'\uEBB9':  // MobBatterySaver3
+        case L'\uEBBA':  // MobBatterySaver4
+        case L'\uEBBB':  // MobBatterySaver5
+        case L'\uEBBC':  // MobBatterySaver6
+        case L'\uEBBD':  // MobBatterySaver7
+        case L'\uEBBE':  // MobBatterySaver8
+        case L'\uEBBF':  // MobBatterySaver9
+        case L'\uEBC0':  // MobBatterySaver10
+        // Misc.
+        case L'\uEB17':
+        case L'\uEC02':
+        case L'\uF1E8':
+            return TrayIcons_SystemTrayIconIdent::kBattery;
+
+        case L'\uE361':  // Private Use
+        case L'\uE720':  // Microphone
+        case L'\uEC71':  // MicOn
+            return TrayIcons_SystemTrayIconIdent::kMicrophone;
+
+        case L'\uE37A':
+            return TrayIcons_SystemTrayIconIdent::kGeolocation;
+
+        case L'\uF47F':
+            return TrayIcons_SystemTrayIconIdent::kMicrophoneAndGeolocation;
+
+        case L'\uF2A3':  // Empty bell
+            return TrayIcons_SystemTrayIconIdent::kBellEmpty;
+
+        case L'\uF285':  // Empty bell, Do Not Disturb
+            return TrayIcons_SystemTrayIconIdent::kBellEmptyDnd;
+
+        case L'\uF2A5':  // Full bell
+            return TrayIcons_SystemTrayIconIdent::kBellFull;
+
+        case L'\uF2A8':  // Full bell, Do Not Disturb
+            return TrayIcons_SystemTrayIconIdent::kBellFullDnd;
+
+        // Language supplementary icons.
+        // Found by installing all the built-in input methods from:
+        // https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-language-pack-default-values?view=windows-11#input-method-editors
+        // and identifying the icon code in the fonts Segoe Fluent and
+        // AXPIcons.ttf.
+        // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
+        // %SystemRoot%\SystemApps\MicrosoftWindows.Client.Core_cw5n1h2txyewy\SystemTray\Assets\AXPIcons.ttf
+        case L'\uE4D7':  // (Maybe) English Private mode
+        case L'\uE4D8':  // (Maybe) Chinese Private mode
+        case L'\uE5BF':  // (Maybe) English mode locked
+        case L'\uE97E':  // HalfAlpha
+        case L'\uE97F':  // FullAlpha
+        case L'\uE980':  // Key12On (Korean mode)
+        case L'\uE982':  // QWERTYOn (Chinese mode)
+        case L'\uE983':  // QWERTYOff (English mode)
+        case L'\uE986':  // FullHiragana
+        case L'\uE987':  // FullKatakana
+        case L'\uE988':  // HalfKatakana
+        case L'\uEB90':  // StatusErrorFull (Input method disabled)
+        case L'\uEE41':  // FullHiraganaPrivateMode
+        case L'\uEE42':  // FullKatakanaPrivateMode
+        case L'\uEE43':  // HalfAlphaPrivateMode
+        case L'\uEE44':  // HalfKatakanaPrivateMode
+        case L'\uEE45':  // FullAlphaPrivateMode
+        case L'\uEE75':  // (Maybe) HalfAlpha
+        case L'\uEE76':  // (Maybe) HalfAlphaPrivateMode
+            return TrayIcons_SystemTrayIconIdent::kLanguage;
+
+        case L'\uEABC':
+            return TrayIcons_SystemTrayIconIdent::kStudioEffects;
+
+        // From:
+        // C:\Windows\SystemApps\MicrosoftWindows.Client.Core_cw5n1h2txyewy\SystemTray\Assets\RecallIcons.ttf
+        case L'\uEC83':
+        case L'\uEADD':
+        case L'\uEB16':
+        case L'\uEF97':
+        case L'\uF1C6':
+            return TrayIcons_SystemTrayIconIdent::kRecall;
+    }
+
+    return TrayIcons_SystemTrayIconIdent::kUnknown;
+}
+
+void TrayIcons_ApplyMainStackIconViewStyle(FrameworkElement notifyIconViewElement) {
+    FrameworkElement systemTrayTextIconContent = nullptr;
+
+    FrameworkElement child = notifyIconViewElement;
+    if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentPresenter")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentGrid")) &&
+        (child = TrayIcons_FindChildByClassName(child, L"SystemTray.TextIconContent"))) {
+        systemTrayTextIconContent = child;
+    } else {
+        Wh_Log(L"Failed to get SystemTray.TextIconContent");
+        return;
+    }
+
+    Controls::TextBlock innerTextBlock = nullptr;
+
+    child = systemTrayTextIconContent;
+    if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+        (child = TrayIcons_FindChildByName(child, L"Base")) &&
+        (child = TrayIcons_FindChildByName(child, L"InnerTextBlock"))) {
+        innerTextBlock = child.as<Controls::TextBlock>();
+    } else {
+        Wh_Log(L"Failed to get InnerTextBlock");
+        return;
+    }
+
+    auto shouldHide = [](Controls::TextBlock innerTextBlock) {
+        auto text = innerTextBlock.Text();
+        auto systemTrayIconIdent = TrayIcons_IdentifySystemTrayIconFromText(text);
+
+        bool hide = false;
+        if (!TrayIcons_g_unloading) {
+            switch (systemTrayIconIdent) {
+                case TrayIcons_SystemTrayIconIdent::kMicrophone:
+                    hide = TrayIcons_g_settings.hideMicrophoneIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kGeolocation:
+                    hide = TrayIcons_g_settings.hideGeolocationIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kMicrophoneAndGeolocation:
+                    hide = TrayIcons_g_settings.hideMicrophoneIcon &&
+                           TrayIcons_g_settings.hideGeolocationIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kStudioEffects:
+                    hide = TrayIcons_g_settings.hideStudioEffectsIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kRecall:
+                    hide = TrayIcons_g_settings.hideRecallIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kNone:
+                    // Happens when the icon is about to disappear.
+                    break;
+
+                default:
+                    Wh_Log(L"Failed");
+                    break;
+            }
+        }
+
+        Wh_Log(L"Main stack icon %d (%s), hide=%d", (int)systemTrayIconIdent,
+               TrayIcons_StringToHex(text).c_str(), hide);
+
+        return hide;
+    };
+
+    bool hide = shouldHide(innerTextBlock);
+
+    notifyIconViewElement.Visibility(hide ? Visibility::Collapsed
+                                          : Visibility::Visible);
+
+    if (!TrayIcons_g_unloading && !TrayIcons_g_mainStackInnerTextBlock.get()) {
+        auto notifyIconViewElementWeakRef =
+            winrt::make_weak(notifyIconViewElement);
+        TrayIcons_g_mainStackInnerTextBlock = innerTextBlock;
+        TrayIcons_g_mainStackTextChangedToken =
+            innerTextBlock.RegisterPropertyChangedCallback(
+                Controls::TextBlock::TextProperty(),
+                [notifyIconViewElementWeakRef, shouldHide](
+                    DependencyObject sender, DependencyProperty property) {
+                    auto innerTextBlock = sender.try_as<Controls::TextBlock>();
+                    if (!innerTextBlock) {
+                        return;
+                    }
+
+                    auto notifyIconViewElement =
+                        notifyIconViewElementWeakRef.get();
+                    if (!notifyIconViewElement) {
+                        return;
+                    }
+
+                    bool hide = shouldHide(innerTextBlock);
+
+                    Wh_Log(L"Main stack icon, hide=%d", hide);
+
+                    notifyIconViewElement.Visibility(
+                        hide ? Visibility::Collapsed : Visibility::Visible);
+                });
+    }
+}
+
+void TrayIcons_ApplyNonActivatableStackIconViewStyle(
+    FrameworkElement notifyIconViewElement) {
+    FrameworkElement child = notifyIconViewElement;
+    bool hide = false;
+    if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentPresenter")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentGrid"))) {
+        child = TrayIcons_EnumChildElements(child, [&hide](FrameworkElement child) {
+            auto className = winrt::get_class_name(child);
+            if (className == L"SystemTray.TextIconContent") {
+                Controls::TextBlock innerTextBlock = nullptr;
+
+                if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+                    (child = TrayIcons_FindChildByName(child, L"Base")) &&
+                    (child = TrayIcons_FindChildByName(child, L"InnerTextBlock"))) {
+                    innerTextBlock = child.as<Controls::TextBlock>();
+                } else {
+                    Wh_Log(L"Failed to get InnerTextBlock");
+                    return false;
+                }
+
+                auto text = innerTextBlock.Text();
+                auto systemTrayIconIdent = TrayIcons_IdentifySystemTrayIconFromText(text);
+
+                if (systemTrayIconIdent == TrayIcons_SystemTrayIconIdent::kLanguage) {
+                    Wh_Log(L"Language supplementary icon %d (%s)",
+                           (int)systemTrayIconIdent, TrayIcons_StringToHex(text).c_str());
+                    hide = TrayIcons_g_settings.hideLanguageSupplementaryIcons;
+                    return true;
+                } else {
+                    Wh_Log(L"Language bar unknown icon %d (%s)",
+                           (int)systemTrayIconIdent, TrayIcons_StringToHex(text).c_str());
+                    return false;
+                }
+            } else if (className == L"SystemTray.ImageIconContent") {
+                Wh_Log(L"Language supplementary icon (image)");
+                hide = TrayIcons_g_settings.hideLanguageSupplementaryIcons;
+                return true;
+            } else if (className == L"SystemTray.LanguageTextIconContent" ||
+                       className == L"SystemTray.LanguageImageIconContent") {
+                Wh_Log(L"Language bar main icon");
+                hide = TrayIcons_g_settings.hideLanguageBar;
+                return true;
+            }
+
+            Wh_Log(L"Unsupported class name %s of child", className.c_str());
+            return false;
+        });
+    }
+
+    if (!child) {
+        // Some input methods use LanguageImageIconContent/ImageIconContent
+        // instead of LanguageTextIconContent/TextIconContent with icon fonts.
+        // If the language bar is hidden and the user switches from a "text"
+        // input method to a "image" input method, the invisible element will
+        // not be populated with the new type of icon content but become empty
+        // instead. Then the icon will be permanently hidden even after
+        // disabling the mod. This code forces the empty element to become
+        // visible and populated, fixing this issue.
+        if (Media::VisualTreeHelper::GetChildrenCount(notifyIconViewElement) ==
+            0) {
+            notifyIconViewElement.Visibility(Visibility::Visible);
+        }
+        return;
+    }
+
+    hide = !TrayIcons_g_unloading && hide;
+
+    Wh_Log(L"Language bar, hide=%d", hide);
+
+    notifyIconViewElement.Visibility(hide ? Visibility::Collapsed
+                                          : Visibility::Visible);
+}
+
+// Path inside SystemTray.BatteryIconContent:
+// Grid#ContainerGrid > StackPanel > Grid > TextBlock.
+//
+// The system sets a colored Foreground brush on each battery TextBlock.
+// Clearing the local Foreground value lets the inherited TextFillColorPrimary
+// take over, giving a grayscale look. The system re-applies the colored brush
+// on theme changes (and similar updates), so we listen for ForegroundProperty
+// changes, save the latest value (so we can restore it on disable), and clear
+// it again.
+void TrayIcons_ApplyBatteryIconGrayscaleStyle(FrameworkElement batteryIconContent) {
+    bool grayscale = !TrayIcons_g_unloading && TrayIcons_g_settings.grayscaleBatteryIcon;
+
+    // Drop any state for TextBlocks that no longer exist.
+    std::erase_if(
+        *TrayIcons_g_batteryTextBlockStates,
+        [](const TrayIcons_BatteryTextBlockState& s) { return !s.textBlock.get(); });
+
+    // Nothing to apply and nothing to restore - skip the tree traversal.
+    if (!grayscale && TrayIcons_g_batteryTextBlockStates->empty()) {
+        return;
+    }
+
+    FrameworkElement grid = nullptr;
+
+    FrameworkElement child = batteryIconContent;
+    if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel")) &&
+        (child =
+             TrayIcons_FindChildByClassName(child, L"Windows.UI.Xaml.Controls.Grid"))) {
+        grid = child;
+    } else {
+        Wh_Log(L"Failed to navigate to battery Grid");
+        return;
+    }
+
+    TrayIcons_EnumChildElements(grid, [grayscale](FrameworkElement textChild) {
+        auto textBlock = textChild.try_as<Controls::TextBlock>();
+        if (!textBlock) {
+            return false;
+        }
+
+        auto it = TrayIcons_g_batteryTextBlockStates->begin();
+        for (; it != TrayIcons_g_batteryTextBlockStates->end(); ++it) {
+            if (it->textBlock.get() == textBlock) {
+                break;
+            }
+        }
+        bool managed = (it != TrayIcons_g_batteryTextBlockStates->end());
+
+        if (grayscale && !managed) {
+            auto localForeground =
+                textBlock
+                    .ReadLocalValue(Controls::TextBlock::ForegroundProperty())
+                    .try_as<Media::Brush>();
+            if (!localForeground) {
+                // No local Foreground set, so clearing would be a no-op and
+                // there'd be nothing meaningful to restore later.
+                return false;
+            }
+
+            TrayIcons_BatteryTextBlockState state;
+            state.textBlock = textBlock;
+            state.savedForeground = localForeground;
+            state.foregroundChangedToken =
+                textBlock.RegisterPropertyChangedCallback(
+                    Controls::TextBlock::ForegroundProperty(),
+                    [](DependencyObject sender, DependencyProperty) {
+                        auto tb = sender.try_as<Controls::TextBlock>();
+                        if (!tb) {
+                            return;
+                        }
+                        auto fg =
+                            tb.ReadLocalValue(
+                                  Controls::TextBlock::ForegroundProperty())
+                                .try_as<Media::Brush>();
+                        if (!fg) {
+                            return;
+                        }
+                        for (auto& s : *TrayIcons_g_batteryTextBlockStates) {
+                            if (s.textBlock.get() == tb) {
+                                s.savedForeground = fg;
+                                break;
+                            }
+                        }
+                        tb.as<DependencyObject>().ClearValue(
+                            Controls::TextBlock::ForegroundProperty());
+                    });
+            TrayIcons_g_batteryTextBlockStates->push_back(std::move(state));
+            textBlock.as<DependencyObject>().ClearValue(
+                Controls::TextBlock::ForegroundProperty());
+        } else if (!grayscale && managed) {
+            textBlock.UnregisterPropertyChangedCallback(
+                Controls::TextBlock::ForegroundProperty(),
+                it->foregroundChangedToken);
+            textBlock.Foreground(it->savedForeground);
+            TrayIcons_g_batteryTextBlockStates->erase(it);
+        }
+        return false;
+    });
+}
+
+void TrayIcons_SetItemContainerMargin(FrameworkElement container,
+                            double left,
+                            double right) {
+    if (left == 0 && right == 0) {
+        container.ClearValue(FrameworkElement::MarginProperty());
+    } else {
+        container.Margin(Thickness{left, 0, right, 0});
+    }
+}
+
+// A hidden icon keeps its (empty) item container in the panel, and the panel
+// adds Spacing for every child regardless of visibility or size. Cancel the
+// extra spacing with negative margins on the neighboring visible items, and
+// hide the button if all icons are hidden.
+void TrayIcons_UpdateControlCenterButtonStackPanel(FrameworkElement stackPanel) {
+    double spacing = 0;
+    if (auto panel = stackPanel.try_as<Controls::StackPanel>()) {
+        spacing = panel.Spacing();
+    }
+
+    // Margins are assigned once the next visible item (or the end) is known,
+    // so that the trailing hidden items can be folded into the right margin.
+    FrameworkElement pendingContainer = nullptr;
+    double pendingLeft = 0;
+    int hiddenRun = 0;
+
+    TrayIcons_EnumChildElements(stackPanel, [&](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        auto systemTrayIconElement = TrayIcons_FindChildByName(child, L"SystemTrayIcon")
+                                         .try_as<Controls::Control>();
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        if (!systemTrayIconElement.IsEnabled()) {
+            hiddenRun++;
+            return false;
+        }
+
+        if (pendingContainer) {
+            TrayIcons_SetItemContainerMargin(pendingContainer, pendingLeft, 0);
+        }
+
+        pendingContainer = child;
+        pendingLeft = -spacing * hiddenRun;
+        hiddenRun = 0;
+        return false;
+    });
+
+    if (pendingContainer) {
+        TrayIcons_SetItemContainerMargin(pendingContainer, pendingLeft,
+                               -spacing * hiddenRun);
+    }
+
+    // The button template has some width of its own (e.g. the background
+    // border margins), so an empty panel alone doesn't make it disappear.
+    FrameworkElement controlCenterButton =
+        TrayIcons_GetParentElementByName(stackPanel, L"ControlCenterButton");
+    if (!controlCenterButton) {
+        Wh_Log(L"Failed to get ControlCenterButton");
+        return;
+    }
+
+    controlCenterButton.Visibility(pendingContainer ? Visibility::Visible
+                                                    : Visibility::Collapsed);
+}
+
+void TrayIcons_ApplyControlCenterButtonIconStyle(FrameworkElement systemTrayIconElement) {
+    FrameworkElement contentGrid = nullptr;
+
+    FrameworkElement child = systemTrayIconElement;
+    if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentGrid"))) {
+        contentGrid = child;
+    } else {
+        Wh_Log(L"Failed to get ContentGrid");
+        return;
+    }
+
+    bool hide = false;
+    FrameworkElement systemTrayTextIconContent =
+        TrayIcons_FindChildByClassName(contentGrid, L"SystemTray.BatteryIconContent");
+    if (systemTrayTextIconContent) {
+        if (!TrayIcons_g_unloading) {
+            hide = TrayIcons_g_settings.hideBatteryIcon;
+        }
+
+        Wh_Log(L"System battery tray icon, hide=%d", hide);
+
+        TrayIcons_ApplyBatteryIconGrayscaleStyle(systemTrayTextIconContent);
+    } else {
+        systemTrayTextIconContent =
+            TrayIcons_FindChildByClassName(contentGrid, L"SystemTray.TextIconContent");
+        if (!systemTrayTextIconContent) {
+            Wh_Log(L"Failed to get SystemTray.TextIconContent");
+            return;
+        }
+
+        Controls::TextBlock innerTextBlock = nullptr;
+
+        child = systemTrayTextIconContent;
+        if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+            (child = TrayIcons_FindChildByName(child, L"Base")) &&
+            (child = TrayIcons_FindChildByName(child, L"InnerTextBlock"))) {
+            innerTextBlock = child.as<Controls::TextBlock>();
+        } else {
+            Wh_Log(L"Failed to get InnerTextBlock");
+            return;
+        }
+
+        auto text = innerTextBlock.Text();
+        auto systemTrayIconIdent = TrayIcons_IdentifySystemTrayIconFromText(text);
+
+        if (!TrayIcons_g_unloading) {
+            switch (systemTrayIconIdent) {
+                case TrayIcons_SystemTrayIconIdent::kVolume:
+                    hide = TrayIcons_g_settings.hideVolumeIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kNetwork:
+                    hide = TrayIcons_g_settings.hideNetworkIcon;
+                    break;
+
+                case TrayIcons_SystemTrayIconIdent::kBattery:
+                    hide = TrayIcons_g_settings.hideBatteryIcon;
+                    break;
+
+                default:
+                    Wh_Log(L"Failed");
+                    break;
+            }
+        }
+
+        Wh_Log(L"System tray icon %d (%s), hide=%d", (int)systemTrayIconIdent,
+               TrayIcons_StringToHex(text).c_str(), hide);
+    }
+
+    bool hidden =
+        systemTrayTextIconContent.Visibility() == Visibility::Collapsed;
+    if (hide != hidden) {
+        systemTrayTextIconContent.Visibility(hide ? Visibility::Collapsed
+                                                  : Visibility::Visible);
+        if (auto control = systemTrayIconElement.try_as<Controls::Control>()) {
+            control.IsEnabled(!hide);
+        } else {
+            Wh_Log(L"Failed");
+        }
+    }
+
+    // The layout depends on the siblings too, e.g. a newly added visible icon
+    // must show the button even if this icon's own state is unchanged.
+    FrameworkElement parent = systemTrayIconElement;
+    if ((parent = Media::VisualTreeHelper::GetParent(parent)
+                      .try_as<FrameworkElement>()) &&
+        winrt::get_class_name(parent) ==
+            L"Windows.UI.Xaml.Controls.ContentPresenter" &&
+        (parent = Media::VisualTreeHelper::GetParent(parent)
+                      .try_as<FrameworkElement>()) &&
+        winrt::get_class_name(parent) ==
+            L"Windows.UI.Xaml.Controls.StackPanel") {
+        // Removing an item container changes the panel size, which is the
+        // only signal that the margins of the remaining items are stale.
+        if (!TrayIcons_g_unloading && !TrayIcons_g_controlCenterStackPanel.get()) {
+            TrayIcons_g_controlCenterStackPanel = parent;
+            TrayIcons_g_controlCenterStackPanelSizeChangedToken = parent.SizeChanged(
+                [](winrt::Windows::Foundation::IInspectable const& sender,
+                   SizeChangedEventArgs const& e) {
+                    Wh_Log(L">");
+
+                    auto stackPanel = sender.try_as<FrameworkElement>();
+                    if (!stackPanel) {
+                        Wh_Log(L"Failed to get sender");
+                        return;
+                    }
+
+                    TrayIcons_UpdateControlCenterButtonStackPanel(stackPanel);
+                });
+        }
+
+        TrayIcons_UpdateControlCenterButtonStackPanel(parent);
+    } else {
+        Wh_Log(L"Failed");
+    }
+}
+
+void TrayIcons_ApplyBellIconStyle(FrameworkElement systemTrayIconElement);
+
+// When the clock is hidden, the bell icon behaves differently - its content is
+// recreated each time the bell icon changes. Therefore we retry until the
+// content is there.
+void TrayIcons_ApplyBellIconStyleWithRetry(FrameworkElement systemTrayIconElement,
+                                 int attempt) {
+    Wh_Log(L"> %d", attempt);
+
+    if (attempt == 10 || TrayIcons_g_unloading) {
+        return;
+    }
+
+    FrameworkElement containerGrid =
+        TrayIcons_FindChildByName(systemTrayIconElement, L"ContainerGrid");
+    if (!containerGrid) {
+        systemTrayIconElement.Dispatcher().TryRunAsync(
+            winrt::Windows::UI::Core::CoreDispatcherPriority::Low,
+            [systemTrayIconElement, attempt]() {
+                TrayIcons_ApplyBellIconStyleWithRetry(systemTrayIconElement, attempt + 1);
+            });
+        return;
+    }
+
+    TrayIcons_ApplyBellIconStyle(systemTrayIconElement);
+}
+
+void TrayIcons_ApplyBellIconStyle(FrameworkElement systemTrayIconElement) {
+    FrameworkElement containerGrid =
+        TrayIcons_FindChildByName(systemTrayIconElement, L"ContainerGrid");
+    if (!containerGrid) {
+        Wh_Log(L"Failed to get ContainerGrid");
+        return;
+    }
+
+    FrameworkElement systemTrayTextIconContent = nullptr;
+    bool hasContentPresenterForMissingClock = true;
+
+    // When the clock is hidden, the element path is:
+    //
+    // #ContainerGrid > #ContentPresenter > #ContentGrid >
+    // SystemTray.TextIconContent
+    //
+    // When the clock is visible, ContentPresenter is missing:
+    //
+    // #ContainerGrid > #ContentGrid > SystemTray.TextIconContent
+    FrameworkElement child =
+        TrayIcons_FindChildByName(containerGrid, L"ContentPresenter");
+    if (!child) {
+        hasContentPresenterForMissingClock = false;
+        child = containerGrid;
+    }
+
+    if ((child = TrayIcons_FindChildByName(child, L"ContentGrid")) &&
+        (child = TrayIcons_FindChildByClassName(child, L"SystemTray.TextIconContent"))) {
+        systemTrayTextIconContent = child;
+    } else {
+        // Wh_Log(L"Failed to get SystemTray.TextIconContent");
+        return;
+    }
+
+    auto contentPresenter =
+        Media::VisualTreeHelper::GetParent(systemTrayIconElement)
+            .try_as<FrameworkElement>();
+
+    bool hide = false;
+
+    if (!TrayIcons_g_unloading) {
+        if (TrayIcons_g_settings.hideBellIcon == TrayIcons_HideBellIcon::always) {
+            hide = true;
+        } else if (TrayIcons_g_settings.hideBellIcon == TrayIcons_HideBellIcon::whenInactive ||
+                   TrayIcons_g_settings.hideBellIcon ==
+                       TrayIcons_HideBellIcon::whenInactiveAndNoDnd) {
+            Controls::TextBlock innerTextBlock = nullptr;
+
+            child = systemTrayTextIconContent;
+            if ((child = TrayIcons_FindChildByName(child, L"ContainerGrid")) &&
+                (child = TrayIcons_FindChildByName(child, L"Base")) &&
+                (child = TrayIcons_FindChildByName(child, L"InnerTextBlock"))) {
+                innerTextBlock = child.as<Controls::TextBlock>();
+            } else {
+                Wh_Log(L"Failed to get InnerTextBlock");
+                return;
+            }
+
+            auto shouldHide = [](Controls::TextBlock innerTextBlock) {
+                auto text = innerTextBlock.Text();
+                auto systemTrayIconIdent = TrayIcons_IdentifySystemTrayIconFromText(text);
+                switch (systemTrayIconIdent) {
+                    case TrayIcons_SystemTrayIconIdent::kBellEmpty:
+                        return true;
+
+                    case TrayIcons_SystemTrayIconIdent::kBellEmptyDnd:
+                        return TrayIcons_g_settings.hideBellIcon !=
+                               TrayIcons_HideBellIcon::whenInactiveAndNoDnd;
+
+                    case TrayIcons_SystemTrayIconIdent::kBellFull:
+                    case TrayIcons_SystemTrayIconIdent::kBellFullDnd:
+                        return false;
+
+                    default:
+                        Wh_Log(L"Unknown bell icon %d (%s)",
+                               (int)systemTrayIconIdent,
+                               TrayIcons_StringToHex(text).c_str());
+                        return false;
+                }
+            };
+
+            hide = shouldHide(innerTextBlock);
+
+            if (!TrayIcons_g_bellSystemTrayIconElement.get()) {
+                TrayIcons_g_bellSystemTrayIconElement = systemTrayIconElement;
+                TrayIcons_g_bellAutomationNameChangedToken =
+                    systemTrayIconElement.RegisterPropertyChangedCallback(
+                        Automation::AutomationProperties::NameProperty(),
+                        [](DependencyObject sender,
+                           DependencyProperty property) {
+                            Wh_Log(L">");
+
+                            auto bellSystemTrayIconElement =
+                                sender.try_as<FrameworkElement>();
+                            if (!bellSystemTrayIconElement) {
+                                Wh_Log(L"Failed to get sender");
+                                return;
+                            }
+
+                            TrayIcons_ApplyBellIconStyleWithRetry(
+                                bellSystemTrayIconElement, 0);
+                        });
+            }
+        }
+    }
+
+    Wh_Log(L"Bell icon, hide=%d", hide);
+
+    systemTrayTextIconContent.Visibility(hide ? Visibility::Collapsed
+                                              : Visibility::Visible);
+
+    if (contentPresenter) {
+        if (hide && hasContentPresenterForMissingClock) {
+            contentPresenter.MaxWidth(0);
+        } else {
+            contentPresenter.ClearValue(FrameworkElement::MaxWidthProperty());
+        }
+    }
+}
+
+// MinWidth/MaxWidth take precedence over an explicit Width, so they override
+// the width without having to replace the Width value itself. The local values
+// are saved the first time an element is seen, for restoring in TrayIcons_ApplySettings.
+void TrayIcons_OverrideShowDesktopWidth(FrameworkElement element, double width) {
+    bool managed = false;
+    for (const auto& state : TrayIcons_g_showDesktopWidthStates) {
+        if (state.element.get() == element) {
+            managed = true;
+            break;
+        }
+    }
+
+    if (!managed) {
+        TrayIcons_g_showDesktopWidthStates.push_back({
+            .element = element,
+            .savedMinWidth =
+                element.ReadLocalValue(FrameworkElement::MinWidthProperty())
+                    .try_as<double>(),
+            .savedMaxWidth =
+                element.ReadLocalValue(FrameworkElement::MaxWidthProperty())
+                    .try_as<double>(),
+        });
+    }
+
+    element.MinWidth(width);
+    element.MaxWidth(width);
+}
+
+void TrayIcons_ApplyShowDesktopStyle(FrameworkElement systemTrayIconElement) {
+    if (TrayIcons_g_unloading) {
+        // Restored in TrayIcons_ApplySettings.
+        return;
+    }
+
+    auto showDesktopStack =
+        TrayIcons_GetParentElementByName(systemTrayIconElement, L"ShowDesktopStack");
+    if (!showDesktopStack) {
+        Wh_Log(L"Failed");
+        return;
+    }
+
+    // Drop any state for elements that no longer exist.
+    std::erase_if(TrayIcons_g_showDesktopWidthStates, [](const TrayIcons_ShowDesktopWidthState& s) {
+        return !s.element.get();
+    });
+
+    int width = TrayIcons_g_settings.showDesktopButtonWidth;
+    Wh_Log(L"Show desktop button, width=%d", width);
+
+    TrayIcons_OverrideShowDesktopWidth(systemTrayIconElement, width);
+    TrayIcons_OverrideShowDesktopWidth(showDesktopStack, width);
+
+    // The container grid has an explicit width, which keeps its content at the
+    // default size regardless of the width of the icon view.
+    auto containerGrid =
+        TrayIcons_FindChildByName(systemTrayIconElement, L"ContainerGrid");
+    if (containerGrid) {
+        TrayIcons_OverrideShowDesktopWidth(containerGrid, width);
+    } else {
+        Wh_Log(L"Failed to get ContainerGrid");
+    }
+
+    // CW-Beautify: 「显示桌面」竖条全高（showDesktop.FullHeight，ShowDesktopBtn
+    // 段）。竖条矩形是 ContainerGrid 的直接子元素 Rectangle#ShowDesktopPipe。
+    FrameworkElement showDesktopPipeElement = nullptr;
+    if (containerGrid) {
+        showDesktopPipeElement =
+            TrayIcons_FindChildByName(containerGrid, L"ShowDesktopPipe");
+    }
+    ShowDesktopBtn::ApplyStyle(showDesktopPipeElement);
+}
+
+bool TrayIcons_ApplyMainStackStyle(FrameworkElement container) {
+    FrameworkElement stackPanel = nullptr;
+
+    FrameworkElement child = container;
+    if ((child = TrayIcons_FindChildByName(child, L"Content")) &&
+        (child = TrayIcons_FindChildByName(child, L"IconStack")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.ItemsPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel"))) {
+        stackPanel = child;
+    }
+
+    if (!stackPanel) {
+        return false;
+    }
+
+    TrayIcons_EnumChildElements(stackPanel, [](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        FrameworkElement systemTrayIconElement =
+            TrayIcons_FindChildByName(child, L"SystemTrayIcon");
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        TrayIcons_ApplyMainStackIconViewStyle(systemTrayIconElement);
+        return false;
+    });
+
+    return true;
+}
+
+bool TrayIcons_ApplyNonActivatableStackStyle(FrameworkElement container) {
+    FrameworkElement stackPanel = nullptr;
+
+    FrameworkElement child = container;
+    if ((child = TrayIcons_FindChildByName(child, L"Content")) &&
+        (child = TrayIcons_FindChildByName(child, L"IconStack")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.ItemsPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel"))) {
+        stackPanel = child;
+    }
+
+    if (!stackPanel) {
+        return false;
+    }
+
+    TrayIcons_EnumChildElements(stackPanel, [](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        FrameworkElement systemTrayIconElement =
+            TrayIcons_FindChildByName(child, L"SystemTrayIcon");
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        TrayIcons_ApplyNonActivatableStackIconViewStyle(systemTrayIconElement);
+        return false;
+    });
+
+    return true;
+}
+
+bool TrayIcons_ApplyControlCenterButtonStyle(FrameworkElement controlCenterButton) {
+    FrameworkElement stackPanel = nullptr;
+
+    FrameworkElement child = controlCenterButton;
+    if ((child =
+             TrayIcons_FindChildByClassName(child, L"Windows.UI.Xaml.Controls.Grid")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.ItemsPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel"))) {
+        stackPanel = child;
+    }
+
+    if (!stackPanel) {
+        return false;
+    }
+
+    TrayIcons_EnumChildElements(stackPanel, [](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        FrameworkElement systemTrayIconElement =
+            TrayIcons_FindChildByName(child, L"SystemTrayIcon");
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        TrayIcons_ApplyControlCenterButtonIconStyle(systemTrayIconElement);
+        return false;
+    });
+
+    return true;
+}
+
+bool TrayIcons_ApplyNotificationCenterButtonStyle(FrameworkElement controlCenterButton) {
+    FrameworkElement stackPanel = nullptr;
+
+    FrameworkElement child = controlCenterButton;
+    if ((child =
+             TrayIcons_FindChildByClassName(child, L"Windows.UI.Xaml.Controls.Grid")) &&
+        (child = TrayIcons_FindChildByName(child, L"ContentPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.ItemsPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel"))) {
+        stackPanel = child;
+    }
+
+    if (!stackPanel) {
+        return false;
+    }
+
+    TrayIcons_EnumChildElements(stackPanel, [](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        FrameworkElement systemTrayIconElement =
+            TrayIcons_FindChildByName(child, L"SystemTrayIcon");
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        TrayIcons_ApplyBellIconStyle(systemTrayIconElement);
+        return false;
+    });
+
+    return true;
+}
+
+bool TrayIcons_ApplyShowDesktopStackStyle(FrameworkElement container) {
+    FrameworkElement stackPanel = nullptr;
+
+    FrameworkElement child = container;
+    if ((child = TrayIcons_FindChildByName(child, L"Content")) &&
+        (child = TrayIcons_FindChildByName(child, L"IconStack")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.ItemsPresenter")) &&
+        (child = TrayIcons_FindChildByClassName(
+             child, L"Windows.UI.Xaml.Controls.StackPanel"))) {
+        stackPanel = child;
+    }
+
+    if (!stackPanel) {
+        return false;
+    }
+
+    TrayIcons_EnumChildElements(stackPanel, [](FrameworkElement child) {
+        auto childClassName = winrt::get_class_name(child);
+        if (childClassName != L"Windows.UI.Xaml.Controls.ContentPresenter") {
+            Wh_Log(L"Unsupported class name %s of child",
+                   childClassName.c_str());
+            return false;
+        }
+
+        FrameworkElement systemTrayIconElement =
+            TrayIcons_FindChildByName(child, L"SystemTrayIcon");
+        if (!systemTrayIconElement) {
+            Wh_Log(L"Failed to get SystemTrayIcon of child");
+            return false;
+        }
+
+        TrayIcons_ApplyShowDesktopStyle(systemTrayIconElement);
+        return false;
+    });
+
+    return true;
+}
+
+bool TrayIcons_ApplyStyle(XamlRoot xamlRoot) {
+    FrameworkElement systemTrayFrameGrid = nullptr;
+
+    FrameworkElement child = xamlRoot.Content().try_as<FrameworkElement>();
+    if (child &&
+        (child = TrayIcons_FindChildByClassName(child, L"SystemTray.SystemTrayFrame")) &&
+        (child = TrayIcons_FindChildByName(child, L"SystemTrayFrameGrid"))) {
+        systemTrayFrameGrid = child;
+    }
+
+    if (!systemTrayFrameGrid) {
+        return false;
+    }
+
+    bool somethingSucceeded = false;
+
+    FrameworkElement mainStack =
+        TrayIcons_FindChildByName(systemTrayFrameGrid, L"MainStack");
+    if (mainStack) {
+        somethingSucceeded |= TrayIcons_ApplyMainStackStyle(mainStack);
+    }
+
+    FrameworkElement nonActivatableStack =
+        TrayIcons_FindChildByName(systemTrayFrameGrid, L"NonActivatableStack");
+    if (nonActivatableStack) {
+        somethingSucceeded |=
+            TrayIcons_ApplyNonActivatableStackStyle(nonActivatableStack);
+    }
+
+    FrameworkElement controlCenterButton =
+        TrayIcons_FindChildByName(systemTrayFrameGrid, L"ControlCenterButton");
+    if (controlCenterButton) {
+        somethingSucceeded |=
+            TrayIcons_ApplyControlCenterButtonStyle(controlCenterButton);
+    }
+
+    FrameworkElement notificationCenterButton =
+        TrayIcons_FindChildByName(systemTrayFrameGrid, L"NotificationCenterButton");
+    if (notificationCenterButton) {
+        somethingSucceeded |=
+            TrayIcons_ApplyNotificationCenterButtonStyle(notificationCenterButton);
+    }
+
+    FrameworkElement showDesktopStack =
+        TrayIcons_FindChildByName(systemTrayFrameGrid, L"ShowDesktopStack");
+    if (showDesktopStack) {
+        somethingSucceeded |= TrayIcons_ApplyShowDesktopStackStyle(showDesktopStack);
+    }
+
+    return somethingSucceeded;
+}
+
+using IconView_IconView_t = void*(WINAPI*)(void* pThis);
+IconView_IconView_t TrayIcons_IconView_IconView_Original;
+void* WINAPI TrayIcons_IconView_IconView_Hook(void* pThis) {
+    Wh_Log(L">");
+
+    void* ret = TrayIcons_IconView_IconView_Original(pThis);
+
+    // A new icon view has nothing to restore, and the revoker list is released
+    // while unloading.
+    if (TrayIcons_g_unloading) {
+        return ret;
+    }
+
+    FrameworkElement iconView = nullptr;
+    ((IUnknown**)pThis)[1]->QueryInterface(winrt::guid_of<FrameworkElement>(),
+                                           winrt::put_abi(iconView));
+    if (!iconView) {
+        return ret;
+    }
+
+    TrayIcons_g_autoRevokerList->emplace_back();
+    auto autoRevokerIt = TrayIcons_g_autoRevokerList->end();
+    --autoRevokerIt;
+
+    *autoRevokerIt = iconView.Loaded(
+        winrt::auto_revoke_t{},
+        [autoRevokerIt](winrt::Windows::Foundation::IInspectable const& sender,
+                        RoutedEventArgs const& e) {
+            Wh_Log(L">");
+
+            TrayIcons_g_autoRevokerList->erase(autoRevokerIt);
+
+            auto iconView = sender.try_as<FrameworkElement>();
+            if (!iconView) {
+                return;
+            }
+
+            auto className = winrt::get_class_name(iconView);
+            Wh_Log(L"className: %s", className.c_str());
+
+            if (className == L"SystemTray.IconView") {
+                if (iconView.Name() == L"SystemTrayIcon") {
+                    if (TrayIcons_IsChildOfElementByName(iconView, L"MainStack")) {
+                        TrayIcons_ApplyMainStackIconViewStyle(iconView);
+                    } else if (TrayIcons_IsChildOfElementByName(iconView,
+                                                      L"NonActivatableStack")) {
+                        TrayIcons_ApplyNonActivatableStackIconViewStyle(iconView);
+                    } else if (TrayIcons_IsChildOfElementByName(iconView,
+                                                      L"ControlCenterButton")) {
+                        TrayIcons_ApplyControlCenterButtonIconStyle(iconView);
+                    } else if (TrayIcons_IsChildOfElementByName(
+                                   iconView, L"NotificationCenterButton")) {
+                        TrayIcons_ApplyBellIconStyle(iconView);
+                    } else if (TrayIcons_IsChildOfElementByName(iconView,
+                                                      L"ShowDesktopStack")) {
+                        TrayIcons_ApplyShowDesktopStyle(iconView);
+                    }
+                }
+            }
+        });
+
+    return ret;
+}
+
+void* TrayIcons_CTaskBand_ITaskListWndSite_vftable;
+
+using TrayIcons_CTaskBand_GetTaskbarHost_t = void*(WINAPI*)(void* pThis, void** result);
+TrayIcons_CTaskBand_GetTaskbarHost_t TrayIcons_CTaskBand_GetTaskbarHost_Original;
+
+void* TrayIcons_TaskbarHost_FrameHeight_Original;
+
+using TrayIcons_std__Ref_count_base__Decref_t = void(WINAPI*)(void* pThis);
+TrayIcons_std__Ref_count_base__Decref_t TrayIcons_std__Ref_count_base__Decref_Original;
+
+XamlRoot TrayIcons_GetTaskbarXamlRoot(HWND hTaskbarWnd) {
+    HWND hTaskSwWnd = (HWND)GetProp(hTaskbarWnd, L"TaskbandHWND");
+    if (!hTaskSwWnd) {
+        return nullptr;
+    }
+
+    void* taskBand = (void*)GetWindowLongPtr(hTaskSwWnd, 0);
+    void* taskBandForTaskListWndSite = taskBand;
+    for (int i = 0; *(void**)taskBandForTaskListWndSite !=
+                    TrayIcons_CTaskBand_ITaskListWndSite_vftable;
+         i++) {
+        if (i == 20) {
+            return nullptr;
+        }
+
+        taskBandForTaskListWndSite = (void**)taskBandForTaskListWndSite + 1;
+    }
+
+    void* taskbarHostSharedPtr[2]{};
+    TrayIcons_CTaskBand_GetTaskbarHost_Original(taskBandForTaskListWndSite,
+                                      taskbarHostSharedPtr);
+    if (!taskbarHostSharedPtr[0] && !taskbarHostSharedPtr[1]) {
+        return nullptr;
+    }
+
+    size_t taskbarElementIUnknownOffset = 0x10;
+
+#if defined(_M_X64)
+    {
+        // 48:83EC 28 | sub rsp,28
+        // 48:83C1 48 | add rcx,48
+        const BYTE* b = (const BYTE*)TrayIcons_TaskbarHost_FrameHeight_Original;
+        if (b[0] == 0x48 && b[1] == 0x83 && b[2] == 0xEC && b[4] == 0x48 &&
+            b[5] == 0x83 && b[6] == 0xC1 && b[7] <= 0x7F) {
+            taskbarElementIUnknownOffset = b[7];
+        } else {
+            Wh_Log(L"Unsupported TaskbarHost::FrameHeight");
+        }
+    }
+#elif defined(_M_ARM64)
+    {
+        // 7f2303d5 pacibsp
+        // fd7bbfa9 stp     fp, lr, [sp, #-0x10]!
+        // fd030091 mov     fp, sp
+        // 080c41f8 ldr     x8, [x0, #0x10]!
+        const DWORD* p = (const DWORD*)TrayIcons_TaskbarHost_FrameHeight_Original;
+        if (p[0] == 0xD503237F && (p[1] & 0xFFC07FFF) == 0xA9807BFD &&
+            p[2] == 0x910003FD && (p[3] & 0xFFF00FE0) == 0xF8400C00) {
+            taskbarElementIUnknownOffset = (p[3] >> 12) & 0xFF;
+        } else {
+            Wh_Log(L"Unsupported TaskbarHost::FrameHeight");
+        }
+    }
+#elif defined(_M_IX86)
+    // CW-Beautify x86 兼容：Windows 11 没有 32 位版本，此分支仅为
+    // 本地 i686 编译验证兜底（运行时不会到达）：不解析机器码，沿用
+    // 默认偏移并记日志；x64 / ARM64 的运行时行为不变。
+    Wh_Log(L"i686 build: using default taskbarElementIUnknownOffset");
+#else
+#error "Unsupported architecture"
+#endif
+
+    auto* taskbarElementIUnknown =
+        *(IUnknown**)((BYTE*)taskbarHostSharedPtr[0] +
+                      taskbarElementIUnknownOffset);
+
+    FrameworkElement taskbarElement = nullptr;
+    taskbarElementIUnknown->QueryInterface(winrt::guid_of<FrameworkElement>(),
+                                           winrt::put_abi(taskbarElement));
+
+    auto result = taskbarElement ? taskbarElement.XamlRoot() : nullptr;
+
+    TrayIcons_std__Ref_count_base__Decref_Original(taskbarHostSharedPtr[1]);
+
+    return result;
+}
+
+using TrayIcons_RunFromWindowThreadProc_t = void(WINAPI*)(void* parameter);
+
+// CW-Beautify x86 兼容：HOOKPROC 为 stdcall 回调，上游此处 SetWindowsHookEx 传入无捕获
+// lambda，无法隐式转换；参照本仓库 cw-taskbar-volume-control 1.4.2 的修复方式，改为显式
+// static 函数，消息注册抽为辅助函数，TrayIcons_RUN_FROM_WINDOW_THREAD_PARAM 结构体上移到文件
+// 作用域（逻辑不变）。
+struct TrayIcons_RUN_FROM_WINDOW_THREAD_PARAM {
+    TrayIcons_RunFromWindowThreadProc_t proc;
+    void* procParam;
+};
+
+static UINT TrayIcons_GetRunFromWindowThreadRegisteredMsg() {
+    static const UINT runFromWindowThreadRegisteredMsg =
+        RegisterWindowMessage(L"Windhawk_RunFromWindowThread_" WH_MOD_ID);
+    return runFromWindowThreadRegisteredMsg;
+}
+
+static LRESULT CALLBACK TrayIcons_RunFromWindowThreadCallWndProc(int nCode,
+                                                       WPARAM wParam,
+                                                       LPARAM lParam) {
+    if (nCode == HC_ACTION) {
+        const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
+        if (cwp->message == TrayIcons_GetRunFromWindowThreadRegisteredMsg()) {
+            TrayIcons_RUN_FROM_WINDOW_THREAD_PARAM* param =
+                (TrayIcons_RUN_FROM_WINDOW_THREAD_PARAM*)cwp->lParam;
+            param->proc(param->procParam);
+        }
+    }
+
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+bool TrayIcons_RunFromWindowThread(HWND hWnd,
+                         TrayIcons_RunFromWindowThreadProc_t proc,
+                         void* procParam) {
+    const UINT runFromWindowThreadRegisteredMsg =
+        TrayIcons_GetRunFromWindowThreadRegisteredMsg();
+
+    DWORD dwThreadId = GetWindowThreadProcessId(hWnd, nullptr);
+    if (dwThreadId == 0) {
+        return false;
+    }
+
+    if (dwThreadId == GetCurrentThreadId()) {
+        proc(procParam);
+        return true;
+    }
+
+    HHOOK hook = SetWindowsHookEx(WH_CALLWNDPROC,
+                                  TrayIcons_RunFromWindowThreadCallWndProc, nullptr,
+                                  dwThreadId);
+    if (!hook) {
+        return false;
+    }
+
+    TrayIcons_RUN_FROM_WINDOW_THREAD_PARAM param{
+        .proc = proc,
+        .procParam = procParam,
+    };
+    SendMessage(hWnd, runFromWindowThreadRegisteredMsg, 0, (LPARAM)&param);
+
+    UnhookWindowsHookEx(hook);
+
+    return true;
+}
+
+// CW-Beautify v1.0.0：设置键加 trayIcons. 前缀收进「托盘系统图标」分组，
+// 代码读取同步（其余逻辑不变）。
+void TrayIcons_LoadSettings() {
+    TrayIcons_g_settings.hideVolumeIcon = Wh_GetIntSetting(L"trayIcons.hideVolumeIcon");
+    TrayIcons_g_settings.hideNetworkIcon = Wh_GetIntSetting(L"trayIcons.hideNetworkIcon");
+    TrayIcons_g_settings.hideBatteryIcon = Wh_GetIntSetting(L"trayIcons.hideBatteryIcon");
+    TrayIcons_g_settings.grayscaleBatteryIcon =
+        Wh_GetIntSetting(L"trayIcons.grayscaleBatteryIcon");
+    TrayIcons_g_settings.hideMicrophoneIcon =
+        Wh_GetIntSetting(L"trayIcons.hideMicrophoneIcon");
+    TrayIcons_g_settings.hideGeolocationIcon =
+        Wh_GetIntSetting(L"trayIcons.hideGeolocationIcon");
+    TrayIcons_g_settings.hideStudioEffectsIcon =
+        Wh_GetIntSetting(L"trayIcons.hideStudioEffectsIcon");
+    TrayIcons_g_settings.hideRecallIcon = Wh_GetIntSetting(L"trayIcons.hideRecallIcon");
+    TrayIcons_g_settings.hideLanguageBar = Wh_GetIntSetting(L"trayIcons.hideLanguageBar");
+    TrayIcons_g_settings.hideLanguageSupplementaryIcons =
+        Wh_GetIntSetting(L"trayIcons.hideLanguageSupplementaryIcons");
+
+    PCWSTR hideBellIcon = Wh_GetStringSetting(L"trayIcons.hideBellIcon");
+    TrayIcons_g_settings.hideBellIcon = TrayIcons_HideBellIcon::never;
+    if (wcscmp(hideBellIcon, L"whenInactive") == 0) {
+        TrayIcons_g_settings.hideBellIcon = TrayIcons_HideBellIcon::whenInactive;
+    } else if (wcscmp(hideBellIcon, L"whenInactiveAndNoDnd") == 0) {
+        TrayIcons_g_settings.hideBellIcon = TrayIcons_HideBellIcon::whenInactiveAndNoDnd;
+    } else if (wcscmp(hideBellIcon, L"always") == 0) {
+        TrayIcons_g_settings.hideBellIcon = TrayIcons_HideBellIcon::always;
+    }
+    Wh_FreeStringSetting(hideBellIcon);
+
+    TrayIcons_g_settings.showDesktopButtonWidth =
+        std::clamp(Wh_GetIntSetting(L"trayIcons.showDesktopButtonWidth"), 0,
+                   800);
+}
+
+struct TrayIcons_ApplySettingsParam {
+    HWND hTaskbarWnd;
+};
+
+// CW-Beautify x86 兼容：TrayIcons_RunFromWindowThreadProc_t 为 WINAPI/stdcall 回调类型，上游此处
+// 为无捕获 lambda，无法隐式转换，改为显式 static 函数，TrayIcons_ApplySettingsParam 结构体上移到
+// 文件作用域（逻辑不变）。
+static void WINAPI TrayIcons_ApplySettingsInTaskbarThread(void* pParam) {
+    TrayIcons_ApplySettingsParam& param = *(TrayIcons_ApplySettingsParam*)pParam;
+
+    TrayIcons_g_autoRevokerList->clear();
+
+    if (auto bellSystemTrayIconElement =
+            TrayIcons_g_bellSystemTrayIconElement.get()) {
+        bellSystemTrayIconElement.UnregisterPropertyChangedCallback(
+            Automation::AutomationProperties::NameProperty(),
+            TrayIcons_g_bellAutomationNameChangedToken);
+        TrayIcons_g_bellSystemTrayIconElement = nullptr;
+        TrayIcons_g_bellAutomationNameChangedToken = 0;
+    }
+
+    if (auto mainStackInnerTextBlock =
+            TrayIcons_g_mainStackInnerTextBlock.get()) {
+        mainStackInnerTextBlock.UnregisterPropertyChangedCallback(
+            Controls::TextBlock::TextProperty(),
+            TrayIcons_g_mainStackTextChangedToken);
+        TrayIcons_g_mainStackInnerTextBlock = nullptr;
+        TrayIcons_g_mainStackTextChangedToken = 0;
+    }
+
+    if (auto controlCenterStackPanel =
+            TrayIcons_g_controlCenterStackPanel.get()) {
+        controlCenterStackPanel.SizeChanged(
+            TrayIcons_g_controlCenterStackPanelSizeChangedToken);
+        TrayIcons_g_controlCenterStackPanel = nullptr;
+        TrayIcons_g_controlCenterStackPanelSizeChangedToken = {};
+    }
+
+    // Unregister and restore battery TextBlock foregrounds. TrayIcons_ApplyStyle
+    // below will re-register if grayscale is still enabled. This also
+    // covers stale entries whose icon view was destroyed.
+    for (auto& state : *TrayIcons_g_batteryTextBlockStates) {
+        auto textBlock = state.textBlock.get();
+        if (!textBlock) {
+            continue;
+        }
+        textBlock.UnregisterPropertyChangedCallback(
+            Controls::TextBlock::ForegroundProperty(),
+            state.foregroundChangedToken);
+        textBlock.Foreground(state.savedForeground);
+    }
+    TrayIcons_g_batteryTextBlockStates->clear();
+
+    // Restore the show desktop width overrides. TrayIcons_ApplyStyle below
+    // re-applies them unless the mod is unloading.
+    for (auto& state : TrayIcons_g_showDesktopWidthStates) {
+        auto element = state.element.get();
+        if (!element) {
+            continue;
+        }
+        if (state.savedMinWidth) {
+            element.MinWidth(*state.savedMinWidth);
+        } else {
+            element.ClearValue(FrameworkElement::MinWidthProperty());
+        }
+        if (state.savedMaxWidth) {
+            element.MaxWidth(*state.savedMaxWidth);
+        } else {
+            element.ClearValue(FrameworkElement::MaxWidthProperty());
+        }
+    }
+    TrayIcons_g_showDesktopWidthStates.clear();
+
+    // CW-Beautify: 还原「显示桌面」竖条高度覆盖（showDesktop.FullHeight，
+    // ShowDesktopBtn 段）。下方 TrayIcons_ApplyStyle 会在未卸载且功能开启时重新应用。
+    ShowDesktopBtn::RestoreAll();
+
+    auto xamlRoot = TrayIcons_GetTaskbarXamlRoot(param.hTaskbarWnd);
+    if (!xamlRoot) {
+        Wh_Log(L"Getting XamlRoot failed");
+    } else if (!TrayIcons_ApplyStyle(xamlRoot)) {
+        Wh_Log(L"TrayIcons_ApplyStyle failed");
+    }
+
+    if (TrayIcons_g_unloading) {
+        TrayIcons_g_autoRevokerList.reset();
+        TrayIcons_g_batteryTextBlockStates.reset();
+    }
+}
+
+void TrayIcons_ApplySettings() {
+    Wh_Log(L"Applying settings");
+
+    HWND hTaskbarWnd = TrayIcons_FindCurrentProcessTaskbarWnd();
+    if (!hTaskbarWnd) {
+        Wh_Log(L"No taskbar found");
+        return;
+    }
+
+    TrayIcons_ApplySettingsParam param{
+        .hTaskbarWnd = hTaskbarWnd,
+    };
+
+    TrayIcons_RunFromWindowThread(hTaskbarWnd, TrayIcons_ApplySettingsInTaskbarThread, &param);
+}
+
+bool TrayIcons_HookSystemTraySymbols(HMODULE module) {
+    // SystemTray.dll, Taskbar.View.dll
+    WindhawkUtils::SYMBOL_HOOK symbolHooks[] = {
+        {
+            {LR"(public: __cdecl winrt::SystemTray::implementation::IconView::IconView(void))"},
+            &TrayIcons_IconView_IconView_Original,
+            TrayIcons_IconView_IconView_Hook,
+        },
+    };
+
+    if (!HookSymbols(module, symbolHooks, ARRAYSIZE(symbolHooks))) {
+        Wh_Log(L"HookSymbols failed");
+        return false;
+    }
+
+    return true;
+}
+
+VS_FIXEDFILEINFO* TrayIcons_GetModuleVersionInfo(HMODULE hModule, UINT* puPtrLen) {
+    void* pFixedFileInfo = nullptr;
+    UINT uPtrLen = 0;
+
+    HRSRC hResource =
+        FindResource(hModule, MAKEINTRESOURCE(VS_VERSION_INFO), RT_VERSION);
+    if (hResource) {
+        HGLOBAL hGlobal = LoadResource(hModule, hResource);
+        if (hGlobal) {
+            void* pData = LockResource(hGlobal);
+            if (pData) {
+                if (!VerQueryValue(pData, L"\\", &pFixedFileInfo, &uPtrLen) ||
+                    uPtrLen == 0) {
+                    pFixedFileInfo = nullptr;
+                    uPtrLen = 0;
+                }
+            }
+        }
+    }
+
+    if (puPtrLen) {
+        *puPtrLen = uPtrLen;
+    }
+
+    return (VS_FIXEDFILEINFO*)pFixedFileInfo;
+}
+
+HMODULE TrayIcons_GetSystemTrayModuleHandle() {
+    HMODULE module = GetModuleHandle(L"SystemTray.dll");
+    if (!module) {
+        module = GetModuleHandle(L"Taskbar.View.dll");
+        if (module) {
+            // Starting with Taskbar.View.dll 2604.8002.200.6000, the SystemTray
+            // types moved out of Taskbar.View.dll into SystemTray.dll, so don't
+            // hook Taskbar.View.dll at this version and above.
+            VS_FIXEDFILEINFO* fixedFileInfo =
+                TrayIcons_GetModuleVersionInfo(module, nullptr);
+            WORD moduleMajor =
+                fixedFileInfo ? HIWORD(fixedFileInfo->dwFileVersionMS) : 0;
+            if (!moduleMajor || moduleMajor >= 2604) {
+                Wh_Log(L"Skipping Taskbar.View.dll version %d", moduleMajor);
+                module = nullptr;
+            }
+        }
+    }
+    if (!module) {
+        module = GetModuleHandle(L"ExplorerExtensions.dll");
+    }
+
+    return module;
+}
+
+void TrayIcons_HandleLoadedModuleIfSystemTray(HMODULE module, LPCWSTR lpLibFileName) {
+    if (!TrayIcons_g_systemTrayModuleHooked && TrayIcons_GetSystemTrayModuleHandle() == module &&
+        !TrayIcons_g_systemTrayModuleHooked.exchange(true)) {
+        Wh_Log(L"Loaded %s", lpLibFileName);
+
+        if (TrayIcons_HookSystemTraySymbols(module)) {
+            Wh_ApplyHookOperations();
+        }
+    }
+}
+
+using TrayIcons_LoadLibraryExW_t = decltype(&LoadLibraryExW);
+TrayIcons_LoadLibraryExW_t TrayIcons_LoadLibraryExW_Original;
+HMODULE WINAPI TrayIcons_LoadLibraryExW_Hook(LPCWSTR lpLibFileName,
+                                   HANDLE hFile,
+                                   DWORD dwFlags) {
+    HMODULE module = TrayIcons_LoadLibraryExW_Original(lpLibFileName, hFile, dwFlags);
+    if (module) {
+        TrayIcons_HandleLoadedModuleIfSystemTray(module, lpLibFileName);
+    }
+
+    return module;
+}
+
+bool TrayIcons_HookTaskbarDllSymbols() {
+    HMODULE module =
+        LoadLibraryEx(L"taskbar.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    if (!module) {
+        Wh_Log(L"Failed to load taskbar.dll");
+        return false;
+    }
+
+    WindhawkUtils::SYMBOL_HOOK taskbarDllHooks[] = {
+        {
+            {LR"(const CTaskBand::`vftable'{for `ITaskListWndSite'})"},
+            &TrayIcons_CTaskBand_ITaskListWndSite_vftable,
+        },
+        {
+            {LR"(public: virtual class std::shared_ptr<class TaskbarHost> __cdecl CTaskBand::GetTaskbarHost(void)const )"},
+            &TrayIcons_CTaskBand_GetTaskbarHost_Original,
+        },
+        {
+            {LR"(public: int __cdecl TaskbarHost::FrameHeight(void)const )"},
+            &TrayIcons_TaskbarHost_FrameHeight_Original,
+        },
+        {
+            {LR"(public: void __cdecl std::_Ref_count_base::_Decref(void))"},
+            &TrayIcons_std__Ref_count_base__Decref_Original,
+        },
+    };
+
+    return HookSymbols(module, taskbarDllHooks, ARRAYSIZE(taskbarDllHooks));
+}
+
+bool Init() {
+    Wh_Log(L">");
+
+    TrayIcons_LoadSettings();
+
+    if (HMODULE systemTrayModule = TrayIcons_GetSystemTrayModuleHandle()) {
+        TrayIcons_g_systemTrayModuleHooked = true;
+        if (!TrayIcons_HookSystemTraySymbols(systemTrayModule)) {
+            return FALSE;
+        }
+    } else {
+        Wh_Log(L"System tray module not loaded yet");
+
+        HMODULE kernelBaseModule = GetModuleHandle(L"kernelbase.dll");
+        auto pKernelBaseLoadLibraryExW =
+            (decltype(&LoadLibraryExW))GetProcAddress(kernelBaseModule,
+                                                      "LoadLibraryExW");
+        WindhawkUtils::SetFunctionHook(pKernelBaseLoadLibraryExW,
+                                       TrayIcons_LoadLibraryExW_Hook,
+                                       &TrayIcons_LoadLibraryExW_Original);
+    }
+
+    if (!TrayIcons_HookTaskbarDllSymbols()) {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+void AfterInit() {
+    Wh_Log(L">");
+
+    if (!TrayIcons_g_systemTrayModuleHooked) {
+        if (HMODULE systemTrayModule = TrayIcons_GetSystemTrayModuleHandle()) {
+            if (!TrayIcons_g_systemTrayModuleHooked.exchange(true)) {
+                Wh_Log(L"Got system tray module");
+
+                if (TrayIcons_HookSystemTraySymbols(systemTrayModule)) {
+                    Wh_ApplyHookOperations();
+                }
+            }
+        }
+    }
+
+    TrayIcons_ApplySettings();
+}
+
+void BeforeUninit() {
+    Wh_Log(L">");
+
+    TrayIcons_g_unloading = true;
+
+    TrayIcons_ApplySettings();
+}
+
+void Uninit() {
+    Wh_Log(L">");
+}
+
+void SettingsChanged() {
+    Wh_Log(L">");
+
+    TrayIcons_LoadSettings();
+
+    TrayIcons_ApplySettings();
+}
+}  // namespace TrayIcons
+
+// ============================================================================
+// CW-Beautify v1.0.0：合并后的 Windhawk 生命周期入口。时钟段、托盘图标段、
+// 显示桌面段各自独立初始化/卸载/设置重载；托盘图标段与显示桌面段仅支持
+// Windows 11，Windows 10 上自动跳过（时钟段继续工作）。
+// ============================================================================
+
+BOOL Wh_ModInit() {
+    Wh_Log(L">");
+
+    if (!Clock_Wh_ModInit()) {
+        return FALSE;
+    }
+
+    if (g_winVersion >= WinVersion::Win11) {
+        if (!TrayIcons::Init()) {
+            return FALSE;
+        }
+        ShowDesktopBtn::Init();
+    } else {
+        Wh_Log(L"Tray icons / Show desktop sections require Windows 11, skipping");
+    }
+
+    return TRUE;
+}
+
+void Wh_ModAfterInit() {
+    Wh_Log(L">");
+
+    Clock_Wh_ModAfterInit();
+
+    if (g_winVersion >= WinVersion::Win11) {
+        TrayIcons::AfterInit();
+    }
+}
+
+void Wh_ModBeforeUninit() {
+    Wh_Log(L">");
+
+    Clock_Wh_ModBeforeUninit();
+
+    if (g_winVersion >= WinVersion::Win11) {
+        TrayIcons::BeforeUninit();
+    }
+}
+
+void Wh_ModUninit() {
+    Wh_Log(L">");
+
+    Clock_Wh_ModUninit();
+
+    TrayIcons::Uninit();
+    ShowDesktopBtn::Uninit();
+}
+
+BOOL Wh_ModSettingsChanged(BOOL* bReload) {
+    Wh_Log(L">");
+
+    Clock_Wh_ModSettingsChanged(bReload);
+    if (*bReload) {
+        // 时钟段请求整体重载（oldTaskbarOnWin11 变更），Windhawk 会重新走
+        // Wh_ModUninit / Wh_ModInit，各段设置随之重读。
+        return TRUE;
+    }
+
+    // 先重读显示桌面段设置，再走托盘图标段的重载——托盘段的应用路径
+    // （ApplySettings -> ApplyShowDesktopStyle）会按显示桌面段设置应用竖条高度。
+    ShowDesktopBtn::SettingsChanged();
+
+    if (g_winVersion >= WinVersion::Win11) {
+        TrayIcons::SettingsChanged();
+    }
 
     return TRUE;
 }

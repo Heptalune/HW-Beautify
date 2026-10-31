@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-# CW-Beautify v2.5.1 打包清单
+# CW-Beautify v2.6.0 打包清单
 # 模组构成：21 核心 + 3 可选 + 8 DLC 额外内容（tool mod）= 32 个
 # 用法：在本目录（源码根）执行 python build_releases.py，
 # 生成的 zip 复制到 上一级的「发布包」目录发布。
@@ -14,31 +14,25 @@ common_files = [
     'local@cw-explorer-styler.wh.cpp',
     'local@cw-taskbar-volume-control.wh.cpp',
     'local@cw-taskbar-animation.wh.cpp',
-    'local@cw-window-arrangement.wh.cpp',
     'local@cw-extension-no-warning.wh.cpp',
-    'local@cw-alt-drag.wh.cpp',
     'local@cw-custom-context-menu.wh.cpp',
-    'local@cw-invisible-borders.wh.cpp',
-    'local@cw-taskbar-thumbnail-settings.wh.cpp',
     'local@cw-desktop-quick-settings.wh.cpp',
     'local@cw-fluent-context-menu.wh.cpp',
     'local@cw-file-hover-info.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
-    'local@cw-modern-run-dialog.wh.cpp',
     'local@cw-file-operation-styler.wh.cpp',
     'local@cw-drag-to-delete.wh.cpp',
+    'local@cw-window-optimizer.wh.cpp',
+    'local@cw-tray-area-settings.wh.cpp',
+    'local@cw-modernized.wh.cpp',
     'local@cw-taskbar-button-click.wh.cpp',
-    'local@cw-taskbar-clock-customization.wh.cpp',
-    'local@cw-modern-folder-picker.wh.cpp',
     'local@cw-winui-context-menu-animation.wh.cpp',
     'local@cw-file-explorer-content-animation.wh.cpp',
     'local@cw-no-focus-rectangle.wh.cpp',
     'local@cw-win11-power-buttons.wh.cpp',
     'local@cw-logon-logoff-shutdown-sounds.wh.cpp',
     'local@cw-explorer-double-click-up.wh.cpp',
-    'local@cw-hide-desktop-icon-text.wh.cpp',
     'local@cw-centered-start-split-icons.wh.cpp',
-    'local@cw-tray-system-icons.wh.cpp',
     'local@cw-explorer-details-better-file-sizes.wh.cpp',
     # 部署 / 卸载脚本（deploy-dlc 为 DLC 额外内容添加程序，与主部署分开运行）
     'deploy.bat',
@@ -52,6 +46,7 @@ common_files = [
     'CHANGELOG_CW-Beautify_v2.4.0.md',
     'CHANGELOG_CW-Beautify_v2.5.0.md',
     'CHANGELOG_CW-Beautify_v2.5.1.md',
+    'CHANGELOG_CW-Beautify_v2.6.0.md',
     'README.md',
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
@@ -71,12 +66,12 @@ common_files = [
 ]
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.5.1.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.5.1_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.6.0.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.6.0_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：
-#   'CW-Beautify_OneKeyDeploy_v2.5.1_Offline.zip': common_files + ['windhawk_setup_offline.exe']
+#   'CW-Beautify_OneKeyDeploy_v2.6.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
 
 for zip_name, file_list in releases.items():
     print(f"正在创建 {zip_name}...")

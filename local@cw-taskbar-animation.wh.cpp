@@ -3,8 +3,8 @@
 // @name              CW-任务栏动画
 // @name:zh-CN        CW-任务栏动画
 // @description       macOS-style icon animations for the taskbar (updated fork with support for all taskbar positions and multi-monitor fixes), instant-show animations for the auto-hidden taskbar, auto-hiding the taskbar only when a window is maximized, and an animated elastic pill indicator for the active taskbar item.
-// @description:zh-CN 任务栏动画合集：图标悬停放大动画（支持所有任务栏位置和多显示器）、自动隐藏任务栏的即时显示动画、窗口最大化时才自动隐藏任务栏，以及当前活动项的弹性药丸指示条。
-// @version           2.4.0
+// @description:zh-CN 任务栏动画合集：图标悬停放大动画（支持所有任务栏位置和多显示器）、自动隐藏任务栏的即时显示动画、窗口最大化时才自动隐藏任务栏，以及当前活动项的弹性指示条。
+// @version           2.4.1
 // @author            incconutwo (Plus fork), Ph0en1x-dev (original), Bo0ii, Lockframe, m417z, CW-Beautify
 // @github            https://github.com/incconutwo
 // @homepage          https://github.com/Bo0ii/windhawk-mods
@@ -44,7 +44,7 @@
 
 1. **任务栏图标动画**（原 CW-任务栏 Dock 动画）：macOS 风格的任务栏图标悬停动画——悬停放大、相邻图标让位、空闲「呼吸」弹跳。
 2. **任务栏显示动画**（原 CW-任务栏秒显）：配合系统「自动隐藏任务栏」使用，鼠标一碰屏幕边缘任务栏立即出现，出现/隐藏延迟与动画可自定义；2.4.0 起并入原「CW-最大化自动隐藏任务栏」子功能——仅当窗口最大化时才自动隐藏任务栏。
-3. **任务栏指示条动画**（原 CW-任务栏弹性药丸）：把任务栏当前活动项的原生指示条换成一条带弹性动画的滑动「药丸」。
+3. **任务栏指示条动画**（原 CW-任务栏弹性药丸）：把任务栏当前活动项的原生指示条换成一条带弹性动画的滑动「指示条」。
 
 > 任务栏图标动画需要 Windows 11 或更高版本；任务栏显示动画（含窗口最大化自动隐藏）支持 Windows 10 与 Windows 11；任务栏指示条动画需要 Windows 11 的 XAML 任务栏。
 
@@ -85,16 +85,16 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 
 ## 功能三：任务栏指示条动画（活动项指示条）
 
-> 仅支持 Windows 11 的 XAML 任务栏。启用后活动任务项的原生指示条由本模组的药丸呈现；停用或卸载模组时自动还原原生指示条与小圆点。
+> 仅支持 Windows 11 的 XAML 任务栏。启用后活动任务项的原生指示条由本模组的指示条呈现；停用或卸载模组时自动还原原生指示条与小圆点。
 
-把任务栏当前活动项的原生指示条，换成一条带弹性动画、可深度自定义的滑动「药丸」（pill）：
+把任务栏当前活动项的原生指示条，换成一条带弹性动画、可深度自定义的滑动「指示条」（pill）：
 
-- **弹性滑动指示条**：切换活动窗口时，药丸以拉伸（Stretch）等动画平滑滑到对应按钮下方，还原 WinUI 原生质感。
+- **弹性滑动指示条**：切换活动窗口时，指示条以拉伸（Stretch）等动画平滑滑到对应按钮下方，还原 WinUI 原生质感。
 - **多种动画风格**：拉伸、弹性、弹跳、线性、缓入、缓出、缓入缓出、无，共 8 种；可选弹簧物理，并可调节弹性强度与速度倍率。
-- **挤压与淡入淡出**：移动过程中可为药丸添加挤压（Squish）形变或淡出淡入过渡。
-- **指针交互反馈**：悬停、按下时药丸可缩放，或改用指定的背景颜色。
-- **外观深度自定义**：药丸尺寸、圆角、边距、不透明度均可调；颜色支持系统强调色、自定义十六进制（含多色渐变、亮/暗主题分色）与应用图标主色三种模式。
-- **系统按钮与原生圆点**：可选为「开始」、任务视图和搜索按钮也添加药丸；可隐藏非活动应用的原生小圆点。
+- **挤压与淡入淡出**：移动过程中可为指示条添加挤压（Squish）形变或淡出淡入过渡。
+- **指针交互反馈**：悬停、按下时指示条可缩放，或改用指定的背景颜色。
+- **外观深度自定义**：指示条尺寸、圆角、边距、不透明度均可调；颜色支持系统强调色、自定义十六进制（含多色渐变、亮/暗主题分色）与应用图标主色三种模式。
+- **系统按钮与原生圆点**：可选为「开始」、任务视图和搜索按钮也添加指示条；可隐藏非活动应用的原生小圆点。
 
 ## 设置说明
 
@@ -144,28 +144,28 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 
 ### 任务栏指示条动画（设置页「任务栏指示条动画」嵌套组）
 
-- **药丸尺寸（宽、高）**：滑动药丸的宽与高，像素，默认 "16, 3"。
-- **药丸边距（水平、底部）**：左边距（右侧对称）与下边距，像素，默认 "0, 5"。
-- **药丸圆角半径**：默认 2，也可填 1.5 这类小数。
+- **指示条尺寸（宽、高）**：滑动指示条的宽与高，像素，默认 "16, 3"。
+- **指示条边距（水平、底部）**：左边距（右侧对称）与下边距，像素，默认 "0, 5"。
+- **指示条圆角半径**：默认 2，也可填 1.5 这类小数。
 - **隐藏非活动应用圆点**：默认关闭。
-- **跟踪系统按钮**：默认关闭；开启后「开始」、任务视图、搜索按钮也会显示药丸。
+- **跟踪系统按钮**：默认关闭；开启后「开始」、任务视图、搜索按钮也会显示指示条。
 - **动画风格**：默认「拉伸（WinUI 原生一致）」，另有弹性、弹跳、线性、缓入、缓出、缓入缓出、无。
 - **使用弹簧物理**：默认关闭；开启后拉伸动画从简单贝塞尔曲线切换为弹簧物理。
 - **弹性强度**：弹簧动画的回弹程度倍率，仅对弹簧物理类模式生效，默认 1.0。
 - **速度倍率**：动画整体速度倍率（2.0 即两倍速），默认 1.0。
-- **淡入淡出过渡 / 挤压过渡**：移动时先淡出再淡入 / 药丸产生挤压形变，默认均关闭。
+- **淡入淡出过渡 / 挤压过渡**：移动时先淡出再淡入 / 指示条产生挤压形变，默认均关闭。
 - **挤压倍率（X、Y）**：挤压强度，填一个值为等比，两个值为 X/Y 独立控制，负值反转方向，默认 1.0。
 - **淡入淡出时长倍率**：淡入淡出过渡的时长倍率，默认 1.0。
-- **悬停/按下缩放倍率**：悬停、按下时药丸的缩放倍率，1.0 为关闭，默认 1.0。
+- **悬停/按下缩放倍率**：悬停、按下时指示条的缩放倍率，1.0 为关闭，默认 1.0。
 - **悬停/按下背景色（亮色、暗色）**：交互时的十六进制颜色覆盖，支持多色渐变与亮/暗分色，默认空。
-- **药丸不透明度（亮色、暗色）**：填充不透明度倍率，1.0 保持原始透明度，默认 "1.0, 1.0"。
-- **药丸颜色模式**：系统强调色（默认）/ 自定义十六进制 / 应用图标颜色。
-- **自定义药丸颜色**：十六进制色值，支持多色渐变与亮/暗分色，默认空。
-- **药丸渐变方向**：水平（默认）/ 垂直 / 两种对角线方向。
+- **指示条不透明度（亮色、暗色）**：填充不透明度倍率，1.0 保持原始透明度，默认 "1.0, 1.0"。
+- **指示条颜色模式**：系统强调色（默认）/ 自定义十六进制 / 应用图标颜色。
+- **自定义指示条颜色**：十六进制色值，支持多色渐变与亮/暗分色，默认空。
+- **指示条渐变方向**：水平（默认）/ 垂直 / 两种对角线方向。
 
 ## 同时使用四部分功能
 
-四部分功能相互独立、可单独或同时启用：任务栏图标动画挂在 Taskbar.View.dll 的指针事件上，任务栏显示动画挂在任务栏窗口的 SlideWindow 与显示/隐藏定时器上，窗口最大化自动隐藏挂在 TrayUI 窗口过程、隐藏/显示调用与 ViewCoordinator 显示判定上，任务栏指示条动画挂在任务栏按钮的视觉状态更新上。自动隐藏的任务栏出现后，把鼠标移到任务栏上，图标悬停动画照常生效；弹性药丸与图标悬停放大也可同用；「窗口最大化自动隐藏」与秒显分层工作（前者管“该不该显示/自动隐藏是否启用”，后者管“显示得多快”），可单独或搭配使用。
+四部分功能相互独立、可单独或同时启用：任务栏图标动画挂在 Taskbar.View.dll 的指针事件上，任务栏显示动画挂在任务栏窗口的 SlideWindow 与显示/隐藏定时器上，窗口最大化自动隐藏挂在 TrayUI 窗口过程、隐藏/显示调用与 ViewCoordinator 显示判定上，任务栏指示条动画挂在任务栏按钮的视觉状态更新上。自动隐藏的任务栏出现后，把鼠标移到任务栏上，图标悬停动画照常生效；弹性指示条与图标悬停放大也可同用；「窗口最大化自动隐藏」与秒显分层工作（前者管“该不该显示/自动隐藏是否启用”，后者管“显示得多快”），可单独或搭配使用。
 
 ## 兼容性与已知问题
 
@@ -173,10 +173,11 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 - 任务栏图标动画：放大后的图标可能略显模糊；配合 CW-任务栏高度与图标大小做窄任务栏时，请把「最大缩放」保持在 130% 或以下，减少裁切（原作者建议）；不支持 StartAllBack（需要重写整个代码库，超出范围）。
 - 任务栏显示动画：必须先在系统中开启「自动隐藏任务栏」才会生效；配合 ExplorerPatcher 的旧版任务栏时，请开启「在 Windows 11 上使用旧版任务栏」；个别情况下（空显示器、全屏程序）鼠标碰屏幕边缘任务栏可能不出现，可尝试开启「空显示器边沿检测」。
 - 窗口最大化自动隐藏：仅注入 explorer.exe，支持 Windows 10 与 Windows 11（含 24H2）；功能启用期间会阻止系统关闭「自动隐藏任务栏」开关（实现前提），关闭该子功能或卸载模组后自动还原；Win+Tab、Alt+Tab 多任务视图打开期间任务栏保持显示，不影响窗口切换。
-- 任务栏指示条动画：仅支持 Windows 11 的 XAML 任务栏（挂钩 Taskbar.View.dll / ExplorerExtensions.dll，跟踪系统按钮时另挂钩 SearchUx.UI.dll）；系统按钮（开始/任务视图/搜索）的药丸依赖对应系统组件的内部符号，Windows 更新后可能暂时失效，需等待上游适配；若其他模组也改动任务栏按钮的指示条或小圆点，视觉上可能相互叠加，建议据此调整药丸尺寸、边距与颜色。
+- 任务栏指示条动画：仅支持 Windows 11 的 XAML 任务栏（挂钩 Taskbar.View.dll / ExplorerExtensions.dll，跟踪系统按钮时另挂钩 SearchUx.UI.dll）；系统按钮（开始/任务视图/搜索）的指示条依赖对应系统组件的内部符号，Windows 更新后可能暂时失效，需等待上游适配；若其他模组也改动任务栏按钮的指示条或小圆点，视觉上可能相互叠加，建议据此调整指示条尺寸、边距与颜色。
 
 ## 更新日志
 
+- **2.4.1（CW）**：两项「实测失效」修复与设置文案改名。其一，任务栏指示条（弹性药丸）完全无效——运行时字节级取证确认根因是引擎符号缓存/解析链路异常（引擎下载的 Taskbar.View.pdb/Taskbar.pdb 内部 age 与本机 DLL 调试目录要求不匹配，dbghelp 拒载，任何新符号解析一律失败；图标动画的指针钩子因早前已入缓存而幸存，指示条的 TaskListButton::UpdateVisualStates 等新符号解析失败、钩子从未挂上）。模组侧补齐自愈能力：符号解析失败改为响明日志且不再让初始化永久失败，后续模块加载事件与每次设置变更都会重试解析并应用钩子（同 CW-任务栏缩略图设置 1.1.1 模式），延迟加载钩子也不再先置位标志后解析（旧写法解析失败会卡死重试标志）。其二，图标动画的空闲弹跳（及悬停缩放）失效——取证确认本 Windows 构建上 XAML 不再把指针移动路由进 TaskbarFrame::OnPointerMoved 虚重写（钩子字节级生效却永不触发，渲染循环因此不启动）；新增指针追踪兜底：借道 TaskListButton::UpdateVisualStates 钩子找到 Taskbar.TaskbarFrame 后，用 AddHandler(..., handledEventsToo=true) 订阅 PointerMoved/PointerExited（事件在按钮层被标记 Handled 也能收到），与虚重写路径互为冗余、均幂等；另修复 TaskbarFrame 重建后同地址弱引用已死的旧上下文永久吞掉指针事件的问题（自动清除重注册）。其三，设置页「任务栏指示条动画」组全部 zh-CN 显示文案中的「药丸」统一改为「指示条」（键名 pill.* 与英文原文不动，分组名本就正确）。
 - **2.4.0（CW）**：「CW-最大化自动隐藏任务栏」（上游 Taskbar auto-hide when maximized，原作者 m417z，1.2.7 汉化版）并入本模组，作为「任务栏显示动画」的子功能「窗口最大化时自动隐藏任务栏」。代码置于 TaskbarMaxHide 命名空间，设置项迁移为 maxHide.* 前缀（设置页「任务栏显示动画」嵌套组），并新增总开关 maxHide.Enabled（默认关闭——并入后不改变现有用户开启动画模组时的默认行为，开启后才接管系统自动隐藏状态）；EnumWindows/EnumThreadWindows/SetTimer 三处无捕获 lambda 回调改为显式 CALLBACK 函数保证 x86 编译；初始化失败时仅降级该功能，不影响其余功能。
 - **2.3.0（CW）**：设置页重组为三个可收起分组——原图标动画设置收进「任务栏图标动画」分组（键前缀 iconAnim.），「任务栏秒显」分组更名为「任务栏显示动画」，「任务栏弹性药丸」分组更名为「任务栏指示条动画」。键名与分组名变化只影响设置页归类，不改变动画行为。
 - **2.2.0（CW）**：「CW-任务栏弹性药丸」（Lockframe，Taskbar Elastic WinUI Pill）并入本模组。药丸代码置于 TaskbarElasticPill 命名空间，四组设置键（Pill.* / Animation.* / PointerInteractions.* / Colors.*）迁移为 pill. 前缀（设置页「任务栏弹性药丸」嵌套组）；药丸初始化失败时仅降级该功能，不影响其余功能。另修复 RunFromWindowThread 钩子回调在 x86 架构下的编译失败（改为等价 CALLBACK 函数，行为不变；2.1.0 存量问题，Windhawk 按注入进程架构编译所以未暴露）。
@@ -529,19 +530,19 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
 - pill:
   - Dimensions: "16, 3"
     $name: Pill Dimensions (Width, Height)
-    $name:zh-CN: 药丸尺寸（宽、高）
+    $name:zh-CN: 指示条尺寸（宽、高）
     $description: The width and height of the sliding pill in pixels.
-    $description:zh-CN: 滑动药丸的宽度与高度，单位为像素。
+    $description:zh-CN: 滑动指示条的宽度与高度，单位为像素。
   - Margins: "0, 5"
     $name: Pill Margins (Horizontal, Bottom)
-    $name:zh-CN: 药丸边距（水平、底部）
+    $name:zh-CN: 指示条边距（水平、底部）
     $description: Left margin (Right is mirrored) and Bottom margin.
     $description:zh-CN: 左边距（右侧对称）与下边距。
   - PillRadius: '2'
     $name: Pill corner radius
-    $name:zh-CN: 药丸圆角半径
+    $name:zh-CN: 指示条圆角半径
     $description: The corner radius for the pill (e.g., 1.5).
-    $description:zh-CN: 药丸的圆角半径（如 1.5）。
+    $description:zh-CN: 指示条的圆角半径（如 1.5）。
   - HideInactiveDots: false
     $name: Hide inactive app dots
     $name:zh-CN: 隐藏非活动应用圆点
@@ -551,7 +552,7 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
     $name: Track System buttons
     $name:zh-CN: 跟踪系统按钮
     $description: Add elastic pill to Start, Task View, and Search buttons.
-    $description:zh-CN: 为「开始」、任务视图和搜索按钮也添加弹性药丸。
+    $description:zh-CN: 为「开始」、任务视图和搜索按钮也添加弹性指示条。
   - AnimationStyle: stretch
     $name: Animation style
     $name:zh-CN: 动画风格
@@ -588,7 +589,7 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
     $name: Squish transition
     $name:zh-CN: 挤压过渡
     $description: Adds a squish effect to the pill while moving.
-    $description:zh-CN: 移动时为药丸添加挤压形变效果。
+    $description:zh-CN: 移动时为指示条添加挤压形变效果。
   - SquishMultiplier: '1.0'
     $name: Squish multiplier (X, Y)
     $name:zh-CN: 挤压倍率（X、Y）
@@ -603,12 +604,12 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
     $name: Hover scale multiplier
     $name:zh-CN: 悬停缩放倍率
     $description: Multiplier for how much the pill scales when hovered. Use 1 value for uniform scale (e.g. 1.1) or 2 values for X,Y scale (e.g. 1.05, 0.7). Set to 1.0 to disable.
-    $description:zh-CN: 悬停时药丸的缩放倍率。填一个值为等比缩放（如 1.1），填两个值为 X/Y 独立缩放（如 1.05, 0.7）。设为 1.0 关闭。
+    $description:zh-CN: 悬停时指示条的缩放倍率。填一个值为等比缩放（如 1.1），填两个值为 X/Y 独立缩放（如 1.05, 0.7）。设为 1.0 关闭。
   - PressedScale: '1.0'
     $name: Pressed scale multiplier
     $name:zh-CN: 按下缩放倍率
     $description: Multiplier for how much the pill scales when clicked. Use 1 value for uniform scale (e.g. 0.85) or 2 values for X,Y scale (e.g. 0.85, 0.5). Set to 1.0 to disable.
-    $description:zh-CN: 按下时药丸的缩放倍率。填一个值为等比缩放（如 0.85），填两个值为 X/Y 独立缩放（如 0.85, 0.5）。设为 1.0 关闭。
+    $description:zh-CN: 按下时指示条的缩放倍率。填一个值为等比缩放（如 0.85），填两个值为 X/Y 独立缩放（如 0.85, 0.5）。设为 1.0 关闭。
   - HoverBgColor: ''
     $name: Hover background color (Light, Dark)
     $name:zh-CN: 悬停背景色（亮色、暗色）
@@ -621,24 +622,24 @@ Windows 自带的「自动隐藏任务栏」平时也会把任务栏藏起来，
     $description:zh-CN: 按下时可选的十六进制颜色覆盖。支持多色渐变与亮/暗分色。
   - BgOpacity: '1.0, 1.0'
     $name: Pill opacity (Light, Dark)
-    $name:zh-CN: 药丸不透明度（亮色、暗色）
+    $name:zh-CN: 指示条不透明度（亮色、暗色）
     $description: Multiplier for the pill fill opacity (e.g. 0.8, 0.5). Set to 1.0 to keep original alpha.
-    $description:zh-CN: 药丸填充不透明度的倍率（如 0.8, 0.5）。设为 1.0 保持原始透明度。
+    $description:zh-CN: 指示条填充不透明度的倍率（如 0.8, 0.5）。设为 1.0 保持原始透明度。
   - ColorMode: accent
     $name: Pill color mode
-    $name:zh-CN: 药丸颜色模式
+    $name:zh-CN: 指示条颜色模式
     $options:
     - accent: 系统强调色
     - custom: 自定义十六进制
     - icon: 应用图标颜色
   - CustomColor: ""
     $name: Custom pill color
-    $name:zh-CN: 自定义药丸颜色
+    $name:zh-CN: 自定义指示条颜色
     $description: Hex color code. Supports multi-color gradients (e.g. 'hex1, hex2') and light|dark separation (e.g. 'light1, light2 | dark1, dark2').
     $description:zh-CN: 十六进制颜色值。支持多色渐变（如 'hex1, hex2'）与亮/暗分色（如 'light1, light2 | dark1, dark2'）。
   - BgGradientDirection: horizontal
     $name: Pill gradient direction
-    $name:zh-CN: 药丸渐变方向
+    $name:zh-CN: 指示条渐变方向
     $options:
     - horizontal: 水平
     - vertical: 垂直
@@ -738,6 +739,18 @@ const double BOUNCE_TRANSLATE_Y = -4.0;
 std::atomic<bool> g_isMouseInside = false;
 std::atomic<double> g_animationIntensity = 0.0;
 std::chrono::steady_clock::time_point g_lastRenderTime;
+
+// Pointer-tracking fallback (2.4.1)：部分 Windows 更新后，XAML 不再把指针移动
+// 路由进 TaskbarFrame::OnPointerMoved 虚重写（produce<>::OnPointerMoved 钩子
+// 字节级已打上却永不触发，实测于 Taskbar.View.dll 2124.22709），导致图标悬停
+// 缩放与空闲弹跳完全失效。此兜底改走事件订阅：找到 Taskbar.TaskbarFrame 后用
+// AddHandler(..., handledEventsToo=true) 订阅 PointerMoved/PointerExited，
+// 由 TaskListButton::UpdateVisualStates 钩子触发挂接（按钮状态变化必然调用它）。
+// 与 produce 钩子路径互为冗余，两条路径均幂等。
+std::atomic<bool> g_pointerFallbackAttached = false;
+winrt::weak_ref<FrameworkElement> g_fallbackFrame;
+winrt::event_token g_fallbackPointerMovedToken{};
+winrt::event_token g_fallbackPointerExitedToken{};
 
 enum class TaskbarEdge {
     Bottom,
@@ -1194,6 +1207,108 @@ void OnTaskbarPointerExited(void* pThis_key) {
         }
     } catch (winrt::hresult_error const& e) {
         Wh_Log(L"DockAnimation: HRESULT Error in OnTaskbarPointerExited: %s", e.message().c_str());
+    }
+}
+
+// ===== 指针追踪兜底（2.4.1）=====
+// 背景：Taskbar.View.dll 2124.22709 上实测 produce<>::OnPointerMoved 钩子虽已
+// 字节级生效，但 XAML 不再调用该虚重写（指针事件在按钮层即被处理，或输入路由
+// 改道），图标动画的渲染循环因此永不启动——悬停缩放与空闲弹跳全部失效。
+// 兜底：从 TaskListButton::UpdateVisualStates 钩子（按钮悬停/状态变化必然经过）
+// 拿到任一按钮元素，向上找到 Taskbar.TaskbarFrame，再用 AddHandler(..., true)
+// 订阅 PointerMoved/PointerExited。handledEventsToo=true 保证即使事件在按钮层
+// 已被标记为 Handled 也能收到。与 produce 钩子路径互为冗余，均幂等。
+winrt::Windows::Foundation::IInspectable g_fallbackPointerMovedHandler{nullptr};
+winrt::Windows::Foundation::IInspectable g_fallbackPointerExitedHandler{nullptr};
+
+FrameworkElement FindTaskbarFrameFromElement(FrameworkElement start) {
+    FrameworkElement current = start;
+    for (int depth = 0; current && depth < 40; depth++) {
+        try {
+            if (winrt::get_class_name(current) == L"Taskbar.TaskbarFrame") {
+                return current;
+            }
+        } catch (...) {
+        }
+        FrameworkElement parent = nullptr;
+        try {
+            auto p = VisualTreeHelper::GetParent(current);
+            parent = p ? p.try_as<FrameworkElement>() : nullptr;
+        } catch (...) {
+        }
+        current = parent;
+    }
+    return nullptr;
+}
+
+void FallbackPointerMovedHandler(winrt::Windows::Foundation::IInspectable const& sender,
+                                 Input::PointerRoutedEventArgs const& args) {
+    try {
+        auto frame = sender.try_as<FrameworkElement>();
+        if (!frame) return;
+        void* key = winrt::get_abi(frame);
+        auto it = g_contexts.find(key);
+        if (it != g_contexts.end() && !it->second.taskbarFrame.get()) {
+            // TaskbarFrame 重建后指针地址被复用：清除弱引用已死的上下文，重新注册。
+            g_contexts.erase(it);
+            it = g_contexts.end();
+        }
+        if (it == g_contexts.end()) {
+            InitializeAnimationHooks(key, frame);
+        }
+        OnTaskbarPointerMoved(key, args);
+    } catch (...) {
+    }
+}
+
+void FallbackPointerExitedHandler(winrt::Windows::Foundation::IInspectable const& sender,
+                                  Input::PointerRoutedEventArgs const& args) {
+    try {
+        auto frame = sender.try_as<FrameworkElement>();
+        if (!frame) return;
+        OnTaskbarPointerExited(winrt::get_abi(frame));
+    } catch (...) {
+    }
+}
+
+void EnsurePointerTrackingFallback(FrameworkElement const& elem) {
+    if (g_pointerFallbackAttached.load(std::memory_order_acquire)) {
+        if (g_fallbackFrame.get()) return;  // 已挂接且 frame 仍存活
+        // frame 已重建（弱引用失效）：旧订阅随旧元素销亡，重置状态允许重挂。
+        g_fallbackPointerMovedHandler = nullptr;
+        g_fallbackPointerExitedHandler = nullptr;
+        g_pointerFallbackAttached.store(false, std::memory_order_release);
+    }
+
+    auto frame = FindTaskbarFrameFromElement(elem);
+    if (!frame) return;
+
+    try {
+        g_fallbackPointerMovedHandler = winrt::box_value(
+            winrt::Windows::UI::Xaml::Input::PointerEventHandler(
+                [](winrt::Windows::Foundation::IInspectable const& sender,
+                   Input::PointerRoutedEventArgs const& args) {
+                    FallbackPointerMovedHandler(sender, args);
+                }));
+        g_fallbackPointerExitedHandler = winrt::box_value(
+            winrt::Windows::UI::Xaml::Input::PointerEventHandler(
+                [](winrt::Windows::Foundation::IInspectable const& sender,
+                   Input::PointerRoutedEventArgs const& args) {
+                    FallbackPointerExitedHandler(sender, args);
+                }));
+        frame.AddHandler(UIElement::PointerMovedEvent(),
+                         g_fallbackPointerMovedHandler, true);
+        frame.AddHandler(UIElement::PointerExitedEvent(),
+                         g_fallbackPointerExitedHandler, true);
+        g_fallbackFrame = frame;
+        g_pointerFallbackAttached.store(true, std::memory_order_release);
+        Wh_Log(L"DockAnimation: pointer-tracking fallback attached (AddHandler, "
+               L"handledEventsToo=true)");
+    } catch (winrt::hresult_error const& e) {
+        Wh_Log(L"DockAnimation: fallback attach failed: %s", e.message().c_str());
+        g_fallbackPointerMovedHandler = nullptr;
+        g_fallbackPointerExitedHandler = nullptr;
+    } catch (...) {
     }
 }
 
@@ -1887,7 +2002,14 @@ int WINAPI TaskbarFrame_OnPointerMoved_Hook(void* pThis, void* pArgs) {
     if (!args)
         return original();
     // Initialize animation hooks only once
-    if (g_contexts.find(pThis) == g_contexts.end()) {
+    auto ctxIt = g_contexts.find(pThis);
+    if (ctxIt != g_contexts.end() && !ctxIt->second.taskbarFrame.get()) {
+        // 2.4.1 自愈：TaskbarFrame 重建后同一实现地址被复用时，弱引用已死的
+        // 旧上下文会永久吞掉指针事件（表现为动画静默失效直到重载模组）。
+        g_contexts.erase(ctxIt);
+        ctxIt = g_contexts.end();
+    }
+    if (ctxIt == g_contexts.end()) {
         InitializeAnimationHooks(pThis, element);
         Wh_Log(L"DockAnimation: Initialized via OnPointerMoved (%s)", className.c_str());
     }
@@ -2001,14 +2123,22 @@ HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dw
     HMODULE module = LoadLibraryExW_Original(lpLibFileName, hFile, dwFlags);
     if (!module) return module;
 
-    if (!g_taskbarViewDllLoaded && GetTaskbarViewModuleHandle() == module) {
-        if (!g_taskbarViewDllLoaded.exchange(true)) {
-            Wh_Log(L"DockAnimation: Taskbar.View.dll loaded, hooking symbols...");
-            if (HookTaskbarViewDllSymbols(module)) {
+    // 2.4.1 重试路径：符号解析未成功期间，任何后续模块加载事件都会重试已加载的
+    // 视图模块；且仅在解析成功后才置位标志（旧写法先置位再解析，解析失败会卡死
+    // 重试标志，图标动画从此静默失效）。
+    if (!g_taskbarViewDllLoaded.load(std::memory_order_acquire)) {
+        HMODULE viewModule = GetTaskbarViewModuleHandle();
+        if (viewModule) {
+            Wh_Log(L"DockAnimation: Taskbar.View.dll available, hooking symbols...");
+            if (HookTaskbarViewDllSymbols(viewModule)) {
+                g_taskbarViewDllLoaded.store(true, std::memory_order_release);
                 if (!g_hooksApplied.exchange(true)) {
                     Wh_ApplyHookOperations();
                     Wh_Log(L"DockAnimation: Hooks applied (slow path).");
                 }
+            } else {
+                Wh_Log(L"DockAnimation: HookSymbols failed, will retry on the next "
+                       L"module load event or settings change");
             }
         }
     }
@@ -5857,6 +5987,11 @@ void WINAPI TaskListButton_UpdateVisualStates_Hook(void* pThis) {
     auto elem = GetFrameworkElementFromNative(pThis);
     if (!elem) return;
 
+    // 2.4.1：借道本钩子（按钮状态变化必经）挂接指针追踪兜底——部分 Windows
+    // 构建上 TaskbarFrame::OnPointerMoved 虚重写不再被 XAML 调用（见全局
+    // EnsurePointerTrackingFallback 注释）。幂等，成功后立即短路。
+    EnsurePointerTrackingFallback(elem);
+
     auto dispatcher = elem.Dispatcher();
     auto weakElem = winrt::make_weak(elem);
 
@@ -6311,12 +6446,25 @@ LoadLibraryExW_t LoadLibraryExW_Original;
 
 HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
     HMODULE module = LoadLibraryExW_Original(lpLibFileName, hFile, dwFlags);
-    if (module) {
-        if (!g_taskbarViewDllLoaded && GetTaskbarViewModuleHandle() == module && !g_taskbarViewDllLoaded.exchange(true)) {
-            Wh_Log(L"Taskbar View DLL loaded: %s", lpLibFileName);
-            if (TaskbarElasticPill::HookTaskbarViewDllSymbols(module)) Wh_ApplyHookOperations();
+    if (module && !g_unloading) {
+        // 2.4.1 重试路径（同 CW-任务栏缩略图设置 1.1.1 模式）：视图模块符号解析
+        // 未成功期间，任何后续模块加载事件都会重试已加载的视图模块——此前仅在
+        // 视图模块自身的加载事件里尝试一次，错过或失败即永久失效。另：不再先把
+        // 标志置位再解析（旧写法解析失败也会卡死重试标志）。
+        if (!g_taskbarViewDllLoaded.load(std::memory_order_acquire)) {
+            HMODULE viewModule = GetTaskbarViewModuleHandle();
+            if (viewModule) {
+                if (TaskbarElasticPill::HookTaskbarViewDllSymbols(viewModule)) {
+                    g_taskbarViewDllLoaded.store(true, std::memory_order_release);
+                    Wh_ApplyHookOperations();
+                    Wh_Log(L"ElasticPill: Taskbar.View.dll hooks applied (retry path)");
+                } else {
+                    Wh_Log(L"ElasticPill: Taskbar.View.dll symbol resolution failed, "
+                           L"will retry on the next module load event");
+                }
+            }
         }
-        if (!g_searchUxDllLoaded && GetSearchUxModuleHandle() == module && !g_searchUxDllLoaded.exchange(true)) {
+        if (!g_searchUxDllLoaded.load(std::memory_order_acquire) && GetSearchUxModuleHandle() == module && !g_searchUxDllLoaded.exchange(true)) {
             Wh_Log(L"SearchUx UI DLL loaded: %s", lpLibFileName);
             if (HookSearchUxDllSymbols(module)) Wh_ApplyHookOperations();
         }
@@ -6328,19 +6476,28 @@ BOOL Init() {
     Wh_Log(L"Initializing Taskbar Elastic Pill Mod");
     LoadSettings();
 
+    // 2.4.1：符号解析失败不再永久放弃。此前 HookSymbols 失败直接 return FALSE
+    // 且不装延迟路径——任务栏指示条静默失效且无任何自愈机会；现改为响明日志 +
+    // 保留 LoadLibraryExW 重试路径（后续模块加载事件 / 设置变更时重试）。
+    bool viewHooked = false;
     HMODULE m = GetTaskbarViewModuleHandle();
     if (m) {
-        g_taskbarViewDllLoaded = true;
-        if (!TaskbarElasticPill::HookTaskbarViewDllSymbols(m)) return FALSE;
+        viewHooked = TaskbarElasticPill::HookTaskbarViewDllSymbols(m);
+        if (viewHooked) {
+            g_taskbarViewDllLoaded = true;
+        } else {
+            Wh_Log(L"ElasticPill: Taskbar.View.dll symbol resolution failed at init; "
+                   L"will retry on later module loads and settings changes");
+        }
     }
-    
+
     HMODULE sm = GetSearchUxModuleHandle();
     if (sm) {
         g_searchUxDllLoaded = true;
         HookSearchUxDllSymbols(sm);
     }
-    
-    if (!m || !sm) {
+
+    if (!viewHooked || !sm) {
         HMODULE kb = GetModuleHandle(L"kernelbase.dll");
         auto pLoadLibraryExW = (decltype(&LoadLibraryExW))GetProcAddress(kb, "LoadLibraryExW");
         if (!WindhawkUtils::SetFunctionHook(pLoadLibraryExW, LoadLibraryExW_Hook, &LoadLibraryExW_Original)) {
@@ -6348,7 +6505,7 @@ BOOL Init() {
             return FALSE;
         }
     }
-    
+
     return TRUE;
 }
 
@@ -6546,6 +6703,21 @@ void Uninit() {
 
 void SettingsChanged() {
     LoadSettings();
+
+    // 2.4.1 自愈重试：设置变更时若视图模块符号解析仍未成功（此前失败），再次
+    // 尝试解析并应用钩子——与模块加载事件重试路径互为兜底（同缩略图 1.1.1 模式）。
+    if (!g_taskbarViewDllLoaded.load(std::memory_order_acquire) && !g_unloading) {
+        HMODULE viewModule = GetTaskbarViewModuleHandle();
+        if (viewModule && TaskbarElasticPill::HookTaskbarViewDllSymbols(viewModule)) {
+            g_taskbarViewDllLoaded.store(true, std::memory_order_release);
+            Wh_ApplyHookOperations();
+            Wh_Log(L"ElasticPill: Taskbar.View.dll hooks applied (settings-change retry)");
+        } else if (viewModule) {
+            Wh_Log(L"ElasticPill: Taskbar.View.dll symbol resolution still failing "
+                   L"on settings-change retry");
+        }
+    }
+
     struct PillUpdateData {
         winrt::Windows::UI::Xaml::Shapes::Rectangle p{nullptr};
         winrt::Windows::UI::Xaml::FrameworkElement a{nullptr};
@@ -6585,17 +6757,29 @@ BOOL Wh_ModInit() {
     Wh_Log(L"DockAnimation: Wh_ModInit");
     LoadSettings();
 
+    // 2.4.1：图标动画的符号解析失败不再让整个模组初始化失败（旧写法 return FALSE
+    // 会被引擎卸载，秒显/指示条/最大化隐藏全部陪葬且永无重试）。改为响明日志 +
+    // 保留 LoadLibraryExW 延迟路径，后续模块加载事件与设置变更时重试。
+    bool iconAnimHooked = false;
     if (HMODULE taskbarViewModule = GetTaskbarViewModuleHandle()) {
-        g_taskbarViewDllLoaded = true;
-        if (!HookTaskbarViewDllSymbols(taskbarViewModule)) return FALSE;
-    } else {
+        iconAnimHooked = HookTaskbarViewDllSymbols(taskbarViewModule);
+        if (iconAnimHooked) {
+            g_taskbarViewDllLoaded = true;
+        } else {
+            Wh_Log(L"DockAnimation: Taskbar.View.dll symbol resolution FAILED at init; "
+                   L"icon animation will retry on later module loads / settings changes");
+        }
+    }
+    if (!iconAnimHooked) {
         HMODULE kernelBaseModule = GetModuleHandle(L"kernelbase.dll");
         auto pKernelBaseLibraryExW =
             (decltype(&LoadLibraryExW))GetProcAddress(kernelBaseModule, "LoadLibraryExW");
-        WindhawkUtils::SetFunctionHook(
-            pKernelBaseLibraryExW,
-            LoadLibraryExW_Hook,
-            &LoadLibraryExW_Original);
+        if (!WindhawkUtils::SetFunctionHook(
+                pKernelBaseLibraryExW,
+                LoadLibraryExW_Hook,
+                &LoadLibraryExW_Original)) {
+            Wh_Log(L"DockAnimation: failed to hook LoadLibraryExW for lazy retry");
+        }
     }
 
     // 任务栏秒显：初始化失败时只记录日志，不阻断图标动画。
@@ -6702,6 +6886,27 @@ void Wh_ModBeforeUninit() {
     g_isMouseInside = false;
     g_animationIntensity = 0.0;
 
+    // 指针追踪兜底：卸载前摘掉 AddHandler 订阅并释放委托（UI 线程上执行，
+    // 本函数由引擎在 UI 线程调用）。
+    try {
+        if (g_pointerFallbackAttached.load(std::memory_order_acquire)) {
+            auto frame = g_fallbackFrame.get();
+            if (frame && g_fallbackPointerMovedHandler) {
+                frame.RemoveHandler(UIElement::PointerMovedEvent(),
+                                    g_fallbackPointerMovedHandler);
+            }
+            if (frame && g_fallbackPointerExitedHandler) {
+                frame.RemoveHandler(UIElement::PointerExitedEvent(),
+                                    g_fallbackPointerExitedHandler);
+            }
+        }
+    } catch (...) {
+    }
+    g_fallbackPointerMovedHandler = nullptr;
+    g_fallbackPointerExitedHandler = nullptr;
+    g_fallbackFrame = nullptr;
+    g_pointerFallbackAttached.store(false, std::memory_order_release);
+
     try {
         if (g_isRenderingHooked.exchange(false)) {
             Media::CompositionTarget::Rendering(g_renderingToken);
@@ -6795,6 +7000,25 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
             &action);
     }
     g_isBouncing = false;
+
+    // 2.4.1 自愈重试：设置变更时若图标动画的符号解析仍未成功，再次尝试解析并
+    // 应用钩子（与 LoadLibraryExW 延迟路径的重试互为兜底，同缩略图 1.1.1 模式）。
+    if (!g_taskbarViewDllLoaded.load(std::memory_order_acquire)) {
+        HMODULE viewModule = GetTaskbarViewModuleHandle();
+        if (viewModule) {
+            if (HookTaskbarViewDllSymbols(viewModule)) {
+                g_taskbarViewDllLoaded.store(true, std::memory_order_release);
+                if (!g_hooksApplied.exchange(true)) {
+                    if (Wh_ApplyHookOperations()) {
+                        Wh_Log(L"DockAnimation: icon animation hooks applied "
+                               L"(settings-change retry)");
+                    }
+                }
+            } else {
+                Wh_Log(L"DockAnimation: HookSymbols still failing on settings-change retry");
+            }
+        }
+    }
 
     TaskbarAutoHide::SettingsChanged(bReload);
 

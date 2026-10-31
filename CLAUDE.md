@@ -72,9 +72,9 @@
    - 项目品牌统一为 **CW-Beautify**；全文不得出现旧项目名（ZenDesktop / CW桌面美化）。
    - 例外：游戏进程名 `ZenlessZoneZero`（绝区零，反作弊排除名单）与 `Zen Browser`（真实浏览器）不属于旧项目关联，保留原样。
 
-## 用户预置启用清单（2026-10-31 起，长期有效）
+## 用户预置启用清单（2026-10-31 起，长期有效；v2.6.0 起窗口滑动排列/窗口拖动/隐形窗口边框三项由 CW-窗口优化 承接）
 
-重新编译/部署全部模组后，以下 17 个模组**自动启用**，其余保持禁用；用户后续手动改动开关时以用户最新状态为准：
+重新编译/部署全部模组后，以下 15 个模组**自动启用**，其余保持禁用；用户后续手动改动开关时以用户最新状态为准：
 
 cw-extension-no-warning（关闭扩展名修改警告）、cw-explorer-double-click-up（双击返回上级）、
 cw-taskbar-volume-control（任务栏音量控制）、cw-taskbar-animation（任务栏动画）、
@@ -82,49 +82,43 @@ cw-taskbar-button-click（任务栏按钮中键关闭）、cw-taskbar-acrylic（
 cw-desktop-quick-settings（关于桌面的快捷设置）、cw-startmenu-acrylic（开始菜单样式美化）、
 cw-drag-to-delete（拖拽删除文件）、cw-file-hover-info（文件悬停信息）、
 cw-explorer-details-better-file-sizes（文件大小列增强）、cw-shake-find-cursor（晃动找指针，DLC）、
-cw-windows-animations（窗口动画，可选）、cw-window-arrangement（窗口滑动排列）、
-cw-alt-drag（窗口拖动）、cw-invisible-borders（隐形窗口边框）、cw-notificationcenter-acrylic（通知栏样式美化）。
+cw-windows-animations（窗口动画，可选）、cw-window-optimizer（窗口优化，承接原窗口滑动排列/窗口拖动/隐形窗口边框三项）、
+cw-notificationcenter-acrylic（通知栏样式美化）。
 
 操作方式：全部模组 `windhawk-cli mod install --file <源码> --disabled` 编译并禁用后，
 对本清单逐个执行 `windhawk-cli --app-root <便携根> --yes mod enable local@<id>`（注意必须带 local@ 前缀，否则报 Mod not installed）。
 
-## 当前模组清单（v2.5.0，40 个 = 32 核心 + 2 可选 + 6 DLC 额外内容）
+## 当前模组清单（v2.6.0，34 个 = 26 核心 + 2 可选 + 6 DLC 额外内容）
 
-核心模组（32 个，主部署装入、默认关闭）：
+核心模组（26 个，主部署装入、默认关闭）：
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
-| CW-任务栏样式美化 | cw-taskbar-acrylic | 4.4.0 | m417z Taskbar Styler 深度修改，已整合任务栏高度与图标大小；4.4.0 新增「任务栏尺寸与缩放」分组（等比缩放从「主题与文字」移入、恢复任务栏高度/图标大小/按钮宽度 5 项单项设置、新增「显示桌面按钮全高」把最右「显示桌面」小竖条撑到与任务栏同高） |
+| CW-任务栏样式美化 | cw-taskbar-acrylic | 4.5.0 | m417z Taskbar Styler 深度修改，已整合任务栏高度与图标大小；4.5.0 大幅瘦身：「任务栏尺寸与缩放」仅保留顶层「等比缩放」（按固定基线 52/32/44/16/32 等比缩放，单项高度/图标/按钮宽设置删除），「托盘溢出面板」「音量/亮度浮窗」「最大化时」三个分组删除（相关表面无条件跟随任务栏背景美化），显示桌面按钮设置迁往 CW-托盘区域设置 |
 | CW-开始菜单样式美化 | cw-startmenu-acrylic | 4.1.14 | m417z Start Menu Styler 深度修改 |
 | CW-通知栏样式美化 | cw-notificationcenter-acrylic | 4.2.7 | m417z Notification Center Styler 深度修改 |
 | CW-文件管理器样式美化 | cw-explorer-styler | 1.7.1 | m417z File Explorer Styler 深度修改；1.7.0 起右键菜单子菜单玻璃为实验性开关 |
 | CW-任务栏音量控制 | cw-taskbar-volume-control | 1.5.0 | m417z 汉化；媒体设备快捷切换（参考 AudioSwitcher）；1.4.0 并入分应用音量控制（perApp.*）；1.5.0 设置页重组出「全局音量控制」分组（globalVolume.*） |
-| CW-任务栏动画 | cw-taskbar-animation | 2.4.0 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性药丸三合一；2.4.0 并入最大化自动隐藏任务栏（autoHide.maxHide.*，置于「任务栏显示动画」分组内的同名子分组，默认关闭）；设置键 autoHide.*/pill.*/autoHide.maxHide.* 隔离 |
-| CW-任务栏缩略图设置 | cw-taskbar-thumbnail-settings | 1.1.0 | Alchemy Instant Taskbar Thumbnail Previews (MIT) + m417z Taskbar Thumbnail Size / Thumbnail Reorder (GPL-3.0) 合并；instant.*/size.*/reorder.* 三个可收起分组；即时预览组需 Win11 24H2+（22H2/23H2 自动降级仅停用该组）；1.1.0 修复 22H2 上无效果的问题（延迟钩子转换静默失败改为失败重试与响明日志）并新增「缩略图排序」分组（缩略图拖动排序） |
-| CW-关于桌面的快捷设置 | cw-desktop-quick-settings | 1.1.0 | m417z Aero Peek + Heptalune 桌面双击隐藏图标 + angel_lov 桌面框选淡出 + HeyOkay 图标平滑自动隐藏 合并；peek.*/toggleIcons.*（含 smooth 子组）/marquee.* 三个可收起分组；1.1.0 起「双击隐藏桌面图标」分组更名为「桌面图标隐藏设置」，系统开关双击隐藏与平滑动画两种机制并存 |
-| CW-窗口滑动排列 | cw-window-arrangement | 1.0.3 | m417z Slick Window Arrangement 汉化 |
+| CW-任务栏动画 | cw-taskbar-animation | 2.4.1 | incconutwo Plus fork（原版 Ph0en1x-dev）+ Bo0ii 秒显 + Lockframe 弹性指示条三合一；2.4.0 并入最大化自动隐藏任务栏（autoHide.maxHide.*，置于「任务栏显示动画」分组内的同名子分组，默认关闭）；2.4.1 修复指示条无动画（引擎 PDB age 不匹配致符号解析失败、指示条钩子未挂上，新增符号解析失败自愈重试）与图标弹跳/悬停放大失效（Windows 更新改变指针路由，新增 AddHandler 兜底订阅）；设置页「药丸」全部改称「指示条」（键名 pill.* 不变）；设置键 autoHide.*/pill.*/autoHide.maxHide.* 隔离 |
+| CW-关于桌面的快捷设置 | cw-desktop-quick-settings | 1.3.0 | m417z Aero Peek + Heptalune 桌面双击隐藏图标 + angel_lov 桌面框选淡出 + HeyOkay 图标平滑自动隐藏 + kivsak 隐藏图标文字与箭头 合并；peek.*/toggleIcons.*（含 smooth 子组）/marquee.*/purity.* 四个可收起分组；1.3.0 新增第四分组「纯净化图标」（purity.*：隐藏图标文字[保留文件夹名]/快捷方式箭头/UAC 盾牌角标，默认关闭） |
+| CW-窗口优化 | cw-window-optimizer | 1.0.0 | m417z AltDrag + m417z Slick Window Arrangement + Bo0ii Invisible Window Borders 三合一融合模组（GPL-3.0/MIT）；三个可收起分组：窗口拖动（Alt+拖动）altDrag.*、窗口排列 winArrange.*、隐形窗口边框 invisBorders.*（从上到下即此顺序） |
 | CW-关闭扩展名修改警告 | cw-extension-no-warning | 1.0.2 | m417z extension-change-no-warning 汉化 |
 | CW-文件悬停信息 | cw-file-hover-info | 1.1.3 | HaVeN80 File Hover Info 汉化 |
 | CW-设置样式美化 | cw-settings-styler | 1.2.3 | m417z Windows 11 Settings Styler 汉化 |
-| CW-窗口拖动 | cw-alt-drag | 1.2 | m417z AltDrag 汉化 |
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.3 | BOLT Custom Cached Context Menu (MIT) 汉化 |
-| CW-隐形窗口边框 | cw-invisible-borders | 1.0.1 | Bo0ii Invisible Window Borders (MIT) 汉化 |
-| CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.2.2 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；**逆向类，绝不可公开分发**；0.2.2 修复「显示更多选项」二级经典菜单图层错误与桌面无响应问题；与 CW-自定义右键菜单 互斥 |
-| CW-现代运行对话框 | cw-modern-run-dialog | 3.0.7 | caotu2k5 Modern Run Dialog UI 汉化（上游未标注许可，署名保留） |
+| CW-Fluent 右键菜单 | cw-fluent-context-menu | 0.3.0 | Heptalune 原创净室重写（机制研究基于闭源 FluentContextMenu v0.5.0 静态逆向）；**逆向类，绝不可公开分发**；0.3.0「Win 10 经典」样式改为委托系统原生完整经典菜单（补全 BandZip/WinRAR 等第三方扩展条目），新增「Win 10（Fluent）」样式（经典完整菜单+Fluent 视觉），原 Fluent 样式改名「Win 11（Fluent）」，样式三选项：Win 11（Fluent）/Win 10（Fluent）/Win 10 经典；与 CW-自定义右键菜单 互斥 |
+| CW-现代化的 | cw-modernized | 1.0.0 | aubymori Modernize Folder Picker Dialog（MIT 惯例）+ caotu2k5 Modern Run Dialog UI（上游未标注许可）融合模组，署名保留；文件夹选择器现代化（全进程生效）+ 运行对话框 Fluent 化（runDialog.* 设置分组，仅 explorer.exe 生效） |
 | CW-文件操作样式美化 | cw-file-operation-styler | 1.2.1 | digART File Operation Styler (GPL-3.0) 汉化（v2.1.0 周期移除后回归） |
 | CW-拖拽删除文件 | cw-drag-to-delete | 1.0.1 | iMAboud Drag to Delete (MIT) 汉化 |
 | CW-任务栏按钮中键关闭 | cw-taskbar-button-click | 1.1.0 | m417z Middle click to close on the taskbar (GPL-3.0) 汉化；中键点任务栏按钮关窗口 |
-| CW-任务栏时钟自定义 | cw-taskbar-clock-customization | 1.8.2 | m417z Taskbar Clock Customization (GPL-3.0) 汉化；时钟深度定制（v2.2.0 移除后回归） |
-| CW-现代文件夹选择对话框 | cw-modern-folder-picker | 1.0.1 | aubymori Modernize Folder Picker Dialog（MIT 惯例）汉化；旧式浏览文件夹对话框现代化，无设置 |
+| CW-托盘区域设置 | cw-tray-area-settings | 1.0.0 | m417z Taskbar Clock Customization + Taskbar tray system icon tweaks（均 GPL-3.0）+ 自任务栏样式美化迁入的显示桌面按钮段，三合一融合模组（GPL-3.0）；时钟定制 26 项顶层设置 + 「托盘系统图标」分组（trayIcons.*，隐藏/灰化托盘系统图标）+ 「显示桌面按钮」分组（showDesktop.*，全高/竖条高度功能） |
 | CW-WinUI 右键菜单动画 | cw-winui-context-menu-animation | 1.0.2 | crazyboyybs (MIT) 汉化；经典右键菜单 WinUI 风格动画；与接管式菜单模组二选一 |
 | CW-文件管理器内容动画 | cw-file-explorer-content-animation | 1.0.3 | crazyboyybs (MIT) 汉化；资源管理器内容区切换动画 |
 | CW-去焦点虚线框 | cw-no-focus-rectangle | 1.0.3 | ItsProfessional No Focus Rectangle（MIT 惯例）汉化；去除虚线焦点框，无设置 |
-| CW-开始菜单电源按钮 | cw-win11-power-buttons | 1.0.3 | Hakuuyosei/灵弦（MIT 惯例）汉化；开始菜单一键电源按钮，仅 Win11 |
+| CW-开始菜单电源按钮 | cw-win11-power-buttons | 1.0.4 | Hakuuyosei/灵弦（MIT 惯例）汉化；开始菜单一键电源按钮，仅 Win11；1.0.4 新增 6 个逐按钮启用开关（关机/重启/注销/睡眠默认开、休眠/锁定默认关），显示 = 排序名单 ∩ 启用开关 |
 | CW-登录注销关机音效 | cw-logon-logoff-shutdown-sounds | 1.0.4 | Toru the Red Fox（MIT 惯例）汉化；恢复 Win7 音效 |
 | CW-双击返回上级 | cw-explorer-double-click-up | 1.0.2 | wrldspawn (GPL-3.0) 汉化；双击资源管理器空白处返回上级，无设置 |
-| CW-隐藏桌面图标文字与箭头 | cw-hide-desktop-icon-text | 1.5.1 | kivsak（MIT 惯例）汉化；隐藏图标文字（保留文件夹名）与快捷方式箭头 |
-| CW-开始按钮居中分流 | cw-centered-start-split-icons | 1.0.1 | rick Taskbar Start Button Centered Origin (GPL-3.0) 汉化；开始按钮居中+图标按中线分流，仅 Win11 |
-| CW-托盘系统图标调整 | cw-tray-system-icons | 1.3.2 | m417z Taskbar tray system icon tweaks (GPL-3.0) 汉化；隐藏/灰化托盘系统图标（v2.2.0 移除后回归） |
+| CW-开始按钮居中留空 | cw-centered-start-split-icons | 2.1.0 | rick Taskbar Start Button Centered Origin (GPL-3.0) 汉化；开始按钮恒居正中，仅 Win11；2.1.0 分流改「按出现顺序左右交替」——图标按任务栏顺序编号、奇偶交替分配到开始按钮两侧，任意数量下两侧都有图标（数量差 ≤1），移除名单设置 |
 | CW-文件大小列增强 | cw-explorer-details-better-file-sizes | 1.7 | m417z Better File Sizes (GPL-3.0)；CW 版创新：新增不依赖 Everything 的后台文件夹大小计算（后台线程+持久缓存+增量 watcher） |
 
 可选模组（2 个，随主部署装入 optional\ 目录、默认关闭）：
@@ -151,4 +145,4 @@ cw-alt-drag（窗口拖动）、cw-invisible-borders（隐形窗口边框）、c
 
 公开性分类（可公开/不可公开/逆向）见 `docs/MOD_CLASSIFICATION.md`。
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；前两者 v2.3.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization（v2.2.0 移除、v2.5.0 回归）、cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）、cw-instant-thumbnail-previews 与 cw-thumbnail-size（合并为 cw-taskbar-thumbnail-settings 1.0.0）、cw-aero-peek 与 cw-desktop-toggle-icons（合并为 cw-desktop-quick-settings 1.0.0）、cw-taskbar-autohide-when-maximized（并入 cw-taskbar-animation 2.4.0）、cw-desktop-marquee-fade 与 cw-smooth-desktop-icons-autohide（并入快捷设置 1.1.0）、cw-pointer-afterimage/cw-better-volume-mixer/cw-macos-style-dock（v2.5.0 用户要求移除）。全部进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；前两者 v2.3.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization（v2.2.0 移除、v2.5.0 回归）、cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）、cw-instant-thumbnail-previews 与 cw-thumbnail-size（合并为 cw-taskbar-thumbnail-settings 1.0.0）、cw-aero-peek 与 cw-desktop-toggle-icons（合并为 cw-desktop-quick-settings 1.0.0）、cw-taskbar-autohide-when-maximized（并入 cw-taskbar-animation 2.4.0）、cw-desktop-marquee-fade 与 cw-smooth-desktop-icons-autohide（并入快捷设置 1.1.0）、cw-pointer-afterimage/cw-better-volume-mixer/cw-macos-style-dock（v2.5.0 用户要求移除）。v2.6.0 退役 9 个：cw-taskbar-thumbnail-settings（多轮修复后用户环境实测仍无效，按用户要求移除）、cw-hide-desktop-icon-text（并入 cw-desktop-quick-settings 1.3.0「纯净化图标」分组）、cw-alt-drag/cw-window-arrangement/cw-invisible-borders（三合一为 cw-window-optimizer 1.0.0）、cw-taskbar-clock-customization/cw-tray-system-icons（v2.2.0 移除、v2.5.0 回归后，v2.6.0 合并为 cw-tray-area-settings 1.0.0，并承接任务栏样式美化的显示桌面按钮段）、cw-modern-folder-picker/cw-modern-run-dialog（合并为 cw-modernized 1.0.0）。全部进了 deploy 的退役清理列表。

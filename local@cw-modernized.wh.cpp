@@ -1,26 +1,73 @@
 // ==WindhawkMod==
-// @id              cw-modern-run-dialog
-// @name            CW-现代运行对话框
-// @name:zh-CN      CW-现代运行对话框
-// @description     Transforms the classic Run dialog on Windows 10 & 11 into a modern Fluent UI with Liquid Glass, DirectWrite typography, app suggestions while typing, and instant history execution.
-// @description:zh-CN 将 Windows 10 / 11 的经典「运行」对话框改造为现代 Fluent UI 风格：液态玻璃质感、DirectWrite 字体排版、输入时的应用建议与历史命令即时执行。
-// @version         3.0.7
-// @author          caotu2k5
-// @github          https://github.com/caotu2k5
-// @homepage        https://windhawk.net/mods/modern-run-dialog-ui
-// @include         explorer.exe
+// @id              cw-modernized
+// @name            CW-现代化的
+// @name:zh-CN      CW-现代化的
+// @description     Two UI modernizations in one mod: replaces the classic "Browse For Folder" dialog with the modern folder picker in every process, and rebuilds the classic Run dialog in explorer.exe as a Fluent UI liquid-glass command palette with app suggestions and instant history execution.
+// @description:zh-CN 整合两个界面现代化功能：把旧式「浏览文件夹」对话框替换为现代样式的文件夹选择对话框（对所有进程生效）；把 explorer.exe 中的经典「运行」对话框改造为 Fluent UI 液态玻璃命令面板（支持输入时的应用建议与历史命令即时执行）。
+// @version         1.0.0
+// @author          aubymori, caotu2k5
+// @github          https://github.com/aubymori
+// @include         *
+// @exclude         windhawk.exe
+// @exclude         windhawk-ui.exe
 // @architecture    x86-64
-// @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32
+// @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -loleaut32
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 3.0.6 逐字节一致，未做任何改动。
-// 原版 mod：https://windhawk.net/mods/modern-run-dialog-ui
+// CW-Beautify 整合说明：本模组由以下两个功能合并而成：
+//   1.「现代文件夹选择对话框」：上游 aubymori Modernize Folder Picker Dialog 1.0.0
+//      （https://windhawk.net/mods/modernize-folder-picker-dialog），原版文件未标注
+//      许可，按仓库惯例视为 MIT；原 CW-现代文件夹选择对话框 1.0.1（代码与上游
+//      1.0.0 逐字节一致，仅汉化元数据与说明）。
+//   2.「现代运行对话框」：上游 caotu2k5 Modern Run Dialog UI For Windows 10 & 11
+//      3.0.6（https://windhawk.net/mods/modern-run-dialog-ui），原版文件头未标注
+//      许可；原 CW-现代运行对话框 3.0.7（代码与上游 3.0.6 逐字节一致，仅汉化）。
+// 两段代码分别以 FolderPicker / RunDialog 命名空间隔离，独立初始化与卸载：
+//   - FolderPicker 挂钩 SHBrowseForFolderW，对所有进程生效（上游 @include *），
+//     无任何设置；开头的 RETURN_IF_FAILED / E_CANCELLED 宏仅服务于此段。
+//   - RunDialog 上游 @include explorer.exe；合并后本模组为 @include *，由文件
+//     末尾的轻量进程判定（IsExplorerProcess，按当前进程映像名判定）保证运行
+//     对话框的全部钩子仅在 explorer.exe 内安装，其他进程自动跳过。
+// 运行对话框的 11 项设置收进「运行对话框」可收起分组，设置键统一加
+// runDialog. 前缀（代码读取同步更新）；文件夹选择对话框无任何设置。
+// @compilerOptions 为两个上游 @compilerOptions 的并集；@exclude 补充
+// windhawk.exe 与 windhawk-ui.exe 防止自注入。
+// 注意：模组 id 变更后 Windhawk 模组存储为全新命名空间，原 cw-modern-run-dialog
+// 存储的历史记录等数据不会自动迁移。
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**caotu2k5**（[Modern Run Dialog UI For Windows 10 & 11](https://windhawk.net/mods/modern-run-dialog-ui)，原版文件未标注许可）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理。
+# CW-现代化的
 
-# CW-现代运行对话框
+本模组把两个独立的界面现代化功能合并为一个模组：
+
+- **现代文件夹选择对话框**（原作者 [aubymori](https://github.com/aubymori)）：对所有进程生效；
+- **现代运行对话框**（原作者 [caotu2k5](https://github.com/caotu2k5)）：仅在 explorer.exe 内生效。
+
+两个功能互不影响，可按需共同使用。本模组由 CW-Beautify 整合包（作者 Heptalune）整合汉化。
+
+## 功能一：现代文件夹选择对话框（所有进程）
+
+把过时、难用的旧式「浏览文件夹」（Browse For Folder）对话框替换为现代风格的文件夹选择对话框，目录层级一目了然，浏览与选择文件夹更加轻松。
+
+**替换前**：
+
+![替换前](https://raw.githubusercontent.com/aubymori/images/main/modernize-folder-picker-dialog-before.png)
+
+**替换后**：
+
+![替换后](https://raw.githubusercontent.com/aubymori/images/main/modernize-folder-picker-dialog-after.png)
+
+功能细节：
+
+- **现代选择器**：挂接 SHBrowseForFolderW，用现代 IFileDialog（FOS_PICKFOLDERS）文件夹选择器替换旧式树形「浏览文件夹」对话框。
+- **保留原对话框语义**：原对话框的标题文字与起始根目录会原样带入新对话框。
+- **失败自动回退**：现代对话框创建或初始化失败时，自动回退到原「浏览文件夹」对话框；用户取消选择时按原语义返回空结果，不影响程序正常运行。
+- **全进程生效**：任何弹出「浏览文件夹」对话框的程序都会改用新式选择器（本模组 @include *，并已排除 windhawk.exe 与 windhawk-ui.exe 防止自注入）。
+
+适用于 Windows 10 与 Windows 11。本功能无需任何配置，安装并启用即生效。
+
+## 功能二：现代运行对话框（仅 explorer.exe）
 
 把 Windows 10 / 11 的经典「运行」（Win + R）对话框替换为无边框的「液态玻璃 / Fluent Design」命令面板，由 Direct2D 与 DirectWrite 直接渲染，支持输入时的应用建议与历史命令一键执行。
 
@@ -30,162 +77,185 @@
 
 ![应用建议系统预览](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-run-dialog/main/306goiyungdung.png)
 
-## 功能
+功能细节：
 
 - **Win10 / Win11 全兼容（内置无符号回退挂钩）**：自动吸附任务栏上方并支持按显示器 DPI 缩放；当微软符号服务器对新版 shell32.pdb 返回 404（如 Insider 内测版 26300.9807+）时，自动改用针对运行对话框模板资源（#1003）的 DialogBoxParamW 无符号挂钩，保证模组始终生效。
 - **输入建议（实验性，类似 PowerToys Run）**：输入时动态建议已安装应用（开始菜单快捷方式、注册表 App Paths）、系统内置工具（cmd、regedit、dxdiag、services.msc、control 等）与最近命令；↑/↓ 选择、Tab 补全、回车或单击建议行立即执行。
 - **液态玻璃 / Windows 模糊 / 不透明三种主题**：液态玻璃为半透明低染色玻璃背景，配双层折射描边与跟随指针的高光；基于 16×16 背景亮度采样自动切换明暗文字对比；尊重系统高对比度模式，旧 CPU 自动回退为 Windows 模糊。
 - **原生 DirectWrite 排版**：以 DirectWrite（IDWriteTextLayout）+ Direct2D 渲染，命令标题 Semibold、说明文字 Regular，按显示器 DPI 缩放，多语言字符清晰准确。
-- **智能历史（按用户存储）**：最多显示 10 条最近执行命令，带程序原生图标、友好应用名与执行时间；单击历史项立即执行；历史与时间戳按用户 SID 保存在 Windhawk 模组存储（HistoryTimestamps_<SID>），即使 Windows 自身的 RunMRU 记录被禁用也能工作；可按 Delete 删除单条，也可在设置中一键清空。
+- **智能历史（按用户存储）**：最多显示 10 条最近执行命令，带程序原生图标、友好应用名与执行时间；单击历史项立即执行；历史与时间戳按用户 SID 保存在 Windhawk 模组存储中，即使 Windows 自身的 RunMRU 记录被禁用也能工作；可按 Delete 删除单条，也可在设置中一键清空。
 - **体验细节**：任务栏图标与 Win + R 开关切换（最小化/还原或直接关闭，可设置）；可选点击对话框外部自动关闭；「浏览」「运行」「退出」三按钮高对比配色直观；完整支持各类 IME 输入法及 Unikey、EVKey，内置 21 种界面语言（含简体/繁体中文，可「自动」跟随系统）。
 
-## 兼容性与注意事项
+兼容性与注意事项：
 
-- 仅注入 explorer.exe，架构为 x86-64（Windhawk 引擎只为该模组编译 64 位 DLL）。
+- 本功能只会在 explorer.exe 进程内启用（由进程判定保证），其他进程中本模组仅启用「现代文件夹选择对话框」功能。
 - 适用于 Windows 10 与 Windows 11；较新系统缺少 shell32 公开符号时自动走无符号回退挂钩。
 - 液态玻璃主题对 CPU 有要求（Intel 第 7 代酷睿及以上或 AMD Zen 及以上），不满足时自动回退为 Windows 模糊；也可在设置中手动固定主题。
-- 本模组会重绘并接管运行对话框界面，与其他「运行对话框」改造类模组可能冲突，请勿同时启用。
+- 本功能会重绘并接管运行对话框界面，与其他「运行对话框」改造类模组可能冲突，请勿同时启用。
+
+## 配置
+
+- **现代文件夹选择对话框**：无需任何配置，安装并启用即生效。
+- **现代运行对话框**：共 11 项设置，收在模组设置页的「运行对话框」可收起分组中，涵盖界面语言、表面主题、明暗模式、模糊底色浓度、输入时建议应用、历史记录（条数/执行时间/一键清空）、打开时清空输入框、任务栏图标点击动作与点击外部时关闭；详见设置页内每一项的双语说明。
 
 ## 支持
 
-问题反馈（英文/越南语）：<https://github.com/ramensoftware/windhawk-mods/issues>
+- 现代文件夹选择对话框（英文）：<https://github.com/ramensoftware/windhawk-mods/issues>
+- 现代运行对话框（英文/越南语）：<https://github.com/ramensoftware/windhawk-mods/issues>
 
 ## 致谢与许可
 
-- 原版 mod：Modern Run Dialog UI For Windows 10 & 11，作者 [caotu2k5](https://github.com/caotu2k5)，原版链接：<https://windhawk.net/mods/modern-run-dialog-ui>（原版文件头未标注许可），源码发布于 Windhawk 官方模组仓库：<https://github.com/ramensoftware/windhawk-mods>。
-- 本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：仅汉化元数据、说明与设置文案，代码与上游 3.0.6 逐字节一致。
+- **现代文件夹选择对话框**：原版 mod Modernize Folder Picker Dialog，作者 [aubymori](https://github.com/aubymori)，原版链接：<https://windhawk.net/mods/modernize-folder-picker-dialog>，源码发布于 Windhawk 官方模组仓库：<https://github.com/ramensoftware/windhawk-mods>（原版文件未标注许可，按仓库惯例视为 MIT）。
+- **现代运行对话框**：原版 mod Modern Run Dialog UI For Windows 10 & 11，作者 [caotu2k5](https://github.com/caotu2k5)，原版链接：<https://windhawk.net/mods/modern-run-dialog-ui>，源码发布于 Windhawk 官方模组仓库：<https://github.com/ramensoftware/windhawk-mods>（原版文件头未标注许可）。
+- 本版由 CW-Beautify 整合包（作者 Heptalune）整合汉化：两个上游模组的代码逻辑均保持原样（文件夹选择器与上游 1.0.0 逐字节一致、运行对话框与上游 3.0.6 逐字节一致），整合改动仅为——合并为单一模组并以 FolderPicker / RunDialog 命名空间隔离、运行对话框设置键统一加 runDialog. 前缀移入「运行对话框」分组、新增仅 explorer.exe 启用运行对话框钩子的轻量进程判定、补充 @exclude 防自注入与双语元数据。
+- 注意：模组 id 变更后 Windhawk 模组存储为全新命名空间，原「CW-现代运行对话框」（cw-modern-run-dialog）保存的历史记录等存储数据不会自动迁移。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- language: auto
-  $name: Display · Language
-  $name:zh-CN: 显示 · 界面语言
-  $description: Auto-detect the system’s UI language or choose a fixed language.
-  $description:zh-CN: 自动检测系统界面语言，或固定使用某种语言。
-  $options:
-  - auto: Auto – System Default
-  - en: English
-  - vi: Tiếng Việt (Vietnamese)
-  - th: ไทย (Thai)
-  - id: Bahasa Indonesia (Indonesian)
-  - ms: Bahasa Melayu (Malay)
-  - ja: 日本語 (Japanese)
-  - zh_cn: 简体中文 (Simplified Chinese)
-  - zh_tw: 繁體中文 (Traditional Chinese)
-  - ko: 한국어 (Korean)
-  - fr: Français (French)
-  - de: Deutsch (German)
-  - es: Español (Spanish)
-  - pt: Português (Portuguese)
-  - it: Italiano (Italian)
-  - ru: Русский (Russian)
-  - uk: Українська (Ukrainian)
-  - pl: Polski (Polish)
-  - nl: Nederlands (Dutch)
-  - tr: Türkçe (Turkish)
-  - hi: हिन्दी (Hindi)
-  - ar: العربية (Arabic)
-  $options:zh-CN:
-  - auto: 自动（跟随系统）
-  - en: 英语
-  - vi: 越南语
-  - th: 泰语
-  - id: 印度尼西亚语
-  - ms: 马来语
-  - ja: 日语
-  - zh_cn: 简体中文
-  - zh_tw: 繁体中文
-  - ko: 韩语
-  - fr: 法语
-  - de: 德语
-  - es: 西班牙语
-  - pt: 葡萄牙语
-  - it: 意大利语
-  - ru: 俄语
-  - uk: 乌克兰语
-  - pl: 波兰语
-  - nl: 荷兰语
-  - tr: 土耳其语
-  - hi: 印地语
-  - ar: 阿拉伯语
-- surfaceTheme: glass
-  $name: Appearance · Surface Theme
-  $name:zh-CN: 外观 · 表面主题
-  $description: Choose between Liquid Glass, Windows Blur, or Off – Opaque surface.
-  $description:zh-CN: 选择液态玻璃、Windows 模糊，或关闭模糊（不透明背景）。
-  $options:
-  - glass: Liquid Glass
-  - blur: Windows Blur
-  - solid: Off – Opaque
-  $options:zh-CN:
-  - glass: 液态玻璃
-  - blur: Windows 模糊
-  - solid: 关闭（不透明）
-- colorMode: auto
-  $name: Appearance · Color Mode
-  $name:zh-CN: 外观 · 明暗模式
-  $description: Follow Windows’ Light/Dark mode and backdrop contrast automatically, or choose a fixed mode.
-  $description:zh-CN: 自动跟随 Windows 的明暗模式与背景对比度，或固定使用某种模式。
-  $options:
-  - auto: Auto – Follow Windows
-  - dark: Dark Mode
-  - light: Light Mode
-  $options:zh-CN:
-  - auto: 自动（跟随 Windows）
-  - dark: 深色模式
-  - light: 浅色模式
-- blurOpacity: 170
-  $name: Appearance · Blur Opacity (0–255)
-  $name:zh-CN: 外观 · 模糊底色浓度（0–255）
-  $description: Background tint opacity when using Windows Blur (0–255, default is 170).
-  $description:zh-CN: 使用 Windows 模糊时背景着色的不透明度（0–255，默认为 170）。
-- enableAppSuggestions: true
-  $name: Experimental · App Suggestions While Typing
-  $name:zh-CN: 实验性 · 输入时建议应用
-  $description: Suggest installed apps (Start Menu, App Paths) and system commands dynamically while typing — similar to PowerToys Run.
-  $description:zh-CN: 输入时动态建议已安装的应用（开始菜单、App Paths）与系统命令 — 类似 PowerToys Run。
-- maxHistoryItems: 5
-  $name: History · Max Items (0–10)
-  $name:zh-CN: 历史 · 最大条数（0–10）
-  $description: Maximum number of recent commands or app suggestions shown in the top list (0–10, set 0 to disable).
-  $description:zh-CN: 顶部列表显示的最近命令 / 应用建议最大条数（0–10，设为 0 可关闭）。
-- showTimestamp: true
-  $name: History · Show Last Executed Time
-  $name:zh-CN: 历史 · 显示最近执行时间
-  $description: Display the execution timestamp and clock icon on each history row — or hide both when disabled.
-  $description:zh-CN: 在每条历史记录上显示执行时间与时钟图标；关闭后两者均隐藏。
-- clearStoredHistory: false
-  $name: History · Clear Stored History
-  $name:zh-CN: 历史 · 清除已保存的历史
-  $description: Turn on and save to clear the mod’s displayed history for the current user (without deleting Windows’ native RunMRU) — or press Delete on any row in the dialog.
-  $description:zh-CN: 开启并保存即可清除当前用户在模组中显示的历史（不会删除 Windows 原生的 RunMRU）；也可在对话框中对任意一行按 Delete 键删除。
-- clearInitialInput: true
-  $name: Input · Clear Input on Open
-  $name:zh-CN: 输入 · 打开时清空输入框
-  $description: Show placeholder text on open — instead of pre-filling the last command.
-  $description:zh-CN: 打开时显示占位提示文字，而不是预填上一次的命令。
-- taskbarClickAction: minimize
-  $name: Behavior · Taskbar Icon Click Action
-  $name:zh-CN: 行为 · 任务栏图标点击动作
-  $description: Action when clicking the Run icon on the Taskbar while open — minimize/restore or close.
-  $description:zh-CN: 对话框处于打开状态时，点击任务栏上运行图标的动作 — 最小化/还原或关闭。
-  $options:
-  - minimize: Minimize – Restore
-  - close: Close Window
-  $options:zh-CN:
-  - minimize: 最小化 / 还原窗口
-  - close: 关闭窗口
-- closeOnClickOutside: false
-  $name: Behavior · Close on Click Outside
-  $name:zh-CN: 行为 · 点击外部时关闭
-  $description: Automatically close the Run dialog when clicking outside the window — similar to Command Palette.
-  $description:zh-CN: 点击窗口外部时自动关闭运行对话框 — 类似命令面板。
+- runDialog:
+  - language: auto
+    $name: Display · Language
+    $name:zh-CN: 显示 · 界面语言
+    $description: Auto-detect the system’s UI language or choose a fixed language.
+    $description:zh-CN: 自动检测系统界面语言，或固定使用某种语言。
+    $options:
+    - auto: Auto – System Default
+    - en: English
+    - vi: Tiếng Việt (Vietnamese)
+    - th: ไทย (Thai)
+    - id: Bahasa Indonesia (Indonesian)
+    - ms: Bahasa Melayu (Malay)
+    - ja: 日本語 (Japanese)
+    - zh_cn: 简体中文 (Simplified Chinese)
+    - zh_tw: 繁體中文 (Traditional Chinese)
+    - ko: 한국어 (Korean)
+    - fr: Français (French)
+    - de: Deutsch (German)
+    - es: Español (Spanish)
+    - pt: Português (Portuguese)
+    - it: Italiano (Italian)
+    - ru: Русский (Russian)
+    - uk: Українська (Ukrainian)
+    - pl: Polski (Polish)
+    - nl: Nederlands (Dutch)
+    - tr: Türkçe (Turkish)
+    - hi: हिन्दी (Hindi)
+    - ar: العربية (Arabic)
+    $options:zh-CN:
+    - auto: 自动（跟随系统）
+    - en: 英语
+    - vi: 越南语
+    - th: 泰语
+    - id: 印度尼西亚语
+    - ms: 马来语
+    - ja: 日语
+    - zh_cn: 简体中文
+    - zh_tw: 繁体中文
+    - ko: 韩语
+    - fr: 法语
+    - de: 德语
+    - es: 西班牙语
+    - pt: 葡萄牙语
+    - it: 意大利语
+    - ru: 俄语
+    - uk: 乌克兰语
+    - pl: 波兰语
+    - nl: 荷兰语
+    - tr: 土耳其语
+    - hi: 印地语
+    - ar: 阿拉伯语
+  - surfaceTheme: glass
+    $name: Appearance · Surface Theme
+    $name:zh-CN: 外观 · 表面主题
+    $description: Choose between Liquid Glass, Windows Blur, or Off – Opaque surface.
+    $description:zh-CN: 选择液态玻璃、Windows 模糊，或关闭模糊（不透明背景）。
+    $options:
+    - glass: Liquid Glass
+    - blur: Windows Blur
+    - solid: Off – Opaque
+    $options:zh-CN:
+    - glass: 液态玻璃
+    - blur: Windows 模糊
+    - solid: 关闭（不透明）
+  - colorMode: auto
+    $name: Appearance · Color Mode
+    $name:zh-CN: 外观 · 明暗模式
+    $description: Follow Windows’ Light/Dark mode and backdrop contrast automatically, or choose a fixed mode.
+    $description:zh-CN: 自动跟随 Windows 的明暗模式与背景对比度，或固定使用某种模式。
+    $options:
+    - auto: Auto – Follow Windows
+    - dark: Dark Mode
+    - light: Light Mode
+    $options:zh-CN:
+    - auto: 自动（跟随 Windows）
+    - dark: 深色模式
+    - light: 浅色模式
+  - blurOpacity: 170
+    $name: Appearance · Blur Opacity (0–255)
+    $name:zh-CN: 外观 · 模糊底色浓度（0–255）
+    $description: Background tint opacity when using Windows Blur (0–255, default is 170).
+    $description:zh-CN: 使用 Windows 模糊时背景着色的不透明度（0–255，默认为 170）。
+  - enableAppSuggestions: true
+    $name: Experimental · App Suggestions While Typing
+    $name:zh-CN: 实验性 · 输入时建议应用
+    $description: Suggest installed apps (Start Menu, App Paths) and system commands dynamically while typing — similar to PowerToys Run.
+    $description:zh-CN: 输入时动态建议已安装的应用（开始菜单、App Paths）与系统命令 — 类似 PowerToys Run。
+  - maxHistoryItems: 5
+    $name: History · Max Items (0–10)
+    $name:zh-CN: 历史 · 最大条数（0–10）
+    $description: Maximum number of recent commands or app suggestions shown in the top list (0–10, set 0 to disable).
+    $description:zh-CN: 顶部列表显示的最近命令 / 应用建议最大条数（0–10，设为 0 可关闭）。
+  - showTimestamp: true
+    $name: History · Show Last Executed Time
+    $name:zh-CN: 历史 · 显示最近执行时间
+    $description: Display the execution timestamp and clock icon on each history row — or hide both when disabled.
+    $description:zh-CN: 在每条历史记录上显示执行时间与时钟图标；关闭后两者均隐藏。
+  - clearStoredHistory: false
+    $name: History · Clear Stored History
+    $name:zh-CN: 历史 · 清除已保存的历史
+    $description: Turn on and save to clear the mod’s displayed history for the current user (without deleting Windows’ native RunMRU) — or press Delete on any row in the dialog.
+    $description:zh-CN: 开启并保存即可清除当前用户在模组中显示的历史（不会删除 Windows 原生的 RunMRU）；也可在对话框中对任意一行按 Delete 键删除。
+  - clearInitialInput: true
+    $name: Input · Clear Input on Open
+    $name:zh-CN: 输入 · 打开时清空输入框
+    $description: Show placeholder text on open — instead of pre-filling the last command.
+    $description:zh-CN: 打开时显示占位提示文字，而不是预填上一次的命令。
+  - taskbarClickAction: minimize
+    $name: Behavior · Taskbar Icon Click Action
+    $name:zh-CN: 行为 · 任务栏图标点击动作
+    $description: Action when clicking the Run icon on the Taskbar while open — minimize/restore or close.
+    $description:zh-CN: 对话框处于打开状态时，点击任务栏上运行图标的动作 — 最小化/还原或关闭。
+    $options:
+    - minimize: Minimize – Restore
+    - close: Close Window
+    $options:zh-CN:
+    - minimize: 最小化 / 还原窗口
+    - close: 关闭窗口
+  - closeOnClickOutside: false
+    $name: Behavior · Close on Click Outside
+    $name:zh-CN: 行为 · 点击外部时关闭
+    $description: Automatically close the Run dialog when clicking outside the window — similar to Command Palette.
+    $description:zh-CN: 点击窗口外部时自动关闭运行对话框 — 类似命令面板。
+  $name: Run dialog
+  $name:zh-CN: 运行对话框
+  $description: >-
+    Settings of the modern Run dialog feature (only active inside
+    explorer.exe). The folder picker feature needs no configuration.
+  $description:zh-CN: >-
+    「现代运行对话框」功能的设置（仅在 explorer.exe 进程内生效）。
+    「现代文件夹选择对话框」功能无需任何配置。
 */
 // ==/WindhawkModSettings==
 
+// ---- FolderPicker（现代文件夹选择对话框）头文件（保持上游包含顺序） ----
+#include <initguid.h>
+#include <shlobj.h>
+#include <winrt/base.h>
 #include <windhawk_utils.h>
+
+// ---- RunDialog（现代运行对话框）头文件（保持上游包含顺序） ----
 #include <windows.h>
 #include <sddl.h>
 #include <commdlg.h>
@@ -210,6 +280,119 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+
+// ====================================================================
+// FolderPicker —— 现代文件夹选择对话框
+// 上游：aubymori Modernize Folder Picker Dialog 1.0.0（代码逐字节保留，
+// 仅移入本命名空间隔离；Wh_ModInit 改名为 FolderPicker::Init）。
+// 挂钩 SHBrowseForFolderW，对所有进程生效；无设置。
+// ====================================================================
+
+#define RETURN_IF_FAILED(hr) if (FAILED(hr)) return SHBrowseForFolderW_orig(lpbi)
+
+#define E_CANCELLED (HRESULT)0x800704C7
+
+namespace FolderPicker {
+
+using SHBrowseForFolderW_t = decltype(&SHBrowseForFolderW);
+SHBrowseForFolderW_t SHBrowseForFolderW_orig = nullptr;
+PIDLIST_ABSOLUTE WINAPI SHBrowseForFolderW_hook(
+    LPBROWSEINFOW lpbi
+)
+{
+    if (!lpbi) return NULL;
+
+    /* Make the dialog */
+    winrt::com_ptr<IFileOpenDialog> pDialog = nullptr;
+    RETURN_IF_FAILED(CoCreateInstance(
+        CLSID_FileOpenDialog,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&pDialog)
+    ));
+
+    /* Make it pick a folder instead of a file */
+    RETURN_IF_FAILED(pDialog->SetOptions(
+        FOS_PICKFOLDERS | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST
+    ));
+
+    if (lpbi->lpszTitle && *lpbi->lpszTitle)
+    {
+        RETURN_IF_FAILED(pDialog->SetTitle(lpbi->lpszTitle));
+    }
+
+    /* Tell it where to start */
+    if (lpbi->pidlRoot)
+    {
+        /* We have to convert from PIDLIST_ABSOLUTE -> IShellItem * */
+        winrt::com_ptr<IShellItem> pRoot = nullptr;
+        RETURN_IF_FAILED(SHCreateItemFromIDList(
+            lpbi->pidlRoot,
+            IID_PPV_ARGS(&pRoot)
+        ));
+        RETURN_IF_FAILED(pDialog->SetFolder(pRoot.get()));
+    }
+
+    HRESULT hr = pDialog->Show(lpbi->hwndOwner);
+    if (FAILED(hr))
+    {
+        /* For whatever reason, the dialog being cancelled counts as a fail */
+        if (hr != E_CANCELLED)
+        {
+            return SHBrowseForFolderW_orig(lpbi);
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    IShellItem *pResult = nullptr;
+    RETURN_IF_FAILED(pDialog->GetResult(&pResult));
+
+    LPWSTR pszPath = nullptr;
+    hr = pResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+    pResult->Release();
+    pResult = nullptr;
+    RETURN_IF_FAILED(hr);
+
+    /* Convert from wide character string to PIDLIST_ABSOLUTE */
+    if (pszPath) {
+        PIDLIST_ABSOLUTE result = ILCreateFromPathW(pszPath);
+        CoTaskMemFree(pszPath);
+        return result;
+    }
+
+    return NULL;
+}
+
+BOOL Init(void)
+{
+    if (!WindhawkUtils::Wh_SetFunctionHookT(
+        SHBrowseForFolderW,
+        SHBrowseForFolderW_hook,
+        &SHBrowseForFolderW_orig
+    ))
+    {
+        Wh_Log(L"Failed to hook SHBrowseForFolderW");
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+} // namespace FolderPicker
+
+// ====================================================================
+// RunDialog —— 现代运行对话框
+// 上游：caotu2k5 Modern Run Dialog UI 3.0.6（代码逐字节保留，仅移入本
+// 命名空间隔离；Wh_ModInit / Wh_ModSettingsChanged / Wh_ModBeforeUninit /
+// Wh_ModUninit 分别改名为 RunDialog::Init / OnSettingsChanged /
+// BeforeUninit / Uninit；设置键统一加 runDialog. 前缀）。
+// 仅在 explorer.exe 内启用（见文件末尾的进程判定与生命周期分发）。
+// ====================================================================
+
+namespace RunDialog {
 
 #ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
@@ -967,10 +1150,10 @@ void ClearCurrentUserStoredHistory() {
 }
 
 void LoadSettings(bool fromSettingsChanged = false) {
-    auto langSetting = WindhawkUtils::StringSetting::make(L"language");
-    auto surfaceSetting = WindhawkUtils::StringSetting::make(L"surfaceTheme");
-    auto colorSetting = WindhawkUtils::StringSetting::make(L"colorMode");
-    auto tbAction = WindhawkUtils::StringSetting::make(L"taskbarClickAction");
+    auto langSetting = WindhawkUtils::StringSetting::make(L"runDialog.language");
+    auto surfaceSetting = WindhawkUtils::StringSetting::make(L"runDialog.surfaceTheme");
+    auto colorSetting = WindhawkUtils::StringSetting::make(L"runDialog.colorMode");
+    auto tbAction = WindhawkUtils::StringSetting::make(L"runDialog.taskbarClickAction");
 
     ModSettings newSettings;
     newSettings.language = langSetting.get()[0] ? langSetting.get() : L"auto";
@@ -992,14 +1175,14 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
 
     newSettings.taskbarCloseInsteadOfMinimize = (wcscmp(tbAction.get(), L"close") == 0);
-    newSettings.blurOpacity = std::clamp(Wh_GetIntSetting(L"blurOpacity"), 0, 255);
-    newSettings.enableAppSuggestions = Wh_GetIntSetting(L"enableAppSuggestions") != 0;
-    newSettings.maxHistoryItems = std::clamp(Wh_GetIntSetting(L"maxHistoryItems"), 0, 10);
-    newSettings.showTimestamp = Wh_GetIntSetting(L"showTimestamp") != 0;
-    newSettings.clearInitialInput = Wh_GetIntSetting(L"clearInitialInput") != 0;
-    newSettings.closeOnClickOutside = Wh_GetIntSetting(L"closeOnClickOutside") != 0;
+    newSettings.blurOpacity = std::clamp(Wh_GetIntSetting(L"runDialog.blurOpacity"), 0, 255);
+    newSettings.enableAppSuggestions = Wh_GetIntSetting(L"runDialog.enableAppSuggestions") != 0;
+    newSettings.maxHistoryItems = std::clamp(Wh_GetIntSetting(L"runDialog.maxHistoryItems"), 0, 10);
+    newSettings.showTimestamp = Wh_GetIntSetting(L"runDialog.showTimestamp") != 0;
+    newSettings.clearInitialInput = Wh_GetIntSetting(L"runDialog.clearInitialInput") != 0;
+    newSettings.closeOnClickOutside = Wh_GetIntSetting(L"runDialog.closeOnClickOutside") != 0;
 
-    bool clearRequested = Wh_GetIntSetting(L"clearStoredHistory") != 0;
+    bool clearRequested = Wh_GetIntSetting(L"runDialog.clearStoredHistory") != 0;
     const std::wstring& ackKey = GetClearAckStorageKey();
     int ack = Wh_GetIntValue(ackKey.c_str(), 0);
     if (clearRequested) {
@@ -4036,7 +4219,7 @@ void ReleaseGlobalResources() {
     }
 }
 
-BOOL Wh_ModInit() {
+BOOL Init() {
     g_unloading.store(false);
     g_glassCpuSupported = DetectGlassCpuSupport();
 
@@ -4111,14 +4294,14 @@ BOOL Wh_ModInit() {
     return TRUE;
 }
 
-void Wh_ModSettingsChanged() {
+void OnSettingsChanged() {
     LoadSettings(true);
     if (HWND hDlg = g_hActiveRunDlg.load()) {
         PostMessageW(hDlg, g_msgToggle, kActionReloadSettings, 0);
     }
 }
 
-void Wh_ModBeforeUninit() {
+void BeforeUninit() {
     g_unloading.store(true);
     HWND hDlg = g_hActiveRunDlg.load();
     while (hDlg && IsWindow(hDlg) && g_hActiveRunDlg.load() == hDlg &&
@@ -4137,10 +4320,67 @@ void Wh_ModBeforeUninit() {
     StopKeyHookThread();
 }
 
-void Wh_ModUninit() {
+void Uninit() {
     while (g_fallbackDialogRefCount.load() > 0) {
         Sleep(200);
     }
     StopKeyHookThread();
     ReleaseGlobalResources();
+}
+
+} // namespace RunDialog
+
+// ====================================================================
+// CW-Beautify 合并层：进程判定与模组生命周期
+// ====================================================================
+
+// 轻量进程判定：运行对话框的全部钩子仅在 explorer.exe 内安装（其上游模组
+// 声明 @include explorer.exe）；文件夹选择器对所有进程生效（上游 @include *）。
+bool IsExplorerProcess() {
+    wchar_t exePath[MAX_PATH] = {};
+    if (!GetModuleFileNameW(nullptr, exePath, MAX_PATH)) {
+        return false;
+    }
+    const wchar_t* fileName = exePath;
+    for (const wchar_t* p = exePath; *p; ++p) {
+        if (*p == L'\\' || *p == L'/') {
+            fileName = p + 1;
+        }
+    }
+    return _wcsicmp(fileName, L"explorer.exe") == 0;
+}
+
+bool g_runDialogHooksInstalled = false;
+
+BOOL Wh_ModInit() {
+    BOOL okFolderPicker = FolderPicker::Init();
+
+    // 运行对话框逻辑仅 explorer.exe 内启用，其他进程自动跳过。
+    BOOL okRunDialog = TRUE;
+    if (IsExplorerProcess()) {
+        okRunDialog = RunDialog::Init();
+        g_runDialogHooksInstalled = (okRunDialog != FALSE);
+    } else {
+        Wh_Log(L"Non-explorer process detected; run dialog hooks skipped");
+    }
+
+    return okFolderPicker && okRunDialog;
+}
+
+void Wh_ModSettingsChanged() {
+    if (g_runDialogHooksInstalled) {
+        RunDialog::OnSettingsChanged();
+    }
+}
+
+void Wh_ModBeforeUninit() {
+    if (g_runDialogHooksInstalled) {
+        RunDialog::BeforeUninit();
+    }
+}
+
+void Wh_ModUninit() {
+    if (g_runDialogHooksInstalled) {
+        RunDialog::Uninit();
+    }
 }
