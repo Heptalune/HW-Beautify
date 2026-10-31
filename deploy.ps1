@@ -515,11 +515,13 @@ $coreModIds = @(
     "local@cw-winui-context-menu-animation",
     "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
     "local@cw-file-operation-styler",
-    "local@cw-resource-redirect", "local@cw-settings-styler"
+    "local@cw-resource-redirect", "local@cw-settings-styler",
+    "local@cw-file-explorer-plus",
+    "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
 $dlcModIds = @(
-    "local@cw-shake-find-cursor", "local@cw-overhauled-alt-tab",
+    "local@cw-shake-find-cursor", "local@cw-shake-find-cursor-inproc", "local@cw-overhauled-alt-tab",
     "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
     "local@cw-quick-launch-dock", "local@cw-dynamic-island-windows"
 )

@@ -2,10 +2,10 @@
 // @id              cw-desktop-quick-settings
 // @name            CW-更好的Windows（小细节）
 // @name:zh-CN      CW-更好的Windows（小细节）
-// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, double-click to go up in File Explorer, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
-// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；双击资源管理器空白处返回上级；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
-// @version         2.1.1
-// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, wrldspawn, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
+// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
+// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
+// @version         2.1.2
+// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
 // @include         *
@@ -15,7 +15,7 @@
 // @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm -lwtsapi32 -lpowrprof -lgdiplus -ldwmapi -lcomdlg32 -Wl,--export-all-symbols
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：本模组由以下十个功能合并而成（显示名 CW-更好的Windows
+// CW-Beautify 整合说明：本模组由以下九个功能合并而成（显示名 CW-更好的Windows
 // （小细节），模组 id 与文件名保持 cw-desktop-quick-settings 不变）：
 //   1.「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4，GPL-3.0）；
 //   2.「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；
@@ -29,20 +29,18 @@
 //   6.「CW-关闭扩展名修改警告」（上游 m417z Turn off change file extension
 //      warning 1.0.1，GPL-3.0，
 //      https://windhawk.net/mods/extension-change-no-warning）；
-//   7.「CW-双击返回上级」（上游 wrldspawn Explorer Double Click Up 1.0.1，
-//      GPL-3.0，https://windhawk.net/mods/explorer-double-click-up）；
-//   8.「CW-开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu
+//   7.「CW-开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu
 //      Power Buttons 1.0.2，MIT 惯例，
 //      https://windhawk.net/mods/win11-power-buttons）；
-//   9.「CW-拖拽删除文件」（上游 iMAboud Drag to Delete 1.0.0，MIT，
+//   8.「CW-拖拽删除文件」（上游 iMAboud Drag to Delete 1.0.0，MIT，
 //      https://windhawk.net/mods/drag-to-delete）；
-//  10.「CW-登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown
+//   9.「CW-登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown
 //      Sounds Restored 1.0.3，MIT 惯例，
 //      https://windhawk.net/mods/logon-logoff-shutdown-sounds）；
-//  11.「CW-窗口优化」（m417z AltDrag + m417z Slick Window Arrangement +
+//  10.「CW-窗口优化」（m417z AltDrag + m417z Slick Window Arrangement +
 //      Bo0ii Invisible Window Borders 三合一，见下方 WinOpt 段说明）。
 // 各部分代码分别以 Peek*/ToggleIcons*/SmoothIcons*/Marquee*/Purity*/ExtWarn*/
-// DblUp*/PowerBtn*/DragDel*/SndLog* 前缀隔离全局符号与函数；窗口优化三段沿用
+// PowerBtn*/DragDel*/SndLog* 前缀隔离全局符号与函数；窗口优化三段沿用
 // 其内部结构收进 WinOpt 命名空间（内含 AltDrag / WinArrange / InvisBorders
 // 三个子命名空间），独立初始化与卸载。
 // 1.2.0 起（按用户要求）：第 4 项不再作为独立隐藏机制——其闲置自动隐藏、
@@ -50,15 +48,15 @@
 // SysListView32 绘制过程的接管与 alpha 混合）作为纯动画绘制器（SmoothIcons*
 // 段）；桌面图标的隐藏机制只有系统「显示桌面图标」开关一种（ToggleIcons），
 // 本模组每次触发切换时在其上叠加一次淡出/淡入过渡动画。
-// 设置键为 peek.*、toggleIcons.*、marquee.*、purity.*、extWarn.*、dblUp.*、
+// 设置键为 peek.*、toggleIcons.*、marquee.*、purity.*、extWarn.*、
 // powerBtn.*、dragDel.*、sndLog.*、altDrag.*、winArrange.* 与 invisBorders.*
 // 前缀（2.1.0 起窗口优化拆分为三个独立顶层分组，不再有 winOpt.* 组壳）。
-// ToggleIcons、SmoothIcons、Purity 与 DblUp 都需要挂钩 CreateWindowExW，由
+// ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 CreateWindowExW，由
 // 文件末尾的共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
 // 2.0.0 起进程门控（@include 为 * 全进程注入，@exclude windhawk.exe /
 // windhawk-ui.exe / devenv.exe）：
-//   • Peek / ToggleIcons（含 SmoothIcons 动画）/ Marquee / Purity / ExtWarn /
-//     DblUp / DragDel / SndLog 只在 explorer.exe 中启用（合并入口按进程名判
+//   • Peek / ToggleIcons（含 SmoothIcons）/ Marquee / Purity / ExtWarn /
+//     DragDel / SndLog 只在 explorer.exe 中启用（合并入口按进程名判
 //     定，其余进程完全不初始化这些段）；
 //   • PowerBtn（开始菜单电源按钮）按 StartMenuExperienceHost.exe（开始菜单
 //     UI 注入）与 explorer.exe（隐藏代理窗口执行电源动作）分流，其余进程
@@ -70,7 +68,7 @@
 /*
 # CW-更好的Windows（小细节）
 
-Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十二个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「双击返回上级」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」五个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余七个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
+Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十一个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」四个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余七个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
 
 ## 功能组一览
 
@@ -81,13 +79,12 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 | 3 | 桌面框选淡出 | `marquee.*` | 开 | 桌面框选矩形松开后平滑淡出 | angel_lov（MIT） |
 | 4 | 纯净化图标 | `purity.*` | 开 | 隐藏图标文字、快捷方式箭头与 UAC 盾牌角标 | kivsak（MIT 惯例） |
 | 5 | 扩展名警告 | `extWarn.*` | **关** | 重命名修改扩展名时不再弹出确认警告 | m417z（GPL-3.0） |
-| 6 | 双击返回上级 | `dblUp.*` | **关** | 双击资源管理器空白处返回上一级文件夹 | wrldspawn（GPL-3.0） |
-| 7 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
-| 8 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
-| 9 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
-| 10 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动，移动或调整窗口大小 | m417z（GPL-3.0） |
-| 11 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口时自动吸附对齐，松手后带惯性顺滑滑动 | m417z（GPL-3.0） |
-| 12 | 隐形窗口边框 | `invisBorders.*` | 开 | 将窗口边框设为隐形并完整保留系统圆角效果 | Bo0ii（MIT） |
+| 6 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
+| 7 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
+| 8 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
+| 9 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动，移动或调整窗口大小 | m417z（GPL-3.0） |
+| 10 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口时自动吸附对齐，松手后带惯性顺滑滑动 | m417z（GPL-3.0） |
+| 11 | 隐形窗口边框 | `invisBorders.*` | 开 | 将窗口边框设为隐形并完整保留系统圆角效果 | Bo0ii（MIT） |
 
 ## 分组 1：显示桌面按钮预览（peek.*）
 
@@ -132,15 +129,7 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - 兼容新旧版 Windows：除经典的 ShellMessageBoxW 外，也覆盖 2025 年 4 月前后新版系统加入的 ShellMessageBoxInternal 弹窗路径。
 - **默认关闭的原因**：该警告是防止误改扩展名导致文件无法打开的系统安全提醒；开启即屏蔽确认弹窗，请知悉风险后显式开启，随时可关闭恢复系统默认行为。
 
-## 分组 6：双击返回上级（dblUp.*，默认关闭）
-
-开启后，在文件资源管理器内容区的空白处（未命中任何文件或文件夹时）双击鼠标左键，即返回上一级目录；双击文件、文件夹或快捷方式时行为不变。
-
-- **新旧视图双适配**：同时适配经典列表视图（SysListView32）与 Windows 11 默认的 DirectUI 视图（通过 UIAutomation 识别 UIItemsView / UIGroupItem 的空白区域）。
-- **多标签页互不干扰**：按每个标签页各自的 ShellTabWindowClass 定位其浏览器实例，多标签页、多窗口下均可正确返回所在目录的上一级。
-- 已知限制：分组视图的组标题未做特殊处理（上游代码标注 FIXME）。
-
-## 分组 7：开始菜单电源按钮（powerBtn.*，默认关闭）
+## 分组 6：开始菜单电源按钮（powerBtn.*，默认关闭）
 
 在 Windows 11 开始菜单导航窗格中原生电源按钮的位置注入一排图标按钮，替换默认的电源按钮二级弹出菜单：点击图标直接执行关机、重启、注销、睡眠、休眠或锁定。
 
@@ -150,7 +139,7 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - **工作原理**：模组同时注入 StartMenuExperienceHost.exe 与 explorer.exe——按钮注入在开始菜单进程完成；由于开始菜单进程运行在受限的 AppContainer 沙箱中，实际的电源动作由 explorer.exe 中的隐藏代理窗口代为执行。
 - 仅支持 Windows 11（依赖 Win11 开始菜单的 XAML 结构与 Segoe Fluent Icons 图标字体）。
 
-## 分组 8：拖拽删除（dragDel.*，默认关闭）
+## 分组 7：拖拽删除（dragDel.*，默认关闭）
 
 开启后，在文件资源管理器或桌面拖动文件时，屏幕顶部会浮现一个悬浮的垃圾桶目标；把文件拖到目标圆形判定范围内松手，文件即被移入回收站，支持一次拖放多个文件。拖动结束后悬浮目标自动隐藏。
 
@@ -159,7 +148,7 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - **DPI 适配**：按显示器实际缩放比例渲染图标与窗口，多显示器环境下跟随拖动所在的显示器；带弹性缩放动画，不获取焦点、无任务栏按钮。
 - **默认关闭的原因**：该功能会把拖放直接变成删除动作，为避免误删请显式开启。
 
-## 分组 9：登录注销关机音效（sndLog.*，默认关闭）
+## 分组 8：登录注销关机音效（sndLog.*，默认关闭）
 
 恢复 Windows 7 时代的登录、注销与关机音效（Windows 8 起系统不再播放）。在 explorer.exe 中随桌面进程触发：
 
@@ -169,19 +158,19 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - **使用前提（重要）**：请先在声音方案中为「Windows 登录」「Windows 注销」「退出 Windows」（开启 XP 模式还含「Windows 启动」）等事件配置 .wav 音效（控制面板 → 声音 →「声音」选项卡，或使用 [Shutdown-Logoff-Logon-Sound-Hacks.zip](https://www.howtogeek.com/wp-content/uploads/2016/09/Shutdown-Logoff-Logon-Sound-Hacks.zip) 恢复声音事件）；事件未配置音效时静默跳过、不回放默认音。若开启 XP 启动行为，建议取消勾选「播放 Windows 启动声音」以免登录前提前播放。
 - 与其他恢复/接管登录注销关机声音的模组或工具同时启用可能重复播放，请按需二选一。
 
-## 分组 10：窗口拖动（Alt+拖动）（altDrag.*）
+## 分组 9：窗口拖动（Alt+拖动）（altDrag.*）
 
 按住移动触发键（默认 Alt + 左键）在窗口任意位置拖动即可移动窗口；按住调整触发键（默认 Alt + 右键）拖动即可调整大小——跟随鼠标的边或角是最靠近起拖位置的那条。走标题栏拖动的同一套系统流程，吸附、DWM 动画、最大化窗口处理一应俱全；未超过延迟或拖动阈值的短按会原样作为点击交还给程序。鼠标键、修饰键与按住延迟（毫秒）均可单独设置，「拖动无标题栏的窗口」（默认关）可选拖动弹出菜单、工具提示、气泡。灵感来自 [Stefan Sundin 的原版 AltDrag 工具](https://stefansundin.github.io/altdrag/)。
 
 本分组与后面两个窗口分组（窗口排列、隐形窗口边框）一样生效于所有进程（窗口拖动的钩子需要跨进程工作），Windhawk 模组设置「高级」选项卡的自定义进程排除列表依旧有效。
 
-## 分组 11：窗口排列（winArrange.*）
+## 分组 10：窗口排列（winArrange.*）
 
 窗口松手后带着惯性顺滑滑动减速停止，拖动与滑动过程中靠近其他窗口或屏幕工作区边缘时自动吸附对齐（**拖动窗口时吸附**、**滑动时吸附窗口**，默认开）；按住「临时禁用吸附的按键」（默认 Alt）可临时绕过吸附；**吸附距离**（默认 25，按窗口 DPI 缩放）、**滑动减速**（默认 15，1-99，越小滑动越久）可调。吸附与滑动都保证窗口标题栏留在屏幕工作区内；窗口滑过屏幕边缘会反弹，也能顺势滑到相邻显示器。
 
 与其他窗口分组及桌面功能的配合：任务栏、桌面（Progman/WorkerW）窗口被窗口拖动排除，不会干扰本模组其余桌面分组；「窗口排列」默认按住 Alt 临时禁用吸附，与「窗口拖动（Alt+拖动）」的默认触发键重叠——按住 Alt 拖动时窗口不会吸附，想边拖边吸附可改掉其中一方的按键。
 
-## 分组 12：隐形窗口边框（invisBorders.*）
+## 分组 11：隐形窗口边框（invisBorders.*）
 
 将窗口边框设为隐形（DWMWA_COLOR_NONE），同时完整保留系统窗口圆角效果。**应用到特殊窗口**（默认关）可同时作用于对话框等特殊窗口。需要 DWM 处于启用状态，Windows 10（1809+）/ Windows 11 可用。
 
@@ -189,12 +178,13 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 
 本模组注入所有进程（`@include *`，排除 windhawk.exe、windhawk-ui.exe 与 devenv.exe），各分组按需门控：
 
-- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、纯净化图标、扩展名警告、双击返回上级、拖拽删除、登录注销关机音效；
+- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、纯净化图标、扩展名警告、拖拽删除、登录注销关机音效；
 - **explorer.exe + StartMenuExperienceHost.exe 分流**：开始菜单电源按钮（按钮注入在开始菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
 - **全进程生效**：窗口拖动（Alt+拖动）、窗口排列、隐形窗口边框。
 
 ## 变更记录
 
+- **2.1.2**：「双击返回上级」分组（`dblUp.*`，上游 wrldspawn Explorer Double Click Up）整体移出本模组，后续将并入「CW-更好的文件管理器」模组。删除该分组设置块与全部实现代码（含 explorerframe.dll 的 FileCabinet_CreateViewWindow2 挂钩、SysListView32 / DirectUI 子类、UIAutomation 空白判定及 DblUp 专用的 UIAutomation/COM 头文件引入），共享 CreateWindowExW 钩子的分发对象由四个功能减为三个（ToggleIcons / SmoothIcons / Purity）；设置页由十二个可收起分组变为十一个。旧设置键 `dblUp.enable` 不再被读取，如曾开启请留意该功能自本模组消失，更新后无需重启资源管理器，其余分组设置与行为不变，x86/x64 双架构编译。
 - **2.1.1**：修复纯净化图标在 explorer 图标缓存彻底重建后（重启资源管理器、删除 iconcache 等），快捷方式小箭头与 UAC 盾牌重新出现且不再消失的问题。根因：图像列表补丁是对「当时那批共享系统图像列表」的原位改写，缓存重建会销毁并重建这批列表（新句柄、内容按注册表 Shell Icons 重定向重新回填），补丁随旧列表整体丢失；2.0.1 的自愈校验存在三处缺口——只校验盾牌 SYSIMAGE 槽位（箭头 overlay 槽位与盾牌 overlay 槽位完全不在范围，而桌面可见的箭头/盾牌恰恰主要经 overlay 路径绘制）、挂在「隐藏 UAC 管理员盾牌」开关之下（只开箭头隐藏时没有自愈）、只由桌面 WM_PAINT 驱动（闲置桌面不再绘制，重建尾声落在最后一次绘制之后的回填无人复查）。现重构为持久自愈：校验覆盖「箭头 overlay 槽位 ＋ 盾牌 overlay 槽位（两者经补丁时记录的自建空白锚点间接校验）＋ 盾牌 SYSIMAGE 槽位（像素级校验）」三类，任一失守立即整体重打补丁；触发面在桌面 WM_PAINT 之外新增桌面 2 秒兜底定时器与 comctl32 ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表的必经路径，钩子内仅置位提示、零重活，不影响其他模组）；失守重打带 3 秒冷却防重建风暴循环，平时仅轻量抽查（深查 1s 节流、感知命中 200ms），补丁幂等。无需重启资源管理器，设置项无变化，x86/x64 双架构编译。
 - **2.1.0**：「窗口优化」分组拆分为三个独立顶层分组——「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」（设置页由十个可收起分组变为十二个），删除组壳 `winOpt.*` 与三合一组级总开关 `winOpt.enable`；原三个子分组的组内开关提升为各自分组的总开关（`altDrag.enable` / `winArrange.enable` / `invisBorders.enable`，默认开启，显示名沿用「启用本组功能」）。设置键迁移：`winOpt.altDrag.*` → `altDrag.*`、`winOpt.winArrange.*` → `winArrange.*`、`winOpt.invisBorders.*` → `invisBorders.*`（组内键名不变），代码侧各读取点同步去掉 `winOpt.` 前缀并删除与 `winOpt.enable` 相与的三合一短路，功能逻辑不变；**旧设置不会自动迁移**，更新后请在设置页重新调整这三个分组的数值。
 - **2.0.1**：修复纯净化图标「隐藏 UAC 管理员盾牌」开启后，管理员权限快捷方式图标左下角（原盾牌位置）残留小方框轮廓的问题。实测根因：机器上遗留的注册表 Shell Icons 重定向（如 `29/77 → imageres.dll,197`）会在 explorer 图标缓存重建时把该"空"图标重新回填进 SIID_SHIELD 的系统图像槽位，而 imageres,197 并非全空——各尺寸帧都残留少量底部阴影像素（48px 约 142 个、96px 约 588 个），绘制出来即小方框；初始化的一次性图像列表补丁覆盖不了回填。现新增盾牌槽位回填校验：桌面绘制期按 1s 节流检查各系统图像列表中 SIID_SHIELD 槽位是否仍为自建全透明图标（32bpp 全零 alpha 校验），发现回填立即整体重新打补丁并重绘桌面；空白图标本体无改动（自建 32bpp 全零 alpha + 全 1 掩码的 CreateIconIndirect 全透明图标，`ImageList_ReplaceIcon` 与 `SHGetStockIconInfo` 替换两处统一使用，按目标图像列表实际尺寸各建一份、钩子用缓存复用）。
@@ -213,7 +203,6 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - 「平滑自动隐藏」原版 mod：Smooth Desktop Icons Auto-Hide，作者 [HeyOkay](https://github.com/HeyOkay)，MIT 许可证，原版链接：<https://windhawk.net/mods/smooth-desktop-icons-auto-hide>。1.2.0 起其独立隐藏机制已按用户要求移除，仅保留其绘制技术用于切换过渡动画。
 - 「纯净化图标」原版 mod：Hide Desktop Icon Text and Shortcut Arrows，作者 [kivsak](https://github.com/kivsak)，源码内未附许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/hide-desktop-icon-text>。
 - 「扩展名警告」原版 mod：Turn off change file extension warning，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证，原版链接：<https://windhawk.net/mods/extension-change-no-warning>。
-- 「双击返回上级」原版 mod：Explorer Double Click Up，作者 [wrldspawn](https://github.com/wrldspawn)，GNU General Public License v3.0（源码内声明），原版链接：<https://windhawk.net/mods/explorer-double-click-up>。上游在源码中注明的实现参考致谢：COMInitializer 类与 UIAutomation 用法取自模组「Click on empty taskbar space」（GPL-3.0）；FileCabinet_CreateViewWindow2 挂钩与 ExplorerWrapper 参考/改写自「Classic Explorer Treeview」；返回上级目录的实现参考 Open-Shell。
 - 「开始菜单电源按钮」原版 mod：Windows 11 Start Menu Power Buttons，作者 Hakuuyosei（灵弦，[github.com/ahzvenol](https://github.com/ahzvenol)），源码内未附带许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/win11-power-buttons>。
 - 「拖拽删除」原版 mod：Drag to Delete，作者 [iMAboud](https://github.com/iMAboud)，MIT 许可证，原版链接：<https://windhawk.net/mods/drag-to-delete>。
 - 「登录注销关机音效」原版 mod：Logon, Logoff & Shutdown Sounds Restored，作者 [Toru the Red Fox](https://github.com/TorutheRedFox)，源码文件头未标注许可，按 Windhawk 官方模组仓库提交规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/logon-logoff-shutdown-sounds>。
@@ -444,30 +433,6 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
     重命名文件并修改扩展名时不再弹出确认警告。由独立模组「关闭扩展名修改
     警告」（原作者 m417z，GPL-3.0）并入。默认关闭：开启即屏蔽系统安全提醒，
     请显式选择开启。
-- dblUp:
-  - enable: false
-    $name: Enable this feature group
-    $name:zh-CN: 启用本组功能
-    $description: >-
-      Master switch for double-click to go up. When turned on, double-clicking
-      empty space in File Explorer navigates to the parent folder (both the
-      classic list view and the Windows 11 DirectUI view are supported, and
-      each tab is handled independently). When turned off, double-clicking
-      behaves exactly as without this feature.
-    $description:zh-CN: >-
-      「双击返回上级」分组总开关。开启后，在文件资源管理器内容区空白处双击
-      即返回上一级文件夹（经典列表视图与 Windows 11 DirectUI 视图均支持，
-      多标签页互不干扰）；关闭后双击空白处行为与系统默认完全一致，
-      开关切换即时生效。
-  $name: Double-click to go up
-  $name:zh-CN: 双击返回上级
-  $description: >-
-    Double-click empty space in File Explorer to navigate to the parent
-    folder. Merged from the standalone mod "Explorer Double Click Up" by
-    wrldspawn (GPL-3.0).
-  $description:zh-CN: >-
-    双击文件资源管理器空白处，返回上一级文件夹。由独立模组「双击返回上级」
-    （原作者 wrldspawn，GPL-3.0）并入。
 - powerBtn:
   - enable: false
     $name: Enable this feature group
@@ -807,14 +772,6 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 #include <tlhelp32.h>
 #include <windhawk_utils.h>
 
-// DblUp（双击返回上级）：UIAutomation 与 COM 辅助头文件。initguid 使其后
-// 包含的头文件中的 GUID（如 CLSID_CUIAutomation）在本编译单元内定义为实体。
-#include <initguid.h>
-#include <UIAnimation.h>
-#include <UIAutomationClient.h>
-#include <UIAutomationCore.h>
-#include <comutil.h>
-
 #include <algorithm>
 #include <atomic>
 #include <bit>
@@ -863,19 +820,18 @@ namespace wuc = winrt::Windows::UI::Core;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并级共享状态：各功能初始化成功/激活标志。文件末尾的共享 CreateWindowExW
-// 钩子按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity / DblUp
+// 钩子按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity
 // 的处理函数。标志在 Wh_ModInit / 卸载流程内设置（Wh_SetFunctionHook 为延迟
 // 生效，钩子在 Wh_ModInit 返回后才应用，此处无数据竞争）。
 // ─────────────────────────────────────────────────────────────────────────────
 std::atomic<bool> g_QuickSettingsToggleIconsActive{false};
 std::atomic<bool> g_QuickSettingsSmoothIconsActive{false};
 std::atomic<bool> g_QuickSettingsPurityActive{false};
-std::atomic<bool> g_QuickSettingsDblUpActive{false};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并级进程判定（2.0.0）：@include 为 *，各功能段按进程门控——
 //   • Explorer：Peek / ToggleIcons（含 SmoothIcons）/ Marquee / Purity /
-//     ExtWarn / DblUp / DragDel / SndLog；
+//     ExtWarn / DragDel / SndLog；
 //   • StartMenuExperienceHost + Explorer：PowerBtn（按钮注入在开始菜单进程、
 //     电源动作由 explorer 的隐藏代理窗口执行）；
 //   • 其他进程：仅 WinOpt（窗口优化）段启用。
@@ -4683,434 +4639,7 @@ static void ExtWarnNotifySettingsChanged() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能七：双击返回上级（DblUp*）
-// 来源：wrldspawn Explorer Double Click Up 1.0.1（GPL-3.0），
-// 原版链接：https://windhawk.net/mods/explorer-double-click-up。
-// 上游源码内注明的实现参考致谢：COMInitializer 类与 UIAutomation 用法取自
-// 模组「Click on empty taskbar space」（GPL-3.0）；FileCabinet_CreateViewWindow2
-// 挂钩与 ExplorerWrapper 参考/改写自「Classic Explorer Treeview」；返回上级
-// 目录的实现参考 Open-Shell。
-// 逻辑与上游一致，全局符号与函数统一加 DblUp 前缀以与其他功能隔离；设置键
-// 迁移为 dblUp.enable（分组总开关，默认关闭）。
-// 上游全部回调均为显式 CALLBACK / WINAPI / __cdecl 函数，无无捕获 lambda
-// 直传 WINAPI/stdcall 回调的情况，x86 兼容（经临时移除架构声明验证 i686
-// 本地编译通过）。
-// CreateWindowExW 的挂钩由文件末尾的共享钩子统一安装，本段只保留创建后的
-// 分发处理函数 DblUpOnCreatedWindow（原 CreateWindowExW_hook 的创建后处理
-// 段，逻辑不变）；总开关经 DblUpUpdateActivation 动态挂接/摘除子类（照
-// ToggleIcons 先例），关闭时共享钩子不再向本组分发新建窗口。
-// 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
-// ─────────────────────────────────────────────────────────────────────────────
-
-class DblUpExplorerWrapper {
-    winrt::com_ptr<IShellBrowser> hBrowser;
-
-public:
-    HWND hShellTab = NULL;
-    HWND hListView = NULL;
-
-    DblUpExplorerWrapper(HWND hWnd, IShellBrowser* hShellBrowser) {
-        hShellTab = hWnd;
-        hBrowser.copy_from(hShellBrowser);
-    }
-
-    void GoUp() {
-        hBrowser->BrowseObject(NULL, SBSP_SAMEBROWSER | SBSP_PARENT);
-    }
-};
-
-class DblUpComInitializer
-{
-public:
-    DblUpComInitializer() : initialized(false) {}
-
-    bool Init()
-    {
-        if (!initialized)
-        {
-            initialized = SUCCEEDED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED));
-        }
-        return initialized;
-    }
-
-    void Uninit()
-    {
-        if (initialized)
-        {
-            CoUninitialize();
-            initialized = false;
-            Wh_Log(L"COM de-initialized");
-        }
-    }
-
-    ~DblUpComInitializer()
-    {
-        Uninit();
-    }
-
-    bool IsInitialized() { return initialized; }
-
-protected:
-    bool initialized;
-} g_DblUpComInitializer;
-
-std::vector<DblUpExplorerWrapper> g_DblUpWrappers;
-static winrt::com_ptr<IUIAutomation> g_DblUpUIAutomation;
-
-LRESULT CALLBACK DblUpSysListViewSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR dwRefData) {
-    if (uMsg == WM_LBUTTONDBLCLK) {
-        POINT mousePos;
-        GetCursorPos(&mousePos);
-        ScreenToClient(hWnd, &mousePos);
-
-        LVHITTESTINFO hitTestInfo;
-        hitTestInfo.flags = LVHT_NOWHERE;
-        hitTestInfo.pt.x = mousePos.x;
-        hitTestInfo.pt.y = mousePos.y;
-
-        // FIXME: Ignores group headers
-        int hitRes = ListView_SubItemHitTest(hWnd, &hitTestInfo);
-        if (hitRes == -1) {
-            bool found = false;
-            HWND parent = GetParent(hWnd);
-            while (parent != NULL) {
-                wchar_t className[256];
-                GetClassName(parent, className, 256);
-
-                if (wcscmp(className, L"ShellTabWindowClass") != 0) {
-                    parent = GetParent(parent);
-                    continue;
-                }
-
-                for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
-                    if (wrapper.hShellTab == parent) {
-                        found = true;
-                        wrapper.GoUp();
-                        break;
-                    }
-                }
-                if (found) break;
-            }
-        }
-    };
-
-    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
-}
-
-struct DblUpClickHelper {
-    DWORD time = 0;
-    wchar_t className[256];
-    HWND hWnd;
-};
-
-DblUpClickHelper DblUpCurrentClick;
-DblUpClickHelper DblUpLastClick;
-
-LRESULT CALLBACK DblUpDUISubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, DWORD_PTR dwRefData) {
-    if (uMsg == WM_PARENTNOTIFY && wParam == WM_LBUTTONDOWN) {
-        DWORD now = GetTickCount();
-        DblUpCurrentClick.time = now;
-        DblUpCurrentClick.hWnd = hWnd;
-
-        POINT mousePos;
-        GetCursorPos(&mousePos);
-
-        winrt::com_ptr<IUIAutomationElement> pElement = NULL;
-        if (SUCCEEDED(g_DblUpUIAutomation->ElementFromPoint(mousePos, pElement.put())) && pElement) {
-            _bstr_t _className;
-            if (SUCCEEDED(pElement->get_CurrentClassName(_className.GetAddress()))) {
-                wchar_t* className = _className.GetBSTR();
-                wcsncpy(DblUpCurrentClick.className, className, 256);
-
-                DWORD delta = DblUpCurrentClick.time - DblUpLastClick.time;
-
-                if (
-                    DblUpCurrentClick.hWnd == DblUpLastClick.hWnd &&
-                    (
-                        (wcscmp(className, L"UIGroupItem") == 0 && wcscmp(DblUpLastClick.className, L"UIGroupItem") == 0) ||
-                        (wcscmp(className, L"UIItemsView") == 0 && wcscmp(DblUpLastClick.className, L"UIItemsView") == 0)
-                    ) &&
-                    delta <= GetDoubleClickTime()
-                ) {
-                    bool found = false;
-                    HWND parent = GetParent(hWnd);
-                    while (parent != NULL) {
-                        wchar_t className[256];
-                        GetClassName(parent, className, 256);
-
-                        if (wcscmp(className, L"ShellTabWindowClass") != 0) {
-                            parent = GetParent(parent);
-                            continue;
-                        }
-
-                        for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
-                            if (wrapper.hShellTab == parent) {
-                                found = true;
-                                wrapper.GoUp();
-                                break;
-                            }
-                        }
-                        if (found) break;
-                    }
-                }
-
-                DblUpLastClick.time = now;
-                DblUpLastClick.hWnd = hWnd;
-                wcsncpy(DblUpLastClick.className, className, 256);
-            }
-        }
-    }
-
-    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
-}
-
-// 共享 CreateWindowExW 钩子的创建后分发处理函数（原独立版 CreateWindowExW_hook
-// 的创建后处理段；挂钩本体见文件末尾共享钩子）。
-static void DblUpOnCreatedWindow(HWND hWnd, LPCWSTR lpClassName, HWND hWndParent) {
-    // 与上游一致：不依赖传入的 lpClassName/hWndParent，自行按类名与父链判定。
-    UNREFERENCED_PARAMETER(lpClassName);
-    UNREFERENCED_PARAMETER(hWndParent);
-
-    if (hWnd != NULL) {
-        wchar_t className[256];
-        GetClassName(hWnd, className, 256);
-
-        HWND parent = GetParent(hWnd);
-        if (parent != NULL) {
-            wchar_t parentClassName[256];
-            GetClassName(parent, parentClassName, 256);
-
-            HWND parentParent = GetParent(parent);
-            if (parentParent != NULL) {
-                wchar_t parentParentClassName[256];
-                GetClassName(parentParent, parentParentClassName, 256);
-
-                if (wcscmp(parentParentClassName, L"ShellTabWindowClass") == 0) {
-                    if (wcscmp(className, L"SysListView32") == 0) {
-                        if (WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DblUpSysListViewSubclass, 0)) {
-                            Wh_Log(L"SysListView32 Subclassed %p", hWnd);
-                            for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
-                                if (wrapper.hShellTab == parentParent) {
-                                    wrapper.hListView = hWnd;
-                                    break;
-                                }
-                            }
-                        }
-                    } else if (wcscmp(className, L"DirectUIHWND") == 0 && wcscmp(parentClassName, L"SHELLDLL_DefView") == 0) {
-                        if (WindhawkUtils::SetWindowSubclassFromAnyThread(parent, DblUpDUISubclass, 0)) {
-                            Wh_Log(L"DirectUIHWND Subclassed %p", parent);
-                            for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
-                                if (wrapper.hShellTab == parentParent) {
-                                    wrapper.hListView = parent;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-typedef HRESULT (*__cdecl DblUpFileCabinet_CreateViewWindow2_t)(IShellBrowser*, void*, IShellView*, IShellView*, void*, HWND*);
-DblUpFileCabinet_CreateViewWindow2_t DblUpFileCabinet_CreateViewWindow2Original;
-HRESULT __cdecl DblUpFileCabinet_CreateViewWindow2Hook(IShellBrowser* pBrowser, void* var1, IShellView* psv1, IShellView* psv2, void* var2, HWND* hWnd) {
-    HRESULT hRes = DblUpFileCabinet_CreateViewWindow2Original(pBrowser, var1, psv1, psv2, var2, hWnd);
-
-    HWND hShellTab = GetParent(*hWnd);
-    if (hShellTab != NULL)
-        g_DblUpWrappers.push_back(DblUpExplorerWrapper(hShellTab, pBrowser));
-
-    return hRes;
-}
-
-BOOL CALLBACK DblUpInitEnumChildWindowsProc(HWND hWnd, LPARAM lParam) {
-    DWORD pid = 0;
-    GetWindowThreadProcessId(hWnd, &pid);
-    if (pid == GetCurrentProcessId()) {
-        wchar_t className[256];
-        GetClassName(hWnd, className, 256);
-
-        if (wcscmp(className, L"SHELLDLL_DefView") == 0) {
-            HWND shellTab = (HWND)lParam;
-
-            auto browser = winrt::com_ptr<IShellBrowser>{
-                reinterpret_cast<IShellBrowser*>((void*)SendMessage(shellTab, WM_USER + 7, 0, 0)),
-                winrt::take_ownership_from_abi
-            };
-            if (browser != NULL) {
-                DblUpExplorerWrapper wrapper = DblUpExplorerWrapper(shellTab, browser.get());
-
-                HWND listView = FindWindowEx(hWnd, NULL, L"SysListView32", NULL);
-                HWND dui = FindWindowEx(hWnd, NULL, L"DirectUIHWND", NULL);
-                if (listView) {
-                    if (WindhawkUtils::SetWindowSubclassFromAnyThread(listView, DblUpSysListViewSubclass, 0)) {
-                        Wh_Log(L"SysListView32 Subclassed %p", listView);
-                        wrapper.hListView = listView;
-                    }
-                } else if (dui) {
-                    if (WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, DblUpDUISubclass, 0)) {
-                        Wh_Log(L"DirectUIHWND Subclassed %p", hWnd);
-                        wrapper.hListView = hWnd;
-                    }
-                }
-
-                if (wrapper.hListView) {
-                    g_DblUpWrappers.push_back(wrapper);
-                } else {
-                    Wh_Log(L"Failed to setup wrapper for %p", shellTab);
-                }
-
-                return FALSE;
-            }
-        }
-    }
-
-    return TRUE;
-}
-
-BOOL CALLBACK DblUpInitEnumWindowsProc(HWND hWnd, LPARAM lParam) {
-    DWORD pid = 0;
-    GetWindowThreadProcessId(hWnd, &pid);
-    if (pid == GetCurrentProcessId()) {
-        wchar_t className[256];
-        GetClassName(hWnd, className, 256);
-
-        if (wcscmp(className, L"CabinetWClass") == 0) {
-            HWND shellTab = FindWindowEx(hWnd, NULL, L"ShellTabWindowClass", NULL);
-            if (shellTab != NULL) {
-                EnumChildWindows(shellTab, DblUpInitEnumChildWindowsProc, (LPARAM)shellTab);
-            }
-        }
-    }
-
-    return TRUE;
-}
-
-static void DblUpSubclassExistingWindows()
-{
-    EnumWindows(DblUpInitEnumWindowsProc, 0);
-}
-
-static void DblUpUnsubclassWindows()
-{
-    for (DblUpExplorerWrapper& wrapper : g_DblUpWrappers) {
-        HWND hWnd = wrapper.hListView;
-        if (hWnd) {
-            wchar_t className[256];
-            GetClassName(hWnd, className, 256);
-
-            if (wcscmp(className, L"SysListView32") == 0) {
-                WindhawkUtils::RemoveWindowSubclassFromAnyThread(hWnd, DblUpSysListViewSubclass);
-                Wh_Log(L"SysListView32 Unsubclassed %p", hWnd);
-            } else if (wcscmp(className, L"SHELLDLL_DefView") == 0) {
-                WindhawkUtils::RemoveWindowSubclassFromAnyThread(hWnd, DblUpDUISubclass);
-                Wh_Log(L"DirectUIHWND Unsubclassed %p", hWnd);
-            }
-        }
-    }
-    g_DblUpWrappers.clear();
-}
-
-static bool DblUpIsEnabled()
-{
-    return Wh_GetIntSetting(L"dblUp.enable") != 0;
-}
-
-// 分组总开关（dblUp.enable）激活状态同步：开启时枚举挂接现有文件夹窗口子类，
-// 关闭时摘除子类（照 ToggleIcons 先例）。共享 CreateWindowExW 钩子按
-// g_QuickSettingsDblUpActive 分发新建窗口，开关切换即时生效。
-static void DblUpUpdateActivation()
-{
-    bool enable = DblUpIsEnabled();
-    bool active = g_QuickSettingsDblUpActive.load();
-
-    if (enable && !active) {
-        // 先置活动标志再枚举挂接：枚举期间新建的文件夹窗口由共享
-        // CreateWindowExW 钩子分发补挂。
-        g_QuickSettingsDblUpActive = true;
-        DblUpSubclassExistingWindows();
-        Wh_Log(L"[CW] dblUp group enabled, folder windows subclassed");
-    } else if (!enable && active) {
-        // 先清活动标志再摘除：摘除期间新建的文件夹窗口不再被分发挂接。
-        g_QuickSettingsDblUpActive = false;
-        DblUpUnsubclassWindows();
-        Wh_Log(L"[CW] dblUp group disabled, subclasses removed");
-    }
-}
-
-static void DblUpLoadSettings()
-{
-    // 本分组仅有总开关（dblUp.enable），读取仅为记录与激活同步使用。
-    Wh_Log(L"[CW] dblUp settings loaded: enable=%d", (int)DblUpIsEnabled());
-}
-
-static BOOL DblUpInit() {
-    Wh_Log(L"DblUp (Explorer Double Click Up) Init");
-
-    HMODULE hExplorerFrame = LoadLibraryExW(L"explorerframe.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-
-    if (!hExplorerFrame) {
-        Wh_Log(L"Failed to load explorerframe.dll");
-        return FALSE;
-    }
-
-    WindhawkUtils::SYMBOL_HOOK explorerframe_dll_hooks[] = {
-        {
-            {
-                L"long __cdecl FileCabinet_CreateViewWindow2(struct IShellBrowser *,struct tagFolderSetDataBase *,struct IShellView *,struct IShellView *,struct tagRECT *,struct HWND__ * *)"
-            },
-            (void**)&DblUpFileCabinet_CreateViewWindow2Original,
-            (void*)DblUpFileCabinet_CreateViewWindow2Hook,
-            FALSE
-        }
-    };
-    if (!WindhawkUtils::HookSymbols(hExplorerFrame, explorerframe_dll_hooks, ARRAYSIZE(explorerframe_dll_hooks))) {
-        Wh_Log(L"Failed to hook ExplorerFrame.dll");
-        return FALSE;
-    }
-
-    // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
-    // 与 ToggleIcons / SmoothIcons / Purity 共用一次挂钩），这里不再重复安装。
-
-    if (!g_DblUpComInitializer.Init()) {
-        Wh_Log(L"COM initialization failed");
-        return FALSE;
-    }
-    if (
-        FAILED(CoCreateInstance(CLSID_CUIAutomation, NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), g_DblUpUIAutomation.put_void())) ||
-        !g_DblUpUIAutomation
-    ) {
-        Wh_Log(L"Failed to create UIAutomation COM instance");
-        return FALSE;
-    }
-
-    DblUpLoadSettings();
-    // 激活（枚举挂接现有窗口）放在 Wh_ModAfterInit 的 DblUpAfterInit 中进行，
-    // 与上游「AfterInit 再枚举」的时序一致；总开关关闭时不挂接任何窗口。
-
-    return TRUE;
-}
-
-static void DblUpAfterInit() {
-    DblUpUpdateActivation();
-}
-
-static void DblUpUninit() {
-    Wh_Log(L"DblUp Uninit");
-    g_QuickSettingsDblUpActive = false;
-    DblUpUnsubclassWindows();
-}
-
-static void DblUpNotifySettingsChanged() {
-    Wh_Log(L"[CW] DblUp settings changed");
-    DblUpLoadSettings();
-    DblUpUpdateActivation();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 功能八：开始菜单电源按钮（PowerBtn*）
+// 功能七：开始菜单电源按钮（PowerBtn*）
 // 来源：Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2（MIT 惯例），
 // 原版链接：https://windhawk.net/mods/win11-power-buttons（官方源码仓库：
 // https://github.com/ramensoftware/windhawk-mods，mods/win11-power-buttons.wh.cpp）。
@@ -6106,7 +5635,7 @@ static void PowerBtnSettingsChanged() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能九：拖拽删除（DragDel*）
+// 功能八：拖拽删除（DragDel*）
 // 来源：iMAboud Drag to Delete 1.0.0（MIT），
 // 原版链接：https://windhawk.net/mods/drag-to-delete。
 // 逻辑与上游一致，全局符号与函数统一加 DragDel 前缀以与其他功能隔离；设置键
@@ -6713,7 +6242,7 @@ static void DragDelUninit() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能十：登录注销关机音效（SndLog*）
+// 功能九：登录注销关机音效（SndLog*）
 // 来源：Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3
 // （MIT 惯例），原版链接：
 // https://windhawk.net/mods/logon-logoff-shutdown-sounds。
@@ -7325,7 +6854,7 @@ static VOID SndLogUninit()
 }
 
 // ============================================================================
-// 功能十一：窗口优化（WinOpt 命名空间）
+// 功能十：窗口优化（WinOpt 命名空间）
 //
 // 来自 CW-窗口优化 1.1.0（本包三合一融合模组，2.0.0 起整体并入本模组）：
 //   • 窗口拖动（Alt+拖动）：上游 AltDrag 1.1，原作者 m417z，GPL-3.0 许可证，
@@ -11042,12 +10571,12 @@ void SettingsChanged() {
 }  // namespace WinOpt
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons、Purity 与 DblUp 共用）
+// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons 与 Purity 共用）
 //
-// 四个功能都需要捕获新建窗口（桌面 SHELLDLL_DefView / SysListView32，或文件
+// 三个功能都需要捕获新建窗口（桌面 SHELLDLL_DefView / SysListView32，或文件
 // 夹窗口 ShellTabWindowClass 树内的 SysListView32 / DirectUIHWND）。为避免在
 // 同一 mod 内对同一目标 API 安装多个钩子，这里只安装一次，由共享钩子按各功能
-// 的激活状态把创建结果分发给四个功能的处理函数。
+// 的激活状态把创建结果分发给三个功能的处理函数。
 // ─────────────────────────────────────────────────────────────────────────────
 
 using QuickSettingsCreateWindowExW_t = decltype(&CreateWindowExW);
@@ -11084,9 +10613,6 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
         if (g_QuickSettingsPurityActive) {
             PurityOnCreatedWindow(hWnd, lpClassName, hWndParent);
         }
-        if (g_QuickSettingsDblUpActive) {
-            DblUpOnCreatedWindow(hWnd, lpClassName, hWndParent);
-        }
     }
 
     return hWnd;
@@ -11095,7 +10621,7 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并入口（2.0.0）：@include 为 *，各功能段按进程门控——
 //   • explorer.exe：Peek、ToggleIcons（含 SmoothIcons）、Marquee、Purity、
-//     ExtWarn、DblUp、DragDel、SndLog；
+//     ExtWarn、DragDel、SndLog；
 //   • StartMenuExperienceHost.exe + explorer.exe：PowerBtn（按钮注入在开始
 //     菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
 //   • 全进程：WinOpt（窗口优化，含 altDrag / winArrange / invisBorders 三段）。
@@ -11136,11 +10662,11 @@ BOOL Wh_ModInit() {
     // ── 桌面各段：仅 explorer.exe ──
     if (isExplorer) {
         // 先安装共享 CreateWindowExW 钩子（Wh_SetFunctionHook 为延迟生效，
-        // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的四个功能。
+        // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的三个功能。
         bool createWindowHookOk = QuickSettingsInstallCreateWindowExWHook() != FALSE;
         if (!createWindowHookOk) {
             Wh_Log(L"Shared CreateWindowExW hook failed, disabling "
-                   L"ToggleIcons/SmoothIcons/Purity/DblUp");
+                   L"ToggleIcons/SmoothIcons/Purity");
         }
 
         bool peekOk = PeekInit() != FALSE;
@@ -11175,14 +10701,6 @@ BOOL Wh_ModInit() {
             Wh_Log(L"ExtWarn init failed, continuing without it");
         }
 
-        // DblUp 对新建文件夹窗口的捕获经由共享 CreateWindowExW 钩子；现有窗口
-        // 的枚举挂接在 Wh_ModAfterInit 的 DblUpAfterInit 中进行（与上游
-        // 「AfterInit 再枚举」时序一致）。
-        bool dblUpOk = createWindowHookOk && DblUpInit() != FALSE;
-        if (!dblUpOk) {
-            Wh_Log(L"DblUp init failed, continuing without it");
-        }
-
         bool dragDelOk = DragDelInit() != FALSE;
         if (!dragDelOk) {
             Wh_Log(L"DragDel init failed, continuing without it");
@@ -11194,7 +10712,7 @@ BOOL Wh_ModInit() {
         }
 
         anyOk = anyOk || peekOk || toggleIconsOk || marqueeOk || smoothIconsOk ||
-                purityOk || extWarnOk || dblUpOk || dragDelOk || sndLogOk;
+                purityOk || extWarnOk || dragDelOk || sndLogOk;
     }
 
     return anyOk ? TRUE : FALSE;
@@ -11209,7 +10727,6 @@ void Wh_ModAfterInit() {
         PeekAfterInit();
         SmoothIconsAfterInit();
         PurityAfterInit();
-        DblUpAfterInit();
     }
 
     PowerBtnAfterInit();
@@ -11241,7 +10758,6 @@ void Wh_ModUninit() {
         MarqueeUninit();
         PurityUninit();
         ExtWarnUninit();
-        DblUpUninit();
         DragDelUninit();
         SndLogUninit();
     }
@@ -11265,7 +10781,6 @@ void Wh_ModSettingsChanged() {
         SmoothIconsNotifySettingsChanged();
         PurityNotifySettingsChanged();
         ExtWarnNotifySettingsChanged();
-        DblUpNotifySettingsChanged();
         DragDelLoadSettings();
         SndLogNotifySettingsChanged();
     }
