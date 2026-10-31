@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-更好的Windows（小细节）
 // @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, double-click to go up in File Explorer, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
 // @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；双击资源管理器空白处返回上级；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
-// @version         2.0.1
+// @version         2.1.1
 // @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, wrldspawn, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
@@ -51,8 +51,8 @@
 // 段）；桌面图标的隐藏机制只有系统「显示桌面图标」开关一种（ToggleIcons），
 // 本模组每次触发切换时在其上叠加一次淡出/淡入过渡动画。
 // 设置键为 peek.*、toggleIcons.*、marquee.*、purity.*、extWarn.*、dblUp.*、
-// powerBtn.*、dragDel.*、sndLog.* 与 winOpt.*（两级嵌套：winOpt 组内嵌
-// altDrag.*/winArrange.*/invisBorders.* 三个子分组）前缀。
+// powerBtn.*、dragDel.*、sndLog.*、altDrag.*、winArrange.* 与 invisBorders.*
+// 前缀（2.1.0 起窗口优化拆分为三个独立顶层分组，不再有 winOpt.* 组壳）。
 // ToggleIcons、SmoothIcons、Purity 与 DblUp 都需要挂钩 CreateWindowExW，由
 // 文件末尾的共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
 // 2.0.0 起进程门控（@include 为 * 全进程注入，@exclude windhawk.exe /
@@ -70,7 +70,7 @@
 /*
 # CW-更好的Windows（小细节）
 
-Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「双击返回上级」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」「窗口优化」六个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余四个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
+Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十二个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「双击返回上级」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」五个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余七个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
 
 ## 功能组一览
 
@@ -85,7 +85,9 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 | 7 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
 | 8 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
 | 9 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
-| 10 | 窗口优化 | `winOpt.*` | **关** | Alt+拖动任意移动/调整窗口、滑动排列吸附、隐形窗口边框（三个子分组） | m417z（GPL-3.0）×2、Bo0ii（MIT） |
+| 10 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动，移动或调整窗口大小 | m417z（GPL-3.0） |
+| 11 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口时自动吸附对齐，松手后带惯性顺滑滑动 | m417z（GPL-3.0） |
+| 12 | 隐形窗口边框 | `invisBorders.*` | 开 | 将窗口边框设为隐形并完整保留系统圆角效果 | Bo0ii（MIT） |
 
 ## 分组 1：显示桌面按钮预览（peek.*）
 
@@ -167,25 +169,21 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - **使用前提（重要）**：请先在声音方案中为「Windows 登录」「Windows 注销」「退出 Windows」（开启 XP 模式还含「Windows 启动」）等事件配置 .wav 音效（控制面板 → 声音 →「声音」选项卡，或使用 [Shutdown-Logoff-Logon-Sound-Hacks.zip](https://www.howtogeek.com/wp-content/uploads/2016/09/Shutdown-Logoff-Logon-Sound-Hacks.zip) 恢复声音事件）；事件未配置音效时静默跳过、不回放默认音。若开启 XP 启动行为，建议取消勾选「播放 Windows 启动声音」以免登录前提前播放。
 - 与其他恢复/接管登录注销关机声音的模组或工具同时启用可能重复播放，请按需二选一。
 
-## 分组 10：窗口优化（winOpt.*，默认关闭）
-
-窗口操作三合一，组内保留三个子分组（`winOpt.altDrag.*` / `winOpt.winArrange.*` / `winOpt.invisBorders.*`），各子分组第一项同样为「启用本组功能」开关（子分组默认开启，但整个「窗口优化」分组默认关闭）。本分组生效于所有进程（窗口拖动的钩子需要跨进程工作），Windhawk 模组设置「高级」选项卡的自定义进程排除列表依旧有效。
-
-### 窗口拖动（Alt+拖动）（winOpt.altDrag.*）
+## 分组 10：窗口拖动（Alt+拖动）（altDrag.*）
 
 按住移动触发键（默认 Alt + 左键）在窗口任意位置拖动即可移动窗口；按住调整触发键（默认 Alt + 右键）拖动即可调整大小——跟随鼠标的边或角是最靠近起拖位置的那条。走标题栏拖动的同一套系统流程，吸附、DWM 动画、最大化窗口处理一应俱全；未超过延迟或拖动阈值的短按会原样作为点击交还给程序。鼠标键、修饰键与按住延迟（毫秒）均可单独设置，「拖动无标题栏的窗口」（默认关）可选拖动弹出菜单、工具提示、气泡。灵感来自 [Stefan Sundin 的原版 AltDrag 工具](https://stefansundin.github.io/altdrag/)。
 
-### 窗口排列（winOpt.winArrange.*）
+本分组与后面两个窗口分组（窗口排列、隐形窗口边框）一样生效于所有进程（窗口拖动的钩子需要跨进程工作），Windhawk 模组设置「高级」选项卡的自定义进程排除列表依旧有效。
+
+## 分组 11：窗口排列（winArrange.*）
 
 窗口松手后带着惯性顺滑滑动减速停止，拖动与滑动过程中靠近其他窗口或屏幕工作区边缘时自动吸附对齐（**拖动窗口时吸附**、**滑动时吸附窗口**，默认开）；按住「临时禁用吸附的按键」（默认 Alt）可临时绕过吸附；**吸附距离**（默认 25，按窗口 DPI 缩放）、**滑动减速**（默认 15，1-99，越小滑动越久）可调。吸附与滑动都保证窗口标题栏留在屏幕工作区内；窗口滑过屏幕边缘会反弹，也能顺势滑到相邻显示器。
 
-### 隐形窗口边框（winOpt.invisBorders.*）
+与其他窗口分组及桌面功能的配合：任务栏、桌面（Progman/WorkerW）窗口被窗口拖动排除，不会干扰本模组其余桌面分组；「窗口排列」默认按住 Alt 临时禁用吸附，与「窗口拖动（Alt+拖动）」的默认触发键重叠——按住 Alt 拖动时窗口不会吸附，想边拖边吸附可改掉其中一方的按键。
+
+## 分组 12：隐形窗口边框（invisBorders.*）
 
 将窗口边框设为隐形（DWMWA_COLOR_NONE），同时完整保留系统窗口圆角效果。**应用到特殊窗口**（默认关）可同时作用于对话框等特殊窗口。需要 DWM 处于启用状态，Windows 10（1809+）/ Windows 11 可用。
-
-### 与桌面功能的配合
-
-任务栏、桌面（Progman/WorkerW）窗口被窗口拖动排除，不会干扰本模组其余桌面分组；「窗口排列」默认按住 Alt 临时禁用吸附，与「窗口拖动（Alt+拖动）」的默认触发键重叠——按住 Alt 拖动时窗口不会吸附，想边拖边吸附可改掉其中一方的按键。
 
 ## 进程生效范围
 
@@ -193,10 +191,12 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 
 - **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、纯净化图标、扩展名警告、双击返回上级、拖拽删除、登录注销关机音效；
 - **explorer.exe + StartMenuExperienceHost.exe 分流**：开始菜单电源按钮（按钮注入在开始菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
-- **全进程生效**：窗口优化（含三个子分组）。
+- **全进程生效**：窗口拖动（Alt+拖动）、窗口排列、隐形窗口边框。
 
 ## 变更记录
 
+- **2.1.1**：修复纯净化图标在 explorer 图标缓存彻底重建后（重启资源管理器、删除 iconcache 等），快捷方式小箭头与 UAC 盾牌重新出现且不再消失的问题。根因：图像列表补丁是对「当时那批共享系统图像列表」的原位改写，缓存重建会销毁并重建这批列表（新句柄、内容按注册表 Shell Icons 重定向重新回填），补丁随旧列表整体丢失；2.0.1 的自愈校验存在三处缺口——只校验盾牌 SYSIMAGE 槽位（箭头 overlay 槽位与盾牌 overlay 槽位完全不在范围，而桌面可见的箭头/盾牌恰恰主要经 overlay 路径绘制）、挂在「隐藏 UAC 管理员盾牌」开关之下（只开箭头隐藏时没有自愈）、只由桌面 WM_PAINT 驱动（闲置桌面不再绘制，重建尾声落在最后一次绘制之后的回填无人复查）。现重构为持久自愈：校验覆盖「箭头 overlay 槽位 ＋ 盾牌 overlay 槽位（两者经补丁时记录的自建空白锚点间接校验）＋ 盾牌 SYSIMAGE 槽位（像素级校验）」三类，任一失守立即整体重打补丁；触发面在桌面 WM_PAINT 之外新增桌面 2 秒兜底定时器与 comctl32 ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表的必经路径，钩子内仅置位提示、零重活，不影响其他模组）；失守重打带 3 秒冷却防重建风暴循环，平时仅轻量抽查（深查 1s 节流、感知命中 200ms），补丁幂等。无需重启资源管理器，设置项无变化，x86/x64 双架构编译。
+- **2.1.0**：「窗口优化」分组拆分为三个独立顶层分组——「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」（设置页由十个可收起分组变为十二个），删除组壳 `winOpt.*` 与三合一组级总开关 `winOpt.enable`；原三个子分组的组内开关提升为各自分组的总开关（`altDrag.enable` / `winArrange.enable` / `invisBorders.enable`，默认开启，显示名沿用「启用本组功能」）。设置键迁移：`winOpt.altDrag.*` → `altDrag.*`、`winOpt.winArrange.*` → `winArrange.*`、`winOpt.invisBorders.*` → `invisBorders.*`（组内键名不变），代码侧各读取点同步去掉 `winOpt.` 前缀并删除与 `winOpt.enable` 相与的三合一短路，功能逻辑不变；**旧设置不会自动迁移**，更新后请在设置页重新调整这三个分组的数值。
 - **2.0.1**：修复纯净化图标「隐藏 UAC 管理员盾牌」开启后，管理员权限快捷方式图标左下角（原盾牌位置）残留小方框轮廓的问题。实测根因：机器上遗留的注册表 Shell Icons 重定向（如 `29/77 → imageres.dll,197`）会在 explorer 图标缓存重建时把该"空"图标重新回填进 SIID_SHIELD 的系统图像槽位，而 imageres,197 并非全空——各尺寸帧都残留少量底部阴影像素（48px 约 142 个、96px 约 588 个），绘制出来即小方框；初始化的一次性图像列表补丁覆盖不了回填。现新增盾牌槽位回填校验：桌面绘制期按 1s 节流检查各系统图像列表中 SIID_SHIELD 槽位是否仍为自建全透明图标（32bpp 全零 alpha 校验），发现回填立即整体重新打补丁并重绘桌面；空白图标本体无改动（自建 32bpp 全零 alpha + 全 1 掩码的 CreateIconIndirect 全透明图标，`ImageList_ReplaceIcon` 与 `SHGetStockIconInfo` 替换两处统一使用，按目标图像列表实际尺寸各建一份、钩子用缓存复用）。
 - **2.0.0**：模组更名「CW-更好的Windows（小细节）」（id 与文件名保持 cw-desktop-quick-settings 不变），定位升级为 Windows 细节功能大合集。并入六个独立模组，成为四个既有分组之外的新分组：`extWarn.*`「扩展名警告」（上游 m417z Turn off change file extension warning 1.0.1，GPL-3.0，总开关默认关闭）、`dblUp.*`「双击返回上级」（上游 wrldspawn Explorer Double Click Up 1.0.1，GPL-3.0，总开关默认关闭，CreateWindowExW 钩子并入共享钩子分发）、`powerBtn.*`「开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2，MIT 惯例，总开关默认关闭，总开关关闭时恢复原生电源按钮）、`dragDel.*`「拖拽删除」（上游 iMAboud Drag to Delete 1.0.0，MIT，总开关默认关闭）、`sndLog.*`「登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3，MIT 惯例，总开关默认关闭）与 `winOpt.*`「窗口优化」（原 CW-窗口优化 1.1.0 整体并入，两级嵌套分组：组级总开关 + altDrag.* / winArrange.* / invisBorders.* 三个子分组，键名结构不变）。为覆盖窗口优化的跨进程钩子，`@include` 由 explorer.exe 改为 `*` 并排除 windhawk.exe / windhawk-ui.exe / devenv.exe，各分组按进程门控（桌面八组仅 explorer、电源按钮按 StartMenuExperienceHost/explorer 分流、窗口优化全进程）；移除 `@architecture x86-64` 单架构声明，x86 与 x64 双架构编译（并入代码已按本包铁律复核/修复无捕获 lambda 直传 stdcall 回调问题）。原六个独立模组源码文件移除，由本模组统一提供；旧模组设置不会自动迁移，安装后请在设置页重新确认数值。
 - **1.4.0**：四个功能分组各新增「启用本组功能」总开关（组内第一项、默认开启）：`peek.enable`、`toggleIcons.enable`、`marquee.enable`、`purity.enable`。实现为运行时短路 + 分组级挂接管理：预览与框选在触发入口直通原逻辑，桌面图标隐藏按开关动态挂接/摘除桌面窗口子类，纯净化按开关跳过或还原图像列表补丁；全部沿用各分组现有的设置变更重载路径，切换即时生效、无需重启资源管理器。
@@ -217,7 +217,7 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
 - 「开始菜单电源按钮」原版 mod：Windows 11 Start Menu Power Buttons，作者 Hakuuyosei（灵弦，[github.com/ahzvenol](https://github.com/ahzvenol)），源码内未附带许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/win11-power-buttons>。
 - 「拖拽删除」原版 mod：Drag to Delete，作者 [iMAboud](https://github.com/iMAboud)，MIT 许可证，原版链接：<https://windhawk.net/mods/drag-to-delete>。
 - 「登录注销关机音效」原版 mod：Logon, Logoff & Shutdown Sounds Restored，作者 [Toru the Red Fox](https://github.com/TorutheRedFox)，源码文件头未标注许可，按 Windhawk 官方模组仓库提交规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/logon-logoff-shutdown-sounds>。
-- 「窗口优化」三个子分组：窗口拖动（Alt+拖动）原版 mod [AltDrag](https://windhawk.net/mods/alt-drag) 与窗口排列原版 mod [Slick Window Arrangement](https://windhawk.net/mods/slick-window-arrangement)，作者均为 [m417z](https://github.com/m417z)，GPL-3.0 许可证（AltDrag 创意来自 Stefan Sundin）；隐形窗口边框原版 mod [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)，作者 [Bo0ii](https://github.com/Bo0ii)，MIT 许可证，源码仓库：<https://github.com/Bo0ii/windhawk-mods>。
+- 「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」三个分组（原「窗口优化」组）：窗口拖动原版 mod [AltDrag](https://windhawk.net/mods/alt-drag) 与窗口排列原版 mod [Slick Window Arrangement](https://windhawk.net/mods/slick-window-arrangement)，作者均为 [m417z](https://github.com/m417z)，GPL-3.0 许可证（AltDrag 创意来自 Stefan Sundin）；隐形窗口边框原版 mod [Invisible Window Borders](https://windhawk.net/mods/invisible-borders)，作者 [Bo0ii](https://github.com/Bo0ii)，MIT 许可证，源码仓库：<https://github.com/Bo0ii/windhawk-mods>。
 - 本模组整体以 GPL-3.0 发布，由 CW-Beautify 整合包（作者 Heptalune）整合维护；并入的 MIT 模组保留其原作者署名与许可声明，各原作者署名与许可声明原样保留。
 */
 // ==/WindhawkModReadme==
@@ -619,198 +619,173 @@ Windows 细节功能大合集：把十组互不冲突的桌面与系统小功能
   $description:zh-CN: >-
     恢复 Windows 7 时代的登录、注销与关机音效，重现熟悉的开机问候。由独立
     模组「登录注销关机音效」（原作者 Toru the Red Fox，MIT 惯例）并入。
-- winOpt:
-  - enable: false
+- altDrag:
+  - enable: true
     $name: Enable this feature group
     $name:zh-CN: 启用本组功能
     $description: >-
-      Master switch for the whole window optimization group. When turned off,
-      none of the three sub-groups below take effect, regardless of their own
-      switches; turning it back on restores them at once.
+      Master switch for window dragging. When turned off, the move and resize
+      triggers do nothing and clicking behaves exactly as without this mod.
     $description:zh-CN: >-
-      「窗口优化」分组总开关。关闭后下列三个子分组（窗口拖动/窗口排列/隐形
-      窗口边框）全部停止生效，与其各自开关无关；重新开启后按各子分组开关
-      立即恢复。本分组生效于所有进程。
-  - altDrag:
-    - enable: true
-      $name: Enable this feature group
-      $name:zh-CN: 启用本组功能
+      「窗口拖动（Alt+拖动）」分组开关。关闭后移动/调整大小触发键不再
+      生效，鼠标点击行为与未启用本功能时完全一致；重新开启立即恢复。
+  - moveTrigger:
+    - button: left
+      $name: Mouse button
+      $name:zh-CN: 鼠标键
+      $options:
+      - left: 左键
+      - right: 右键
+      - middle: 中键
+      - x1: X1（后退）键
+      - x2: X2（前进）键
+    - ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    - win: false
+      $name: Win
+      $name:zh-CN: Win
+    - delay: 0
+      $name: Delay
+      $name:zh-CN: 延迟
       $description: >-
-        Master switch for window dragging. When turned off, the move and resize
-        triggers do nothing and clicking behaves exactly as without this mod.
-      $description:zh-CN: >-
-        「窗口拖动（Alt+拖动）」子分组开关。关闭后移动/调整大小触发键不再
-        生效，鼠标点击行为与未启用本功能时完全一致；重新开启立即恢复。
-    - moveTrigger:
-      - button: left
-        $name: Mouse button
-        $name:zh-CN: 鼠标键
-        $options:
-        - left: 左键
-        - right: 右键
-        - middle: 中键
-        - x1: X1（后退）键
-        - x2: X2（前进）键
-      - ctrl: false
-        $name: Ctrl
-        $name:zh-CN: Ctrl
-      - alt: true
-        $name: Alt
-        $name:zh-CN: Alt
-      - shift: false
-        $name: Shift
-        $name:zh-CN: Shift
-      - win: false
-        $name: Win
-        $name:zh-CN: Win
-      - delay: 0
-        $name: Delay
-        $name:zh-CN: 延迟
-        $description: >-
-          The time in milliseconds to hold the mouse button before the window
-          starts moving. A shorter press is passed to the window as a click.
-        $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始移动；更短的按压会作为点击交给窗口。
-      $name: Move trigger
-      $name:zh-CN: 移动触发
-      $description: >-
-        The mouse button and the keys to hold for moving a window.
-      $description:zh-CN: 移动窗口时按住的鼠标键与修饰键组合。
-    - sizeTrigger:
-      - button: right
-        $name: Mouse button
-        $name:zh-CN: 鼠标键
-        $options:
-        - left: 左键
-        - right: 右键
-        - middle: 中键
-        - x1: X1（后退）键
-        - x2: X2（前进）键
-      - ctrl: false
-        $name: Ctrl
-        $name:zh-CN: Ctrl
-      - alt: true
-        $name: Alt
-        $name:zh-CN: Alt
-      - shift: false
-        $name: Shift
-        $name:zh-CN: Shift
-      - win: false
-        $name: Win
-        $name:zh-CN: Win
-      - delay: 0
-        $name: Delay
-        $name:zh-CN: 延迟
-        $description: >-
-          The time in milliseconds to hold the mouse button before the window
-          starts resizing. A shorter press is passed to the window as a click.
-        $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始调整大小；更短的按压会作为点击交给窗口。
-      $name: Resize trigger
-      $name:zh-CN: 调整大小触发
-      $description: >-
-        The mouse button and the keys to hold for resizing a window. The edge or
-        corner which follows the mouse is the one closest to where the drag starts.
-      $description:zh-CN: 调整窗口大小时按住的鼠标键与修饰键组合。跟随鼠标的边或角，是最靠近起拖位置的那条。
-    - dragWindowsWithoutTitleBar: false
-      $name: Drag windows without a title bar
-      $name:zh-CN: 拖动无标题栏的窗口
-      $description: >-
-        Also drag windows without a title bar, such as popup menus, tooltips
-        and flyouts.
-      $description:zh-CN: 同时允许拖动没有标题栏的窗口，例如弹出菜单、工具提示和气泡。
-    $name: Window drag (Alt+drag)
-    $name:zh-CN: 窗口拖动（Alt+拖动）
+        The time in milliseconds to hold the mouse button before the window
+        starts moving. A shorter press is passed to the window as a click.
+      $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始移动；更短的按压会作为点击交给窗口。
+    $name: Move trigger
+    $name:zh-CN: 移动触发
     $description: >-
-      Move or resize any window by holding the trigger keys and dragging it
-      from anywhere, without having to grab the title bar or the borders.
-    $description:zh-CN: >-
-      按住触发键从窗口任意位置拖动，即可移动或调整窗口大小，
-      无需瞄准标题栏或边框。
-  - winArrange:
-    - enable: true
-      $name: Enable this feature group
-      $name:zh-CN: 启用本组功能
+      The mouse button and the keys to hold for moving a window.
+    $description:zh-CN: 移动窗口时按住的鼠标键与修饰键组合。
+  - sizeTrigger:
+    - button: right
+      $name: Mouse button
+      $name:zh-CN: 鼠标键
+      $options:
+      - left: 左键
+      - right: 右键
+      - middle: 中键
+      - x1: X1（后退）键
+      - x2: X2（前进）键
+    - ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    - win: false
+      $name: Win
+      $name:zh-CN: Win
+    - delay: 0
+      $name: Delay
+      $name:zh-CN: 延迟
       $description: >-
-        Master switch for window arrangement. When turned off, windows stop
-        normally when released, without sliding animation or snapping.
-      $description:zh-CN: >-
-        「窗口排列」子分组开关。关闭后窗口松手即停，不再播放滑动动画，也不再
-        吸附对齐（拖动与滑动中的吸附均关闭）；重新开启立即恢复。
-    - SnapWindowsWhenDragging: true
-      $name: Snap windows when dragging
-      $name:zh-CN: 拖动窗口时吸附
-    - SnapWindowsDistance: 25
-      $name: Snap windows distance
-      $name:zh-CN: 吸附距离
-      $description: Set the required distance for windows to snap to other windows
-      $description:zh-CN: 设置窗口与其他窗口吸附时所需的距离
-    - KeysToDisableSnapping:
-      - Ctrl: false
-        $name: Ctrl
-        $name:zh-CN: Ctrl
-      - Alt: true
-        $name: Alt
-        $name:zh-CN: Alt
-      - Shift: false
-        $name: Shift
-        $name:zh-CN: Shift
-      $name: Keys to temporarily disable snapping
-      $name:zh-CN: 临时禁用吸附的按键
-      $description: A combination of keys that can be used to temporarily disable snapping
-      $description:zh-CN: 按住该组合键可临时禁用窗口吸附
-    - SlidingAnimation: true
-      $name: Sliding animation
-      $name:zh-CN: 滑动动画
-      $description: Keep sliding the window after it's being moved
-      $description:zh-CN: 窗口被拖动松手后继续保持惯性滑动
-    - SnapWindowsWhenSliding: true
-      $name: Snap windows when sliding
-      $name:zh-CN: 滑动时吸附窗口
-    - SlidingAnimationSlowdown: 15
-      $name: Sliding animation slowdown
-      $name:zh-CN: 滑动减速
-      $description: Set a smaller value for a sliding animation that lasts longer (between 1 and 99)
-      $description:zh-CN: 数值越小，滑动动画持续越久（取值 1 到 99 之间）
-    $name: Window arrangement
-    $name:zh-CN: 窗口排列
+        The time in milliseconds to hold the mouse button before the window
+        starts resizing. A shorter press is passed to the window as a click.
+      $description:zh-CN: 按住鼠标键多少毫秒后窗口才开始调整大小；更短的按压会作为点击交给窗口。
+    $name: Resize trigger
+    $name:zh-CN: 调整大小触发
     $description: >-
-      Snap windows when dragging or sliding, and keep them sliding smoothly
-      with inertia after they are released.
-    $description:zh-CN: >-
-      拖动或滑动窗口时自动吸附对齐，窗口松手后带惯性顺滑滑动。
-  - invisBorders:
-    - enable: true
-      $name: Enable this feature group
-      $name:zh-CN: 启用本组功能
-      $description: >-
-        Master switch for invisible window borders. When turned off, all
-        borders in this process return to their default color at once.
-      $description:zh-CN: >-
-        「隐形窗口边框」子分组开关。关闭后本进程内所有已被隐形的窗口边框立即
-        恢复系统默认颜色；重新开启立即恢复隐形效果。
-    - SpecialWindows: false
-      $name: Apply to Special Windows
-      $name:zh-CN: 应用到特殊窗口
-      $description: Also apply to special windows like dialogs
-      $description:zh-CN: 同时应用到对话框等特殊窗口
-    $name: Invisible window borders
-    $name:zh-CN: 隐形窗口边框
+      The mouse button and the keys to hold for resizing a window. The edge or
+      corner which follows the mouse is the one closest to where the drag starts.
+    $description:zh-CN: 调整窗口大小时按住的鼠标键与修饰键组合。跟随鼠标的边或角，是最靠近起拖位置的那条。
+  - dragWindowsWithoutTitleBar: false
+    $name: Drag windows without a title bar
+    $name:zh-CN: 拖动无标题栏的窗口
     $description: >-
-      Make window borders invisible while keeping rounded corners.
-    $description:zh-CN: >-
-      将窗口边框设为隐形，同时保留圆角效果。
-  $name: Window optimization
-  $name:zh-CN: 窗口优化
+      Also drag windows without a title bar, such as popup menus, tooltips
+      and flyouts.
+    $description:zh-CN: 同时允许拖动没有标题栏的窗口，例如弹出菜单、工具提示和气泡。
+  $name: Window drag (Alt+drag)
+  $name:zh-CN: 窗口拖动（Alt+拖动）
   $description: >-
-    Window operations three-in-one: move or resize windows from anywhere with
-    a custom trigger, slick sliding window arrangement with snapping, and
-    invisible window borders that keep rounded corners. Merged from AltDrag and
-    Slick Window Arrangement by m417z (GPL-3.0) and Invisible Window Borders by
-    Bo0ii (MIT). Applies to all processes.
+    Move or resize any window by holding the trigger keys and dragging it
+    from anywhere, without having to grab the title bar or the borders.
   $description:zh-CN: >-
-    窗口操作三合一：按住触发键即可从窗口任意位置拖动移动或调整大小（无需瞄准
-    标题栏或边框）；窗口移动带顺滑的滑动动画与吸附对齐；窗口边框隐形且保留
-    圆角。由「窗口拖动（Alt+拖动）」「窗口排列」（均原作者 m417z，GPL-3.0）与
-    「隐形窗口边框」（原作者 Bo0ii，MIT）并入。本分组生效于所有进程。
+    按住触发键从窗口任意位置拖动，即可移动或调整窗口大小，
+    无需瞄准标题栏或边框。
+- winArrange:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for window arrangement. When turned off, windows stop
+      normally when released, without sliding animation or snapping.
+    $description:zh-CN: >-
+      「窗口排列」分组开关。关闭后窗口松手即停，不再播放滑动动画，也不再
+      吸附对齐（拖动与滑动中的吸附均关闭）；重新开启立即恢复。
+  - SnapWindowsWhenDragging: true
+    $name: Snap windows when dragging
+    $name:zh-CN: 拖动窗口时吸附
+  - SnapWindowsDistance: 25
+    $name: Snap windows distance
+    $name:zh-CN: 吸附距离
+    $description: Set the required distance for windows to snap to other windows
+    $description:zh-CN: 设置窗口与其他窗口吸附时所需的距离
+  - KeysToDisableSnapping:
+    - Ctrl: false
+      $name: Ctrl
+      $name:zh-CN: Ctrl
+    - Alt: true
+      $name: Alt
+      $name:zh-CN: Alt
+    - Shift: false
+      $name: Shift
+      $name:zh-CN: Shift
+    $name: Keys to temporarily disable snapping
+    $name:zh-CN: 临时禁用吸附的按键
+    $description: A combination of keys that can be used to temporarily disable snapping
+    $description:zh-CN: 按住该组合键可临时禁用窗口吸附
+  - SlidingAnimation: true
+    $name: Sliding animation
+    $name:zh-CN: 滑动动画
+    $description: Keep sliding the window after it's being moved
+    $description:zh-CN: 窗口被拖动松手后继续保持惯性滑动
+  - SnapWindowsWhenSliding: true
+    $name: Snap windows when sliding
+    $name:zh-CN: 滑动时吸附窗口
+  - SlidingAnimationSlowdown: 15
+    $name: Sliding animation slowdown
+    $name:zh-CN: 滑动减速
+    $description: Set a smaller value for a sliding animation that lasts longer (between 1 and 99)
+    $description:zh-CN: 数值越小，滑动动画持续越久（取值 1 到 99 之间）
+  $name: Window arrangement
+  $name:zh-CN: 窗口排列
+  $description: >-
+    Snap windows when dragging or sliding, and keep them sliding smoothly
+    with inertia after they are released.
+  $description:zh-CN: >-
+    拖动或滑动窗口时自动吸附对齐，窗口松手后带惯性顺滑滑动。
+- invisBorders:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for invisible window borders. When turned off, all
+      borders in this process return to their default color at once.
+    $description:zh-CN: >-
+      「隐形窗口边框」分组开关。关闭后本进程内所有已被隐形的窗口边框立即
+      恢复系统默认颜色；重新开启立即恢复隐形效果。
+  - SpecialWindows: false
+    $name: Apply to Special Windows
+    $name:zh-CN: 应用到特殊窗口
+    $description: Also apply to special windows like dialogs
+    $description:zh-CN: 同时应用到对话框等特殊窗口
+  $name: Invisible window borders
+  $name:zh-CN: 隐形窗口边框
+  $description: >-
+    Make window borders invisible while keeping rounded corners.
+  $description:zh-CN: >-
+    将窗口边框设为隐形，同时保留圆角效果。
 */
 // ==/WindhawkModSettings==
 
@@ -3741,10 +3716,16 @@ void SmoothIconsNotifySettingsChanged() {
 //     槽位与 SIID_SHIELD 图像项原位替换为空白图标；另挂钩 SHGetFileInfoW
 //     （剥离 SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX，拦截提取期合成——Win11
 //     桌面可见盾牌的关键层）与 SHGetStockIconInfo（SIID_SHIELD 直接返回空白）。
-//   • 盾牌槽位回填校验（2.0.1）：explorer 图标缓存会按注册表 Shell Icons 重定向
-//     把“非全空”的空图标（如 imageres,197，各尺寸残留底部阴影像素）重新回填进
-//     SIID_SHIELD 槽位，表现为管理员快捷方式左下角残留小方框；桌面绘制期按 1s
-//     节流校验槽位内容，发现回填即整体重新打补丁（详见校验函数注释）。
+//   • 图像列表补丁自愈（2.0.1 引入、2.1.1 重构为持久自愈）：explorer 图标缓存
+//     重建（重启 explorer、删除 iconcache、SHCNE_ASSOCCHANGED 刷新等）会销毁并
+//     重建共享 SHIL 图像列表，已打上的补丁随旧列表整体丢失；注册表 Shell Icons
+//     重定向（如 29/77 → imageres.dll,197）还会把“非全空”的空图标回填进盾牌
+//     槽位（管理员快捷方式左下角残留小方框）。自愈校验覆盖三类槽位：箭头
+//     overlay 槽位与盾牌 overlay 槽位（经补丁时记录的自建空白锚点间接校验）与
+//     盾牌 SYSIMAGE 槽位（像素级校验）；触发面为桌面 WM_PAINT ＋ 2s 兜底定时器
+//     ＋ comctl32 ImageList_Create/Destroy 轻量感知钩子（仅置位提示，重打在
+//     桌面线程执行）；失守立即全量重打 ＋ 3s 冷却，平时仅轻量抽查（详见自愈
+//     校验段注释）。
 //   • 初始化时序（上游 2.5.0 实测结论，原样保留）：SHChangeNotify 必须先于
 //     图像列表补丁（通知会重建图像列表，先打补丁会被整体丢弃）。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3762,8 +3743,32 @@ static struct {
 static std::unordered_set<std::wstring> PurityFolderNames;
 static DWORD PurityLastUpdateTick = 0;
 
-// 盾牌槽位回填校验的节流时钟（桌面 WM_PAINT 内 1s 一次，见校验函数注释）。
-static DWORD PurityLastShieldVerifyTick = 0;
+// ── 图像列表补丁自愈状态（2.1.1，替代 2.0.1 的仅盾牌 SYSIMAGE 1s 节流校验）──
+// 深度校验（像素级）节流与修复冷却时钟；GetTickCount 回绕由无符号减法天然处理。
+static DWORD PurityLastDeepCheckTick = 0;
+static DWORD PurityLastRepairTick = 0;
+
+// 每个共享 SHIL 图像列表的自愈锚点：补丁时追加的自建空白图标索引与列表尺寸。
+// 重打补丁时记录，校验时比对——列表被销毁重建后锚点必然失配（索引越界/尺寸
+// 变化/槽位非空白），据此感知「句柄已换、补丁已丢」。字段为对齐 int，单字段
+// 读写无撕裂；跨线程读到新旧混合快照的最坏后果是一次冗余重打（补丁幂等），
+// 不会漏报失守，故不加锁。
+struct PurityListRecord {
+    int appendedIdx;  // 追加的空白图标索引（-1 = 该列表本次未打上补丁）
+    int cx;
+    int cy;
+};
+static PurityListRecord PurityListRecords[5] = {};
+
+// 自愈兜底定时器 ID（挂在桌面 FolderView 上，2s 周期——桌面闲置无 WM_PAINT 时
+// 仍能感知图标缓存重建；见 PurityUpdateSelfHealTimer）。
+static const UINT_PTR PuritySelfHealTimerId = 0x50555254; // 'TRUP'
+
+// ImageList_Create/Destroy 感知钩子 → 自愈校验的「可能重建」提示位（钩子内只
+// 置位，深度校验与重打一律由 PuritySelfHealCheck 在桌面线程消费执行）。
+static std::atomic<bool> PurityImageListRebuildHint{false};
+// 感知钩子的启用门（explorer + 纯净化开启 + 箭头/盾牌至少一项开启）。
+static std::atomic<bool> PuritySelfHealArmed{false};
 
 // SHGetStockIconInfo 钩子用的空白盾牌图标缓存：[0] = 标准尺寸，[1] = 小尺寸。
 // 在初始化/设置重载时按需预创建（避免在钩子内懒初始化产生线程竞争）。
@@ -3856,17 +3861,20 @@ static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
 // Subclass
 // ---------------------------------------------------------------------------
 
-static void PurityOnDesktopPaintShieldVerify(HWND hWnd);
+static void PuritySelfHealCheck(HWND hWnd);
 
 static LRESULT CALLBACK PurityDesktopListSubclass(HWND hWnd, UINT uMsg, WPARAM wParam,
                                                   LPARAM lParam, DWORD_PTR dwRefData) {
-    if (uMsg == WM_PAINT && PuritySettings.enable) {
-        // 盾牌槽位回填校验（hideShields 开启时；1s 节流，详见校验函数注释）。
-        // 放在 DefSubclassProc 之前，让本帧绘制尽量用上重新置空后的槽位内容。
-        if (PuritySettings.hideShields) {
-            PurityOnDesktopPaintShieldVerify(hWnd);
+    if (PuritySettings.enable) {
+        // 图像列表补丁自愈（2.1.1）：WM_PAINT 与 2s 兜底定时器都进入同一路径。
+        // 校验内部自带节流（深查 1s 一次、感知钩子命中时 200ms 一次）与修复后
+        // 3s 冷却，平时只做轻量句柄/槽位抽查，失守才全量重打（详见自愈校验段
+        // 注释）。放在 DefSubclassProc 之前，让本帧绘制尽量用上重新置空后的
+        // 槽位内容。
+        if (uMsg == WM_PAINT || (uMsg == WM_TIMER && wParam == PuritySelfHealTimerId)) {
+            PuritySelfHealCheck(hWnd);
         }
-        if (PuritySettings.hideText) {
+        if (uMsg == WM_PAINT && PuritySettings.hideText) {
             PurityUpdateFolderCache();
             PurityIsDrawingDesktop = true;
             LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -3965,8 +3973,15 @@ static const GUID PurityIidImageList =
 //    为空白（ReplaceIcon 保持索引不变）。但 Win11 桌面可见的盾牌主要来自提取期
 //    合成（见下方 SHGetFileInfoW 钩子），本函数与其配合使用。
 //  - 2.0.1 补充：一次性补丁会被 explorer 图标缓存按注册表 Shell Icons 重定向的
-//    回填覆盖（详见下方回填校验段），需配合桌面绘制期的节流校验保持持久。
+//    回填覆盖（详见下方自愈校验段），需配合自愈校验保持持久。
+//  - 2.1.1 补充：补丁幂等且可重入——每次执行先清空自愈锚点记录，成功追加空白
+//    图标的列表记录锚点（索引+尺寸），供 PuritySelfHealCheck 校验补丁是否仍在。
 static void PurityPatchOverlayImageLists() {
+    // 无论本次走到哪一步退出，都先清空旧锚点：未打上的列表不参与校验。
+    for (int i = 0; i < 5; i++) {
+        PurityListRecords[i] = {-1, 0, 0};
+    }
+
     HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
     if (!hShell32) return;
 
@@ -4014,7 +4029,9 @@ static void PurityPatchOverlayImageLists() {
     }
 
     const int sizes[] = { 1, 0, 2, 3, 4 }; // SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE, SHIL_SYSSMALL, SHIL_JUMBO
-    for (int shil : sizes) {
+    int patchedLists = 0;
+    for (int listIdx = 0; listIdx < 5; listIdx++) {
+        int shil = sizes[listIdx];
         IImageList* piml = nullptr;
         if (FAILED(pSHGetImageList(shil, PurityIidImageList, (void**)&piml)) || !piml) {
             continue;
@@ -4039,6 +4056,10 @@ static void PurityPatchOverlayImageLists() {
                             }
                         }
                     }
+                    // 记录自愈锚点：空白图标追加在本列表尾部，箭头/盾牌 overlay
+                    // 槽位已重指向它；PuritySelfHealCheck 据此校验补丁是否仍在。
+                    PurityListRecords[listIdx] = {idx, cx, cy};
+                    patchedLists++;
                 }
                 if (PuritySettings.hideShields && shieldSysIdx >= 0) {
                     int replacedIdx = -1;
@@ -4049,26 +4070,51 @@ static void PurityPatchOverlayImageLists() {
         }
         piml->Release();
     }
+
+    Wh_Log(L"[CW] Purity image list patch done (%d/5 lists)", patchedLists);
 }
 
 // ---------------------------------------------------------------------------
-// 盾牌槽位回填校验（hideShields 持久性保障，2.0.1 新增）
-// 实测（Win11 22621 + 机器上遗留的注册表 Shell Icons 重定向 29/77 →
-// imageres.dll,197）：初始化补丁把 SIID_SHIELD 的系统图像槽位替换为自建全透明
-// 图标后，explorer 的图标缓存会在后续列表重建/槽位回填时按重定向把“空图标”
-// 重新装入该槽位。而这类经典“空”图标并非全空——imageres,197 各尺寸帧都残留
-// 少量底部阴影像素（48px 实测约 142 个、96px 约 588 个），绘制出来就是管理员
-// 快捷方式图标左下角的小方框轮廓。一次性补丁覆盖不了回填，故在桌面绘制期
-// 节流校验槽位内容，发现回填即整体重新打补丁（补丁幂等：重新解析索引、
-// 重新置空、重新挂 overlay 槽位）。
+// 图像列表补丁自愈校验（Purity 补丁持久性保障；2.0.1 引入、2.1.1 重构）
+//
+// 为什么需要自愈（实测根因链，Win11 22621）：
+//  1. 补丁随列表销毁而丢失：PurityPatchOverlayImageLists 的两处动作——把自建
+//     全透明图标 ReplaceIcon 进 SIID_SHIELD 系统图像槽位、把箭头/盾牌 overlay
+//     槽位 SetOverlayImage 重指向自建空白——都是对「当时那批共享 SHIL 图像列
+//     表」的原位改写。explorer 图标缓存重建（重启 explorer、删除 iconcache、
+//     初始化/设置变更时的 SHCNE_ASSOCCHANGED 刷新等）会销毁并重建这批列表，
+//     新列表由缓存按注册表 Shell Icons 重定向重新填充，补丁随旧列表整体丢失。
+//     注意 SHGetImageList 每次调用都现取当前列表（补丁与校验都不持旧句柄），
+//     失守不是「句柄缓存」问题，而是旧列表内容上的补丁不复存在。
+//  2. 2.0.1 自愈为何没兜住（三处独立缺陷）：
+//     a) 覆盖面：PurityShieldSlotRefilled 只校验 SIID_SHIELD 的 SYSIMAGE 槽位，
+//        箭头 overlay 槽位（IDO_SHGIOI_LINK）与盾牌 overlay 槽位（shell32,77 /
+//        imageres,77 / imageres,78）完全不在校验范围——桌面可见的箭头/盾牌恰恰
+//        主要经 overlay 路径绘制，重建后 overlay 槽位指回真实图标，校验却读不
+//        到失守；
+//     b) 门控：校验挂在 PuritySettings.hideShields 之下，只开箭头隐藏时完全没有
+//        自愈；
+//     c) 触发面：只挂桌面 WM_PAINT——校验靠绘制驱动，重建尾声的最后一次缓存回
+//        填若落在最后一次桌面绘制之后（重建期间校验与重打多次赛跑），闲置桌面
+//        不再绘制，最终失守状态永远无人复查。
+// 2.1.1 持久自愈设计：
+//  - 覆盖面＝三类槽位：自愈锚点（补丁时记录的空白图标索引+尺寸）同时覆盖箭头
+//    overlay 槽位、盾牌 overlay 槽位（两者都被 SetOverlayImage 重指向锚点，锚
+//    点失守即 overlay 槽位必然指回真实图标——IImageList 无 overlay 映射读取
+//    接口，故用锚点间接校验）与盾牌 SYSIMAGE 槽位（像素级校验，保留 2.0.1 的
+//    「GetIcon 失败按空白处理」防循环语义）；任一失守即整体重跑补丁。
+//  - 触发面＝桌面 WM_PAINT ＋ 桌面 FolderView 上的 2s 兜底定时器 ＋ comctl32
+//    ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表必经此路径；
+//    钩子内只做尺寸比对与原子置位，判定与重打一律延迟到桌面线程，不在钩子里
+//    做任何重活、不影响其他模组）。
+//  - 开销控制：平时每次 WM_PAINT/定时器只做锚点抽查（GetIconSize + 关键槽位
+//    GetIcon，深查按 1s 节流；感知钩子命中时提速到 200ms）；失守立即全量重打
+//    ＋ 3s 修复冷却，避免重建风暴下的重打循环；补丁幂等（重新解析索引、重新
+//    置空、重新挂 overlay 槽位、重新记录锚点）。
 // ---------------------------------------------------------------------------
 
-// 判断图像列表指定索引的图像是否“真全透明”（无任何可见像素）。
-// GetIcon 失败时按空白处理：无法证明有内容时不触发重打补丁。
-static bool PurityImageListEntryIsBlank(IImageList* piml, int index) {
-    HICON hIcon = nullptr;
-    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
-
+// 判断单个 HICON 是否“真全透明”（无任何可见像素）。
+static bool PurityIconIsBlank(HICON hIcon) {
     bool blank = true;
     ICONINFO ii = {};
     if (GetIconInfo(hIcon, &ii)) {
@@ -4105,12 +4151,38 @@ static bool PurityImageListEntryIsBlank(IImageList* piml, int index) {
         if (ii.hbmColor) DeleteObject(ii.hbmColor);
         if (ii.hbmMask) DeleteObject(ii.hbmMask);
     }
+    return blank;
+}
+
+// 判断图像列表指定索引的图像是否“真全透明”（盾牌 SYSIMAGE 槽位用）。
+// GetIcon 失败时按空白处理：无法证明有内容时不触发重打补丁（防误报循环）。
+static bool PurityImageListEntryIsBlank(IImageList* piml, int index) {
+    HICON hIcon = nullptr;
+    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
+    bool blank = PurityIconIsBlank(hIcon);
     DestroyIcon(hIcon);
     return blank;
 }
 
-// 任一系统图像列表的 SIID_SHIELD 槽位出现可见内容即返回 true（需要重新补丁）。
-static bool PurityShieldSlotRefilled() {
+// 自愈锚点槽位校验（2.1.1）：我们亲手追加的空白图标应当仍然存在且全透明。
+// 与系统槽位语义相反——GetIcon 失败说明锚点已随列表重建/收缩而消失，判失守。
+// （锚点失守即箭头/盾牌 overlay 槽位必然已指回真实图标：重建后的 overlay 映射
+// 不再指向自建空白。）
+static bool PurityOwnBlankSlotBreached(IImageList* piml, int index) {
+    HICON hIcon = nullptr;
+    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
+    bool breached = !PurityIconIsBlank(hIcon);
+    DestroyIcon(hIcon);
+    return breached;
+}
+
+// 自愈失守判定（2.1.1）：任一共享图像列表出现下列任一情况即需要整体重打——
+//  ① 锚点尺寸与当前列表不一致（列表已整体重建）；
+//  ② 锚点槽位丢失或不再全透明（重建/收缩/被改写）；
+//  ③ hideShields 开启时，SIID_SHIELD 的 SYSIMAGE 槽位出现可见内容（2.0.1 的
+//     回填场景，如注册表 Shell Icons 重定向把 imageres,197 回填进槽位）。
+// 列表获取失败（重建窗口期）按跳过处理，不误报。
+static bool PuritySelfHealBreached() {
     HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
     if (!hShell32) return false;
     auto pSHGetImageList = (HRESULT(WINAPI*)(int, REFIID, void**))
@@ -4119,41 +4191,132 @@ static bool PurityShieldSlotRefilled() {
 
     int shieldSysIdxLarge = -1;
     int shieldSysIdxSmall = -1;
-    SHSTOCKICONINFO sii = {};
-    sii.cbSize = sizeof(sii);
-    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
-        shieldSysIdxLarge = sii.iSysImageIndex;
+    if (PuritySettings.hideShields) {
+        SHSTOCKICONINFO sii = {};
+        sii.cbSize = sizeof(sii);
+        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
+            shieldSysIdxLarge = sii.iSysImageIndex;
+        }
+        SHSTOCKICONINFO siiSmall = {};
+        siiSmall.cbSize = sizeof(siiSmall);
+        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON,
+                                         &siiSmall))) {
+            shieldSysIdxSmall = siiSmall.iSysImageIndex;
+        }
     }
-    SHSTOCKICONINFO siiSmall = {};
-    siiSmall.cbSize = sizeof(siiSmall);
-    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON, &siiSmall))) {
-        shieldSysIdxSmall = siiSmall.iSysImageIndex;
-    }
-    if (shieldSysIdxLarge < 0 && shieldSysIdxSmall < 0) return false;
 
-    const int sizes[] = { 1, 0, 2, 3, 4 }; // 与 PurityPatchOverlayImageLists 相同集合
-    for (int shil : sizes) {
+    const int sizes[] = { 1, 0, 2, 3, 4 }; // 与 PurityPatchOverlayImageLists 相同集合与顺序
+    for (int listIdx = 0; listIdx < 5; listIdx++) {
         IImageList* piml = nullptr;
-        if (FAILED(pSHGetImageList(shil, PurityIidImageList, (void**)&piml)) || !piml) continue;
-        bool isSmallList = (shil == 1 || shil == 3);
-        int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
-        bool blank = shieldSysIdx < 0 || PurityImageListEntryIsBlank(piml, shieldSysIdx);
+        if (FAILED(pSHGetImageList(sizes[listIdx], PurityIidImageList, (void**)&piml)) || !piml) {
+            continue;
+        }
+
+        bool breach = false;
+        const PurityListRecord& rec = PurityListRecords[listIdx];
+        if (rec.appendedIdx >= 0) {
+            int cx = 0, cy = 0;
+            if (FAILED(piml->GetIconSize(&cx, &cy)) || cx != rec.cx || cy != rec.cy) {
+                breach = true; // 尺寸失配：列表已被整体重建
+            } else if (PurityOwnBlankSlotBreached(piml, rec.appendedIdx)) {
+                breach = true; // 锚点丢失或被改写：重建/回填
+            }
+        }
+        if (!breach && PuritySettings.hideShields) {
+            bool isSmallList = (sizes[listIdx] == 1 || sizes[listIdx] == 3);
+            int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
+            if (shieldSysIdx >= 0 && !PurityImageListEntryIsBlank(piml, shieldSysIdx)) {
+                breach = true;
+            }
+        }
+
         piml->Release();
-        if (!blank) return true;
+        if (breach) return true;
     }
     return false;
 }
 
-// 桌面绘制期的节流校验入口（1s 一次；发现回填即重新打补丁并触发重绘）。
-static void PurityOnDesktopPaintShieldVerify(HWND hWnd) {
+// ---------------------------------------------------------------------------
+// 自愈触发面（2.1.1）
+// ---------------------------------------------------------------------------
+
+// comctl32 的 ImageList_Create/Destroy 是 explorer（含 shell32）创建/销毁共享
+// SHIL 图像列表的必经路径。钩子只做「尺寸像不像共享列表」的比对并置位提示，
+// 真正的失守判定与重打由 PuritySelfHealCheck 在桌面线程执行——钩子内零重活，
+// 其余模组与系统组件的 ImageList 调用只增加一次原子读＋几个整数比较。
+// （ImageList_Create 的导出模块是 comctl32 而非 shell32，后者只是导入方。）
+static void PurityNotePossibleImageListRecreate(int cx, int cy) {
+    if (!PuritySelfHealArmed.load(std::memory_order_relaxed)) return;
+    if (cx == GetSystemMetrics(SM_CXSMICON) || cx == GetSystemMetrics(SM_CXICON) ||
+        cx == 48 || cx == 96 || cy == 256) {
+        PurityImageListRebuildHint.store(true, std::memory_order_relaxed);
+    }
+}
+
+using PurityImageListCreate_t = HIMAGELIST(WINAPI*)(int cx, int cy, UINT flags,
+                                                   int cInitial, int cGrow);
+static PurityImageListCreate_t PurityImageListCreate_Original;
+static HIMAGELIST WINAPI PurityImageListCreate_Hook(int cx, int cy, UINT flags,
+                                                    int cInitial, int cGrow) {
+    HIMAGELIST himl = PurityImageListCreate_Original(cx, cy, flags, cInitial, cGrow);
+    PurityNotePossibleImageListRecreate(cx, cy);
+    return himl;
+}
+
+using PurityImageListDestroy_t = BOOL(WINAPI*)(HIMAGELIST himl);
+static PurityImageListDestroy_t PurityImageListDestroy_Original;
+static BOOL WINAPI PurityImageListDestroy_Hook(HIMAGELIST himl) {
+    if (PuritySelfHealArmed.load(std::memory_order_relaxed)) {
+        PurityImageListRebuildHint.store(true, std::memory_order_relaxed);
+    }
+    return PurityImageListDestroy_Original(himl);
+}
+
+// 自愈兜底定时器：挂在桌面 FolderView 上，2s 周期。桌面闲置无 WM_PAINT 时仍能
+// 感知重建（重建尾声的回填落在最后一次绘制之后的场景，2.0.1 正是栽在这里）。
+static void PurityUpdateSelfHealTimer(HWND hDesktop) {
+    if (!hDesktop) return;
+    if (PuritySettings.enable &&
+        (PuritySettings.hideArrows || PuritySettings.hideShields)) {
+        SetTimer(hDesktop, PuritySelfHealTimerId, 2000, nullptr);
+    } else {
+        KillTimer(hDesktop, PuritySelfHealTimerId);
+    }
+}
+
+// 自愈校验入口（桌面 WM_PAINT / 2s 定时器共用）：
+//  - 深度校验按 1s 节流；感知钩子命中（可能重建）时提速到 200ms；
+//  - 失守立即全量重打（PurityPatchOverlayImageLists 幂等）＋ 3s 修复冷却，
+//    避免重建风暴下的重打循环；
+//  - 重打后触发一次重绘，让重新置空后的槽位内容立即可见（下一帧校验为通过，
+//    不会形成循环）。
+static void PuritySelfHealCheck(HWND hWnd) {
+    if (!PuritySettings.enable ||
+        (!PuritySettings.hideArrows && !PuritySettings.hideShields)) {
+        return;
+    }
+
     DWORD now = GetTickCount();
-    if (PurityLastShieldVerifyTick != 0 && now - PurityLastShieldVerifyTick < 1000) return;
-    PurityLastShieldVerifyTick = now;
-    if (PurityShieldSlotRefilled()) {
+    DWORD minInterval = PurityImageListRebuildHint.load(std::memory_order_relaxed) ? 200
+                                                                                   : 1000;
+    if (PurityLastDeepCheckTick != 0 && now - PurityLastDeepCheckTick < minInterval) {
+        return;
+    }
+    PurityImageListRebuildHint.store(false, std::memory_order_relaxed);
+    PurityLastDeepCheckTick = now;
+
+    // 修复冷却期内不再重打（重建风暴下每 3s 最多一轮，冷却后仍失守会再修）。
+    if (PurityLastRepairTick != 0 && now - PurityLastRepairTick < 3000) {
+        return;
+    }
+
+    if (PuritySelfHealBreached()) {
+        Wh_Log(L"[CW] Purity self-heal: image list patch breached, repatching");
         PurityPatchOverlayImageLists();
-        // 触发一次重绘，让重新置空后的槽位内容立即可见（下一帧校验为空白，
-        // 不会形成循环）。
-        InvalidateRect(hWnd, nullptr, TRUE);
+        PurityLastRepairTick = GetTickCount();
+        if (hWnd) {
+            InvalidateRect(hWnd, nullptr, TRUE);
+        }
     }
 }
 
@@ -4232,6 +4395,7 @@ static void PurityOnCreatedWindow(HWND hWnd, LPCWSTR lpClassName, HWND hWndParen
 
     if (hWnd && PurityIsDesktopFolderView(hWnd)) {
         WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, PurityDesktopListSubclass, 0);
+        PurityUpdateSelfHealTimer(hWnd);
     }
 }
 
@@ -4265,6 +4429,22 @@ static BOOL PurityInit() {
             WindhawkUtils::SetFunctionHook(p, PuritySHGetStockIconInfo_Hook, &PuritySHGetStockIconInfo_Original);
     }
 
+    // ImageList_Create/Destroy 感知钩子（2.1.1 自愈触发面之一）：只置位提示、
+    // 不做重活；安装失败不影响任何功能（桌面 WM_PAINT 与 2s 定时器兜底）。
+    // comctl32 在 explorer 中必然已加载。
+    if (HMODULE hComctl32 = GetModuleHandle(L"comctl32.dll")) {
+        if (auto p = (PurityImageListCreate_t)GetProcAddress(hComctl32, "ImageList_Create"))
+            WindhawkUtils::SetFunctionHook(p, PurityImageListCreate_Hook,
+                                           &PurityImageListCreate_Original);
+        if (auto p = (PurityImageListDestroy_t)GetProcAddress(hComctl32, "ImageList_Destroy"))
+            WindhawkUtils::SetFunctionHook(p, PurityImageListDestroy_Hook,
+                                           &PurityImageListDestroy_Original);
+    }
+
+    // 感知钩子启用门：只在 explorer + 纯净化开启 + 箭头/盾牌至少一项开启时布防。
+    PuritySelfHealArmed = PuritySettings.enable &&
+                          (PuritySettings.hideArrows || PuritySettings.hideShields);
+
     // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
     // 与 ToggleIcons / SmoothIcons 共用一次挂钩），这里不再重复安装。
     // 文字/提取期钩子始终安装（代价极低），由各钩子内的总开关判断短路；
@@ -4288,6 +4468,7 @@ static void PurityAfterInit() {
 
     if (HWND hDesktop = PurityGetDesktopFolderView()) {
         WindhawkUtils::SetWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass, 0);
+        PurityUpdateSelfHealTimer(hDesktop);
         int count = ListView_GetItemCount(hDesktop);
         if (count > 0) {
             ListView_RedrawItems(hDesktop, 0, count - 1);
@@ -4318,8 +4499,11 @@ static void PurityNotifySettingsChanged() {
         return;
     }
 
-    // 运行中开关状态同步：共享 CreateWindowExW 钩子按此分发新建桌面窗口。
+    // 运行中开关状态同步：共享 CreateWindowExW 钩子按此分发新建桌面窗口；
+    // ImageList 感知钩子按此布防/撤防（2.1.1）。
     g_QuickSettingsPurityActive = PuritySettings.enable;
+    PuritySelfHealArmed = PuritySettings.enable &&
+                          (PuritySettings.hideArrows || PuritySettings.hideShields);
 
     if (PuritySettings.enable) {
         // 运行中新开启盾牌隐藏时补建空白图标（SHGetStockIconInfo 钩子依赖）。
@@ -4344,18 +4528,22 @@ static void PurityNotifySettingsChanged() {
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
     }
 
-    // 强制重绘桌面，让文字隐藏等变化立即可见。
+    // 强制重绘桌面，让文字隐藏等变化立即可见；同步自愈兜底定时器的启停。
     if (HWND hDesktop = PurityGetDesktopFolderView()) {
         InvalidateRect(hDesktop, nullptr, TRUE);
         UpdateWindow(hDesktop);
+        PurityUpdateSelfHealTimer(hDesktop);
     }
 }
 
 static void PurityUninit() {
     Wh_Log(L"[CW] === PurityUninit ===");
     g_QuickSettingsPurityActive = false;
+    PuritySelfHealArmed = false;
+    PurityImageListRebuildHint = false;
 
     if (HWND hDesktop = PurityGetDesktopFolderView()) {
+        KillTimer(hDesktop, PuritySelfHealTimerId);
         WindhawkUtils::RemoveWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass);
         InvalidateRect(hDesktop, nullptr, TRUE);
         UpdateWindow(hDesktop);
@@ -7148,10 +7336,10 @@ static VOID SndLogUninit()
 //     许可证，原版链接 https://windhawk.net/mods/invisible-borders。
 // 三段代码沿用其在本包 CW-窗口优化 1.1.0 中的内部结构，整体收进 WinOpt
 // 命名空间（内含 AltDrag / WinArrange / InvisBorders 三个子命名空间）；设置
-// 迁移为两级嵌套分组：组级总开关 winOpt.enable（默认关闭）+ 子分组键
-// winOpt.altDrag.* / winOpt.winArrange.* / winOpt.invisBorders.*（子分组内的
-// 键名结构不变），三个子分组各自的 enable 总开关与运行时短路逻辑全部保留，
-// 并与组级总开关相与（见各 LoadSettings）。
+// 键（2.1.0 起）为 altDrag.* / winArrange.* / invisBorders.* 三个独立顶层
+// 分组（组内键名结构不变），各分组 enable 总开关与运行时短路逻辑全部保留，
+// 各自独立生效（见各 LoadSettings）。原 2.0.x 的两级嵌套分组（组级总开关
+// winOpt.enable + winOpt.* 前缀子分组键）已拆除，不再有三合一短路。
 // 进程范围：窗口拖动的钩子需要跨进程工作，本段在全进程启用（@include *，
 // 见元数据；原 devenv.exe 排除保留在 @exclude 中）。
 // x86 兼容修复（并入 CW-窗口优化 1.0.0 时已修复，此处原样保留）：
@@ -7160,10 +7348,6 @@ static VOID SndLogUninit()
 // ============================================================================
 namespace WinOpt {
 
-// 分组总开关（winOpt.enable）：关闭时三个子分组全部失效（与其各自开关无关）。
-inline bool IsMasterEnabled() {
-    return Wh_GetIntSetting(L"winOpt.enable") != 0;
-}
 // ============================================================================
 // 窗口拖动（Alt+拖动）
 //
@@ -9332,11 +9516,11 @@ void LoadTriggerSettings(TriggerSettings& trigger, PCWSTR name) {
 }
 
 void LoadSettings() {
-    g_settings.enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.altDrag.enable") != 0;
-    LoadTriggerSettings(g_settings.moveTrigger, L"winOpt.altDrag.moveTrigger");
-    LoadTriggerSettings(g_settings.sizeTrigger, L"winOpt.altDrag.sizeTrigger");
+    g_settings.enable = Wh_GetIntSetting(L"altDrag.enable") != 0;
+    LoadTriggerSettings(g_settings.moveTrigger, L"altDrag.moveTrigger");
+    LoadTriggerSettings(g_settings.sizeTrigger, L"altDrag.sizeTrigger");
     g_settings.dragWindowsWithoutTitleBar =
-        Wh_GetIntSetting(L"winOpt.altDrag.dragWindowsWithoutTitleBar");
+        Wh_GetIntSetting(L"altDrag.dragWindowsWithoutTitleBar");
 }
 
 BOOL Init() {
@@ -10548,15 +10732,15 @@ void OnThreadDetach() {
 
 void LoadSettings()
 {
-    g_settings.enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.winArrange.enable") != 0;
-    g_settings.snapWindowsWhenDragging = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsWhenDragging");
-    g_settings.snapWindowsDistance = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsDistance");
-    g_settings.keysToDisableSnappingCtrl = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Ctrl");
-    g_settings.keysToDisableSnappingAlt = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Alt");
-    g_settings.keysToDisableSnappingShift = Wh_GetIntSetting(L"winOpt.winArrange.KeysToDisableSnapping.Shift");
-    g_settings.slidingAnimation = Wh_GetIntSetting(L"winOpt.winArrange.SlidingAnimation");
-    g_settings.snapWindowsWhenSliding = Wh_GetIntSetting(L"winOpt.winArrange.SnapWindowsWhenSliding");
-    g_settings.slidingAnimationSlowdown = Wh_GetIntSetting(L"winOpt.winArrange.SlidingAnimationSlowdown");
+    g_settings.enable = Wh_GetIntSetting(L"winArrange.enable") != 0;
+    g_settings.snapWindowsWhenDragging = Wh_GetIntSetting(L"winArrange.SnapWindowsWhenDragging");
+    g_settings.snapWindowsDistance = Wh_GetIntSetting(L"winArrange.SnapWindowsDistance");
+    g_settings.keysToDisableSnappingCtrl = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Ctrl");
+    g_settings.keysToDisableSnappingAlt = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Alt");
+    g_settings.keysToDisableSnappingShift = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Shift");
+    g_settings.slidingAnimation = Wh_GetIntSetting(L"winArrange.SlidingAnimation");
+    g_settings.snapWindowsWhenSliding = Wh_GetIntSetting(L"winArrange.SnapWindowsWhenSliding");
+    g_settings.slidingAnimationSlowdown = Wh_GetIntSetting(L"winArrange.SlidingAnimationSlowdown");
 }
 
 BOOL Init()
@@ -10789,8 +10973,8 @@ BOOL CALLBACK DisableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
 BOOL Init() {
     Wh_Log(L"Init - Invisible Borders");
 
-    enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.invisBorders.enable") != 0;
-    SpecialWindows = Wh_GetIntSetting(L"winOpt.invisBorders.SpecialWindows");
+    enable = Wh_GetIntSetting(L"invisBorders.enable") != 0;
+    SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
 
     Wh_SetFunctionHook(
         (void *)DwmSetWindowAttribute,
@@ -10846,8 +11030,8 @@ void SettingsChanged() {
     // 先整体还原默认边框，再按新设置（含总开关）决定是否重新应用：
     // 总开关关闭时还原即终点，本组功能完全失效；重新开启则立即恢复隐形。
     EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
-    enable = IsMasterEnabled() && Wh_GetIntSetting(L"winOpt.invisBorders.enable") != 0;
-    SpecialWindows = Wh_GetIntSetting(L"winOpt.invisBorders.SpecialWindows");
+    enable = Wh_GetIntSetting(L"invisBorders.enable") != 0;
+    SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
     if (enable) {
         EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
     }

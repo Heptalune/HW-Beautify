@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-tray-hover-expand
-// @name            CW-托盘悬停展开
-// @name:zh-CN      CW-托盘悬停展开
+// @name            CW-托盘悬停展开（独立进程版）
+// @name:zh-CN      CW-托盘悬停展开（独立进程版）
 // @description     Open the hidden tray icons flyout on hover instead of clicking the chevron; optionally collapse it when the cursor leaves
 // @description:zh-CN 鼠标悬停到托盘区的「显示隐藏的图标」箭头上时自动展开隐藏图标弹出面板，无需点击；光标离开后可选自动收起。
 // @version         1.7.2
@@ -19,7 +19,7 @@
 /*
 > 原作者：**wygodad**（[Tray hover expand](https://windhawk.net/mods/tray-hover-expand)，MIT）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理。
 
-# CW-托盘悬停展开
+# CW-托盘悬停展开（独立进程版）
 
 ![效果演示](https://i.imgur.com/qsNUNpj.png)
 
@@ -29,6 +29,23 @@
 本模组通过 UI 自动化（UI Automation）实现，不挂钩任何系统外壳内部函数，
 相对安全，也能较好适应不同 Windows 版本之间的变化。它以「tool mod」形式
 运行在独立的 windhawk.exe 进程中，不会注入外壳进程。
+
+## 与注入版变体的关系
+
+本模组另有一个**注入版**变体：CW-托盘悬停展开（注入版）（`cw-tray-hover-expand-inproc`，
+主套件根目录 `local@cw-tray-hover-expand-inproc.wh.cpp`）。两者由同一份上游代码衍生、
+版本号同源同号（1.7.2），功能与设置完全相同，仅运行方式不同：
+
+- **独立进程版（本模组，DLC）**：以 tool mod 形式运行在独立的 windhawk.exe 进程中，
+  崩溃隔离——模组自身出错不影响 explorer；但会引发 windhawk.exe 宿主进程，内存占用
+  较高。
+- **注入版（主套件）**：把同一份功能逻辑直接注入 explorer.exe 内运行，没有额外的
+  后台进程、随 explorer 存活，整体内存占用更低。
+
+两个版本**不可同时开启，只能二选一**：虽然两者 mod id 不同（Windhawk 允许同时处于
+启用状态），但它们基于同一套「UIA 客户端 + 鼠标轮询」逻辑——一旦同开，会有两个
+实例同时监视并 Invoke 同一个托盘箭头，展开与收起动作互相抵消（面板开-关循环），
+并产生双份轮询开销。请按需选择其中一个版本启用。
 
 ## 与类似模组的区别
 

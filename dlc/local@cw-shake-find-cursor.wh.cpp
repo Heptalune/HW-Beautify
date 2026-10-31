@@ -1,7 +1,7 @@
 ﻿// ==WindhawkMod==
 // @id              cw-shake-find-cursor
-// @name            CW-晃动找指针
-// @name:zh-CN      CW-晃动找指针
+// @name            CW-晃动找指针（独立进程版）
+// @name:zh-CN      CW-晃动找指针（独立进程版）
 // @description     Temporarily enlarges the mouse cursor when you shake the mouse, like macOS "Shake to locate"
 // @description:zh-CN 复刻 macOS「摇晃以定位」：晃动鼠标（或在触摸板上快速来回滑动）时临时放大指针，停下后自动缩回。Raw Input 事件驱动 + 系统光标原位放大：无覆盖窗口、无拖尾、空闲零 CPU。
 // @version         1.5.0
@@ -26,9 +26,29 @@
 
 // ==WindhawkModReadme==
 /*
-# CW-晃动找指针
+# CW-晃动找指针（独立进程版）
 
 晃动鼠标（或在触摸板上快速来回滑动），指针随即放大，一眼就能找到；停止晃动后自动缩回。复刻 macOS 的「摇晃以定位」（Shake to locate）。
+
+## 与注入版变体的关系
+
+本模组另有一个**注入版**变体：CW-晃动找指针（注入版）（`cw-shake-find-cursor-inproc`，
+主套件根目录 `local@cw-shake-find-cursor-inproc.wh.cpp`）。两者由同一份合并代码衍生、
+版本号同源同号（1.5.0），功能与设置完全相同，仅运行方式不同：
+
+- **独立进程版（本模组，DLC）**：以 tool mod 形式运行在独立的 windhawk.exe 进程中，
+  崩溃隔离、完全不触碰 Explorer；但会引发 windhawk.exe 宿主进程，内存占用较高。
+  工作窗口为隐藏顶层工具窗口，能接收会话结束广播（WM_QUERYENDSESSION/WM_ENDSESSION）
+  在注销/关机前即时还原系统光标。
+- **注入版（主套件）**：把同一份功能逻辑直接注入 explorer.exe 内运行，没有额外的
+  后台进程、随 explorer 存活；工作窗口为 message-only 消息专用窗口（按基底上游方式
+  注册 Raw Input，RIDEV_INPUTSINK 全局接收），收不到会话结束广播，注销/关机时的
+  还原依赖模组卸载安全网与下次启动兜底。
+
+两个版本**不可同时开启，只能二选一**：虽然两者 mod id 不同（Windhawk 允许同时处于
+启用状态），但二者的放大实现都是「替换系统光标」（SetSystemCursor）——一旦同开，
+两个实例会互相争抢与还原系统光标，放大状态来回跳变，且 Raw Input 事件被两份逻辑
+重复消费。请按需选择其中一个版本启用。
 
 ## 致谢与来源
 

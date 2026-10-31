@@ -372,14 +372,15 @@ $retiredMods = @(
     "local@cw-taskbar-thumbnail-settings", "local@cw-hide-desktop-icon-text",
     "local@cw-alt-drag", "local@cw-window-arrangement", "local@cw-invisible-borders",
     "local@cw-taskbar-clock-customization", "local@cw-tray-system-icons",
-    "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
     # v2.7.0：去焦点虚线框与 Windows 灵动岛按用户要求剔除；六模组并入更好的Windows（小细节）、
     # 文件操作样式美化并入现代化的Windows
-    "local@cw-no-focus-rectangle", "dlc-local@cw-dynamic-island-windows",
+    "local@cw-no-focus-rectangle", "local@cw-dynamic-island-windows",
     "local@cw-extension-no-warning", "local@cw-explorer-double-click-up",
     "local@cw-win11-power-buttons", "local@cw-drag-to-delete",
     "local@cw-logon-logoff-shutdown-sounds", "local@cw-window-optimizer",
-    "local@cw-file-operation-styler"
+    "local@cw-file-operation-styler",
+    # v2.7.1 回退：现代化的Windows 拆回四模组；桌面图标尺寸修复剔除
+    "local@cw-modernized", "local@cw-desktop-icon-size-fix"
     # 注：cw-file-operation-styler 在 v2.1.0 周期移除、v2.3.0 重新整合回归；
     # cw-better-volume-mixer 曾于 v2.3.0 回归、v2.5.0 再次按用户要求移除。
 )
@@ -506,12 +507,14 @@ $coreModIds = @(
     "local@cw-taskbar-animation", "local@cw-taskbar-button-click",
     "local@cw-taskbar-count-badges", "local@cw-taskbar-labels", "local@cw-taskbar-system-info",
     "local@cw-tray-area-settings", "local@cw-centered-start-split-icons",
-    "local@cw-desktop-quick-settings", "local@cw-desktop-icon-size-fix",
+    "local@cw-desktop-quick-settings",
     "local@cw-explorer-details-better-file-sizes", "local@cw-explorer-info-bar-plus",
     "local@cw-file-explorer-content-animation", "local@cw-file-hover-info",
     "local@cw-disk-usage-bar-customizer", "local@cw-desktop-audio-visualizer-plus",
     "local@cw-fluent-context-menu", "local@cw-custom-context-menu",
-    "local@cw-winui-context-menu-animation", "local@cw-modernized",
+    "local@cw-winui-context-menu-animation",
+    "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
+    "local@cw-file-operation-styler",
     "local@cw-resource-redirect", "local@cw-settings-styler"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
