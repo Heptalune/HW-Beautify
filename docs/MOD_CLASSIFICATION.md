@@ -1,7 +1,7 @@
 # CW-Beautify 模组分类清单（公开发布政策）
 
 > 本文档对整合包内全部模组按「公开性」分类，是发布与分发的政策依据。
-> 适用版本：v2.9.0 后批次（21 个 = 19 主套件 + 2 可选，0 DLC；DLC tool mod 档已全部退役，
+> 适用版本：v2.9.0 后批次（20 个 = 19 主套件 + 1 可选，0 DLC；DLC tool mod 档已全部退役，
 > 四个注入版转正进主套件根目录；模组清单见 CLAUDE.md）。
 > 政策制定：作者 Heptalune（2026-10-29）；v2.9.0 实况同步（2026-11-01）。
 
@@ -16,7 +16,7 @@
 
 来源均为 Windhawk 官方模组社区的开源作品，保留原作者署名、原版链接与许可证；CW 版仅做汉化、适配或在源码基础上的整合合并（改动范围在各模组说明块中注明）。
 
-**当前在役（19 个，含 optional\ 目录 2 个）**
+**当前在役（20 个，含 optional\ 目录 1 个）**
 
 | 模组 | id | 版本 | 上游作者 | 许可证 |
 |---|---|---|---|---|
@@ -33,7 +33,6 @@
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.4 | BOLT | MIT |
 | CW-WinUI 右键菜单动画 | cw-winui-context-menu-animation | 1.0.2 | crazyboyybs | MIT |
 | CW-窗口动画 | cw-windows-animations | 1.6.0 | ReDrag + macOS Genie（Abdullah Masood、Potassiumuncher） | MIT |
-| CW-动态视频壁纸 | cw-live-video-wallpaper | 1.1.2 | AKS HAY | GPL-3.0 |
 | CW-设置样式美化 | cw-settings-styler | 1.2.3 | m417z | GPL-3.0 |
 | CW-窗口切换动画（Vista 风格） | cw-alt-tab-flip-3d-inproc | 1.0.2 | caliberda（注入版改造：剥 tool mod 样板，功能逐字保留） | MIT |
 | CW-现代 Alt+Tab 切换器 | cw-overhauled-alt-tab-inproc | 1.3.1 | IMiloDev（注入版改造） | MIT |
@@ -68,7 +67,7 @@
 | 媒体设备快速切换（deviceSwitch.*） | Convenient Windows | 参考 AudioSwitcher（xenolightning，MS-PL）重实现 | — |
 | 显示桌面全高（showDesktop.*） | Convenient Windows | m417z（任务栏高度系） | GPL-3.0 |
 
-> optional\ 目录仅是打包目录（cw-windows-animations、cw-live-video-wallpaper）。
+> optional\ 目录仅是打包目录（cw-windows-animations）。
 
 ## 二类：本项目原创（可公开，版权归属作者本人）
 
@@ -90,5 +89,5 @@
 ## 分类速查（用于脚本/打包审查）
 
 - **打包时必须排除**：`local@cw-fluent-context-menu.wh.cpp`（如构建对外公开的分发包）。
-- 私有仓库主包（含全部 21 个模组）不受此限制。
+- 私有仓库主包（含全部 20 个模组）不受此限制。
 - 当前状态：仓库已私有 ✓；公开发布前需产出「不含三类模组」的裁剪包（待办）。

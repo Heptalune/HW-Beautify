@@ -505,7 +505,7 @@ if ($files.Count -eq 0) {
 # 支持在无人值守脚本中通过 -Optional 参数预选开启指定模块。
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
-$optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpaper")
+$optionalModIds = @("local@cw-windows-animations")
 # 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描；与根目录 local@cw-*.wh.cpp 一一对应）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",

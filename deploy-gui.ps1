@@ -279,7 +279,6 @@ $script:ModCategoryMap = @{
     "local@cw-desktop-quick-settings"             = "桌面"   # CW-更好的Windows（小细节）
     "local@cw-desktop-icon-size-fix"              = "桌面"   # CW-桌面图标尺寸修复
     "local@cw-desktop-audio-visualizer-plus"      = "桌面"   # CW-桌面音频可视化增强
-    "local@cw-live-video-wallpaper"               = "桌面"   # CW-动态视频壁纸（可选）
     # —— 窗口与右键菜单 ——
     "local@cw-windows-animations"                 = "窗口与右键菜单"   # CW-窗口动画（可选）
     "local@cw-custom-context-menu"                = "窗口与右键菜单"   # CW-自定义右键菜单

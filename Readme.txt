@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（21 个 = 19 主套件 + 2 可选；装好后默认全部关闭，
+包含的 Mod（20 个 = 19 主套件 + 1 可选；装好后默认全部关闭，
 在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
@@ -63,8 +63,6 @@ v2.9.0 起 DLC（tool mod）档已全部退役：四个 tool mod 完成注入版
                                 + 扩展名警告 + 电源按钮 + 拖拽删除
                                 + 登录注销关机音效 + 窗口拖动/吸附排列
                                 + 隐形窗口边框——十个分组各带总开关
-  CW-动态视频壁纸               MP4 视频硬件加速动态壁纸，带性能 HUD
-                                （optional\ 目录）
 
   —— 窗口与右键菜单类 ——
   CW-Fluent 右键菜单            桌面/左树 Fluent 风格右键菜单（原创）；
@@ -166,8 +164,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
   uninstall-gui.bat / .ps1        图形化卸载（按引擎实装枚举、可勾选）
   restart_explorer.bat            重启资源管理器
   local@*.wh.cpp                  各 mod 源码
-  optional\                       随主部署装入的打包目录（窗口动画、动态视频壁纸）
-                                  及第三方许可说明
+  optional\                       随主部署装入的打包目录（窗口动画）及第三方许可说明
   standalone\                     多合一模组的原始单独版本（16 个，deploy-gui
                                   「单模组版」分区二选一安装，不参与默认部署）
   tools\uninstall-ExplorerBlurMica.bat  卸载旧版 ExplorerBlurMica（升级前运行）
@@ -220,7 +217,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 - 自定义右键菜单 BOLT（MIT）、WinUI 右键菜单动画 crazyboyybs（MIT）、
   开始按钮居中 rick（GPL-3.0）、窗口动画 ReDrag（MIT）+ macOS 神奇效果
   Abdullah Masood、Potassiumuncher、现代文件夹选择对话框 aubymori
-  （MIT 惯例）、现代运行对话框 caotu2k5、动态视频壁纸 AKS HAY（GPL-3.0）、
+  （MIT 惯例）、现代运行对话框 caotu2k5、
   Fluent 右键菜单为本项目对闭源 FluentContextMenu v0.5.0 的静态逆向
   净室重写（原创）。
 - 套件深度修改、汉化、注入版改造与本项目原创模组：Heptalune（GPL-3.0）。
@@ -229,7 +226,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-21 Windhawk mods (19 main-suite mods in the package root plus 2 in
+20 Windhawk mods (19 main-suite mods in the package root plus 1 in
 optional\) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0
 every mod is injected into its target process — no tool mods and no
 windhawk.exe host process at all; the four former DLC tool mods (Vista

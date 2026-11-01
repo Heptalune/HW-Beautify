@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能等比缩放任务栏、滚动调音量（系统/分应用）、快捷键切换播放设备、给任务栏加计数角标/中键关闭/悬停放大动画、Alt+拖动窗口、一键换成 Fluent 右键菜单，以及 Alt+Tab 切换器（现代卡片式与 Vista Flip 3D 双方案）、macOS 灵动岛与 Dock、快速启动 Dock、动态视频壁纸等一整套细节美化。一共 **21 个 mod（19 主套件 + 2 可选）**，一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能等比缩放任务栏、滚动调音量（系统/分应用）、快捷键切换播放设备、给任务栏加计数角标/中键关闭/悬停放大动画、Alt+拖动窗口、一键换成 Fluent 右键菜单，以及 Alt+Tab 切换器（现代卡片式与 Vista Flip 3D 双方案）、macOS 灵动岛与 Dock、快速启动 Dock 等一整套细节美化。一共 **20 个 mod（19 主套件 + 1 可选）**，一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 v2.9.0 起**全部模组均为注入式**（直接注入目标进程），不再有任何引发 `windhawk.exe` 宿主进程的 tool mod，Windhawk 保持约 2 MB 的常驻轻量状态。
 
@@ -13,14 +13,13 @@ v2.9.0 起**全部模组均为注入式**（直接注入目标进程），不再
 
 ## Mod 介绍
 
-19 个主套件 mod（根目录 15 个 + 4 个自 DLC 注入版转正的模组，见「注入版」节）+ `optional\` 目录 2 个。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。模组按作用的部位分类：任务栏／开始菜单与通知中心／文件管理器／桌面／窗口与右键菜单／系统工具。合并与整合模组的设置页均按功能拆分为**可收起的分组**（每组带总开关）。
+19 个主套件 mod（根目录 15 个 + 4 个自 DLC 注入版转正的模组，见「注入版」节）+ `optional\` 目录 1 个。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。模组按作用的部位分类：任务栏／开始菜单与通知中心／文件管理器／桌面／窗口与右键菜单／系统工具。合并与整合模组的设置页均按功能拆分为**可收起的分组**（每组带总开关）。
 
 ## 精选模组
 
 以下 5 个是本整合包中完成度与口碑俱佳的作品，单独拿出来推荐（均为社区开源作品，本整合包**做汉化与打包整合**，注入版另做了去 tool mod 化改造，功能逻辑逐字保留）：
 
 * **CW-Mac 灵动岛与 Dock**：屏幕顶部 macOS 菜单栏风格的灵动岛 + 底部 Dock，一条模组给足 Mac 氛围（caliberda 作品）。
-* **CW-动态视频壁纸**：Media Foundation + Direct3D 11 硬解的本地视频壁纸，自带性能 HUD 与智能遮挡暂停，CPU 占用极低（AKS HAY 作品）。
 * **CW-快速启动 Dock**：屏幕边缘的纤细启动条，拖入快捷方式单击即启，干净利落（cheliks1123 作品）。
 * **CW-Convenient Windows**：任务栏音量/媒体设备/分应用音量/托盘悬停/晃动找指针等 13 组实用行为合集，其中「晃动找指针」为 Raw Input 零轮询零 CPU（Shake to Find Cursor 与 macOS magnifying cursor 合并而来）。
 * **CW-窗口切换动画（Vista 风格）**：Alt+Tab 变 Vista Flip 3D 实时窗口堆栈，另有 20 多种切换样式（caliberda 作品）。
@@ -211,14 +210,6 @@ Windows 细节功能大合集（原「CW-关于桌面的快捷设置」，2.0.0 
 * 11 种关闭动画、12 种最小化／还原／启动动画，每组可单独开关、选样式和时长。
 * 可按进程名排除指定程序，常见游戏和反作弊程序已默认排除。
 
-### CW-动态视频壁纸
-
-把本地 MP4 视频作为 Windows 桌面动态壁纸：Media Foundation + Direct3D 11 硬件加速渲染，CPU 占用低，保持流畅播放。
-
-* 内置实时性能 HUD（`Ctrl + Alt + D` 开关）：真实帧率、帧时间分位数（P95/P99）、显存/提交统计与管线各阶段耗时。
-* 智能遮挡检测：桌面被窗口完全覆盖时自动暂停渲染，前台切换零延迟响应。
-* 基于 [Live Video Wallpaper](https://windhawk.net/mods/live-video-wallpaper)（作者 AKS HAY，GPL-3.0）汉化。
-
 ## 关于 DLC（v2.9.0 起）
 
 v2.9.0 前本包设有「DLC 额外内容」档（tool mod，引发 windhawk.exe 宿主进程、内存占用较高）。四个 tool mod 全部完成注入版改造后，DLC 档已清空退役，`dlc\` 目录移除，`deploy-dlc.bat` / `deploy-dlc.ps1` **保留作未来 DLC 扩展通道**：想以 tool mod 形态新增模组时，把 `.wh.cpp` 放进 `dlc\` 目录再运行 `deploy-dlc.bat` 即可（目录为空时报错退出属预期）。
@@ -292,11 +283,11 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 *   CW-更好的文件管理器七组来源——Better File Sizes：m417z（GPL-3.0）；文件悬停信息：HaVeN80；内容动画：crazyboyybs（MIT）；磁盘使用率条：Valer100；信息栏增强、文件操作样式：digART（GPL-3.0）；双击返回上级：wrldspawn（GPL-3.0）。
 *   CW-更好的Windows（小细节）——桌面双击隐藏图标：Heptalune（原创）；框选淡出：angel_lov + HeyOkay（平滑自动隐藏）；登录注销关机音效：Toru the Red Fox（MIT 惯例）；隐形窗口边框：Bo0ii（MIT）。
 *   注入版四模组——Mac 灵动岛与 Dock、窗口切换动画（Vista 风格）：caliberda（GPL-3.0/MIT）；现代 Alt+Tab 切换器：IMiloDev（MIT）；快速启动 Dock：cheliks1123。
-*   自定义右键菜单：BOLT（MIT）；WinUI 右键菜单动画：crazyboyybs（MIT）；开始按钮居中：rick（GPL-3.0）；窗口动画：ReDrag（MIT）、macOS 神奇效果：Abdullah Masood、Potassiumuncher；现代文件夹选择对话框：aubymori（MIT 惯例）；现代运行对话框：caotu2k5；动态视频壁纸：AKS HAY（GPL-3.0）。
+*   自定义右键菜单：BOLT（MIT）；WinUI 右键菜单动画：crazyboyybs（MIT）；开始按钮居中：rick（GPL-3.0）；窗口动画：ReDrag（MIT）、macOS 神奇效果：Abdullah Masood、Potassiumuncher；现代文件夹选择对话框：aubymori（MIT 惯例）；现代运行对话框：caotu2k5；
 *   Fluent 右键菜单：项目作者基于闭源 FluentContextMenu v0.5.0 静态逆向净室重写（原创，GPL-3.0）。
 *   套件深度修改、汉化、注入版改造与本项目原创模组：Heptalune（GPL-3.0）。
 *   第三方署名与许可见 optional/THIRD_PARTY_NOTICES.md。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 21 Windhawk mods (19 main-suite mods in the package root plus 2 in `optional\`) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0 every mod is injected into its target process — no tool mods and no windhawk.exe host process at all; the four former DLC tool mods (Vista Alt+Tab switcher, modern Alt+Tab switcher, quick launch dock, Mac island & dock) were converted into regular injected mods (ids keep the `-inproc` suffix). Mods are grouped by the surface they restyle (taskbar / Start menu & notification center / File Explorer / desktop / windows & context menus / system tools). Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); `deploy-dlc.bat` is kept only as an extension channel for future tool mods. Upgrading keeps toggles and settings and auto-uninstalls retired mods. Uninstall: `uninstall.bat` or `uninstall-gui.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 20 Windhawk mods (19 main-suite mods in the package root plus 1 in `optional\`) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0 every mod is injected into its target process — no tool mods and no windhawk.exe host process at all; the four former DLC tool mods (Vista Alt+Tab switcher, modern Alt+Tab switcher, quick launch dock, Mac island & dock) were converted into regular injected mods (ids keep the `-inproc` suffix). Mods are grouped by the surface they restyle (taskbar / Start menu & notification center / File Explorer / desktop / windows & context menus / system tools). Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); `deploy-dlc.bat` is kept only as an extension channel for future tool mods. Upgrading keeps toggles and settings and auto-uninstalls retired mods. Uninstall: `uninstall.bat` or `uninstall-gui.bat`. License: GPL-3.0.
