@@ -2,10 +2,10 @@
 // @id              cw-desktop-quick-settings
 // @name            CW-更好的Windows（小细节）
 // @name:zh-CN      CW-更好的Windows（小细节）
-// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, desktop icon purification, turning off the change-file-extension warning, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
-// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；纯净化图标（隐藏图标文字、快捷方式箭头与 UAC 盾牌角标）；重命名修改扩展名不再弹确认警告；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
-// @version         2.1.2
-// @author          m417z, Heptalune, angel_lov, HeyOkay, kivsak, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
+// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, turning off the change-file-extension warning, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
+// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；重命名修改扩展名不再弹确认警告；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
+// @version         2.2.0
+// @author          m417z, Heptalune, angel_lov, HeyOkay, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
 // @include         *
@@ -15,7 +15,7 @@
 // @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm -lwtsapi32 -lpowrprof -lgdiplus -ldwmapi -lcomdlg32 -Wl,--export-all-symbols
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：本模组由以下九个功能合并而成（显示名 CW-更好的Windows
+// CW-Beautify 整合说明：本模组由以下八个功能合并而成（显示名 CW-更好的Windows
 // （小细节），模组 id 与文件名保持 cw-desktop-quick-settings 不变）：
 //   1.「CW-显示桌面按钮预览」（m417z 原版汉化，原 1.0.4，GPL-3.0）；
 //   2.「CW-桌面双击隐藏图标」（Heptalune 原创，原 4.2.0）；
@@ -23,23 +23,20 @@
 //      https://windhawk.net/mods/desktop-marquee-fade）；
 //   4.「CW-桌面图标平滑自动隐藏」（上游 HeyOkay Smooth Desktop Icons Auto-Hide
 //      0.14.2，MIT，https://windhawk.net/mods/smooth-desktop-icons-auto-hide）；
-//   5.「CW-隐藏桌面图标文字与箭头」（上游 kivsak Hide Desktop Icon Text and
-//      Shortcut Arrows 1.6.0，MIT 惯例，
-//      https://windhawk.net/mods/hide-desktop-icon-text）；
-//   6.「CW-关闭扩展名修改警告」（上游 m417z Turn off change file extension
+//   5.「CW-关闭扩展名修改警告」（上游 m417z Turn off change file extension
 //      warning 1.0.1，GPL-3.0，
 //      https://windhawk.net/mods/extension-change-no-warning）；
-//   7.「CW-开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu
+//   6.「CW-开始菜单电源按钮」（上游 Hakuuyosei/灵弦 Windows 11 Start Menu
 //      Power Buttons 1.0.2，MIT 惯例，
 //      https://windhawk.net/mods/win11-power-buttons）；
-//   8.「CW-拖拽删除文件」（上游 iMAboud Drag to Delete 1.0.0，MIT，
+//   7.「CW-拖拽删除文件」（上游 iMAboud Drag to Delete 1.0.0，MIT，
 //      https://windhawk.net/mods/drag-to-delete）；
-//   9.「CW-登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown
+//   8.「CW-登录注销关机音效」（上游 Toru the Red Fox Logon, Logoff & Shutdown
 //      Sounds Restored 1.0.3，MIT 惯例，
 //      https://windhawk.net/mods/logon-logoff-shutdown-sounds）；
-//  10.「CW-窗口优化」（m417z AltDrag + m417z Slick Window Arrangement +
+//   9.「CW-窗口优化」（m417z AltDrag + m417z Slick Window Arrangement +
 //      Bo0ii Invisible Window Borders 三合一，见下方 WinOpt 段说明）。
-// 各部分代码分别以 Peek*/ToggleIcons*/SmoothIcons*/Marquee*/Purity*/ExtWarn*/
+// 各部分代码分别以 Peek*/ToggleIcons*/SmoothIcons*/Marquee*/ExtWarn*/
 // PowerBtn*/DragDel*/SndLog* 前缀隔离全局符号与函数；窗口优化三段沿用
 // 其内部结构收进 WinOpt 命名空间（内含 AltDrag / WinArrange / InvisBorders
 // 三个子命名空间），独立初始化与卸载。
@@ -48,14 +45,14 @@
 // SysListView32 绘制过程的接管与 alpha 混合）作为纯动画绘制器（SmoothIcons*
 // 段）；桌面图标的隐藏机制只有系统「显示桌面图标」开关一种（ToggleIcons），
 // 本模组每次触发切换时在其上叠加一次淡出/淡入过渡动画。
-// 设置键为 peek.*、toggleIcons.*、marquee.*、purity.*、extWarn.*、
+// 设置键为 peek.*、toggleIcons.*、marquee.*、extWarn.*、
 // powerBtn.*、dragDel.*、sndLog.*、altDrag.*、winArrange.* 与 invisBorders.*
 // 前缀（2.1.0 起窗口优化拆分为三个独立顶层分组，不再有 winOpt.* 组壳）。
-// ToggleIcons、SmoothIcons 与 Purity 都需要挂钩 CreateWindowExW，由
+// ToggleIcons 与 SmoothIcons 都需要挂钩 CreateWindowExW，由
 // 文件末尾的共享钩子统一安装一次并分发，避免对同一 API 重复挂钩。
 // 2.0.0 起进程门控（@include 为 * 全进程注入，@exclude windhawk.exe /
 // windhawk-ui.exe / devenv.exe）：
-//   • Peek / ToggleIcons（含 SmoothIcons）/ Marquee / Purity / ExtWarn /
+//   • Peek / ToggleIcons（含 SmoothIcons）/ Marquee / ExtWarn /
 //     DragDel / SndLog 只在 explorer.exe 中启用（合并入口按进程名判
 //     定，其余进程完全不初始化这些段）；
 //   • PowerBtn（开始菜单电源按钮）按 StartMenuExperienceHost.exe（开始菜单
@@ -68,7 +65,7 @@
 /*
 # CW-更好的Windows（小细节）
 
-Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十一个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」四个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余七个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
+Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能合并进一个模组，由 Windhawk 直接注入目标进程运行，不需要额外的后台程序。设置页共十个可收起分组，每个分组的第一项均为「启用本组功能」总开关——其中「扩展名警告」「开始菜单电源按钮」「拖拽删除」「登录注销关机音效」四个分组默认关闭（各自带有需要显式开启或直接删除文件等原因，见各组说明），其余六个分组默认开启；关闭总开关后该分组功能完全停止且即时生效，无需重启资源管理器。
 
 ## 功能组一览
 
@@ -77,14 +74,13 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 | 1 | 显示桌面按钮预览 | `peek.*` | 开 | 悬停任务栏「显示桌面」按钮显示 Aero Peek 桌面速览 | m417z（GPL-3.0） |
 | 2 | 桌面图标隐藏设置 | `toggleIcons.*` | 开 | 双击桌面空白处/闲置自动隐藏图标（系统开关方式，可选平滑过渡动画） | Heptalune 原创 + HeyOkay 绘制技术（MIT） |
 | 3 | 桌面框选淡出 | `marquee.*` | 开 | 桌面框选矩形松开后平滑淡出 | angel_lov（MIT） |
-| 4 | 纯净化图标 | `purity.*` | 开 | 隐藏图标文字、快捷方式箭头与 UAC 盾牌角标 | kivsak（MIT 惯例） |
-| 5 | 扩展名警告 | `extWarn.*` | **关** | 重命名修改扩展名时不再弹出确认警告 | m417z（GPL-3.0） |
-| 6 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
-| 7 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
-| 8 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
-| 9 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动，移动或调整窗口大小 | m417z（GPL-3.0） |
-| 10 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口时自动吸附对齐，松手后带惯性顺滑滑动 | m417z（GPL-3.0） |
-| 11 | 隐形窗口边框 | `invisBorders.*` | 开 | 将窗口边框设为隐形并完整保留系统圆角效果 | Bo0ii（MIT） |
+| 4 | 扩展名警告 | `extWarn.*` | **关** | 重命名修改扩展名时不再弹出确认警告 | m417z（GPL-3.0） |
+| 5 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
+| 6 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
+| 7 | 登录注销关机音效 | `sndLog.*` | **关** | 恢复 Windows 7 时代的登录/注销/关机音效 | Toru the Red Fox（MIT 惯例） |
+| 8 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动，移动或调整窗口大小 | m417z（GPL-3.0） |
+| 9 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口时自动吸附对齐，松手后带惯性顺滑滑动 | m417z（GPL-3.0） |
+| 10 | 隐形窗口边框 | `invisBorders.*` | 开 | 将窗口边框设为隐形并完整保留系统圆角效果 | Bo0ii（MIT） |
 
 ## 分组 1：显示桌面按钮预览（peek.*）
 
@@ -113,15 +109,7 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - 在桌面图标上按下鼠标（命中图标）时不会触发淡出，仅在空白处框选时触发。
 - 「使用自定义颜色」只作用于淡出覆盖层，拖动过程中的实时框选矩形仍为系统配色。
 
-## 分组 4：纯净化图标（purity.*）
-
-隐藏桌面图标的文字标签（**隐藏桌面图标文字**，默认开；文件夹名保留显示），实时移除快捷方式小箭头（**移除快捷方式箭头**，默认开），并可选移除 UAC 管理员盾牌角标（**隐藏 UAC 管理员盾牌**，默认关）。
-
-- 箭头的移除作用于整个资源管理器会话（箭头覆盖层位于共享的系统图标列表中），关闭该功能或停用模组后要等图标缓存刷新才恢复。
-- **安全提示**：UAC 盾牌是「该程序需要管理员权限」的可视提醒，隐藏后无法从桌面直观分辨哪些程序会以管理员身份运行，请在知情的前提下开启；资源管理器窗口里的盾牌角标也会一并隐藏。
-- 与「桌面图标隐藏设置」的分工：本分组只负责图标**显示样式**的纯净化（文字/箭头/盾牌的显隐）；「桌面图标隐藏设置」负责图标的**整体隐藏与恢复**，两者互不冲突，可同时开启搭配使用。
-
-## 分组 5：扩展名警告（extWarn.*，默认关闭）
+## 分组 4：扩展名警告（extWarn.*，默认关闭）
 
 重命名文件并修改扩展名时，Windows 默认会弹出「如果改变文件扩展名，可能会导致文件不可用」的确认警告。开启本分组后不再弹出该警告，重命名一步生效。
 
@@ -129,7 +117,7 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - 兼容新旧版 Windows：除经典的 ShellMessageBoxW 外，也覆盖 2025 年 4 月前后新版系统加入的 ShellMessageBoxInternal 弹窗路径。
 - **默认关闭的原因**：该警告是防止误改扩展名导致文件无法打开的系统安全提醒；开启即屏蔽确认弹窗，请知悉风险后显式开启，随时可关闭恢复系统默认行为。
 
-## 分组 6：开始菜单电源按钮（powerBtn.*，默认关闭）
+## 分组 5：开始菜单电源按钮（powerBtn.*，默认关闭）
 
 在 Windows 11 开始菜单导航窗格中原生电源按钮的位置注入一排图标按钮，替换默认的电源按钮二级弹出菜单：点击图标直接执行关机、重启、注销、睡眠、休眠或锁定。
 
@@ -139,7 +127,7 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - **工作原理**：模组同时注入 StartMenuExperienceHost.exe 与 explorer.exe——按钮注入在开始菜单进程完成；由于开始菜单进程运行在受限的 AppContainer 沙箱中，实际的电源动作由 explorer.exe 中的隐藏代理窗口代为执行。
 - 仅支持 Windows 11（依赖 Win11 开始菜单的 XAML 结构与 Segoe Fluent Icons 图标字体）。
 
-## 分组 7：拖拽删除（dragDel.*，默认关闭）
+## 分组 6：拖拽删除（dragDel.*，默认关闭）
 
 开启后，在文件资源管理器或桌面拖动文件时，屏幕顶部会浮现一个悬浮的垃圾桶目标；把文件拖到目标圆形判定范围内松手，文件即被移入回收站，支持一次拖放多个文件。拖动结束后悬浮目标自动隐藏。
 
@@ -148,7 +136,7 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - **DPI 适配**：按显示器实际缩放比例渲染图标与窗口，多显示器环境下跟随拖动所在的显示器；带弹性缩放动画，不获取焦点、无任务栏按钮。
 - **默认关闭的原因**：该功能会把拖放直接变成删除动作，为避免误删请显式开启。
 
-## 分组 8：登录注销关机音效（sndLog.*，默认关闭）
+## 分组 7：登录注销关机音效（sndLog.*，默认关闭）
 
 恢复 Windows 7 时代的登录、注销与关机音效（Windows 8 起系统不再播放）。在 explorer.exe 中随桌面进程触发：
 
@@ -158,19 +146,19 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - **使用前提（重要）**：请先在声音方案中为「Windows 登录」「Windows 注销」「退出 Windows」（开启 XP 模式还含「Windows 启动」）等事件配置 .wav 音效（控制面板 → 声音 →「声音」选项卡，或使用 [Shutdown-Logoff-Logon-Sound-Hacks.zip](https://www.howtogeek.com/wp-content/uploads/2016/09/Shutdown-Logoff-Logon-Sound-Hacks.zip) 恢复声音事件）；事件未配置音效时静默跳过、不回放默认音。若开启 XP 启动行为，建议取消勾选「播放 Windows 启动声音」以免登录前提前播放。
 - 与其他恢复/接管登录注销关机声音的模组或工具同时启用可能重复播放，请按需二选一。
 
-## 分组 9：窗口拖动（Alt+拖动）（altDrag.*）
+## 分组 8：窗口拖动（Alt+拖动）（altDrag.*）
 
 按住移动触发键（默认 Alt + 左键）在窗口任意位置拖动即可移动窗口；按住调整触发键（默认 Alt + 右键）拖动即可调整大小——跟随鼠标的边或角是最靠近起拖位置的那条。走标题栏拖动的同一套系统流程，吸附、DWM 动画、最大化窗口处理一应俱全；未超过延迟或拖动阈值的短按会原样作为点击交还给程序。鼠标键、修饰键与按住延迟（毫秒）均可单独设置，「拖动无标题栏的窗口」（默认关）可选拖动弹出菜单、工具提示、气泡。灵感来自 [Stefan Sundin 的原版 AltDrag 工具](https://stefansundin.github.io/altdrag/)。
 
 本分组与后面两个窗口分组（窗口排列、隐形窗口边框）一样生效于所有进程（窗口拖动的钩子需要跨进程工作），Windhawk 模组设置「高级」选项卡的自定义进程排除列表依旧有效。
 
-## 分组 10：窗口排列（winArrange.*）
+## 分组 9：窗口排列（winArrange.*）
 
 窗口松手后带着惯性顺滑滑动减速停止，拖动与滑动过程中靠近其他窗口或屏幕工作区边缘时自动吸附对齐（**拖动窗口时吸附**、**滑动时吸附窗口**，默认开）；按住「临时禁用吸附的按键」（默认 Alt）可临时绕过吸附；**吸附距离**（默认 25，按窗口 DPI 缩放）、**滑动减速**（默认 15，1-99，越小滑动越久）可调。吸附与滑动都保证窗口标题栏留在屏幕工作区内；窗口滑过屏幕边缘会反弹，也能顺势滑到相邻显示器。
 
 与其他窗口分组及桌面功能的配合：任务栏、桌面（Progman/WorkerW）窗口被窗口拖动排除，不会干扰本模组其余桌面分组；「窗口排列」默认按住 Alt 临时禁用吸附，与「窗口拖动（Alt+拖动）」的默认触发键重叠——按住 Alt 拖动时窗口不会吸附，想边拖边吸附可改掉其中一方的按键。
 
-## 分组 11：隐形窗口边框（invisBorders.*）
+## 分组 10：隐形窗口边框（invisBorders.*）
 
 将窗口边框设为隐形（DWMWA_COLOR_NONE），同时完整保留系统窗口圆角效果。**应用到特殊窗口**（默认关）可同时作用于对话框等特殊窗口。需要 DWM 处于启用状态，Windows 10（1809+）/ Windows 11 可用。
 
@@ -178,12 +166,13 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 
 本模组注入所有进程（`@include *`，排除 windhawk.exe、windhawk-ui.exe 与 devenv.exe），各分组按需门控：
 
-- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、纯净化图标、扩展名警告、拖拽删除、登录注销关机音效；
+- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、扩展名警告、拖拽删除、登录注销关机音效；
 - **explorer.exe + StartMenuExperienceHost.exe 分流**：开始菜单电源按钮（按钮注入在开始菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
 - **全进程生效**：窗口拖动（Alt+拖动）、窗口排列、隐形窗口边框。
 
 ## 变更记录
 
+- **2.2.0**：「纯净化图标」分组（`purity.*`，上游 kivsak Hide Desktop Icon Text and Shortcut Arrows）整体移出本模组，后续将由独立新模组「CW-纯净化图标」替代。删除该分组设置块与全部实现代码（含 DrawTextW / DrawThemeTextEx 文字隐藏钩子、系统图像列表箭头/盾牌补丁及其持久自愈校验、SHGetFileInfoW / SHGetStockIconInfo 钩子、comctl32 ImageList_Create/Destroy 感知钩子、桌面 FolderView 子类与 SHChangeNotify 刷新时序逻辑），共享 CreateWindowExW 钩子的分发对象由三个功能减为两个（ToggleIcons / SmoothIcons）；设置页由十一个可收起分组变为十个。旧设置键 `purity.enable` 等不再被读取，如曾开启请留意该功能自本模组消失（已移除的箭头/盾牌待图标缓存刷新后恢复原样），更新后无需重启资源管理器，其余分组设置与行为不变，x86/x64 双架构编译。
 - **2.1.2**：「双击返回上级」分组（`dblUp.*`，上游 wrldspawn Explorer Double Click Up）整体移出本模组，后续将并入「CW-更好的文件管理器」模组。删除该分组设置块与全部实现代码（含 explorerframe.dll 的 FileCabinet_CreateViewWindow2 挂钩、SysListView32 / DirectUI 子类、UIAutomation 空白判定及 DblUp 专用的 UIAutomation/COM 头文件引入），共享 CreateWindowExW 钩子的分发对象由四个功能减为三个（ToggleIcons / SmoothIcons / Purity）；设置页由十二个可收起分组变为十一个。旧设置键 `dblUp.enable` 不再被读取，如曾开启请留意该功能自本模组消失，更新后无需重启资源管理器，其余分组设置与行为不变，x86/x64 双架构编译。
 - **2.1.1**：修复纯净化图标在 explorer 图标缓存彻底重建后（重启资源管理器、删除 iconcache 等），快捷方式小箭头与 UAC 盾牌重新出现且不再消失的问题。根因：图像列表补丁是对「当时那批共享系统图像列表」的原位改写，缓存重建会销毁并重建这批列表（新句柄、内容按注册表 Shell Icons 重定向重新回填），补丁随旧列表整体丢失；2.0.1 的自愈校验存在三处缺口——只校验盾牌 SYSIMAGE 槽位（箭头 overlay 槽位与盾牌 overlay 槽位完全不在范围，而桌面可见的箭头/盾牌恰恰主要经 overlay 路径绘制）、挂在「隐藏 UAC 管理员盾牌」开关之下（只开箭头隐藏时没有自愈）、只由桌面 WM_PAINT 驱动（闲置桌面不再绘制，重建尾声落在最后一次绘制之后的回填无人复查）。现重构为持久自愈：校验覆盖「箭头 overlay 槽位 ＋ 盾牌 overlay 槽位（两者经补丁时记录的自建空白锚点间接校验）＋ 盾牌 SYSIMAGE 槽位（像素级校验）」三类，任一失守立即整体重打补丁；触发面在桌面 WM_PAINT 之外新增桌面 2 秒兜底定时器与 comctl32 ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表的必经路径，钩子内仅置位提示、零重活，不影响其他模组）；失守重打带 3 秒冷却防重建风暴循环，平时仅轻量抽查（深查 1s 节流、感知命中 200ms），补丁幂等。无需重启资源管理器，设置项无变化，x86/x64 双架构编译。
 - **2.1.0**：「窗口优化」分组拆分为三个独立顶层分组——「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」（设置页由十个可收起分组变为十二个），删除组壳 `winOpt.*` 与三合一组级总开关 `winOpt.enable`；原三个子分组的组内开关提升为各自分组的总开关（`altDrag.enable` / `winArrange.enable` / `invisBorders.enable`，默认开启，显示名沿用「启用本组功能」）。设置键迁移：`winOpt.altDrag.*` → `altDrag.*`、`winOpt.winArrange.*` → `winArrange.*`、`winOpt.invisBorders.*` → `invisBorders.*`（组内键名不变），代码侧各读取点同步去掉 `winOpt.` 前缀并删除与 `winOpt.enable` 相与的三合一短路，功能逻辑不变；**旧设置不会自动迁移**，更新后请在设置页重新调整这三个分组的数值。
@@ -201,7 +190,6 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 - 「双击隐藏桌面图标」为 CW-Beautify 整合包作者 Heptalune 的原创 mod。
 - 「桌面框选淡出」原版 mod：Desktop Marquee Fade，作者 [angel_lov](https://github.com/Twilight0Sparkle)，MIT 许可证，原版链接：<https://windhawk.net/mods/desktop-marquee-fade>。
 - 「平滑自动隐藏」原版 mod：Smooth Desktop Icons Auto-Hide，作者 [HeyOkay](https://github.com/HeyOkay)，MIT 许可证，原版链接：<https://windhawk.net/mods/smooth-desktop-icons-auto-hide>。1.2.0 起其独立隐藏机制已按用户要求移除，仅保留其绘制技术用于切换过渡动画。
-- 「纯净化图标」原版 mod：Hide Desktop Icon Text and Shortcut Arrows，作者 [kivsak](https://github.com/kivsak)，源码内未附许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/hide-desktop-icon-text>。
 - 「扩展名警告」原版 mod：Turn off change file extension warning，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证，原版链接：<https://windhawk.net/mods/extension-change-no-warning>。
 - 「开始菜单电源按钮」原版 mod：Windows 11 Start Menu Power Buttons，作者 Hakuuyosei（灵弦，[github.com/ahzvenol](https://github.com/ahzvenol)），源码内未附带许可声明，按 Windhawk 官方模组仓库规则视为 MIT 许可证，原版链接：<https://windhawk.net/mods/win11-power-buttons>。
 - 「拖拽删除」原版 mod：Drag to Delete，作者 [iMAboud](https://github.com/iMAboud)，MIT 许可证，原版链接：<https://windhawk.net/mods/drag-to-delete>。
@@ -361,52 +349,6 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
   $description:zh-CN: >-
     桌面框选矩形在松开鼠标按钮后以平滑动画淡出消散。由独立模组
     「桌面框选淡出」（原作者 angel_lov，MIT）并入。
-- purity:
-  - enable: true
-    $name: Enable this feature group
-    $name:zh-CN: 启用本组功能
-    $description: >-
-      Master switch for desktop icon purification. When turned off, icon text
-      labels, shortcut arrows and UAC shields are all restored to their
-      original look (arrows and shields reappear once the icon cache
-      refreshes).
-    $description:zh-CN: >-
-      「纯净化图标」分组总开关。关闭后桌面图标文字、快捷方式箭头与 UAC 盾牌
-      全部恢复原样（箭头/盾牌待图标缓存刷新后重新出现）；重新开启立即恢复
-      隐藏效果。
-  - hideText: true
-    $name: Hide desktop icon text
-    $name:zh-CN: 隐藏桌面图标文字
-    $description: Hides text labels for files and shortcuts on the desktop (keeps folder names).
-    $description:zh-CN: 隐藏桌面文件与快捷方式的文字标签（保留文件夹名称）。
-  - hideArrows: true
-    $name: Remove shortcut arrows
-    $name:zh-CN: 移除快捷方式箭头
-    $description: Removes the shortcut arrow overlay from icons (applies to the whole Explorer session).
-    $description:zh-CN: 移除图标上的快捷方式小箭头（作用于整个资源管理器会话）。
-  - hideShields: false
-    $name: Hide UAC shield badges
-    $name:zh-CN: 隐藏 UAC 管理员盾牌
-    $description: >-
-      Removes the UAC administrator shield badge from icons (applies to the whole
-      Explorer session). The shield indicates which programs run as administrator.
-    $description:zh-CN: >-
-      移除图标上的 UAC 管理员盾牌角标（作用于整个资源管理器会话）。
-      注意：盾牌是管理员权限的可视提醒，隐藏后无法从桌面直观分辨哪些程序以管理员身份运行。
-  $name: Desktop icon purification
-  $name:zh-CN: 纯净化图标
-  $description: >-
-    Hide desktop icon text labels (keeps folder names), remove shortcut arrow
-    overlays and UAC shield badges for a cleaner desktop. Merged from the
-    standalone mod "Hide Desktop Icon Text and Shortcut Arrows" by kivsak
-    (MIT). UAC shield badges are off by default: the shield is a visual
-    reminder that a program requires administrator privileges.
-  $description:zh-CN: >-
-    隐藏桌面图标的文字标签（保留文件夹名称），并移除快捷方式小箭头与
-    UAC 管理员盾牌角标，让桌面更清爽。由独立模组「隐藏桌面图标文字与箭头」
-    （原作者 kivsak，MIT 惯例）并入。UAC 盾牌角标默认关闭：盾牌是「该程序
-    需要管理员权限」的可视提醒，隐藏后将无法从桌面直观分辨哪些程序会以
-    管理员身份运行，请在知情的前提下开启。
 - extWarn:
   - enable: false
     $name: Enable this feature group
@@ -757,7 +699,6 @@ Windows 细节功能大合集：把九组互不冲突的桌面与系统小功能
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
-#include <commoncontrols.h>
 #include <shellapi.h>
 #include <shlobj.h>
 #include <shlwapi.h>
@@ -820,17 +761,16 @@ namespace wuc = winrt::Windows::UI::Core;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并级共享状态：各功能初始化成功/激活标志。文件末尾的共享 CreateWindowExW
-// 钩子按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons / Purity
+// 钩子按这些标志把新建窗口分发给 ToggleIcons / SmoothIcons
 // 的处理函数。标志在 Wh_ModInit / 卸载流程内设置（Wh_SetFunctionHook 为延迟
 // 生效，钩子在 Wh_ModInit 返回后才应用，此处无数据竞争）。
 // ─────────────────────────────────────────────────────────────────────────────
 std::atomic<bool> g_QuickSettingsToggleIconsActive{false};
 std::atomic<bool> g_QuickSettingsSmoothIconsActive{false};
-std::atomic<bool> g_QuickSettingsPurityActive{false};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并级进程判定（2.0.0）：@include 为 *，各功能段按进程门控——
-//   • Explorer：Peek / ToggleIcons（含 SmoothIcons）/ Marquee / Purity /
+//   • Explorer：Peek / ToggleIcons（含 SmoothIcons）/ Marquee /
 //     ExtWarn / DragDel / SndLog；
 //   • StartMenuExperienceHost + Explorer：PowerBtn（按钮注入在开始菜单进程、
 //     电源动作由 explorer 的隐藏代理窗口执行）；
@@ -3653,876 +3593,13 @@ void SmoothIconsNotifySettingsChanged() {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能五：纯净化图标（Purity*）
-// 来源：kivsak Hide Desktop Icon Text and Shortcut Arrows 1.6.0（MIT 惯例），
-// 原版链接：https://windhawk.net/mods/hide-desktop-icon-text（源码内未附许可
-// 声明，按 Windhawk 官方模组仓库规则视为 MIT 许可）。
-// 上游 @architecture 声明仅 x86-64；经复核其全部回调（桌面列表子类过程与
-// DrawTextW / DrawThemeTextEx / SHGetFileInfoW / SHGetStockIconInfo /
-// CreateWindowExW 钩子）均为显式 CALLBACK/WINAPI 函数，无无捕获 lambda 直传
-// WINAPI/stdcall 回调的情况，无需 x86 兼容修复；并入后 CreateWindowExW 挂钩
-// 由文件末尾的共享钩子统一安装与分发，本段只保留创建后的分发处理函数。
-// 全局符号与函数统一加 Purity 前缀以与其他功能隔离；设置键迁移为 purity.*
-// 前缀（purity.hideText / purity.hideArrows / purity.hideShields）。
-// 机制概要：
-//   • 文字隐藏：桌面 SysListView32 绘制期间置 thread_local 标记，DrawTextW /
-//     DrawThemeTextEx 钩子对「非桌面文件夹名」的标签置空（文件夹名经
-//     IShellFolder 枚举缓存保留显示）。
-//   • 箭头/盾牌：PurityPatchOverlayImageLists 把系统图像列表中快捷方式箭头 overlay
-//     槽位与 SIID_SHIELD 图像项原位替换为空白图标；另挂钩 SHGetFileInfoW
-//     （剥离 SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX，拦截提取期合成——Win11
-//     桌面可见盾牌的关键层）与 SHGetStockIconInfo（SIID_SHIELD 直接返回空白）。
-//   • 图像列表补丁自愈（2.0.1 引入、2.1.1 重构为持久自愈）：explorer 图标缓存
-//     重建（重启 explorer、删除 iconcache、SHCNE_ASSOCCHANGED 刷新等）会销毁并
-//     重建共享 SHIL 图像列表，已打上的补丁随旧列表整体丢失；注册表 Shell Icons
-//     重定向（如 29/77 → imageres.dll,197）还会把“非全空”的空图标回填进盾牌
-//     槽位（管理员快捷方式左下角残留小方框）。自愈校验覆盖三类槽位：箭头
-//     overlay 槽位与盾牌 overlay 槽位（经补丁时记录的自建空白锚点间接校验）与
-//     盾牌 SYSIMAGE 槽位（像素级校验）；触发面为桌面 WM_PAINT ＋ 2s 兜底定时器
-//     ＋ comctl32 ImageList_Create/Destroy 轻量感知钩子（仅置位提示，重打在
-//     桌面线程执行）；失守立即全量重打 ＋ 3s 冷却，平时仅轻量抽查（详见自愈
-//     校验段注释）。
-//   • 初始化时序（上游 2.5.0 实测结论，原样保留）：SHChangeNotify 必须先于
-//     图像列表补丁（通知会重建图像列表，先打补丁会被整体丢弃）。
-// ─────────────────────────────────────────────────────────────────────────────
-
-static thread_local bool PurityIsDrawingDesktop = false;
-
-static struct {
-    bool enable;      // 分组总开关（purity.enable）
-    bool hideText;
-    bool hideArrows;
-    bool hideShields;
-} PuritySettings;
-
-// 桌面文件夹显示名缓存（隐藏文字时用于保留文件夹名）。
-static std::unordered_set<std::wstring> PurityFolderNames;
-static DWORD PurityLastUpdateTick = 0;
-
-// ── 图像列表补丁自愈状态（2.1.1，替代 2.0.1 的仅盾牌 SYSIMAGE 1s 节流校验）──
-// 深度校验（像素级）节流与修复冷却时钟；GetTickCount 回绕由无符号减法天然处理。
-static DWORD PurityLastDeepCheckTick = 0;
-static DWORD PurityLastRepairTick = 0;
-
-// 每个共享 SHIL 图像列表的自愈锚点：补丁时追加的自建空白图标索引与列表尺寸。
-// 重打补丁时记录，校验时比对——列表被销毁重建后锚点必然失配（索引越界/尺寸
-// 变化/槽位非空白），据此感知「句柄已换、补丁已丢」。字段为对齐 int，单字段
-// 读写无撕裂；跨线程读到新旧混合快照的最坏后果是一次冗余重打（补丁幂等），
-// 不会漏报失守，故不加锁。
-struct PurityListRecord {
-    int appendedIdx;  // 追加的空白图标索引（-1 = 该列表本次未打上补丁）
-    int cx;
-    int cy;
-};
-static PurityListRecord PurityListRecords[5] = {};
-
-// 自愈兜底定时器 ID（挂在桌面 FolderView 上，2s 周期——桌面闲置无 WM_PAINT 时
-// 仍能感知图标缓存重建；见 PurityUpdateSelfHealTimer）。
-static const UINT_PTR PuritySelfHealTimerId = 0x50555254; // 'TRUP'
-
-// ImageList_Create/Destroy 感知钩子 → 自愈校验的「可能重建」提示位（钩子内只
-// 置位，深度校验与重打一律由 PuritySelfHealCheck 在桌面线程消费执行）。
-static std::atomic<bool> PurityImageListRebuildHint{false};
-// 感知钩子的启用门（explorer + 纯净化开启 + 箭头/盾牌至少一项开启）。
-static std::atomic<bool> PuritySelfHealArmed{false};
-
-// SHGetStockIconInfo 钩子用的空白盾牌图标缓存：[0] = 标准尺寸，[1] = 小尺寸。
-// 在初始化/设置重载时按需预创建（避免在钩子内懒初始化产生线程竞争）。
-static HICON PurityBlankShieldIcon[2] = { nullptr, nullptr };
-
-// ---------------------------------------------------------------------------
-// Window helpers
-// ---------------------------------------------------------------------------
-
-static HWND PurityFindChild(HWND parent, LPCWSTR cls, LPCWSTR win) {
-    if (!parent) return nullptr;
-    return FindWindowEx(parent, nullptr, cls, win);
-}
-
-static bool PurityIsDesktopFolderView(HWND hWnd) {
-    WCHAR buf[64];
-
-    if (!GetClassName(hWnd, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"SysListView32")) return false;
-    if (!GetWindowText(hWnd, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"FolderView")) return false;
-
-    HWND defView = GetAncestor(hWnd, GA_PARENT);
-    if (!defView) return false;
-    if (!GetClassName(defView, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"SHELLDLL_DefView")) return false;
-
-    HWND top = GetAncestor(defView, GA_PARENT);
-    if (!top) return false;
-    if ((!GetClassName(top, buf, ARRAYSIZE(buf)) || _wcsicmp(buf, L"Progman")) &&
-        top != GetShellWindow()) {
-        return false;
-    }
-    return true;
-}
-
-static HWND PurityGetDesktopFolderView() {
-    HWND lv = PurityFindChild(PurityFindChild(GetShellWindow(), L"SHELLDLL_DefView", L""),
-                              L"SysListView32", L"FolderView");
-    if (!lv) return nullptr;
-
-    DWORD pid = 0;
-    if (!GetWindowThreadProcessId(lv, &pid) || pid != GetCurrentProcessId()) return nullptr;
-    return lv;
-}
-
-// ---------------------------------------------------------------------------
-// Folder name cache
-// ---------------------------------------------------------------------------
-
-static void PurityUpdateFolderCache() {
-    DWORD now = GetTickCount();
-    if (PurityLastUpdateTick != 0 && now - PurityLastUpdateTick < 1000) return;
-    PurityLastUpdateTick = now;
-
-    std::unordered_set<std::wstring> fresh;
-
-    IShellFolder* pDesktop = nullptr;
-    if (SUCCEEDED(SHGetDesktopFolder(&pDesktop))) {
-        IEnumIDList* pEnum = nullptr;
-        if (SUCCEEDED(pDesktop->EnumObjects(nullptr, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum))) {
-            LPITEMIDLIST pidl = nullptr;
-            while (pEnum->Next(1, &pidl, nullptr) == S_OK) {
-                SFGAOF attr = SFGAO_FOLDER | SFGAO_STREAM;
-                if (SUCCEEDED(pDesktop->GetAttributesOf(1, (LPCITEMIDLIST*)&pidl, &attr)) &&
-                    (attr & SFGAO_FOLDER) && !(attr & SFGAO_STREAM)) {
-                    STRRET str;
-                    if (SUCCEEDED(pDesktop->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str))) {
-                        WCHAR name[MAX_PATH];
-                        if (SUCCEEDED(StrRetToBufW(&str, pidl, name, MAX_PATH))) {
-                            fresh.insert(name);
-                        }
-                    }
-                }
-                CoTaskMemFree(pidl);
-            }
-            pEnum->Release();
-        }
-        pDesktop->Release();
-    }
-
-    PurityFolderNames = std::move(fresh);
-}
-
-static inline bool PurityShouldHideLabel(LPCWSTR text, int cch) {
-    // 分组总开关关闭时不隐藏任何文字（运行时短路，随设置重载即时生效）。
-    if (!PuritySettings.enable || !PuritySettings.hideText) return false;
-    std::wstring s(text, cch == -1 ? wcslen(text) : cch);
-    return PurityFolderNames.count(s) == 0;
-}
-
-// ---------------------------------------------------------------------------
-// Subclass
-// ---------------------------------------------------------------------------
-
-static void PuritySelfHealCheck(HWND hWnd);
-
-static LRESULT CALLBACK PurityDesktopListSubclass(HWND hWnd, UINT uMsg, WPARAM wParam,
-                                                  LPARAM lParam, DWORD_PTR dwRefData) {
-    if (PuritySettings.enable) {
-        // 图像列表补丁自愈（2.1.1）：WM_PAINT 与 2s 兜底定时器都进入同一路径。
-        // 校验内部自带节流（深查 1s 一次、感知钩子命中时 200ms 一次）与修复后
-        // 3s 冷却，平时只做轻量句柄/槽位抽查，失守才全量重打（详见自愈校验段
-        // 注释）。放在 DefSubclassProc 之前，让本帧绘制尽量用上重新置空后的
-        // 槽位内容。
-        if (uMsg == WM_PAINT || (uMsg == WM_TIMER && wParam == PuritySelfHealTimerId)) {
-            PuritySelfHealCheck(hWnd);
-        }
-        if (uMsg == WM_PAINT && PuritySettings.hideText) {
-            PurityUpdateFolderCache();
-            PurityIsDrawingDesktop = true;
-            LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
-            PurityIsDrawingDesktop = false;
-            return res;
-        }
-    }
-
-    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
-}
-
-// ---------------------------------------------------------------------------
-// Hooks
-// ---------------------------------------------------------------------------
-
-using PurityDrawTextW_t = decltype(&DrawTextW);
-static PurityDrawTextW_t PurityDrawTextW_Original;
-int WINAPI PurityDrawTextW_Hook(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format) {
-    if (PurityIsDrawingDesktop && lpchText && PurityShouldHideLabel(lpchText, cchText)) {
-        return PurityDrawTextW_Original(hdc, L"", 0, lprc, format);
-    }
-    return PurityDrawTextW_Original(hdc, lpchText, cchText, lprc, format);
-}
-
-using PurityDrawThemeTextEx_t = HRESULT (WINAPI*)(HTHEME, HDC, int, int, LPCWSTR, int, DWORD, LPRECT, const void*);
-static PurityDrawThemeTextEx_t PurityDrawThemeTextEx_Original;
-HRESULT WINAPI PurityDrawThemeTextEx_Hook(HTHEME hTheme, HDC hdc, int iPartId, int iStateId,
-                                          LPCWSTR pszText, int cchText, DWORD dwTextFlags,
-                                          LPRECT pRect, const void* pOptions) {
-    if (PurityIsDrawingDesktop && pszText && PurityShouldHideLabel(pszText, cchText)) {
-        return PurityDrawThemeTextEx_Original(hTheme, hdc, iPartId, iStateId, L"", 0,
-                                              dwTextFlags, pRect, pOptions);
-    }
-    return PurityDrawThemeTextEx_Original(hTheme, hdc, iPartId, iStateId, pszText, cchText,
-                                          dwTextFlags, pRect, pOptions);
-}
-
-// ---------------------------------------------------------------------------
-// Shortcut arrow & UAC shield removal (image list patching)
-// ---------------------------------------------------------------------------
-
-#ifndef IDO_SHGIOI_LINK
-#define IDO_SHGIOI_LINK 0x0FFFFFFE
-#endif
-
-static HICON PurityCreateTransparentIcon(int cx, int cy) {
-    if (cx <= 0 || cy <= 0) return nullptr;
-
-    BITMAPV5HEADER bi = {};
-    bi.bV5Size        = sizeof(bi);
-    bi.bV5Width       = cx;
-    bi.bV5Height      = cy;
-    bi.bV5Planes      = 1;
-    bi.bV5BitCount    = 32;
-    bi.bV5Compression = BI_BITFIELDS;
-    bi.bV5RedMask     = 0x00FF0000;
-    bi.bV5GreenMask   = 0x0000FF00;
-    bi.bV5BlueMask    = 0x000000FF;
-    bi.bV5AlphaMask   = 0xFF000000;
-
-    HDC hdc = GetDC(nullptr);
-    void* bits = nullptr;
-    HBITMAP hColor = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, &bits, nullptr, 0);
-    ReleaseDC(nullptr, hdc);
-    if (!hColor) return nullptr;
-
-    if (bits) {
-        memset(bits, 0, (size_t)cx * cy * 4);
-    }
-
-    int rowBytes = ((cx + 15) / 16) * 2;
-    std::vector<BYTE> maskBits((size_t)rowBytes * cy, 0xFF);
-    HBITMAP hMask = CreateBitmap(cx, cy, 1, 1, maskBits.data());
-
-    ICONINFO ii = {};
-    ii.fIcon    = TRUE;
-    ii.hbmColor = hColor;
-    ii.hbmMask  = hMask;
-    HICON hIcon = CreateIconIndirect(&ii);
-
-    DeleteObject(hColor);
-    if (hMask) DeleteObject(hMask);
-    return hIcon;
-}
-
-// 系统图像列表接口 IID（IImageList），打补丁与回填校验共用。
-static const GUID PurityIidImageList =
-    {0x46eb5926, 0x582e, 0x4017, {0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x09, 0x50}};
-
-// 把箭头/盾牌的 overlay 槽位与 SIID_SHIELD 系统图像项替换为空白图标。
-// 机制说明（上游 1.6.0 调研结论）：
-//  - 箭头：overlay 槽位由 SHGetIconOverlayIndex(nullptr, IDO_SHGIOI_LINK) 解析，
-//    置空槽位图即可让绘制期/提取期引用该槽位的箭头全部消失（上游 1.5.0 原机制）；
-//  - 盾牌：源图标位置（shell32,77 / imageres,77 / imageres,78）同样注册在 overlay
-//    表中，可置空对应槽位；同时把 SIID_SHIELD 在系统图像列表中的图像项原位替换
-//    为空白（ReplaceIcon 保持索引不变）。但 Win11 桌面可见的盾牌主要来自提取期
-//    合成（见下方 SHGetFileInfoW 钩子），本函数与其配合使用。
-//  - 2.0.1 补充：一次性补丁会被 explorer 图标缓存按注册表 Shell Icons 重定向的
-//    回填覆盖（详见下方自愈校验段），需配合自愈校验保持持久。
-//  - 2.1.1 补充：补丁幂等且可重入——每次执行先清空自愈锚点记录，成功追加空白
-//    图标的列表记录锚点（索引+尺寸），供 PuritySelfHealCheck 校验补丁是否仍在。
-static void PurityPatchOverlayImageLists() {
-    // 无论本次走到哪一步退出，都先清空旧锚点：未打上的列表不参与校验。
-    for (int i = 0; i < 5; i++) {
-        PurityListRecords[i] = {-1, 0, 0};
-    }
-
-    HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
-    if (!hShell32) return;
-
-    auto pSHGetImageList = (HRESULT(WINAPI*)(int, REFIID, void**))
-        GetProcAddress(hShell32, "SHGetImageList");
-    auto pSHGetIconOverlayIndex = (int(WINAPI*)(LPCWSTR, int))
-        GetProcAddress(hShell32, "SHGetIconOverlayIndexW");
-    if (!pSHGetImageList || !pSHGetIconOverlayIndex) return;
-
-    int linkOverlay = -1;
-    if (PuritySettings.hideArrows) {
-        linkOverlay = pSHGetIconOverlayIndex(nullptr, IDO_SHGIOI_LINK);
-    }
-
-    // 盾牌 overlay 槽位：三个源图标位置逐一解析，解析失败（<=0）的跳过。
-    int shieldOverlays[3] = { -1, -1, -1 };
-    // SIID_SHIELD 在系统图像列表中的图像索引：大图/小图两类列表分别解析。
-    int shieldSysIdxLarge = -1;
-    int shieldSysIdxSmall = -1;
-    if (PuritySettings.hideShields) {
-        static const struct { LPCWSTR path; int id; } kShieldSources[] = {
-            { L"shell32.dll", 77 },
-            { L"imageres.dll", 77 },
-            { L"imageres.dll", 78 },
-        };
-        for (int i = 0; i < 3; i++) {
-            shieldOverlays[i] = pSHGetIconOverlayIndex(kShieldSources[i].path, kShieldSources[i].id);
-        }
-
-        SHSTOCKICONINFO sii = {};
-        sii.cbSize = sizeof(sii);
-        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
-            shieldSysIdxLarge = sii.iSysImageIndex;
-        }
-        SHSTOCKICONINFO siiSmall = {};
-        siiSmall.cbSize = sizeof(siiSmall);
-        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON, &siiSmall))) {
-            shieldSysIdxSmall = siiSmall.iSysImageIndex;
-        }
-    }
-
-    if (linkOverlay <= 0 && shieldOverlays[0] <= 0 && shieldOverlays[1] <= 0 &&
-        shieldOverlays[2] <= 0 && shieldSysIdxLarge < 0 && shieldSysIdxSmall < 0) {
-        return;
-    }
-
-    const int sizes[] = { 1, 0, 2, 3, 4 }; // SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE, SHIL_SYSSMALL, SHIL_JUMBO
-    int patchedLists = 0;
-    for (int listIdx = 0; listIdx < 5; listIdx++) {
-        int shil = sizes[listIdx];
-        IImageList* piml = nullptr;
-        if (FAILED(pSHGetImageList(shil, PurityIidImageList, (void**)&piml)) || !piml) {
-            continue;
-        }
-
-        // 小尺寸类图像列表（SHIL_SMALL / SHIL_SYSSMALL）用小盾牌索引，其余用大盾牌索引。
-        bool isSmallList = (shil == 1 || shil == 3);
-        int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
-
-        int cx = 0, cy = 0;
-        if (SUCCEEDED(piml->GetIconSize(&cx, &cy)) && cx > 0 && cy > 0) {
-            if (HICON hBlank = PurityCreateTransparentIcon(cx, cy)) {
-                int idx = -1;
-                if (SUCCEEDED(piml->ReplaceIcon(-1, hBlank, &idx)) && idx >= 0) {
-                    if (PuritySettings.hideArrows && linkOverlay > 0) {
-                        piml->SetOverlayImage(idx, linkOverlay);
-                    }
-                    if (PuritySettings.hideShields) {
-                        for (int i = 0; i < 3; i++) {
-                            if (shieldOverlays[i] > 0) {
-                                piml->SetOverlayImage(idx, shieldOverlays[i]);
-                            }
-                        }
-                    }
-                    // 记录自愈锚点：空白图标追加在本列表尾部，箭头/盾牌 overlay
-                    // 槽位已重指向它；PuritySelfHealCheck 据此校验补丁是否仍在。
-                    PurityListRecords[listIdx] = {idx, cx, cy};
-                    patchedLists++;
-                }
-                if (PuritySettings.hideShields && shieldSysIdx >= 0) {
-                    int replacedIdx = -1;
-                    piml->ReplaceIcon(shieldSysIdx, hBlank, &replacedIdx);
-                }
-                DestroyIcon(hBlank);
-            }
-        }
-        piml->Release();
-    }
-
-    Wh_Log(L"[CW] Purity image list patch done (%d/5 lists)", patchedLists);
-}
-
-// ---------------------------------------------------------------------------
-// 图像列表补丁自愈校验（Purity 补丁持久性保障；2.0.1 引入、2.1.1 重构）
-//
-// 为什么需要自愈（实测根因链，Win11 22621）：
-//  1. 补丁随列表销毁而丢失：PurityPatchOverlayImageLists 的两处动作——把自建
-//     全透明图标 ReplaceIcon 进 SIID_SHIELD 系统图像槽位、把箭头/盾牌 overlay
-//     槽位 SetOverlayImage 重指向自建空白——都是对「当时那批共享 SHIL 图像列
-//     表」的原位改写。explorer 图标缓存重建（重启 explorer、删除 iconcache、
-//     初始化/设置变更时的 SHCNE_ASSOCCHANGED 刷新等）会销毁并重建这批列表，
-//     新列表由缓存按注册表 Shell Icons 重定向重新填充，补丁随旧列表整体丢失。
-//     注意 SHGetImageList 每次调用都现取当前列表（补丁与校验都不持旧句柄），
-//     失守不是「句柄缓存」问题，而是旧列表内容上的补丁不复存在。
-//  2. 2.0.1 自愈为何没兜住（三处独立缺陷）：
-//     a) 覆盖面：PurityShieldSlotRefilled 只校验 SIID_SHIELD 的 SYSIMAGE 槽位，
-//        箭头 overlay 槽位（IDO_SHGIOI_LINK）与盾牌 overlay 槽位（shell32,77 /
-//        imageres,77 / imageres,78）完全不在校验范围——桌面可见的箭头/盾牌恰恰
-//        主要经 overlay 路径绘制，重建后 overlay 槽位指回真实图标，校验却读不
-//        到失守；
-//     b) 门控：校验挂在 PuritySettings.hideShields 之下，只开箭头隐藏时完全没有
-//        自愈；
-//     c) 触发面：只挂桌面 WM_PAINT——校验靠绘制驱动，重建尾声的最后一次缓存回
-//        填若落在最后一次桌面绘制之后（重建期间校验与重打多次赛跑），闲置桌面
-//        不再绘制，最终失守状态永远无人复查。
-// 2.1.1 持久自愈设计：
-//  - 覆盖面＝三类槽位：自愈锚点（补丁时记录的空白图标索引+尺寸）同时覆盖箭头
-//    overlay 槽位、盾牌 overlay 槽位（两者都被 SetOverlayImage 重指向锚点，锚
-//    点失守即 overlay 槽位必然指回真实图标——IImageList 无 overlay 映射读取
-//    接口，故用锚点间接校验）与盾牌 SYSIMAGE 槽位（像素级校验，保留 2.0.1 的
-//    「GetIcon 失败按空白处理」防循环语义）；任一失守即整体重跑补丁。
-//  - 触发面＝桌面 WM_PAINT ＋ 桌面 FolderView 上的 2s 兜底定时器 ＋ comctl32
-//    ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表必经此路径；
-//    钩子内只做尺寸比对与原子置位，判定与重打一律延迟到桌面线程，不在钩子里
-//    做任何重活、不影响其他模组）。
-//  - 开销控制：平时每次 WM_PAINT/定时器只做锚点抽查（GetIconSize + 关键槽位
-//    GetIcon，深查按 1s 节流；感知钩子命中时提速到 200ms）；失守立即全量重打
-//    ＋ 3s 修复冷却，避免重建风暴下的重打循环；补丁幂等（重新解析索引、重新
-//    置空、重新挂 overlay 槽位、重新记录锚点）。
-// ---------------------------------------------------------------------------
-
-// 判断单个 HICON 是否“真全透明”（无任何可见像素）。
-static bool PurityIconIsBlank(HICON hIcon) {
-    bool blank = true;
-    ICONINFO ii = {};
-    if (GetIconInfo(hIcon, &ii)) {
-        BITMAP bm = {};
-        if (ii.hbmColor && GetObject(ii.hbmColor, sizeof(bm), &bm) &&
-            bm.bmWidth > 0 && bm.bmHeight > 0 && bm.bmBitsPixel >= 24) {
-            BITMAPINFO bi = {};
-            bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-            bi.bmiHeader.biWidth = bm.bmWidth;
-            bi.bmiHeader.biHeight = -bm.bmHeight;
-            bi.bmiHeader.biPlanes = 1;
-            bi.bmiHeader.biBitCount = 32;
-            bi.bmiHeader.biCompression = BI_RGB;
-            std::vector<BYTE> bits((size_t)bm.bmWidth * bm.bmHeight * 4);
-            HDC hdc = GetDC(nullptr);
-            if (GetDIBits(hdc, ii.hbmColor, 0, bm.bmHeight, bits.data(), &bi, DIB_RGB_COLORS)) {
-                // 自建全透明图标全部像素 alpha=0；回填的系统图标（盾牌本体或
-                // imageres,197 一类“空”图标）至少有少量 alpha>0 的像素。
-                // 阈值取 8：可抓住 16px 下约 14 像素的残影，同时不受压缩噪声影响。
-                int content = 0;
-                if (bm.bmBitsPixel == 32) {
-                    for (size_t i = 3; i < bits.size(); i += 4) {
-                        if (bits[i] != 0 && ++content > 8) break;
-                    }
-                } else {
-                    for (size_t i = 0; i + 2 < bits.size(); i += 4) {
-                        if ((bits[i] | bits[i + 1] | bits[i + 2]) != 0 && ++content > 8) break;
-                    }
-                }
-                blank = content <= 8;
-            }
-            ReleaseDC(nullptr, hdc);
-        }
-        if (ii.hbmColor) DeleteObject(ii.hbmColor);
-        if (ii.hbmMask) DeleteObject(ii.hbmMask);
-    }
-    return blank;
-}
-
-// 判断图像列表指定索引的图像是否“真全透明”（盾牌 SYSIMAGE 槽位用）。
-// GetIcon 失败时按空白处理：无法证明有内容时不触发重打补丁（防误报循环）。
-static bool PurityImageListEntryIsBlank(IImageList* piml, int index) {
-    HICON hIcon = nullptr;
-    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
-    bool blank = PurityIconIsBlank(hIcon);
-    DestroyIcon(hIcon);
-    return blank;
-}
-
-// 自愈锚点槽位校验（2.1.1）：我们亲手追加的空白图标应当仍然存在且全透明。
-// 与系统槽位语义相反——GetIcon 失败说明锚点已随列表重建/收缩而消失，判失守。
-// （锚点失守即箭头/盾牌 overlay 槽位必然已指回真实图标：重建后的 overlay 映射
-// 不再指向自建空白。）
-static bool PurityOwnBlankSlotBreached(IImageList* piml, int index) {
-    HICON hIcon = nullptr;
-    if (FAILED(piml->GetIcon(index, ILD_NORMAL, &hIcon)) || !hIcon) return true;
-    bool breached = !PurityIconIsBlank(hIcon);
-    DestroyIcon(hIcon);
-    return breached;
-}
-
-// 自愈失守判定（2.1.1）：任一共享图像列表出现下列任一情况即需要整体重打——
-//  ① 锚点尺寸与当前列表不一致（列表已整体重建）；
-//  ② 锚点槽位丢失或不再全透明（重建/收缩/被改写）；
-//  ③ hideShields 开启时，SIID_SHIELD 的 SYSIMAGE 槽位出现可见内容（2.0.1 的
-//     回填场景，如注册表 Shell Icons 重定向把 imageres,197 回填进槽位）。
-// 列表获取失败（重建窗口期）按跳过处理，不误报。
-static bool PuritySelfHealBreached() {
-    HMODULE hShell32 = GetModuleHandle(L"shell32.dll");
-    if (!hShell32) return false;
-    auto pSHGetImageList = (HRESULT(WINAPI*)(int, REFIID, void**))
-        GetProcAddress(hShell32, "SHGetImageList");
-    if (!pSHGetImageList) return false;
-
-    int shieldSysIdxLarge = -1;
-    int shieldSysIdxSmall = -1;
-    if (PuritySettings.hideShields) {
-        SHSTOCKICONINFO sii = {};
-        sii.cbSize = sizeof(sii);
-        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &sii))) {
-            shieldSysIdxLarge = sii.iSysImageIndex;
-        }
-        SHSTOCKICONINFO siiSmall = {};
-        siiSmall.cbSize = sizeof(siiSmall);
-        if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX | SHGSI_SMALLICON,
-                                         &siiSmall))) {
-            shieldSysIdxSmall = siiSmall.iSysImageIndex;
-        }
-    }
-
-    const int sizes[] = { 1, 0, 2, 3, 4 }; // 与 PurityPatchOverlayImageLists 相同集合与顺序
-    for (int listIdx = 0; listIdx < 5; listIdx++) {
-        IImageList* piml = nullptr;
-        if (FAILED(pSHGetImageList(sizes[listIdx], PurityIidImageList, (void**)&piml)) || !piml) {
-            continue;
-        }
-
-        bool breach = false;
-        const PurityListRecord& rec = PurityListRecords[listIdx];
-        if (rec.appendedIdx >= 0) {
-            int cx = 0, cy = 0;
-            if (FAILED(piml->GetIconSize(&cx, &cy)) || cx != rec.cx || cy != rec.cy) {
-                breach = true; // 尺寸失配：列表已被整体重建
-            } else if (PurityOwnBlankSlotBreached(piml, rec.appendedIdx)) {
-                breach = true; // 锚点丢失或被改写：重建/回填
-            }
-        }
-        if (!breach && PuritySettings.hideShields) {
-            bool isSmallList = (sizes[listIdx] == 1 || sizes[listIdx] == 3);
-            int shieldSysIdx = isSmallList ? shieldSysIdxSmall : shieldSysIdxLarge;
-            if (shieldSysIdx >= 0 && !PurityImageListEntryIsBlank(piml, shieldSysIdx)) {
-                breach = true;
-            }
-        }
-
-        piml->Release();
-        if (breach) return true;
-    }
-    return false;
-}
-
-// ---------------------------------------------------------------------------
-// 自愈触发面（2.1.1）
-// ---------------------------------------------------------------------------
-
-// comctl32 的 ImageList_Create/Destroy 是 explorer（含 shell32）创建/销毁共享
-// SHIL 图像列表的必经路径。钩子只做「尺寸像不像共享列表」的比对并置位提示，
-// 真正的失守判定与重打由 PuritySelfHealCheck 在桌面线程执行——钩子内零重活，
-// 其余模组与系统组件的 ImageList 调用只增加一次原子读＋几个整数比较。
-// （ImageList_Create 的导出模块是 comctl32 而非 shell32，后者只是导入方。）
-static void PurityNotePossibleImageListRecreate(int cx, int cy) {
-    if (!PuritySelfHealArmed.load(std::memory_order_relaxed)) return;
-    if (cx == GetSystemMetrics(SM_CXSMICON) || cx == GetSystemMetrics(SM_CXICON) ||
-        cx == 48 || cx == 96 || cy == 256) {
-        PurityImageListRebuildHint.store(true, std::memory_order_relaxed);
-    }
-}
-
-using PurityImageListCreate_t = HIMAGELIST(WINAPI*)(int cx, int cy, UINT flags,
-                                                   int cInitial, int cGrow);
-static PurityImageListCreate_t PurityImageListCreate_Original;
-static HIMAGELIST WINAPI PurityImageListCreate_Hook(int cx, int cy, UINT flags,
-                                                    int cInitial, int cGrow) {
-    HIMAGELIST himl = PurityImageListCreate_Original(cx, cy, flags, cInitial, cGrow);
-    PurityNotePossibleImageListRecreate(cx, cy);
-    return himl;
-}
-
-using PurityImageListDestroy_t = BOOL(WINAPI*)(HIMAGELIST himl);
-static PurityImageListDestroy_t PurityImageListDestroy_Original;
-static BOOL WINAPI PurityImageListDestroy_Hook(HIMAGELIST himl) {
-    if (PuritySelfHealArmed.load(std::memory_order_relaxed)) {
-        PurityImageListRebuildHint.store(true, std::memory_order_relaxed);
-    }
-    return PurityImageListDestroy_Original(himl);
-}
-
-// 自愈兜底定时器：挂在桌面 FolderView 上，2s 周期。桌面闲置无 WM_PAINT 时仍能
-// 感知重建（重建尾声的回填落在最后一次绘制之后的场景，2.0.1 正是栽在这里）。
-static void PurityUpdateSelfHealTimer(HWND hDesktop) {
-    if (!hDesktop) return;
-    if (PuritySettings.enable &&
-        (PuritySettings.hideArrows || PuritySettings.hideShields)) {
-        SetTimer(hDesktop, PuritySelfHealTimerId, 2000, nullptr);
-    } else {
-        KillTimer(hDesktop, PuritySelfHealTimerId);
-    }
-}
-
-// 自愈校验入口（桌面 WM_PAINT / 2s 定时器共用）：
-//  - 深度校验按 1s 节流；感知钩子命中（可能重建）时提速到 200ms；
-//  - 失守立即全量重打（PurityPatchOverlayImageLists 幂等）＋ 3s 修复冷却，
-//    避免重建风暴下的重打循环；
-//  - 重打后触发一次重绘，让重新置空后的槽位内容立即可见（下一帧校验为通过，
-//    不会形成循环）。
-static void PuritySelfHealCheck(HWND hWnd) {
-    if (!PuritySettings.enable ||
-        (!PuritySettings.hideArrows && !PuritySettings.hideShields)) {
-        return;
-    }
-
-    DWORD now = GetTickCount();
-    DWORD minInterval = PurityImageListRebuildHint.load(std::memory_order_relaxed) ? 200
-                                                                                   : 1000;
-    if (PurityLastDeepCheckTick != 0 && now - PurityLastDeepCheckTick < minInterval) {
-        return;
-    }
-    PurityImageListRebuildHint.store(false, std::memory_order_relaxed);
-    PurityLastDeepCheckTick = now;
-
-    // 修复冷却期内不再重打（重建风暴下每 3s 最多一轮，冷却后仍失守会再修）。
-    if (PurityLastRepairTick != 0 && now - PurityLastRepairTick < 3000) {
-        return;
-    }
-
-    if (PuritySelfHealBreached()) {
-        Wh_Log(L"[CW] Purity self-heal: image list patch breached, repatching");
-        PurityPatchOverlayImageLists();
-        PurityLastRepairTick = GetTickCount();
-        if (hWnd) {
-            InvalidateRect(hWnd, nullptr, TRUE);
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// UAC shield bake-in interception（提取期合成拦截）
-// Win11 上桌面可见的 UAC 盾牌在图标提取期经 SHGetFileInfo(SHGFI_ADDOVERLAYS |
-// SHGFI_OVERLAYINDEX) 被合成进 HICON 位图本体，不出现独立的 overlay 绘制调用，
-// 因此图像列表补丁（PurityPatchOverlayImageLists）对已合成部分无效；在源头剥离
-// 这两个标志即可让 shell 返回未合成的干净图标（上游 2.5.0 称之为「盾牌的真正
-// 杀手」）。
-// ---------------------------------------------------------------------------
-
-using PuritySHGetFileInfoW_t = decltype(&SHGetFileInfoW);
-static PuritySHGetFileInfoW_t PuritySHGetFileInfoW_Original;
-DWORD_PTR WINAPI PuritySHGetFileInfoW_Hook(LPCWSTR pszPath, DWORD dwFileAttributes,
-                                           SHFILEINFOW* psfi, UINT cbFileInfo, UINT uFlags) {
-    if (PuritySettings.enable && PuritySettings.hideShields) {
-        // SHGFI_ADDOVERLAYS 会把已注册的 overlay（含 UAC 盾牌）烘焙进返回的 HICON；
-        // SHGFI_OVERLAYINDEX 把 overlay 序号编码进 iIcon 高位。一并剥离即得到干净图标。
-        // 仅在 hideShields 开启时剥离，保证与「移除快捷方式箭头」互相独立。
-        uFlags &= ~(SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX);
-    }
-    return PuritySHGetFileInfoW_Original(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
-}
-
-using PuritySHGetStockIconInfo_t = decltype(&SHGetStockIconInfo);
-static PuritySHGetStockIconInfo_t PuritySHGetStockIconInfo_Original;
-HRESULT WINAPI PuritySHGetStockIconInfo_Hook(SHSTOCKICONID siid, UINT uFlags, SHSTOCKICONINFO* psii) {
-    HRESULT hr = PuritySHGetStockIconInfo_Original(siid, uFlags, psii);
-
-    // 直接请求 SIID_SHIELD 图标句柄的调用方（工具栏、按钮装饰等）改为拿到空白图标。
-    if (PuritySettings.enable && PuritySettings.hideShields && SUCCEEDED(hr) &&
-        siid == SIID_SHIELD && psii && (uFlags & SHGSI_ICON) && psii->hIcon) {
-        int slot = (uFlags & SHGSI_SMALLICON) ? 1 : 0;
-        if (PurityBlankShieldIcon[slot]) {
-            DestroyIcon(psii->hIcon);
-            psii->hIcon = CopyIcon(PurityBlankShieldIcon[slot]);
-        }
-    }
-    return hr;
-}
-
-static void PurityInitBlankShieldIcons() {
-    if (!PurityBlankShieldIcon[0]) {
-        PurityBlankShieldIcon[0] = PurityCreateTransparentIcon(GetSystemMetrics(SM_CXICON),
-                                                               GetSystemMetrics(SM_CYICON));
-    }
-    if (!PurityBlankShieldIcon[1]) {
-        PurityBlankShieldIcon[1] = PurityCreateTransparentIcon(GetSystemMetrics(SM_CXSMICON),
-                                                               GetSystemMetrics(SM_CYSMICON));
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Settings
-// ---------------------------------------------------------------------------
-
-static void PurityLoadSettings() {
-    PuritySettings.enable = Wh_GetIntSetting(L"purity.enable") != 0;
-    PuritySettings.hideText = Wh_GetIntSetting(L"purity.hideText") != 0;
-    PuritySettings.hideArrows = Wh_GetIntSetting(L"purity.hideArrows") != 0;
-    PuritySettings.hideShields = Wh_GetIntSetting(L"purity.hideShields") != 0;
-}
-
-// ---------------------------------------------------------------------------
-// New desktop window dispatch — called by the shared CreateWindowExW hook
-// （原独立版 CreateWindowExW 钩子的创建后处理段；挂钩本体见文件末尾共享钩子）
-// ---------------------------------------------------------------------------
-
-static void PurityOnCreatedWindow(HWND hWnd, LPCWSTR lpClassName, HWND hWndParent) {
-    // 与原版一致：对每个新建窗口做桌面 FolderView 完整判定（类名/窗口文字/
-    // 父链/Progman 归属）。lpClassName 与 hWndParent 仅与其他功能的分发函数
-    // 保持同构，本功能的判定在 PurityIsDesktopFolderView 内自行完成。
-    UNREFERENCED_PARAMETER(lpClassName);
-    UNREFERENCED_PARAMETER(hWndParent);
-
-    if (hWnd && PurityIsDesktopFolderView(hWnd)) {
-        WindhawkUtils::SetWindowSubclassFromAnyThread(hWnd, PurityDesktopListSubclass, 0);
-        PurityUpdateSelfHealTimer(hWnd);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Lifecycle
-// ---------------------------------------------------------------------------
-
-static BOOL PurityInit() {
-    Wh_Log(L"[CW] === PurityInit ===");
-    PurityLoadSettings();
-
-    // 空白盾牌图标需在安装钩子前就绪（钩子安装后即可被任意线程调用）。
-    if (PuritySettings.enable && PuritySettings.hideShields) {
-        PurityInitBlankShieldIcons();
-    }
-
-    if (HMODULE hUser32 = GetModuleHandle(L"user32.dll")) {
-        if (auto p = (PurityDrawTextW_t)GetProcAddress(hUser32, "DrawTextW"))
-            WindhawkUtils::SetFunctionHook(p, PurityDrawTextW_Hook, &PurityDrawTextW_Original);
-    }
-
-    if (HMODULE hUxTheme = GetModuleHandle(L"uxtheme.dll")) {
-        if (auto p = (PurityDrawThemeTextEx_t)GetProcAddress(hUxTheme, "DrawThemeTextEx"))
-            WindhawkUtils::SetFunctionHook(p, PurityDrawThemeTextEx_Hook, &PurityDrawThemeTextEx_Original);
-    }
-
-    if (HMODULE hShell32 = GetModuleHandle(L"shell32.dll")) {
-        if (auto p = (PuritySHGetFileInfoW_t)GetProcAddress(hShell32, "SHGetFileInfoW"))
-            WindhawkUtils::SetFunctionHook(p, PuritySHGetFileInfoW_Hook, &PuritySHGetFileInfoW_Original);
-        if (auto p = (PuritySHGetStockIconInfo_t)GetProcAddress(hShell32, "SHGetStockIconInfo"))
-            WindhawkUtils::SetFunctionHook(p, PuritySHGetStockIconInfo_Hook, &PuritySHGetStockIconInfo_Original);
-    }
-
-    // ImageList_Create/Destroy 感知钩子（2.1.1 自愈触发面之一）：只置位提示、
-    // 不做重活；安装失败不影响任何功能（桌面 WM_PAINT 与 2s 定时器兜底）。
-    // comctl32 在 explorer 中必然已加载。
-    if (HMODULE hComctl32 = GetModuleHandle(L"comctl32.dll")) {
-        if (auto p = (PurityImageListCreate_t)GetProcAddress(hComctl32, "ImageList_Create"))
-            WindhawkUtils::SetFunctionHook(p, PurityImageListCreate_Hook,
-                                           &PurityImageListCreate_Original);
-        if (auto p = (PurityImageListDestroy_t)GetProcAddress(hComctl32, "ImageList_Destroy"))
-            WindhawkUtils::SetFunctionHook(p, PurityImageListDestroy_Hook,
-                                           &PurityImageListDestroy_Original);
-    }
-
-    // 感知钩子启用门：只在 explorer + 纯净化开启 + 箭头/盾牌至少一项开启时布防。
-    PuritySelfHealArmed = PuritySettings.enable &&
-                          (PuritySettings.hideArrows || PuritySettings.hideShields);
-
-    // CreateWindowExW 钩子由合并入口统一安装（共享 CreateWindowExW 钩子，
-    // 与 ToggleIcons / SmoothIcons 共用一次挂钩），这里不再重复安装。
-    // 文字/提取期钩子始终安装（代价极低），由各钩子内的总开关判断短路；
-    // 活动标志仅反映总开关状态，关闭时共享钩子不再向本组分发新窗口。
-    g_QuickSettingsPurityActive = PuritySettings.enable;
-    Wh_Log(L"[CW] Init complete (enabled=%d)", (int)PuritySettings.enable);
-    return TRUE;
-}
-
-static void PurityAfterInit() {
-    Wh_Log(L"[CW] === PurityAfterInit ===");
-
-    // 注意时序：SHChangeNotify 会刷新图标缓存并触发系统图像列表重建，必须先通知、
-    // 后打图像列表补丁，否则补丁会被整体丢弃（上游 2.5.0 实测结论）。
-    // 总开关关闭时跳过通知与补丁，箭头/盾牌保持系统原样。
-    if (PuritySettings.enable &&
-        (PuritySettings.hideArrows || PuritySettings.hideShields)) {
-        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
-        PurityPatchOverlayImageLists();
-    }
-
-    if (HWND hDesktop = PurityGetDesktopFolderView()) {
-        WindhawkUtils::SetWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass, 0);
-        PurityUpdateSelfHealTimer(hDesktop);
-        int count = ListView_GetItemCount(hDesktop);
-        if (count > 0) {
-            ListView_RedrawItems(hDesktop, 0, count - 1);
-        }
-        InvalidateRect(hDesktop, nullptr, TRUE);
-        UpdateWindow(hDesktop);
-    }
-}
-
-static void PurityNotifySettingsChanged() {
-    Wh_Log(L"[CW] Purity settings changed");
-
-    // 与独立版行为对齐：独立版任何设置变更都会整模组重载（Wh_ModInit /
-    // Wh_ModAfterInit 重跑，重新执行 SHChangeNotify + 图像列表补丁并重绘桌面）。
-    // 合并版为免其他分组的设置改动也触发图标缓存刷新，仅在纯净化图标设置
-    // 实际变化时复刻该收尾；总开关（purity.enable）的切换同样在此即时生效。
-    bool prevEnable = PuritySettings.enable;
-    bool prevHideText = PuritySettings.hideText;
-    bool prevHideArrows = PuritySettings.hideArrows;
-    bool prevHideShields = PuritySettings.hideShields;
-
-    PurityLoadSettings();
-
-    if (PuritySettings.enable == prevEnable &&
-        PuritySettings.hideText == prevHideText &&
-        PuritySettings.hideArrows == prevHideArrows &&
-        PuritySettings.hideShields == prevHideShields) {
-        return;
-    }
-
-    // 运行中开关状态同步：共享 CreateWindowExW 钩子按此分发新建桌面窗口；
-    // ImageList 感知钩子按此布防/撤防（2.1.1）。
-    g_QuickSettingsPurityActive = PuritySettings.enable;
-    PuritySelfHealArmed = PuritySettings.enable &&
-                          (PuritySettings.hideArrows || PuritySettings.hideShields);
-
-    if (PuritySettings.enable) {
-        // 运行中新开启盾牌隐藏时补建空白图标（SHGetStockIconInfo 钩子依赖）。
-        if (PuritySettings.hideShields) {
-            PurityInitBlankShieldIcons();
-        }
-
-        if (PuritySettings.hideArrows || PuritySettings.hideShields) {
-            SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
-            PurityPatchOverlayImageLists();
-        }
-
-        // 重新启用时确保现有桌面 FolderView 已挂子类（禁用期间新建的桌面
-        // 窗口未经共享 CreateWindowExW 钩子分发挂接；重复挂接为安全覆盖）。
-        if (HWND hDesktop = PurityGetDesktopFolderView()) {
-            WindhawkUtils::SetWindowSubclassFromAnyThread(
-                hDesktop, PurityDesktopListSubclass, 0);
-        }
-    } else if (prevEnable && (prevHideArrows || prevHideShields)) {
-        // 总开关关闭且此前打过图像列表补丁：只通知图标缓存刷新（重建图像
-        // 列表即可还原箭头/盾牌原样），不再重新打补丁。
-        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
-    }
-
-    // 强制重绘桌面，让文字隐藏等变化立即可见；同步自愈兜底定时器的启停。
-    if (HWND hDesktop = PurityGetDesktopFolderView()) {
-        InvalidateRect(hDesktop, nullptr, TRUE);
-        UpdateWindow(hDesktop);
-        PurityUpdateSelfHealTimer(hDesktop);
-    }
-}
-
-static void PurityUninit() {
-    Wh_Log(L"[CW] === PurityUninit ===");
-    g_QuickSettingsPurityActive = false;
-    PuritySelfHealArmed = false;
-    PurityImageListRebuildHint = false;
-
-    if (HWND hDesktop = PurityGetDesktopFolderView()) {
-        KillTimer(hDesktop, PuritySelfHealTimerId);
-        WindhawkUtils::RemoveWindowSubclassFromAnyThread(hDesktop, PurityDesktopListSubclass);
-        InvalidateRect(hDesktop, nullptr, TRUE);
-        UpdateWindow(hDesktop);
-    }
-
-    for (int i = 0; i < 2; i++) {
-        if (PurityBlankShieldIcon[i]) {
-            DestroyIcon(PurityBlankShieldIcon[i]);
-            PurityBlankShieldIcon[i] = nullptr;
-        }
-    }
-}
-
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 功能六：扩展名警告（ExtWarn*）
+// 功能五：扩展名警告（ExtWarn*）
 // 来源：m417z Turn off change file extension warning 1.0.1（GPL-3.0），
 // 原版链接：https://windhawk.net/mods/extension-change-no-warning。
 // 逻辑与上游一致，全局符号与函数统一加 ExtWarn 前缀以与其他功能隔离；设置键
 // 迁移为 extWarn.enable（分组总开关，默认关闭——开启即屏蔽系统确认弹窗，
 // 让用户显式选择）。
-// 实现方式（照 Purity 先例）：ShellMessageBoxW / ShellMessageBoxInternal 钩子
+// 实现方式：ShellMessageBoxW / ShellMessageBoxInternal 钩子
 // 始终安装（代价极低），由各钩子内的总开关判断短路——关闭时完全直通原函数，
 // 系统默认警告照常弹出；开启时命中重命名警告特征即代答 IDYES。
 // 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
@@ -4639,7 +3716,7 @@ static void ExtWarnNotifySettingsChanged() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能七：开始菜单电源按钮（PowerBtn*）
+// 功能六：开始菜单电源按钮（PowerBtn*）
 // 来源：Hakuuyosei/灵弦 Windows 11 Start Menu Power Buttons 1.0.2（MIT 惯例），
 // 原版链接：https://windhawk.net/mods/win11-power-buttons（官方源码仓库：
 // https://github.com/ramensoftware/windhawk-mods，mods/win11-power-buttons.wh.cpp）。
@@ -5635,7 +4712,7 @@ static void PowerBtnSettingsChanged() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能八：拖拽删除（DragDel*）
+// 功能七：拖拽删除（DragDel*）
 // 来源：iMAboud Drag to Delete 1.0.0（MIT），
 // 原版链接：https://windhawk.net/mods/drag-to-delete。
 // 逻辑与上游一致，全局符号与函数统一加 DragDel 前缀以与其他功能隔离；设置键
@@ -6242,7 +5319,7 @@ static void DragDelUninit() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能九：登录注销关机音效（SndLog*）
+// 功能八：登录注销关机音效（SndLog*）
 // 来源：Toru the Red Fox Logon, Logoff & Shutdown Sounds Restored 1.0.3
 // （MIT 惯例），原版链接：
 // https://windhawk.net/mods/logon-logoff-shutdown-sounds。
@@ -6854,7 +5931,7 @@ static VOID SndLogUninit()
 }
 
 // ============================================================================
-// 功能十：窗口优化（WinOpt 命名空间）
+// 功能九：窗口优化（WinOpt 命名空间）
 //
 // 来自 CW-窗口优化 1.1.0（本包三合一融合模组，2.0.0 起整体并入本模组）：
 //   • 窗口拖动（Alt+拖动）：上游 AltDrag 1.1，原作者 m417z，GPL-3.0 许可证，
@@ -10571,12 +9648,12 @@ void SettingsChanged() {
 }  // namespace WinOpt
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 共享 CreateWindowExW 钩子（ToggleIcons、SmoothIcons 与 Purity 共用）
+// 共享 CreateWindowExW 钩子（ToggleIcons 与 SmoothIcons 共用）
 //
-// 三个功能都需要捕获新建窗口（桌面 SHELLDLL_DefView / SysListView32，或文件
+// 两个功能都需要捕获新建窗口（桌面 SHELLDLL_DefView / SysListView32，或文件
 // 夹窗口 ShellTabWindowClass 树内的 SysListView32 / DirectUIHWND）。为避免在
 // 同一 mod 内对同一目标 API 安装多个钩子，这里只安装一次，由共享钩子按各功能
-// 的激活状态把创建结果分发给三个功能的处理函数。
+// 的激活状态把创建结果分发给两个功能的处理函数。
 // ─────────────────────────────────────────────────────────────────────────────
 
 using QuickSettingsCreateWindowExW_t = decltype(&CreateWindowExW);
@@ -10610,9 +9687,6 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
         if (g_QuickSettingsToggleIconsActive) {
             ToggleIconsOnCreatedWindow(hWnd, lpClassName, hWndParent);
         }
-        if (g_QuickSettingsPurityActive) {
-            PurityOnCreatedWindow(hWnd, lpClassName, hWndParent);
-        }
     }
 
     return hWnd;
@@ -10620,7 +9694,7 @@ static HWND WINAPI QuickSettingsHookCreateWindowExW(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 合并入口（2.0.0）：@include 为 *，各功能段按进程门控——
-//   • explorer.exe：Peek、ToggleIcons（含 SmoothIcons）、Marquee、Purity、
+//   • explorer.exe：Peek、ToggleIcons（含 SmoothIcons）、Marquee、
 //     ExtWarn、DragDel、SndLog；
 //   • StartMenuExperienceHost.exe + explorer.exe：PowerBtn（按钮注入在开始
 //     菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
@@ -10662,11 +9736,11 @@ BOOL Wh_ModInit() {
     // ── 桌面各段：仅 explorer.exe ──
     if (isExplorer) {
         // 先安装共享 CreateWindowExW 钩子（Wh_SetFunctionHook 为延迟生效，
-        // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的三个功能。
+        // Wh_ModInit 返回后才应用）；安装失败时禁用依赖它的两个功能。
         bool createWindowHookOk = QuickSettingsInstallCreateWindowExWHook() != FALSE;
         if (!createWindowHookOk) {
             Wh_Log(L"Shared CreateWindowExW hook failed, disabling "
-                   L"ToggleIcons/SmoothIcons/Purity");
+                   L"ToggleIcons/SmoothIcons");
         }
 
         bool peekOk = PeekInit() != FALSE;
@@ -10689,13 +9763,6 @@ BOOL Wh_ModInit() {
             Wh_Log(L"SmoothIcons init failed, continuing without it");
         }
 
-        // Purity 对新建桌面窗口的捕获同样经由共享 CreateWindowExW 钩子；其文字/
-        // 提取期钩子在本段内部独立安装。
-        bool purityOk = createWindowHookOk && PurityInit() != FALSE;
-        if (!purityOk) {
-            Wh_Log(L"Purity init failed, continuing without it");
-        }
-
         bool extWarnOk = ExtWarnInit() != FALSE;
         if (!extWarnOk) {
             Wh_Log(L"ExtWarn init failed, continuing without it");
@@ -10712,7 +9779,7 @@ BOOL Wh_ModInit() {
         }
 
         anyOk = anyOk || peekOk || toggleIconsOk || marqueeOk || smoothIconsOk ||
-                purityOk || extWarnOk || dragDelOk || sndLogOk;
+                extWarnOk || dragDelOk || sndLogOk;
     }
 
     return anyOk ? TRUE : FALSE;
@@ -10726,7 +9793,6 @@ void Wh_ModAfterInit() {
     if (kind == QuickSettingsProcessKind::Explorer) {
         PeekAfterInit();
         SmoothIconsAfterInit();
-        PurityAfterInit();
     }
 
     PowerBtnAfterInit();
@@ -10756,7 +9822,6 @@ void Wh_ModUninit() {
         ToggleIconsUninit();
         SmoothIconsUninit();
         MarqueeUninit();
-        PurityUninit();
         ExtWarnUninit();
         DragDelUninit();
         SndLogUninit();
@@ -10779,7 +9844,6 @@ void Wh_ModSettingsChanged() {
         ToggleIconsUpdateActivation();
         MarqueeLoadSettings();
         SmoothIconsNotifySettingsChanged();
-        PurityNotifySettingsChanged();
         ExtWarnNotifySettingsChanged();
         DragDelLoadSettings();
         SndLogNotifySettingsChanged();

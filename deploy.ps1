@@ -516,6 +516,7 @@ $coreModIds = @(
     "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
     "local@cw-file-operation-styler",
     "local@cw-resource-redirect", "local@cw-settings-styler",
+    "local@cw-purify-icons",
     "local@cw-file-explorer-plus",
     "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc"
 )

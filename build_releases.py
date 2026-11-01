@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-# CW-Beautify v2.7.1 打包清单
+# CW-Beautify v2.8.0 打包清单
 # 模组构成：21 核心 + 3 可选 + 8 DLC 额外内容（tool mod）= 32 个
 # 用法：在本目录（源码根）执行 python build_releases.py，
 # 生成的 zip 复制到 上一级的「发布包」目录发布。
@@ -25,6 +25,7 @@ common_files = [
     'local@cw-taskbar-system-info.wh.cpp',
     'local@cw-taskbar-labels.wh.cpp',
     'local@cw-resource-redirect.wh.cpp',
+    'local@cw-purify-icons.wh.cpp',
     'local@cw-desktop-audio-visualizer-plus.wh.cpp',
     'local@cw-settings-styler.wh.cpp',
     'local@cw-tray-area-settings.wh.cpp',
@@ -46,6 +47,7 @@ common_files = [
     'CHANGELOG_CW-Beautify_v2.6.0.md',
     'CHANGELOG_CW-Beautify_v2.7.0.md',
     'CHANGELOG_CW-Beautify_v2.7.1.md',
+    'CHANGELOG_CW-Beautify_v2.8.0.md',
     'README.md',
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
@@ -89,12 +91,12 @@ common_files = [
 ]
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.7.1.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.7.1_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.8.0.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.8.0_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：
-#   'CW-Beautify_OneKeyDeploy_v2.7.1_Offline.zip': common_files + ['windhawk_setup_offline.exe']
+#   'CW-Beautify_OneKeyDeploy_v2.8.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
 
 for zip_name, file_list in releases.items():
     print(f"正在创建 {zip_name}...")

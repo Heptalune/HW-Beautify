@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-Fluent 右键菜单
 // @description     Replaces the desktop and Explorer folder-tree context menus with a Fluent (WinUI2 MenuFlyout, acrylic) menu. Clean-room reimplementation based on static analysis of FluentContextMenu v0.5.0.
 // @description:zh-CN 把桌面和资源管理器左树的右键菜单换成 Fluent（WinUI2 MenuFlyout、亚克力）菜单；基于对 FluentContextMenu v0.5.0 的静态逆向分析净室重写。
-// @version         0.3.1
+// @version         0.3.2
 // @author          Heptalune
 // @license         GPL-3.0
 // @include         explorer.exe
@@ -46,7 +46,7 @@
 
 1. **内联钩** `user32!TrackPopupMenu` / `TrackPopupMenuEx`（原版用 IAT 钩，覆盖相同）；
 2. 仅当：窗口类为 `SHELLDLL_DefView`（桌面）或 `SysTreeView32` 且父为 `NamespaceTreeControl`（资源管理器左树）、uFlags 带 `TPM_RETURNCMD`、且不是 EDIT 控件时才拦截，否则直通原函数；
-3. 拦截时：重放原生菜单生命周期消息（WM_ENTERMENULOOP / WM_INITMENU / WM_INITMENUPOPUP），`GetMenuItemInfoW` 两遍扫描把 HMENU 快照成菜单树；图标优先取 `hbmpItem`，否则按 `dwItemData` 经 `GetPropW(hwnd, "ImmersiveContextMenuArray_%lu-%lu")` 拿到 shell 预渲染图标数组指针（+0x20 / +0x28 / +0x30 三个 HBITMAP 依次回退），`GetDIBits` 抓 32bpp 像素；
+3. 拦截时：重放原生菜单生命周期消息（WM_ENTERMENULOOP / WM_INITMENU / WM_INITMENUPOPUP），再经捕获的 shell DefCM 对象以 `IContextMenu3::HandleMenuMsg2` 重放 `WM_INITMENUPOPUP` 驱动**懒填充子菜单**（「发送到」在子菜单首次打开时才枚举 SendTo 目录填充，仅靠 owner 窗口重放到不了处理器链），随后 `GetMenuItemInfoW` 两遍扫描把 HMENU 快照成菜单树；图标优先取 `hbmpItem`，否则按 `dwItemData` 经 `GetPropW(hwnd, "ImmersiveContextMenuArray_%lu-%lu")` 拿到 shell 预渲染图标数组指针（+0x20 / +0x28 / +0x30 三个 HBITMAP 依次回退），`GetDIBits` 抓 32bpp 像素；填充后仍为空/仅剩占位的级联渲染为普通条目，点击时放行原生 `TrackPopupMenu` 弹出该子菜单（真实菜单循环触发真实填充与原生选择），命令 ID 沿原语义返回；
 4. 独立 XAML 线程：OS Application 对象（合并 WinUI2 XamlControlsResources 获得 Fluent 视觉）→ DispatcherQueue → 隐藏 100x100 `WS_POPUP|WS_EX_NOACTIVATE` 宿主窗 + `DesktopWindowXamlSource`（XAML Islands，原生接口 QI 自 IDesktopWindowXamlSourceNative / Native2）；
 5. 构建 `MenuFlyout`（MenuFlyoutItem / SubItem / Separator，图标 WriteableBitmap，主题跟随注册表 `AppsUseLightTheme`，AcrylicBrush 亚克力背景）；
 6. 调用线程泵消息等待菜单关闭，选中项命令 ID 沿原 TrackPopupMenu 语义返回；坐标 = ScreenToClient（宿主）/ GetDpiForWindow（宿主）/96 转 DIP 后 ShowAt；点击外部 / 失活 / Esc 取消返回 0；关闭后向 owner 重放 WM_EXITMENULOOP 复位 shell 状态（与原版一致）。
@@ -54,13 +54,14 @@
 
 ## 已知事项
 
-- 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。经典样式下每次弹出会记录放行的条目数，presenter 拦截会记录被拦的查询 IID，可与真实右键对比核对条目完整性。
+- 调试日志写入 Windhawk 根目录 `fluent-menu-debug.log`（作者排查用；路径不可用时静默跳过）。经典样式下每次弹出会记录放行的条目数，presenter 拦截会记录被拦的查询 IID；Fluent 样式下 `populate:` 行记录 DefCM 懒填充结果、`native submenu fallback:` 行记录原生子菜单兜底弹出，可与真实右键对比核对条目完整性。
 - 「Win 11 原生」样式自 0.3.1 起恢复（0.3.0 曾从设置列表移除，即 0.2.x 的「Win11 原生（直通）」），新键值 `native`；期间保存的旧键值 `win11` 仍自动按该样式处理，在设置里重新选择后即被覆盖为 `native`。
 - 菜单样式选经典两种之一时依赖对 Win11 XAML presenter 的拦截（按服务 GUID 匹配，不依赖具体 IID），系统更新后理论上无需跟随适配；若行为异常请查看日志中 `presenter:` 行。
 - 「Win 10（Fluent）」与「Win 11（Fluent）」在当前 Windows 11 22H2 上渲染内容一致（`TrackPopupMenu` 携带的 HMENU 本就是完整经典条目集），两者差异在数据源保障：前者先拦截 presenter，确保数据始终来自经典菜单构建链（对未来改动现代菜单数据模型的系统更新更稳健）。
 
 ## 更新记录
 
+- **0.3.2**：修复「发送到」子菜单为空（展开后无条目/仅剩占位）。根因：「发送到」的内容由 shell 默认上下文菜单链（DefCM）里的 SendTo 处理器**在子菜单首次打开时才填充**（`WM_INITMENUPOPUP` → `IContextMenu3::HandleMenuMsg2` 契约），而本模组拦截 `TrackPopupMenu` 后仅向 owner 窗口重放生命周期消息，该路径到不了处理器链——快照拿到的「发送到」子菜单只有填充前的 1 个条目（日志可复现 `submenu '发送到' children=1`；WinRAR/7-Zip 等在 `QueryContextMenu` 构建期已写满条目故不受影响，0.2.x 起即存在）。修复分两层：① **原生填充**——对 DefCM 实例共享的 `QueryContextMenu` 实现安装只读捕获钩（与 CW-自定义右键菜单同技术），快照前经 `HandleMenuMsg2` 重放 `WM_INITMENUPOPUP`（递归各级、跳过已填充层级，与原生菜单循环打开子菜单时的契约一致），让 shell 自己把「发送到」等动态子菜单填满；② **原生子菜单兜底**——填充后仍为空/仅剩占位的级联项渲染为普通条目（带「›」标识），点击时关闭飞出并放行原生 `TrackPopupMenu` 弹出该子菜单（真实菜单循环触发真实填充，与「Win 10 经典」同机制），所选命令 ID 沿 `TPM_RETURNCMD` 原语义返回 shell 执行；兜底带防重入护栏（user32 的 `TrackPopupMenu` 内部转发 `TrackPopupMenuEx`，两个钩不会重复接管）。填充钩不可用时兜底独立生效，功能不回退。
 - **0.3.1**：恢复「Win 11 原生」样式选项（0.3.0 曾移除，新键值 `native`）：Win11 现代菜单完全原样直通——不接管、不渲染，`TrackPopupMenu` 拦截与 presenter 拦截（`IUnknown_QueryService` / `ShouldShowMiniMenu`，均无条件安装）在拦截体最前面短路放行，行为等同 0.2.x 的「Win11 原生（直通）」；经典委托门控（`IsClassicMenuStyle`）仍只对 Win 10 两种样式生效，旧键值 `win11` 自动映射到 `native`。
 - **0.3.0**：菜单样式重组为三选项：原「Fluent 样式（本 mod）」改名「Win 11（Fluent）」；新增「Win 10（Fluent）」——拦截 Win11 现代菜单 presenter 拿到完整经典条目集后由本模组 Fluent 管线（亚克力/圆角）自绘，即「经典内容 + Fluent 皮」；「Win 10 经典」落实完整委托：presenter 查询改按服务 GUID 拦截（不再受 KB 更新变更 IID 影响，修复 0.2.x 下经典菜单可能缺失 WinRAR/Bandizip 等第三方 shell 扩展条目的问题），TrackPopupMenu 原生放行由系统弹出完整经典菜单，桌面与资源管理器两种宿主一致，并新增放行条目数日志便于核对。「Win11 原生（直通）」选项从设置列表移除（历史保存值仍兼容处理）。
 - **0.2.2**：修复点击 Win11 菜单「显示更多选项」后经典二级菜单的显示问题。此前该二级菜单会被本模组再次接管渲染成飞出菜单，而飞出窗口显示时未被提升 Z 序：资源管理器里菜单被主窗口遮挡（图层错误），桌面上则完全被盖住、看起来无响应或反应极慢。现在检测到 Win11 现代菜单正在收起（其 XAML 弹窗仍可见且覆盖菜单弹出点）时，直接放行原生 TrackPopupMenu，经典二级菜单在桌面与资源管理器两种宿主下都以前台顶层正常弹出、不经过本模组的飞出/消息泵逻辑；另为飞出菜单窗口显示时增加 Z 序提升兜底（TOPMOST→NOTOPMOST 弹跳，不激活窗口），保证任何残余接管路径下菜单也不会被宿主窗口遮挡。
@@ -112,6 +113,7 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <shlobj.h>
 #include <dispatcherqueue.h>
 #include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
 
@@ -369,6 +371,7 @@ struct MenuItem {
     std::vector<MenuItem> children;
     IconBitmap icon;
     std::wstring iconPath;  // materialized BMP for BitmapIcon (v1 icon path)
+    HMENU nativeSubMenu = nullptr;  // source HMENU when this is a cascade
     unsigned int cmdId = 0;
     bool isSeparator = false;
     bool isEnabled = false;
@@ -611,6 +614,7 @@ static void BuildMenuItems(HMENU menu, HWND hwnd, std::vector<MenuItem>& out) {
         }
 
         if (info.hSubMenu) {
+            item.nativeSubMenu = info.hSubMenu;
             BuildMenuItems(info.hSubMenu, hwnd, item.children);
             HOOK_LOG(L"submenu '%s' (id=%u) children=%u", item.text.c_str(),
                      item.cmdId, (unsigned)item.children.size());
@@ -618,6 +622,231 @@ static void BuildMenuItems(HMENU menu, HWND hwnd, std::vector<MenuItem>& out) {
 
         out.push_back(std::move(item));
     }
+}
+
+// ============================================================================
+// Shell default context menu (DefCM) capture: lazy submenu population
+// ============================================================================
+
+// The desktop/Explorer classic menu is built by the shell's default context
+// menu aggregate (DefCM). Some of its handlers fill their submenus lazily,
+// when the submenu is first opened: "发送到" (Send To) enumerates the SendTo
+// folder and inserts its entries on WM_INITMENUPOPUP — until then the submenu
+// holds a single pre-population entry (seen in the debug log as
+// `submenu '发送到' children=1`, which is exactly what the flyout snapshot
+// used to render as an empty-looking cascade).
+//
+// During native tracking the owner window forwards WM_INITMENUPOPUP into the
+// IContextMenu3::HandleMenuMsg2 chain; replaying that message to the owner
+// window's wndproc alone does not reach the handler chain (verified with the
+// debug log — the snapshot kept seeing the placeholder). So the DefCM object
+// itself is captured and the population is driven through its own
+// HandleMenuMsg2, the same contract the native menu loop fulfills.
+//
+// Capture: all DefCM instances share one QueryContextMenu implementation, so
+// a throwaway default context menu gives the function address to inline-hook
+// (the technique proven in CW-自定义右键菜单). The hook only records the most
+// recent DefCM object + menu HMENU per thread; a shell menu is built via
+// QueryContextMenu and handed to TrackPopupMenu on the same thread, back to
+// back. Recording is passive: no menu behavior changes, every style is free
+// to ignore the record.
+
+// Stable shell IIDs, defined locally so no uuid lib is needed.
+static const IID kIID_IContextMenu = {
+    0x000214e4, 0x0000, 0x0000, {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
+static const IID kIID_IContextMenu2 = {
+    0x000214f4, 0x0000, 0x0000, {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
+static const IID kIID_IContextMenu3 = {
+    0xbcfce0a0, 0xec17, 0x11d0, {0x8d, 0x10, 0x00, 0xa0, 0xc9, 0x0f, 0x27, 0x19}};
+// FOLDERID_Windows, defined locally for the throwaway DefCM creation.
+static const GUID kGUID_WindowsFolder = {
+    0xf38bf404, 0x1d43, 0x42f2, {0x93, 0x05, 0x67, 0xde, 0x0b, 0x28, 0xfc, 0x23}};
+
+using QueryContextMenu_t = HRESULT(STDMETHODCALLTYPE*)(IContextMenu*, HMENU,
+                                                       UINT, UINT, UINT, UINT);
+QueryContextMenu_t DefCM_QueryContextMenu_Original = nullptr;
+static void* g_targetDefCMQueryContextMenu = nullptr;
+
+struct DefCMRecord {
+    IContextMenu* obj = nullptr;
+    HMENU menu = nullptr;
+    DWORD tick = 0;
+    ~DefCMRecord() {
+        if (obj) {
+            obj->Release();
+        }
+    }
+};
+static thread_local DefCMRecord t_defcmRecord;
+
+static HRESULT STDMETHODCALLTYPE DefCM_QueryContextMenu_Hook(
+    IContextMenu* pThis, HMENU hmenu, UINT indexMenu, UINT idCmdFirst,
+    UINT idCmdLast, UINT uFlags) {
+    HRESULT hr = DefCM_QueryContextMenu_Original(pThis, hmenu, indexMenu,
+                                                 idCmdFirst, idCmdLast, uFlags);
+    // Record after the real build: the menu is complete (minus lazy
+    // submenus) and the same thread is about to track it.
+    if (t_defcmRecord.obj) {
+        t_defcmRecord.obj->Release();
+    }
+    t_defcmRecord.obj = pThis;
+    if (pThis) {
+        pThis->AddRef();
+    }
+    t_defcmRecord.menu = hmenu;
+    t_defcmRecord.tick = GetTickCount();
+    return hr;
+}
+
+// Consumes the per-thread record and returns the captured DefCM object as a
+// plain IUnknown (its reference is transferred), or nullptr when there is no
+// fresh record for this exact menu — population must never be driven by the
+// wrong object.
+static IUnknown* TakeCapturedDefCM(HMENU menu) {
+    IContextMenu* obj = t_defcmRecord.obj;
+    if (!obj) {
+        return nullptr;
+    }
+    t_defcmRecord.obj = nullptr;
+    HMENU recordedMenu = t_defcmRecord.menu;
+    DWORD tick = t_defcmRecord.tick;
+    t_defcmRecord.menu = nullptr;
+
+    if (recordedMenu == menu && (DWORD)(GetTickCount() - tick) <= 15000) {
+        return (IUnknown*)obj;  // reference transferred to the caller
+    }
+    obj->Release();
+    return nullptr;
+}
+
+// One menu level: a fully built level (more than one entry — WinRAR/7-Zip
+// write their items at QueryContextMenu time) is skipped so every menu open
+// doesn't pay for re-initializing already-populated handlers; the root and
+// sparse levels get WM_INITMENUPOPUP, then the walk recurses into the
+// (possibly newly inserted) children. Passing position + HMENU mirrors what
+// the native menu loop sends when a submenu is opened.
+static void PopulateLazySubmenuLevel(IContextMenu3* cm3, IContextMenu2* cm2,
+                                     HMENU menu, UINT position, bool isRoot) {
+    int count = GetMenuItemCount(menu);
+    if (isRoot || count <= 1) {
+        if (cm3) {
+            LRESULT result = 0;
+            cm3->HandleMenuMsg2(WM_INITMENUPOPUP, (WPARAM)menu,
+                                MAKELPARAM(position, 0), &result);
+        } else if (cm2) {
+            cm2->HandleMenuMsg(WM_INITMENUPOPUP, (WPARAM)menu,
+                               MAKELPARAM(position, 0));
+        } else {
+            return;
+        }
+        count = GetMenuItemCount(menu);  // population may have inserted items
+    }
+    for (int i = 0; i < count; i++) {
+        HMENU sub = GetSubMenu(menu, i);
+        if (sub) {
+            PopulateLazySubmenuLevel(cm3, cm2, sub, (UINT)i, false);
+        }
+    }
+}
+
+// Asks the captured DefCM chain to populate lazy submenus before the
+// snapshot. Called on the hook thread with the replayed menu lifecycle still
+// open, so handler-side state (data object, site, ...) is the live one.
+static void RunLazySubmenuPopulation(HMENU menu) {
+    IUnknown* defcm = TakeCapturedDefCM(menu);
+    if (!defcm) {
+        HOOK_LOG(L"populate: no fresh DefCM capture for menu %p", (void*)menu);
+        return;
+    }
+
+    IContextMenu3* cm3 = nullptr;
+    IContextMenu2* cm2 = nullptr;
+    defcm->QueryInterface(kIID_IContextMenu3, (void**)&cm3);
+    if (!cm3) {
+        defcm->QueryInterface(kIID_IContextMenu2, (void**)&cm2);
+    }
+
+    if (cm3 || cm2) {
+        PopulateLazySubmenuLevel(cm3, cm2, menu, 0, true);
+        HOOK_LOG(L"populate: DefCM pass done, root items=%d",
+                 GetMenuItemCount(menu));
+    } else {
+        HOOK_LOG(L"populate: DefCM has no IContextMenu2/3");
+    }
+
+    if (cm3) {
+        cm3->Release();
+    }
+    if (cm2) {
+        cm2->Release();
+    }
+    defcm->Release();
+}
+
+// Installs the DefCM QueryContextMenu capture hook. Optional: when it fails,
+// the native submenu fallback (see BuildFlyoutItem) still covers lazily
+// filled submenus.
+static void InitDefCMCaptureHook() {
+    // All DefCM instances share one implementation; read its address from a
+    // throwaway object's vtable (slot 3: after the three IUnknown methods)
+    // and inline-hook it.
+    HRESULT initResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    bool installed = false;
+
+    IShellFolder* desktop = nullptr;
+    PIDLIST_ABSOLUTE pidl = nullptr;
+    IContextMenu* menu = nullptr;
+
+    HRESULT hr = SHGetDesktopFolder(&desktop);
+    if (SUCCEEDED(hr) && desktop) {
+        hr = SHGetKnownFolderIDList(kGUID_WindowsFolder, 0, nullptr, &pidl);
+        if (SUCCEEDED(hr) && pidl) {
+            PCUITEMID_CHILD children[1] = {pidl};
+            DEFCONTEXTMENU dcm = {};
+            dcm.psf = desktop;
+            dcm.cidl = 1;
+            dcm.apidl = children;
+
+            hr = SHCreateDefaultContextMenu(&dcm, kIID_IContextMenu,
+                                            (void**)&menu);
+            if (SUCCEEDED(hr) && menu) {
+                void** vtable = *reinterpret_cast<void***>(menu);
+                g_targetDefCMQueryContextMenu = vtable[3];
+                if (g_targetDefCMQueryContextMenu) {
+                    installed =
+                        Wh_SetFunctionHook(g_targetDefCMQueryContextMenu,
+                                           (void*)DefCM_QueryContextMenu_Hook,
+                                           (void**)&DefCM_QueryContextMenu_Original);
+                }
+            } else {
+                DebugLog(L"defcm: SHCreateDefaultContextMenu failed: %08lX",
+                         (unsigned long)hr);
+            }
+        } else {
+            DebugLog(L"defcm: SHGetKnownFolderIDList failed: %08lX",
+                     (unsigned long)hr);
+        }
+    } else {
+        DebugLog(L"defcm: SHGetDesktopFolder failed: %08lX",
+                 (unsigned long)hr);
+    }
+
+    if (menu) {
+        menu->Release();
+    }
+    if (pidl) {
+        CoTaskMemFree(pidl);
+    }
+    if (desktop) {
+        desktop->Release();
+    }
+    // Balancing the call is only safe for S_OK; S_FALSE means this thread was
+    // already initialized by someone else.
+    if (initResult == S_OK) {
+        CoUninitialize();
+    }
+
+    DebugLog(L"defcm capture hook: %s", installed ? L"OK" : L"failed");
 }
 
 // ============================================================================
@@ -648,6 +877,8 @@ struct ShowRequest {
     bool compact = false;
     bool acrylic = true;
     unsigned int selectedId = 0;
+    HMENU nativeSubMenu = nullptr;    // set when a fallback submenu was picked
+    POINT nativePoint{};              // cursor position at that click
     HANDLE doneEvent = nullptr;       // auto-reset, set when flyout closed
 };
 
@@ -716,10 +947,74 @@ static IconElement BuildItemIcon(const MenuItem& item) {
     }
 }
 
+// Submenus that still look unpopulated after the DefCM population pass
+// (empty, or a lone placeholder entry) can't be shown usefully as a XAML
+// cascade. They render as clickable items instead: on click the flyout
+// closes and the submenu's own HMENU is shown by the native TrackPopupMenu
+// chain — a real menu loop makes the shell fill it (e.g. 发送到/Send To),
+// and the picked command id flows back through the normal hook return path.
+// A lone entry that is itself a populated cascade still counts as a real
+// submenu and stays Fluent.
+static bool ShouldUseNativeSubmenuFallback(const MenuItem& item) {
+    if (!item.nativeSubMenu) {
+        return false;
+    }
+    if (item.children.size() > 1) {
+        return false;
+    }
+    if (item.children.size() == 1 && !item.children[0].children.empty()) {
+        return false;
+    }
+    return true;
+}
+
 static MenuFlyoutItemBase BuildFlyoutItem(const MenuItem& item,
                                           ShowRequest* request) {
     if (item.isSeparator) {
         return MenuFlyoutSeparator();
+    }
+
+    if (ShouldUseNativeSubmenuFallback(item)) {
+        MenuFlyoutItem flyoutItem;
+
+        std::wstring text = item.text;
+        if (!item.shortcut.empty()) {
+            text += L"    " + item.shortcut;
+        }
+        if (!text.empty()) {
+            flyoutItem.Text(text + L"  ›");  // cascade affordance
+        }
+
+        flyoutItem.IsEnabled(item.isEnabled);
+
+        if (item.hasIcon) {
+            auto icon = BuildItemIcon(item);
+            if (icon) {
+                flyoutItem.Icon(icon);
+            }
+        }
+
+        if (request->compact) {
+            flyoutItem.Padding(Thickness{6, 2, 4, 3});
+            flyoutItem.FontSize(12.0);
+        } else {
+            flyoutItem.Padding(Thickness{10, 5, 8, 6});
+            flyoutItem.FontSize(14.0);
+        }
+
+        if (item.isEnabled) {
+            HMENU subMenu = item.nativeSubMenu;
+            flyoutItem.Click(
+                [request, subMenu](winrt::Windows::Foundation::IInspectable const&,
+                                   RoutedEventArgs const&) {
+                    if (g_currentRequest == request) {
+                        request->nativeSubMenu = subMenu;
+                        GetCursorPos(&request->nativePoint);
+                    }
+                });
+        }
+
+        return flyoutItem;
     }
 
     if (item.children.empty()) {
@@ -1365,9 +1660,32 @@ static void DumpMenuLevel(HMENU menu, const char* tag) {
     }
 }
 
+// TrackPopupMenu hook plumbing, declared here because the native submenu
+// fallback below calls the original directly (the hooks themselves live at
+// the bottom of the file).
+using TrackPopupMenu_t = BOOL(WINAPI*)(HMENU, UINT, int, int, int, HWND,
+                                       const RECT*);
+using TrackPopupMenuEx_t = BOOL(WINAPI*)(HMENU, UINT, int, int, HWND,
+                                         const RECT*);
+static void* g_targetTrackPopupMenu = nullptr;
+static void* g_targetTrackPopupMenuEx = nullptr;
+static TrackPopupMenu_t TrackPopupMenu_Original;
+static TrackPopupMenuEx_t TrackPopupMenuEx_Original;
+
+// Re-entrancy guard for the native submenu fallback: user32's TrackPopupMenu
+// forwards to TrackPopupMenuEx internally, so without the guard the Ex hook
+// would see the fallback popup and re-intercept it as a flyout.
+static thread_local bool t_nativeMenuPassThrough = false;
+
 // Returns the selected command id, or -1 to fall through to the original.
 static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
                                   HWND hwnd) {
+    // Our own native submenu popup (see the fallback in BuildFlyoutItem):
+    // never re-intercept it, pass straight through.
+    if (t_nativeMenuPassThrough) {
+        return -1;
+    }
+
     // Style gate. Two styles render the flyout (fluent / win10fluent); the
     // others pass the original TrackPopupMenu through. native never reaches
     // this point — it short-circuits inside the TrackPopupMenu hooks before
@@ -1446,6 +1764,10 @@ static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
     std::vector<MenuItem> items;
     std::vector<HMENU> menus;
     ReplayMenuBegin(hwnd, menu, true);
+    // Drive the shell's own lazy submenu population first (发送到/Send To
+    // only fills its submenu when it is first opened); without this the
+    // snapshot sees a lone placeholder and the cascade renders empty.
+    RunLazySubmenuPopulation(menu);
     BuildMenuItems(menu, hwnd, items);
     int pass1Sub = CountSubmenus(items);
     HOOK_LOG(L"snapshot pass1: items=%u submenus=%d", (unsigned)items.size(),
@@ -1505,6 +1827,25 @@ static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
     CloseHandle(request.doneEvent);
     ReplayMenuEnd(hwnd, menus);
 
+    // Native submenu fallback (see BuildFlyoutItem): the user picked a
+    // submenu whose entries the flyout could not obtain. The replayed
+    // lifecycle is balanced now; track the submenu's own HMENU with the real
+    // TrackPopupMenu — the native menu loop makes the shell populate it
+    // (发送到/Send To enumerates the SendTo folder on WM_INITMENUPOPUP) and,
+    // with TPM_RETURNCMD, returns the picked command id for the normal
+    // return path below. The guard keeps both TrackPopupMenu hooks from
+    // re-intercepting this popup.
+    if (request.nativeSubMenu) {
+        POINT pt = request.nativePoint;
+        HOOK_LOG(L"native submenu fallback: menu=%p at (%ld,%ld)",
+                 (void*)request.nativeSubMenu, (long)pt.x, (long)pt.y);
+        t_nativeMenuPassThrough = true;
+        id = TrackPopupMenu_Original(request.nativeSubMenu, flags, pt.x, pt.y,
+                                     0, hwnd, nullptr);
+        t_nativeMenuPassThrough = false;
+        HOOK_LOG(L"native submenu fallback -> id %d", id);
+    }
+
     // Mirror the original focus fix-up.
     if (wcscmp(className, L"SysListView32") != 0) {
         SetFocus(hwnd);
@@ -1516,16 +1857,6 @@ static int ShowFluentMenuInternal(HMENU menu, UINT flags, int x, int y,
 // ============================================================================
 // Hooks (mirror original hooked TrackPopupMenu / TrackPopupMenuEx)
 // ============================================================================
-
-using TrackPopupMenu_t = BOOL(WINAPI*)(HMENU, UINT, int, int, int, HWND,
-                                       const RECT*);
-using TrackPopupMenuEx_t = BOOL(WINAPI*)(HMENU, UINT, int, int, HWND,
-                                         const RECT*);
-
-static void* g_targetTrackPopupMenu = nullptr;
-static void* g_targetTrackPopupMenuEx = nullptr;
-static TrackPopupMenu_t TrackPopupMenu_Original;
-static TrackPopupMenuEx_t TrackPopupMenuEx_Original;
 
 static BOOL WINAPI TrackPopupMenu_Hook(HMENU menu, UINT flags, int x, int y,
                                        int reserved, HWND hwnd,
@@ -1615,6 +1946,11 @@ BOOL Wh_ModInit() {
     // user selects a classic menu style (win10 / win10fluent).
     InitPresenterBypassHooks();
 
+    // DefCM capture hook: lets the flyout snapshot drive the shell's lazy
+    // submenu population (e.g. 发送到/Send To). Passive — only records the
+    // menu object; when it fails, the native submenu fallback still covers.
+    InitDefCMCaptureHook();
+
     g_winuiThread = CreateThread(nullptr, 0, WinUIThreadProc, nullptr, 0,
                                  (DWORD*)&g_winuiThreadId);
     if (!g_winuiThread) {
@@ -1631,6 +1967,9 @@ void Wh_ModBeforeUninit() {
 
     Wh_RemoveFunctionHook(g_targetTrackPopupMenu);
     Wh_RemoveFunctionHook(g_targetTrackPopupMenuEx);
+    if (g_targetDefCMQueryContextMenu) {
+        Wh_RemoveFunctionHook(g_targetDefCMQueryContextMenu);
+    }
     Wh_ApplyHookOperations();
 }
 
