@@ -11,7 +11,9 @@ import os
 
 
 def scan_mods(dirpath, prefix=''):
-    """列出目录下全部 local@cw-*.wh.cpp 模组文件（排序后加目录前缀）。"""
+    """列出目录下全部 local@cw-*.wh.cpp 模组文件（排序后加目录前缀）；目录缺失返回空表。"""
+    if not os.path.isdir(dirpath):
+        return []
     return sorted(
         prefix + f for f in os.listdir(dirpath)
         if f.startswith('local@cw-') and f.endswith('.wh.cpp')
@@ -22,8 +24,8 @@ def scan_mods(dirpath, prefix=''):
 root_mods = scan_mods('.')
 # 可选 mod（仅在部署时选择安装才启用）
 optional_mods = scan_mods('optional', 'optional/')
-# DLC 额外内容（tool mod，引发 windhawk.exe 宿主进程、内存占用较高，
-# 由 deploy-dlc.ps1 单独安装、用户自选安装，主部署不扫描 dlc\ 目录）
+# DLC 额外内容（v2.9.0 起已清空退役：dlc\ 目录移除、本段自动为空；
+# deploy-dlc.ps1 保留作扩展通道——新增 tool mod 时放入 dlc\ 目录即会被打进包）
 dlc_mods = scan_mods('dlc', 'dlc/')
 
 print(f"模组清单（磁盘自动生成）：主套件 {len(root_mods)} 个 + 可选 {len(optional_mods)} 个 + DLC {len(dlc_mods)} 个")
