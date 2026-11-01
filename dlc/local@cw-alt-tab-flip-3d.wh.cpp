@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-alt-tab-flip-3d
-// @name            CW-窗口切换动画（Vista 风格）
-// @name:zh-CN      CW-窗口切换动画（Vista 风格）
+// @name            CW-窗口切换动画（Vista 风格）（独立进程版）
+// @name:zh-CN      CW-窗口切换动画（Vista 风格）（独立进程版）
 // @description     Replaces Alt+Tab with a fluid, Windows Vista-style Flip 3D stack of live windows. CW build of the community "Alt+Tab Flip 3D (Vista Style)" mod by caliberda (MIT).
 // @description:zh-CN 用流畅的 Windows Vista 风格 Flip 3D 实时窗口堆栈替换 Alt+Tab。CW 版，基于社区模组 "Alt+Tab Flip 3D (Vista Style)"（作者 caliberda，MIT 许可）。
 // @version         1.0.2
@@ -16,13 +16,33 @@
 
 // ==WindhawkModReadme==
 /*
-# CW-窗口切换动画（Vista 风格）
+# CW-窗口切换动画（Vista 风格）（独立进程版）
 
 在 Windows 11 上找回 Windows Vista 的 **Flip 3D** 窗口切换器，
 带 macOS 风格、弹簧阻尼的流畅动画。
 
 按下 **Alt+Tab**，窗口会从真实位置飞入一个 3D 堆栈（一扇扇叠放），
 并显示**实时内容**；按住 Alt 可翻动，松开后所选窗口飞回原位。
+
+## 与注入版变体的关系
+
+本模组另有一个**注入版**变体：CW-窗口切换动画（Vista 风格）（注入版）
+（`cw-alt-tab-flip-3d-inproc`，主套件根目录
+`local@cw-alt-tab-flip-3d-inproc.wh.cpp`）。两者由同一份上游代码（Alt+Tab Flip 3D
+(Vista Style) 1.7.2）衍生、版本号同源同号（1.0.2），功能与设置完全相同，仅运行方式
+不同：
+
+- **独立进程版（本模组，DLC）**：以 tool mod 形式运行在独立的 windhawk.exe 进程中
+  （explorer 只负责把 Alt+Tab 热键移交给切换器）。优点是崩溃隔离——模组自身出错
+  不影响 explorer；但会引发 windhawk.exe 宿主进程，内存占用较高。
+- **注入版（主套件）**：把同一份功能逻辑直接注入 explorer.exe 内运行，切换器
+  UI、输入钩子与热键移交全部在 explorer 进程内，没有额外的后台进程、随 explorer
+  存活（重启资源管理器即随之重启），整体内存占用更低。
+
+两个版本**不可同时开启，只能二选一**：虽然两者 mod id 不同（Windhawk 允许同时
+处于启用状态），但两者都会接管 Alt+Tab——两套低级键盘/鼠标钩子互相争抢 Tab 按键
+与热键移交，切换器行为不可预测，还有双份图形设备开销。请按需选择其中一个版本
+启用。
 
 ## 动画样式
 

@@ -2,9 +2,9 @@
 // @id              cw-purify-icons
 // @name            CW-纯净化图标
 // @name:zh-CN      CW-纯净化图标
-// @description     Desktop icon purification: removes shortcut arrow overlays and UAC administrator shield badges, hides desktop icon text labels (folder names optional), strips the "- Shortcut" naming suffix, with persistent image-list self-healing. Original CW-Beautify mod.
-// @description:zh-CN 桌面图标纯净化三合一：移除快捷方式小箭头、隐藏 UAC 管理员盾牌角标（默认关，带安全提示）、隐藏图标下文字标签（文件夹名可选保留），新建快捷方式不再自动带「- 快捷方式」字样；图像列表补丁带持久自愈。CW-Beautify 原创模组。
-// @version         1.0.0
+// @description     Desktop icon purification: removes shortcut arrow overlays and UAC administrator shield badges, hides desktop icon text labels (folder names optional), strips the "- Shortcut" naming suffix. Five-layer defense with a registry source redirect (Shell Icons override) plus persistent image-list self-healing. Original CW-Beautify mod.
+// @description:zh-CN 桌面图标纯净化三合一：移除快捷方式小箭头、隐藏 UAC 管理员盾牌角标（默认关，带安全提示）、隐藏图标下文字标签（文件夹名可选保留），新建快捷方式不再自动带「- 快捷方式」字样。五层防线：注册表源重定向（Shell Icons 覆盖）＋提取期拦截＋图像列表置空＋绘制期拦截＋持久自愈。CW-Beautify 原创模组。
+// @version         1.1.0
 // @author          Heptalune
 // @include         explorer.exe
 // @compilerOptions -lole32 -lshlwapi -lgdi32 -lcomctl32 -ladvapi32 -lshell32 -luser32
@@ -43,8 +43,8 @@
 //      全透明）。
 //   5. Hakoniwalily-fan「remove-shortcut-arrow」（GitHub，MIT，PowerShell）：
 //      注册表 Shell Icons 29/77 重定向 + 自生成 1bpp 全 1 掩码 blank.ico；验证
-//      了注册表路线需要图标缓存重建且存在「非全空回填」伪影风险（本模组不采
-//      用注册表路线）。
+//      了注册表路线需要图标缓存重建且存在「非全空回填」伪影风险（1.0.0 据此
+//      未采用注册表路线，1.1.0 结合轻松设置实测结论重新收编，见第四节）。
 //
 // 二、去除图标下文字标签：
 //   1. kivsak 1.5.0：桌面 SysListView32 绘制期间 thread_local 标记 +
@@ -59,42 +59,106 @@
 //      下 Link=REG_BINARY 00 00 00 00（微软文档化的命名模板机制，仅影响新建
 //      快捷方式的自动命名，无需管理员）；本模组以「开关可控、缺值才写、不覆
 //      盖用户已有值」的方式接入。桌面标签显示层的「- 快捷方式」字样剥离为本
-//      模组原创补充。
+//      模组原创补充。轻松设置 v1.12 的同功能走的是另一经典变体（HKCU\...\
+//      Explorer 二进制值 link=00000000，见第四节），效果等价，本模组沿用
+//      NamingTemplates 路线不变。
 //
-// 三、去除 UAC 管理员盾牌角标：
+// 三、去除 UAC 管理员盾牌角标（1.0.0 时期的调研）：
 //   1. 本包前身实测结论（CW-隐藏桌面图标文字与箭头 1.6.0 起、更好的Windows
 //      （小细节）纯净化分组 2.0.1/2.1.1/2.1.2，Heptalune 机制研究）：Win11
-//      22H2 上桌面可见盾牌在图标提取期经 SHGetFileInfo(SHGFI_ADDOVERLAYS |
-//      SHGFI_OVERLAYINDEX) 被合成进 HICON 位图本体，单靠 overlay 通道置空不
-//      彻底——必须在提取期剥离合成标志；同时 SIID_SHIELD 在共享图像列表中
-//      有独立图像槽位（SHGSI_SYSICONINDEX 可解析），需一并置空；注册表
-//      Shell Icons 重定向（如 29/77 → imageres.dll,197 一类「空」图标）会把
-//      非全空的图标回填进槽位造成残留小方框——需要像素级自愈校验。
+//      22H2 上桌面可见盾牌在图标提取期被合成进 HICON 位图本体/直绘槽位图像，
+//      单靠 overlay 通道置空不彻底；SIID_SHIELD 在共享图像列表中有独立图像槽
+//      位（SHGSI_SYSICONINDEX 可解析），需一并置空；注册表 Shell Icons 重定向
+//      （如 29/77 → imageres.dll,197 一类「空」图标）会把非全空的图标回填进
+//      槽位造成残留小方框——需要像素级自愈校验。
 //   2. kivsak PR #4362 v2.5.0：独立验证了同一组机制（盾牌 overlay 槽位
 //      shell32,77 / imageres,77 / imageres,78 + SIID_SHIELD 置空 + 提取期剥
 //      离），并有唤醒重打补丁的定时器。
 //   3. 经典注册表 Shell Icons「77」方案与 imageres.dll 资源替换方案（社区教
 //      程）：前者存在黑方块/197 式残影且需管理员与缓存重建，后者改系统文件、
-//      更新易碎——均不采用。
+//      更新易碎——1.0.0 均不采用（1.1.0 修正，见下）。
 //
-// 【机制总览（四层防线 + 自愈）】
-//   • 第 1 层（提取期剥离）：SHGetFileInfoW 钩子剥离 SHGFI_ADDOVERLAYS |
-//     SHGFI_OVERLAYINDEX（仅在隐藏盾牌时启用，保证与箭头功能互相独立），
-//     SHGetStockIconInfo 钩子把 SIID_SHIELD 图标句柄替换为空白副本——从源头
-//     杜绝「盾牌被合成进位图」。
+// 四、Windows 11轻松设置（快乐无极 v1.12 正式版，闭源免费工具；1.1.0 重建的
+//     核心依据。官方无 GitHub 仓库，经远景论坛/网盘/Bilibili 分发；源码级证据
+//     取自 YiKongk/Win11EasyConfig——以相同语言 C# 对原版 .NET 程序集的反编译
+//     复刻工程（net481/x64，README 自述仅供学习研究，重编译产物与原 exe 在文
+//     件大小、嵌入资源、版本信息上一致））：
+//   1. Form2.cs（资源管理器/增强设置子窗口）ExplorerCheckBox_Click 反编译代
+//      码逐行证据：
+//      • case 15「去除快捷方式的小箭头」＝写
+//        HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons
+//        值 "29" = REG_SZ "%systemroot%\system32\imageres.dll,197"，取消勾选
+//        即删除该值；随后弹窗询问用户「是否现在立即重启文件资源管理器」。
+//      • case 16「去除程序图标的盾牌标识」＝同一键下值 "77" 写同一重定向串，
+//        删除同理；写入后调用 RefreshDesktop.DeskRef()。
+//      • case 17（新建快捷方式去「快捷方式」字样）＝写
+//        HKCU\...\Explorer 二进制值 "link" = 00 00 00 00。
+//      状态回显逻辑（同文件）：以「值存在且等于 %systemroot%\system32\
+//      imageres.dll,197 字面串」判定功能已开启——整个工具对箭头/盾牌的全部实
+//      现就是这两条注册表值，无任何 API 挂钩、无图像列表操作。
+//   2. RefreshDesktop.cs：DeskRef() 即 SHChangeNotify(SHCNE_ASSOCCHANGED)——
+//      与本模组既有的缓存刷新通知是同一 API。证明该机制生效只需「写入覆盖 +
+//      触发图标缓存重建」两步；重启 explorer 只是外部工具无法主动触发缓存重
+//      建时的用户兜底手段，模组进程内 SHChangeNotify 即可完成。
+//   3. RegControl.cs：直写失败时回退 Form2.ForceChangeRegKey（经 MSHta.exe +
+//      WScript.Shell.RegWrite 绕过微软 UCPD 驱动的强制改写）；Program.cs 在非
+//      管理员启动时以 runas 自提权重启自身——即该工具整体以管理员运行来获得
+//      HKLM 直写能力。本模组注入 explorer（未提权进程），不能也不应触发 UAC
+//      弹窗，故采用同一覆盖机制的 HKCU 每用户变体
+//      （HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons，
+//      How-To Geek / WiseCleaner / Virtual Plastic 等多个社区来源均记载该路径
+//      按用户生效、无需管理员）。
+//   4. 机制定性（它为什么能真正隐藏盾牌而本模组 1.0.0 不行）：Shell Icons 覆
+//      盖在 explorer 图标缓存构建期生效——系统重建共享图像列表时自行把 29/77
+//      号源图标的内容替换为重定向图标。这正是本机实测「图标缓存重建后
+//      overlay 槽位会被回填」的同一管道：回填读取的就是 Shell Icons 覆盖（用
+//      户删除遗留 29/77 后回填恢复真实图标，与本机制互相印证）。而桌面图标的
+//      UAC 盾牌在提取期即被合成进「每个文件独立槽位」的 HICON 位图本体/直绘
+//      槽位图像，不经过 overlay 绘制通道：1.0.0 的 SHGetFileInfoW 钩子不在桌
+//      面提取路径上（桌面走 IExtractIcon → SHDefExtractIconW），ImageList_
+//      DrawIndirect 拦截对无 overlay 标志的合成体绘制不生效，图像列表置空的
+//      又是 overlay 映射与 SIID_SHIELD 槽位而非「含盾牌合成体」的文件槽位——
+//      四层全部打在合成点下游的错误 API 边界上。Shell Icons 覆盖作用在合成源
+//      头（缓存构建期重定向 77 号盾牌源图标），是该管道上唯一可达的用户态控
+//      制点，轻松设置正以此取胜。1.1.0 将该机制收编为「第 0 层」，原四层降级
+//      为纵深防御并补充 SHDefExtractIconW 提取源拦截。
+//
+// 【1.0.0 实测缺陷与重建动机】用户实测（Win11 22H2）：箭头/标签功能正常，
+// 「UAC 小盾牌根本没有隐藏」。按第四节第 4 点的机制定性，1.0.0 四层对「提取
+// 期合成进文件槽位位图本体」的盾牌全部失效。1.1.0 重建：新增第 0 层注册表源
+// 重定向（轻松设置机制）为盾牌（及箭头）的主生效层，第 1 层补充 SHDefExtract
+// IconW 盾牌源拦截，其余机制保留。
+//
+// 【机制总览（五层防线 + 自愈）】
+//   • 第 0 层（注册表源重定向，1.1.0 新增，收编轻松设置机制）：开启箭头/盾牌
+//     时写 HKCU\...\Explorer\Shell Icons 值 "29"/"77" → 本模组生成的多尺寸
+//     「真全透明」.ico（写入失败回退 imageres.dll,197 串），系统在图标缓存构
+//     建期自行把源槽位内容替换为空白——覆盖「提取期合成/直绘」这一原四层机
+//     制不可达的失效点，且缓存重建后的回填天然是空白（系统级自愈，不再与回
+//     填对抗）。仅写入缺失值，绝不覆盖用户已有值；关闭/卸载时仅删除「内容与
+//     本模组模板一致」的值（跨会话所有权判定，与 NamingTemplates\Link 同策
+//     略）。写入后以 SHCNE_ASSOCCHANGED 触发缓存重建使其生效——外部工具需要
+//     用户确认重启资源管理器的环节，模组进程内即可完成。
+//   • 第 1 层（提取期拦截）：SHGetFileInfoW 钩子剥离 SHGFI_ADDOVERLAYS |
+//     SHGFI_OVERLAYINDEX（仅在隐藏盾牌时启用，保证与箭头功能互相独立）；
+//     SHGetStockIconInfo 钩子把 SIID_SHIELD 图标句柄替换为空白副本；1.1.0 新
+//     增 SHDefExtractIconW 钩子，把「请求 imageres/shell32 77/78 号盾牌源图
+//     标」的提取调用直接替换为空白 HICON——合成管道即使绕过注册表覆盖与
+//     SHGetFileInfoW，也在这一层拿不到真实盾牌位图。
 //   • 第 2 层（图像列表置空）：解析快捷方式 overlay 槽位
 //     （SHGetIconOverlayIndexW(nullptr, IDO_SHGIOI_LINK)）与盾牌 overlay 槽位
 //     （shell32,77 / imageres,77 / imageres,78），在 5 张共享 SHIL 图像列表中
 //     追加「真全透明」图标（32bpp alpha=0 + 全 1 掩码，WORD 对齐步距）并把
 //     上述 overlay 槽位重指向空白；SIID_SHIELD 的系统图像槽位原位替换为空白
 //     （ReplaceIcon 保持索引不变）。覆盖 25H2 式「无 overlay 标志直绘槽位图
-//     像」的路径（槽位图像本身就是空白）。
+//     像」的路径（槽位图像本身为空白）。
 //   • 第 3 层（绘制期拦截）：ImageList_DrawIndirect 钩子对「overlay 序号命中
 //     箭头/盾牌槽位」的绘制请求剥离 ILD_OVERLAYMASK 后放行（不改调用方结构
 //     体、传副本）。图像列表补丁若在缓存重建窗口期暂时失守，绘制期仍不出
 //     现箭头/盾牌；同时从绘制路径上杜绝黑方块类伪影。
 //   • 第 4 层（持久自愈）：explorer 图标缓存重建会销毁重建共享 SHIL 列表并
-//     按注册表 Shell Icons 重定向回填（残影根因）。自愈覆盖三类槽位——箭头
+//     按注册表 Shell Icons 重定向回填（1.1.0 起回填内容即本模组空白源，自愈
+//     主要覆盖注册表覆盖不可用/被绕过的场景）。自愈覆盖三类槽位——箭头
 //     overlay 槽位、盾牌 overlay 槽位（经补丁时记录的空白锚点间接校验）与
 //     盾牌 SYSIMAGE 槽位（像素级校验，GetIcon 失败按空白处理防误报循环）；
 //     触发面为桌面 WM_PAINT ＋ 桌面 FolderView 2s 兜底定时器 ＋ comctl32
@@ -104,9 +168,9 @@
 //     名白名单可选保留、桌面标签中的「- 快捷方式」字样可选剥离）；新建快捷
 //     方式命名经 NamingTemplates\Link 注册表值（可选，无需管理员）。
 //
-// 【初始化时序（上游实测结论，必须遵守）】SHChangeNotify(SHCNE_ASSOCCHANGED)
-// 必须先于图像列表补丁——通知会刷新图标缓存并重建图像列表，先打补丁会被整
-// 体丢弃。
+// 【初始化时序（必须遵守）】注册表覆盖写入 → SHChangeNotify(SHCNE_ASSOCCHANGED)
+// → 图像列表补丁。通知会刷新图标缓存并重建图像列表，先打补丁会被整体丢弃；
+// 第 0 层的注册表值必须赶在缓存重建（通知）之前写入，重建回填才能拿到空白源。
 //
 // 【x86 兼容铁律】本模组全部钩子与回调均为显式 static ... CALLBACK/WINAPI 函
 // 数，无任何（无捕获）lambda 直传 WINAPI/stdcall 回调类型的情况，x86/x64 双
@@ -119,16 +183,16 @@
 
 桌面图标纯净化三合一（CW-Beautify 原创模组，作者 Heptalune）：**移除快捷方式小箭头**、**隐藏图标下文字标签**（「- 快捷方式」字样与完整文字标签，文件夹名可选保留）、**隐藏 UAC 管理员盾牌角标**（默认关，带安全提示）。三个功能各自独立开关，随时切换即时生效，无需重启资源管理器。
 
-本模组承接并替代「CW-更好的Windows（小细节）」中的「纯净化图标」分组，在其机制基础上按 2026-11 全网调研结论重写加固（详见下方「与旧实现的差异」）。
+本模组承接并替代「CW-更好的Windows（小细节）」中的「纯净化图标」分组。1.1.0 为重建版本：吸收「Windows 11轻松设置」（v1.12，快乐无极）的注册表源重定向机制，修复 1.0.0 在 Win11 22H2 上「UAC 盾牌没有隐藏」的实测缺陷（详见下方「1.1.0 重建说明」）。
 
 ## 功能
 
 ### ① 移除快捷方式小箭头（默认开）
 
-实时移除桌面与资源管理器中快捷方式图标左下角的小箭头，无需注册表修改、无需管理员权限。
+实时移除桌面与资源管理器中快捷方式图标左下角的小箭头，无需管理员权限。
 
-- 箭头覆盖层位于共享的系统图像列表中，移除作用于整个资源管理器会话。
-- 关闭该开关或停用模组后，本模组会主动刷新图标缓存让箭头恢复原样（若图标缓存未即时刷新，重启资源管理器亦可恢复）。
+- 双路生效：注册表源重定向（`HKCU\...\Explorer\Shell Icons` 值 `29` → 本模组生成的全透明图标文件，仅在值缺失时写入、绝不覆盖已有值）＋ 进程内图像列表补丁/绘制期拦截。
+- 关闭该开关或停用模组后，本模组会自动清理自己写入的注册表值并刷新图标缓存，让箭头恢复原样（若图标缓存未即时刷新，重启资源管理器亦可恢复）。
 
 ### ② 隐藏图标文字标签（默认开）
 
@@ -146,44 +210,64 @@
 
 - **安全提示（请知情后开启）**：UAC 盾牌是「该程序需要管理员权限」的可视提醒，隐藏后无法从图标直观分辨哪些程序会以管理员身份运行；资源管理器界面里的盾牌角标（如「以管理员身份运行」按钮装饰）也会一并隐藏。盾牌角标本身不影响任何实际权限行为，仅是显示层变化。
 - 默认关闭的原因即上述安全提示，请在知情的前提下显式开启。
+- 1.1.0 起盾牌移除采用与箭头相同的双路机制（注册表源重定向值 `77` ＋ 进程内五层防线），真正覆盖 Win11 22H2 桌面「盾牌在图标提取期被合成进位图本体」的路径（1.0.0 的四层机制对该路径失效）。
 
-## 机制说明（四层防线 + 持久自愈）
+## 机制说明（五层防线 + 持久自愈）
 
-- **第 1 层 · 提取期剥离**：Win11（实测 22H2）上桌面可见的 UAC 盾牌在图标提取期经 `SHGetFileInfoW(SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX)` 被合成进 HICON 位图本体，不出现独立 overlay 绘制调用——本层在源头剥离这两个标志，让 shell 返回未合成的干净图标；同时 `SHGetStockIconInfo(SIID_SHIELD)` 直接请求盾牌图标句柄的调用方拿到空白图标。该层仅在「隐藏盾牌」开启时启用，保证与箭头功能互相独立。
+- **第 0 层 · 注册表源重定向**（1.1.0 新增，收编「Windows 11轻松设置」机制）：在 `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons` 下写入值 `29`（箭头）/ `77`（盾牌），指向本模组生成的多尺寸「真全透明」图标文件（生成失败时回退系统自带 `imageres.dll,197` 空图标串）。系统在图标缓存构建期会自行按该覆盖把源图标替换为空白——这正是桌面图标盾牌/箭头的合成源头，也是图标缓存重建后「槽位回填」读取的数据源：覆盖存在时，每次缓存重建的回填天然是空白（系统级自愈）。写入走 HKCU 每用户路径，无需管理员；仅写缺失值、绝不覆盖用户已有值；关闭/卸载时仅删除内容与本模组模板一致的值。
+- **第 1 层 · 提取期拦截**：`SHGetFileInfoW` 钩子剥离 `SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX` 标志（仅在隐藏盾牌时启用）；`SHGetStockIconInfo(SIID_SHIELD)` 的图标句柄请求替换为空白副本；1.1.0 新增 `SHDefExtractIconW` 钩子，把请求 imageres/shell32 `77/78` 号盾牌源图标的提取调用直接替换为空白 HICON——合成管道即使绕过注册表覆盖与 SHGetFileInfoW，也在此层拿不到真实盾牌位图。
 - **第 2 层 · 图像列表置空**：把共享系统图像列表（5 张 SHIL 尺寸）中的快捷方式箭头 overlay 槽位、盾牌 overlay 槽位与 SIID_SHIELD 系统图像槽位替换为「真全透明」图标（32 位 alpha=0 + 全 1 掩码，非 imageres.dll,197 一类「非全空」图标，从根上避免空框残影）。新版 Windows（实测 25H2）存在「无 overlay 标志直绘槽位图像」的路径，由槽位图像本身为空白兜住。
 - **第 3 层 · 绘制期拦截**：挂钩 `ImageList_DrawIndirect`，凡 overlay 序号命中箭头/盾牌槽位的绘制请求一律剥离 overlay 标志后放行。图像列表补丁在缓存重建窗口期暂时失守时，绘制层仍不出箭头/盾牌；同时从绘制路径杜绝「黑方块/空框」类伪影。
-- **第 4 层 · 持久自愈**：explorer 图标缓存重建（重启 explorer、删除 iconcache、`SHCNE_ASSOCCHANGED` 刷新等）会销毁并重建共享图像列表，把注册表 Shell Icons 重定向的图标回填进槽位（旧版残留小方框的根因）。自愈校验覆盖三类槽位（箭头/盾牌 overlay 槽位经空白锚点间接校验、盾牌 SYSIMAGE 槽位像素级校验），触发面为桌面绘制 ＋ 2 秒兜底定时器 ＋ 图像列表创建/销毁感知钩子三路；失守立即全量重打（幂等）＋ 3 秒修复冷却，重建风暴下不会形成重打循环。
+- **第 4 层 · 持久自愈**：explorer 图标缓存重建（重启 explorer、删除 iconcache、`SHCNE_ASSOCCHANGED` 刷新等）会销毁并重建共享图像列表。1.1.0 起重建回填读取的就是第 0 层写入的空白覆盖，回填内容天然干净；自愈层转为主要覆盖「注册表覆盖不可用/被外部改动/被绕过」的场景，校验覆盖三类槽位（箭头/盾牌 overlay 槽位经空白锚点间接校验、盾牌 SYSIMAGE 槽位像素级校验），触发面为桌面绘制 ＋ 2 秒兜底定时器 ＋ 图像列表创建/销毁感知钩子三路；失守立即全量重打（幂等）＋ 3 秒修复冷却，重建风暴下不会形成重打循环。
 
-初始化时序遵循上游实测结论：图标缓存刷新通知先于图像列表补丁，否则补丁会被重建整体丢弃。
+初始化时序：注册表覆盖写入 → 图标缓存刷新通知（`SHCNE_ASSOCCHANGED`）→ 图像列表补丁。通知先于补丁（否则补丁被重建整体丢弃）、注册表写入先于通知（重建回填才能拿到空白源）。
 
-## 与旧实现（更好的Windows（小细节）· 纯净化图标分组）的差异
+## 1.1.0 重建说明（为什么 1.0.0 隐藏不了盾牌）
 
-| 项 | 旧分组（purity.*） | 本模组 |
-|---|---|---|
-| 整体 | 基于 kivsak 1.5.0 方案并入，多模组合并版的一个分组 | 独立原创模组，三功能各自独立分组开关 |
-| 箭头/盾牌 | 图像列表置空 + 提取期剥离 + 空白替换 | 在此之上新增 **绘制期拦截层**（`ImageList_DrawIndirect` 剥离 overlay 标志，吸收 kivsak 2.5.0 PR 验证的技法），补丁失守窗口期也不出箭头/盾牌，并从绘制路径杜绝伪影 |
-| 盾牌直绘路径 | 未覆盖 25H2 式「无 overlay 标志直绘槽位图像」路径 | 槽位图像本身为真全透明图标，直绘亦无残留 |
-| 自愈 | 三槽位校验 + 三路触发 + 修复冷却（2.1.2） | 同等继承（绘制 + 2s 定时器 + ImageList 创建/销毁感知），并适配独立模组的布防/撤防时机 |
-| 文字 | 隐藏标签（文件夹名保留，固定） | 保留文件夹名改为**可选**；新增标签「- 快捷方式」字样显示级剥离；新增新建快捷方式命名模板（NamingTemplates）；补 `WM_PRINTCLIENT` 覆盖 |
-| 恢复行为 | 关闭分组后仅通知缓存刷新 | 停用/卸载模组时主动刷新图标缓存恢复箭头/盾牌原样；NamingTemplates 值自动清理 |
-| 架构 | 跟随上游 x86-64 | x86 + x64 双架构编译 |
+**实测缺陷**：Win11 22H2 上开启「隐藏 UAC 管理员盾牌」，小盾牌完全没有消失。
+
+**调研对象**：「Windows 11轻松设置」v1.12 正式版（快乐无极，闭源免费工具，远景论坛/网盘分发；官方无 GitHub 仓库）。源码级证据取自 [YiKongk/Win11EasyConfig](https://github.com/YiKongk/Win11EasyConfig)——用相同语言 C# 对原版 .NET 程序集的反编译复刻工程（.NET Framework 4.8.1 / x64，自述仅供学习研究，重编译产物与原 exe 一致）。
+
+**轻松设置的实现（反编译源码逐行证据）**：
+
+| 功能 | 实现（Form2.cs ExplorerCheckBox_Click） |
+|---|---|
+| 去除快捷方式小箭头（case 15） | 写 `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons` 值 `"29"` = REG_SZ `%systemroot%\system32\imageres.dll,197`；取消即删除；随后弹窗询问用户重启资源管理器 |
+| 去除程序图标的盾牌标识（case 16） | 同一键下值 `"77"` 写同一重定向串，取消即删除；写入后调用 `RefreshDesktop.DeskRef()` |
+| 新建快捷方式不带「快捷方式」字样（case 17） | 写 `HKCU\...\Explorer` 二进制值 `"link"` = `00 00 00 00`（经典变体） |
+
+- `RefreshDesktop.DeskRef()` 就是 `SHChangeNotify(SHCNE_ASSOCCHANGED)`——与本模组既有的缓存刷新通知同一 API；重启资源管理器只是外部工具的兜底询问。
+- `RegControl.cs`：直写失败回退 `Form2.ForceChangeRegKey`（经 MSHta.exe + WScript.Shell.RegWrite 绕过微软 UCPD 驱动）；`Program.cs` 非管理员启动时 runas 自提权——即整工具以管理员运行获得 HKLM 直写能力。
+- 状态回显以「值存在且等于 `imageres.dll,197` 字面串」判定——**该工具对箭头/盾牌的全部实现就是这两条注册表值**，无任何 API 挂钩、无图像列表操作，用户实测有效。
+
+**与四层体系的对比（为什么注册表层能赢）**：
+
+| 维度 | 轻松设置（注册表覆盖） | 本模组 1.0.0（进程内四层） | 本模组 1.1.0（五层） |
+|---|---|---|---|
+| 作用点 | 图标缓存**构建期**：系统自行把 29/77 号源图标替换为空白 | 合成点**下游**的 API 边界（SHGetFileInfoW / 图像列表 / DrawIndirect） | 合成**源头**（第 0 层）＋ 下游全部补齐 |
+| 盾牌提取期合成路径 | 覆盖（源图标在合成前已被替换） | **失效**：桌面提取走 IExtractIcon→SHDefExtractIconW，不经过被挂钩的 SHGetFileInfoW；合成体落在文件独立槽位，无 overlay 标志可剥 | 第 0 层覆盖 ＋ 新增 SHDefExtractIconW 拦截 |
+| 图标缓存重建后 | 系统自动重读覆盖回填空白（原生自愈） | 槽位回填真实图标，需运行时自愈重打 | 回填即空白；自愈转为兜底 |
+| 权限/范围 | 整工具提权，HKLM 全局 | 无需管理员 | HKCU 每用户，无需管理员，不触发 UAC |
+| 残影风险 | imageres.dll,197 非全空图标可能残留小方框 | 真全透明图标，无残影 | 自生成多尺寸真全透明 .ico（197 仅作回退），兼得两家长处 |
+
+**1.1.0 变化清单**：新增第 0 层注册表源重定向（HKCU Shell Icons `29`/`77` → 自生成真全透明 .ico，带跨会话所有权跟踪的写入/清理）；第 1 层新增 SHDefExtractIconW 盾牌源拦截；原四层机制全部保留为纵深防御；文字标签与命名模板机制不变。三个功能的开关结构、默认值与安全提示不变。
 
 ## 注意事项
 
-- 箭头/盾牌的移除作用于整个资源管理器会话（共享系统图像列表）；关闭开关或停用模组后本模组会主动刷新图标缓存恢复原样，个别情况下需重启资源管理器（可用整合包的 `restart_explorer.bat`）。
+- 箭头/盾牌移除的注册表覆盖走 `HKCU`（每用户，无需管理员）：开启对应功能时写入值（仅当缺失），关闭开关或停用模组时自动删除**本模组写入的值**并刷新图标缓存恢复原样；用户或其他工具自建的、内容不同的同键值一律不碰。个别情况下需重启资源管理器（可用整合包的 `restart_explorer.bat`）。
 - 与「CW-更好的Windows（小细节）」的「桌面图标隐藏设置」分工：本模组只负责图标**显示样式**的纯净化（文字/箭头/盾牌显隐）；图标整体隐藏与恢复请使用小细节模组，两者互不冲突。本模组启用后请勿再开启小细节中即将移除的「纯净化图标」分组，以免重复打补丁。
 - 修改文字标签为绘制层处理，不重命名任何文件；「- 快捷方式」字样的文件名本身不变（若需要连文件名一起改，请手动重命名）。
 - 使用壁纸引擎等替换桌面视图的工具时，文字隐藏可能不生效（依赖经典 Progman/WorkerW → SHELLDLL_DefView → SysListView32 桌面结构）。
-- 本模组不修改系统文件、不删除注册表项（NamingTemplates\Link 值仅在对应子项开启且缺失时写入，缺省即系统默认行为），无需管理员权限。
+- 本模组不修改系统文件；会按功能开关在 HKCU 写入/清理 `Shell Icons` 的 `29`/`77` 值与 `NamingTemplates\Link` 值（均仅在缺失时写入、绝不覆盖用户已有值，卸载自动清理本模组写入的值），无需管理员权限。
 
 ## 兼容性
 
-- Windows 10 / 11（注入 explorer.exe；Win11 22H2 实测，25H2 直绘路径已由第 2 层覆盖）。
+- Windows 10 / 11（注入 explorer.exe；Win11 22H2 实测——1.1.0 针对本机实测缺陷重建，25H2 直绘路径已由第 0/2 层覆盖）。
 - x86 + x64 双架构编译（Windhawk 2.x 引擎同时注入两份 DLL）。
 
 ## 支持与许可
 
-- 本模组为 CW-Beautify 整合包（作者 Heptalune）原创实现（GPL-3.0），机制调研参考了下列公开项目（见文件头「调研依据」）：kivsak Hide Desktop Icon Text and Shortcut Arrows（1.5.0 与 PR #4362 v2.5.0，MIT 惯例）、ELSEGuy Desktop Shortcut Cleaner（MIT）、Hakoniwalily-fan remove-shortcut-arrow（MIT）、akumy Hide desktop icon labels（PR #4427）、ramensoftware/windhawk-mods issue #4339（黑方块实测与绘制期方案讨论）。
+- 本模组为 CW-Beautify 整合包（作者 Heptalune）原创实现（GPL-3.0），机制调研参考了下列公开项目（见文件头「调研依据」）：kivsak Hide Desktop Icon Text and Shortcut Arrows（1.5.0 与 PR #4362 v2.5.0，MIT 惯例）、ELSEGuy Desktop Shortcut Cleaner（MIT）、Hakoniwalily-fan remove-shortcut-arrow（MIT）、akumy Hide desktop icon labels（PR #4427）、ramensoftware/windhawk-mods issue #4339（黑方块实测与绘制期方案讨论）、「Windows 11轻松设置」v1.12（快乐无极，闭源；机制经反编译复刻工程 YiKongk/Win11EasyConfig 学习研究）。
 - 感谢上述项目作者公开的机制与实测结论。
 */
 // ==/WindhawkModReadme==
@@ -196,13 +280,16 @@
     $name:zh-CN: 移除快捷方式小箭头
     $description: >-
       Removes the shortcut arrow overlay from icons in the whole Explorer
-      session. Applies live, no registry edits and no admin rights needed.
-      Turning this off (or unloading the mod) refreshes the icon cache to
-      restore the arrows.
+      session, via a per-user registry source redirect (HKCU Shell Icons value
+      "29", written only when absent) plus in-process image-list patching.
+      Applies live, no admin rights needed. Turning this off (or unloading
+      the mod) removes the value written by this mod and refreshes the icon
+      cache to restore the arrows.
     $description:zh-CN: >-
-      移除整个资源管理器会话中图标上的快捷方式小箭头。实时生效，无需修改
-      注册表、无需管理员权限。关闭本开关（或停用模组）时会主动刷新图标
-      缓存恢复箭头原样。
+      通过每用户注册表源重定向（HKCU Shell Icons 值 "29"，仅在缺失时写入）加
+      进程内图像列表补丁，移除整个资源管理器会话中图标上的快捷方式小箭头。
+      实时生效，无需管理员权限。关闭本开关（或停用模组）时会自动清理本模组
+      写入的注册表值并刷新图标缓存恢复箭头原样。
   $name: Shortcut arrows
   $name:zh-CN: 快捷方式小箭头
   $description: >-
@@ -281,15 +368,19 @@
       requires administrator privileges; hiding it makes shortcuts and
       Explorer UI indistinguishable in this regard (elevation behavior
       itself is not affected). Off by default for this reason - enable only
-      if you accept this. Removal covers the whole Explorer session and
-      also hides shield decorations inside Explorer UI. Turning this off
-      (or unloading the mod) refreshes the icon cache to restore shields.
+      if you accept this. Removal covers the whole Explorer session (per-user
+      registry source redirect HKCU Shell Icons value "77" + in-process
+      layers) and also hides shield decorations inside Explorer UI. Turning
+      this off (or unloading the mod) removes the value written by this mod
+      and refreshes the icon cache to restore shields.
     $description:zh-CN: >-
       安全提示：UAC 盾牌是「该程序需要管理员权限」的可视提醒，隐藏后无法
       从图标直观分辨哪些程序会以管理员身份运行（提权行为本身不受影响，
       仅显示层变化）。因此默认关闭，请在知情的前提下开启。移除作用于整
-      个资源管理器会话，资源管理器界面里的盾牌角标装饰也会一并隐藏。
-      关闭本开关（或停用模组）时会主动刷新图标缓存恢复盾牌原样。
+      个资源管理器会话（每用户注册表源重定向 HKCU Shell Icons 值 "77" 加
+      进程内五层防线），资源管理器界面里的盾牌角标装饰也会一并隐藏。关
+      闭本开关（或停用模组）时会自动清理本模组写入的注册表值并刷新图标
+      缓存恢复盾牌原样。
   $name: UAC shield badges
   $name:zh-CN: UAC 管理员盾牌
   $description: >-
@@ -481,6 +572,218 @@ static bool PIIconIsBlank(HICON hIcon) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 第 0 层：注册表源重定向（Shell Icons 覆盖，收编「Windows 11轻松设置」机制）
+//
+// 机制（轻松设置 v1.12 反编译源码验证，见文件头「调研依据·四」）：在
+// ...\Explorer\Shell Icons 下写值 "29"（快捷方式箭头源图标）/ "77"（UAC 盾
+// 牌源图标）= "文件,索引" 形式的空白图标后，explorer 在图标缓存构建期会自
+// 行把这两个源图标替换为重定向图标——合成发生在源头之后，桌面/资源管理器
+// 里的箭头与盾牌从根上消失；且图标缓存重建的「槽位回填」读取的正是该覆盖，
+// 重建后回填天然是空白（系统级自愈）。
+//
+// 与轻松设置的三点工程差异：
+//   1. HKCU 每用户路径（无需管理员、不触发 UAC；轻松设置整程序自提权写
+//      HKLM，社区多来源确认 HKCU 路径按用户生效）；
+//   2. 重定向目标是本模组生成的多尺寸「真全透明」.ico（轻松设置用
+//      imageres.dll,197，该图标非全空、有残留小方框风险——本包前身实测结
+//      论），文件写入失败才回退 197 串；
+//   3. 所有权跟踪：仅写缺失值、绝不覆盖已有值；删除仅针对「内容与本模组
+//      模板一致」的值（跨会话判定），用户自建值永不触碰。
+// 生效方式：写入后 SHCNE_ASSOCCHANGED 触发缓存重建（轻松设置因是外部进程
+// 只能弹窗请用户重启 explorer；模组在 explorer 进程内，SHChangeNotify 即可）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Shell Icons 覆盖键（HKCU 下；系统同时读取 HKLM 与 HKCU 的同名键）。
+static const wchar_t* kPIShellIconsSubkey =
+    L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons";
+
+// 本会话解析出的重定向目标串（"路径,0" 或回退的 imageres.dll,197）。
+// 仅在模组线程（init/uninit）读写，无并发访问。
+static std::wstring g_PIBlankIconSource;
+static bool g_PIBlankIconSourceReady = false;
+
+// 生成多尺寸（16/20/24/32/40/48）真全透明 .ico：32bpp 色位图全 0 + AND 掩
+// 码全 1（.ico 内掩码行按 DWORD 对齐）。更大尺寸（如 256）由 shell 就近缩放，
+// 全透明图缩放仍全透明。写入成功返回 true。
+static bool PIWriteBlankIcoFile(LPCWSTR filePath) {
+    static const int kSizes[] = {16, 20, 24, 32, 40, 48};
+    const int count = (int)ARRAYSIZE(kSizes);
+
+    std::vector<BYTE> images[ARRAYSIZE(kSizes)];
+    DWORD bytesInRes[ARRAYSIZE(kSizes)] = {};
+
+    for (int i = 0; i < count; i++) {
+        int w = kSizes[i];
+        int h = kSizes[i];
+        int maskRow = ((w + 31) / 32) * 4; // .ico 内 AND 掩码行按 DWORD 对齐
+        int xorSize = w * h * 4;
+        int maskSize = maskRow * h;
+
+        std::vector<BYTE>& img = images[i];
+        img.assign(sizeof(BITMAPINFOHEADER) + xorSize + maskSize, 0);
+
+        BITMAPINFOHEADER bih = {};
+        bih.biSize = sizeof(BITMAPINFOHEADER);
+        bih.biWidth = w;
+        bih.biHeight = h * 2; // XOR + AND 两个高度
+        bih.biPlanes = 1;
+        bih.biBitCount = 32;
+        bih.biSizeImage = (DWORD)(xorSize + maskSize);
+        memcpy(img.data(), &bih, sizeof(bih));
+
+        // XOR 全 0 已由 assign 清零；AND 掩码全 1 = 全透明。
+        memset(img.data() + sizeof(BITMAPINFOHEADER) + xorSize, 0xFF, (size_t)maskSize);
+        bytesInRes[i] = (DWORD)img.size();
+    }
+
+    HANDLE hFile = CreateFileW(filePath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
+                               FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (hFile == INVALID_HANDLE_VALUE) return false;
+
+    bool ok = true;
+    DWORD written = 0;
+
+    // ICONDIR：reserved=0, type=1(图标), count。
+    BYTE dir[6] = {0x00, 0x00, 0x01, 0x00, (BYTE)count, 0x00};
+    ok = ok && WriteFile(hFile, dir, sizeof(dir), &written, nullptr) && written == sizeof(dir);
+
+    // ICONDIRENTRY × count。
+    DWORD imgOffset = 6 + (DWORD)(16 * count);
+    for (int i = 0; i < count && ok; i++) {
+        int s = kSizes[i];
+        BYTE entry[16] = {};
+        entry[0] = (BYTE)(s >= 256 ? 0 : s); // 0 表示 256
+        entry[1] = (BYTE)(s >= 256 ? 0 : s);
+        entry[2] = 0;    // 调色板色数（真彩为 0）
+        entry[3] = 0;    // 保留
+        entry[4] = 0x01; // planes
+        entry[5] = 0x00;
+        entry[6] = 32;   // bitcount
+        entry[7] = 0x00;
+        memcpy(entry + 8, &bytesInRes[i], 4);
+        memcpy(entry + 12, &imgOffset, 4);
+        ok = WriteFile(hFile, entry, sizeof(entry), &written, nullptr) &&
+             written == sizeof(entry);
+        imgOffset += bytesInRes[i];
+    }
+
+    // 图像数据体。
+    for (int i = 0; i < count && ok; i++) {
+        ok = WriteFile(hFile, images[i].data(), bytesInRes[i], &written, nullptr) &&
+             written == bytesInRes[i];
+    }
+
+    CloseHandle(hFile);
+    if (!ok) {
+        DeleteFileW(filePath);
+    }
+    return ok;
+}
+
+// 解析（并按需生成）重定向目标串。首次调用后缓存，保证同一会话内写入与清
+// 理比对用的是同一串。
+static bool PIEnsureBlankIconSource() {
+    if (g_PIBlankIconSourceReady) {
+        return !g_PIBlankIconSource.empty();
+    }
+    g_PIBlankIconSourceReady = true;
+
+    WCHAR buf[MAX_PATH];
+    DWORD n = GetEnvironmentVariableW(L"LOCALAPPDATA", buf, MAX_PATH);
+    if (n > 0 && n < MAX_PATH) {
+        std::wstring dir = buf;
+        dir += L"\\CW-Beautify";
+        CreateDirectoryW(dir.c_str(), nullptr); // 已存在时返回失败，忽略
+        std::wstring path = dir + L"\\PurifyIcons-blank.ico";
+        if (PIWriteBlankIcoFile(path.c_str())) {
+            g_PIBlankIconSource = path + L",0";
+            Wh_Log(L"[CW] PurifyIcons: blank icon file ready: %s", path.c_str());
+        }
+    }
+    if (g_PIBlankIconSource.empty()) {
+        // 轻松设置 v1.12 的重定向串（imageres.dll 的空白图标位），作为本地
+        // 文件不可用时的回退。
+        g_PIBlankIconSource = L"%systemroot%\\system32\\imageres.dll,197";
+        Wh_Log(L"[CW] PurifyIcons: blank icon file unavailable, falling back to imageres.dll,197");
+    }
+    return true;
+}
+
+// 应用/移除第 0 层覆盖。removing=false 时按当前设置写入缺失值；removing=true
+// 时删除本模组写入的值。返回「是否发生了注册表变化」（供卸载路径决定是否
+// 需要触发缓存重建）。
+static bool PIApplyShellIconsOverride(bool removing) {
+    struct PIOverrideItem {
+        int index;
+        bool wanted;
+    };
+    PIOverrideItem items[2] = {
+        {29, !removing && g_PISettings.arrows},
+        {77, !removing && g_PISettings.shields},
+    };
+
+    PIEnsureBlankIconSource();
+
+    bool changed = false;
+    HKEY hKey = nullptr;
+    LONG rc = RegCreateKeyExW(HKEY_CURRENT_USER, kPIShellIconsSubkey, 0, nullptr,
+                              REG_OPTION_NON_VOLATILE, KEY_QUERY_VALUE | KEY_SET_VALUE,
+                              nullptr, &hKey, nullptr);
+    if (rc != ERROR_SUCCESS || !hKey) {
+        Wh_Log(L"[CW] PurifyIcons: cannot open HKCU Shell Icons key (rc=%ld)", rc);
+        return false;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        std::wstring name = std::to_wstring(items[i].index);
+        const std::wstring& want = g_PIBlankIconSource;
+
+        WCHAR existing[512] = {};
+        DWORD type = 0;
+        DWORD cb = sizeof(existing) - sizeof(WCHAR);
+        rc = RegQueryValueExW(hKey, name.c_str(), nullptr, &type, (BYTE*)existing, &cb);
+        bool exists = (rc == ERROR_SUCCESS && type == REG_SZ);
+        if (exists) {
+            existing[cb / sizeof(WCHAR)] = L'\0';
+        }
+
+        if (items[i].wanted) {
+            if (exists && _wcsicmp(existing, want.c_str()) == 0) {
+                continue; // 已是本模组目标值，幂等
+            }
+            if (exists) {
+                // 用户或其他工具的自建值：绝不覆盖（第 0 层缺位时仍有进程内
+                // 四层防线兜底，功能不致完全失效）。
+                Wh_Log(L"[CW] PurifyIcons: Shell Icons value %s exists with foreign data, left untouched",
+                       name.c_str());
+                continue;
+            }
+            rc = RegSetValueExW(hKey, name.c_str(), 0, REG_SZ, (const BYTE*)want.c_str(),
+                                (DWORD)((want.size() + 1) * sizeof(WCHAR)));
+            if (rc == ERROR_SUCCESS) {
+                changed = true;
+                Wh_Log(L"[CW] PurifyIcons: Shell Icons %s -> %s", name.c_str(),
+                       want.c_str());
+            } else {
+                Wh_Log(L"[CW] PurifyIcons: Shell Icons %s write failed (rc=%ld)",
+                       name.c_str(), rc);
+            }
+        } else if (exists && _wcsicmp(existing, want.c_str()) == 0) {
+            // 仅删除内容为本模组模板的值（跨会话所有权判定），绝不误删用户
+            // 自建值。
+            rc = RegDeleteValueW(hKey, name.c_str());
+            if (rc == ERROR_SUCCESS) {
+                changed = true;
+                Wh_Log(L"[CW] PurifyIcons: Shell Icons %s removed (was ours)", name.c_str());
+            }
+        }
+    }
+
+    RegCloseKey(hKey);
+    return changed;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 功能二：隐藏图标文字标签（Labels）
 // 机制（kivsak 验证、ELSEGuy 补充）：桌面 SysListView32 绘制期间置
 // thread_local 标记，DrawTextW / DrawThemeTextEx 钩子对目标标签置空或剥离
@@ -618,7 +921,7 @@ static HRESULT WINAPI PIDrawThemeTextEx_Hook(HTHEME hTheme, HDC hdc, int iPartId
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能一/三：快捷方式箭头与 UAC 盾牌（图像列表 + 提取期 + 绘制期三层）
+// 功能一/三：快捷方式箭头与 UAC 盾牌（图像列表 + 提取期 + 绘制期纵深防线）
 // ─────────────────────────────────────────────────────────────────────────────
 
 #ifndef IDO_SHGIOI_LINK
@@ -705,8 +1008,9 @@ static const UINT_PTR PI_SELF_HEAL_TIMER_ID = 0x50494943; // 'PIIC'
 // 置位，深度校验与重打一律由 PISelfHealCheck 在桌面线程消费执行）。
 static std::atomic<bool> g_PIImageListRebuildHint{false};
 
-// SHGetStockIconInfo 钩子用的空白盾牌图标缓存：[0] = 标准尺寸，[1] = 小尺寸。
-// 在初始化时按需预创建（避免在钩子内懒初始化产生线程竞争）。
+// SHGetStockIconInfo / SHDefExtractIconW 钩子用的空白盾牌图标缓存：
+// [0] = 标准尺寸，[1] = 小尺寸。在初始化时按需预创建（避免在钩子内懒初始化产
+// 生线程竞争）。
 static HICON g_PIBlankShieldIcon[2] = { nullptr, nullptr };
 
 // ---------------------------------------------------------------------------
@@ -719,8 +1023,8 @@ static HICON g_PIBlankShieldIcon[2] = { nullptr, nullptr };
 //  - 盾牌：三个源图标位置（shell32,77 / imageres,77 / imageres,78）注册的
 //    overlay 槽位一并重指向空白；SIID_SHIELD 在系统图像列表中的图像项原位替
 //    换为空白（ReplaceIcon 保持索引不变，覆盖「直接引用槽位图像」的路径）。
-//    但 Win11 桌面可见的盾牌主要来自提取期合成（见第 1 层 SHGetFileInfoW 钩
-//    子），本函数必须与其配合使用；
+//    提取期合成的盾牌由第 0 层（注册表源重定向）与第 1 层（SHDefExtractIconW
+//    拦截）配合兜住，本层负责 overlay 与直绘槽位通道；
 //  - 补丁幂等且可重入：每次执行先清空自愈锚点记录，成功打上的列表重新记录
 //    锚点（索引+尺寸），供自愈校验比对。
 // ---------------------------------------------------------------------------
@@ -830,14 +1134,19 @@ static BOOL WINAPI PIImageListDrawIndirect_Hook(IMAGELISTDRAWPARAMS* pimldp) {
 }
 
 // ---------------------------------------------------------------------------
-// 第 1 层：提取期合成拦截（SHGetFileInfoW）与库存图标替换（SHGetStockIconInfo）
+// 第 1 层：提取期拦截（SHGetFileInfoW / SHGetStockIconInfo / SHDefExtractIconW）
 //
-// Win11（实测 22H2）上桌面可见的 UAC 盾牌在图标提取期经
-// SHGetFileInfo(SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX) 被合成进 HICON 位图本
-// 体，不出现独立的 overlay 绘制调用，图像列表补丁与绘制期拦截对已合成部分无
-// 效；在源头剥离这两个标志即可让 shell 返回未合成的干净图标。
-// 仅在 hideShields 开启时剥离，保证与「移除快捷方式箭头」互相独立（只开箭头
-// 时提取期仍照常合成，盾牌显示不受影响）。
+// 1) SHGetFileInfoW：Win11（实测 22H2）上部分调用方经
+//    SHGetFileInfo(SHGFI_ADDOVERLAYS | SHGFI_OVERLAYINDEX) 请求把 overlay（含
+//    UAC 盾牌）编码进返回结果，剥离这两个标志即返回未合成的干净图标。仅在
+//    hideShields 开启时剥离，保证与「移除快捷方式箭头」互相独立。
+// 2) SHGetStockIconInfo：直接请求 SIID_SHIELD 图标句柄的调用方（工具栏、按钮
+//    装饰等）改为拿到空白图标副本。
+// 3) SHDefExtractIconW（1.1.0 新增）：桌面图标的真实提取路径是
+//    IExtractIcon → SHDefExtractIconW（不经过 SHGetFileInfoW），盾牌在提取期
+//    被合成进返回的 HICON 位图本体（1.0.0 实测缺陷根因）。本钩子把「请求
+//    imageres.dll/shell32.dll 77/78 号盾牌源图标」的提取调用直接替换为空白
+//    HICON——合成管道即使绕过第 0 层注册表覆盖，也在此层拿不到真实盾牌。
 // ---------------------------------------------------------------------------
 using PISHGetFileInfoW_t = decltype(&SHGetFileInfoW);
 static PISHGetFileInfoW_t PISHGetFileInfoW_Original;
@@ -870,6 +1179,57 @@ static HRESULT WINAPI PISHGetStockIconInfo_Hook(SHSTOCKICONID siid, UINT uFlags,
     return hr;
 }
 
+// 判断「路径 + 索引」是否为盾牌源图标请求：文件名（不区分大小写）为
+// imageres.dll（索引 77/78，正负索引形式均接受）或 shell32.dll（索引 77）。
+static bool PIIsShieldSourceRequest(LPCWSTR pszIconFile, int iIconIndex) {
+    LPCWSTR name = pszIconFile;
+    for (LPCWSTR p = pszIconFile; *p; p++) {
+        if (*p == L'\\' || *p == L'/') name = p + 1;
+    }
+    bool isImageRes = _wcsicmp(name, L"imageres.dll") == 0;
+    bool isShell32 = _wcsicmp(name, L"shell32.dll") == 0;
+    if (!isImageRes && !isShell32) return false;
+
+    int idx = iIconIndex < 0 ? -iIconIndex : iIconIndex;
+    if (isShell32) return idx == 77;
+    return idx == 77 || idx == 78;
+}
+
+using PISHDefExtractIconW_t = HRESULT(WINAPI*)(LPCWSTR, int, DWORD, HICON*, HICON*, UINT);
+static PISHDefExtractIconW_t PISHDefExtractIconW_Original;
+static HRESULT WINAPI PISHDefExtractIconW_Hook(LPCWSTR pszIconFile, int iIconIndex, DWORD pwFlags,
+                                               HICON* phiconLarge, HICON* phiconSmall,
+                                               UINT nIconSize) {
+    if (g_PISettings.shields && pszIconFile && PIIsShieldSourceRequest(pszIconFile, iIconIndex)) {
+        // 盾牌源图标请求 → 返回空白副本。无法产出空白时放行原调用（失败安全）。
+        HICON hLarge = nullptr;
+        HICON hSmall = nullptr;
+        if (phiconLarge) {
+            hLarge = g_PIBlankShieldIcon[0] ? CopyIcon(g_PIBlankShieldIcon[0])
+                                            : PICreateBlankIcon(32, 32);
+            if (!hLarge) {
+                return PISHDefExtractIconW_Original(pszIconFile, iIconIndex, pwFlags,
+                                                    phiconLarge, phiconSmall, nIconSize);
+            }
+            *phiconLarge = hLarge;
+        }
+        if (phiconSmall) {
+            hSmall = g_PIBlankShieldIcon[1] ? CopyIcon(g_PIBlankShieldIcon[1])
+                                            : PICreateBlankIcon(16, 16);
+            if (!hSmall) {
+                if (hLarge) DestroyIcon(hLarge);
+                if (phiconLarge) *phiconLarge = nullptr;
+                return PISHDefExtractIconW_Original(pszIconFile, iIconIndex, pwFlags,
+                                                    phiconLarge, phiconSmall, nIconSize);
+            }
+            *phiconSmall = hSmall;
+        }
+        return S_OK;
+    }
+    return PISHDefExtractIconW_Original(pszIconFile, iIconIndex, pwFlags, phiconLarge,
+                                        phiconSmall, nIconSize);
+}
+
 static void PIInitBlankShieldIcons() {
     if (!g_PIBlankShieldIcon[0]) {
         g_PIBlankShieldIcon[0] = PICreateBlankIcon(GetSystemMetrics(SM_CXICON),
@@ -888,13 +1248,14 @@ static void PIInitBlankShieldIcons() {
 //  1. 补丁随列表销毁而丢失：图像列表置空是对「当时那批共享 SHIL 图像列表」
 //     的原位改写。explorer 图标缓存重建（重启 explorer、删除 iconcache、
 //     SHCNE_ASSOCCHANGED 刷新等）会销毁并重建这批列表，新列表由缓存按注册表
-//     Shell Icons 重定向重新填充，补丁随旧列表整体丢失。注意 SHGetImageList
-//     每次调用都现取当前列表（补丁与校验都不持旧句柄），失守不是「句柄缓存」
-//     问题，而是旧列表内容上的补丁不复存在。
-//  2. 残留小方框（旧版 2.0.0 实测）：注册表 Shell Icons 重定向（如
-//     29/77 → imageres.dll,197）把「非全空」的空图标回填进槽位——图标看起来
-//     是空的，实际带几个可见像素，显示为小方框。因此校验必须是像素级
-//     （PIIconIsBlank），而不是「有图标就算打过补丁」。
+//     Shell Icons 重定向重新填充。注意 SHGetImageList 每次调用都现取当前列表
+//     （补丁与校验都不持旧句柄），失守不是「句柄缓存」问题，而是旧列表内容
+//     上的补丁不复存在。1.1.0 起第 0 层覆盖存在时，重建回填的就是本模组空白
+//     源，本层主要覆盖覆盖缺位/被绕过的场景。
+//  2. 残留小方框（旧版 2.0.0 实测）：注册表 Shell Icons 重定向把「非全空」
+//     的空图标（imageres,197）回填进槽位——图标看起来是空的，实际带几个可
+//     见像素，显示为小方框。1.1.0 的第 0 层重定向目标是自生成真全透明 .ico
+//     （197 仅作回退），从根上消除该伪影；校验仍保持像素级（PIIconIsBlank）。
 //
 // 自愈设计（继承本包 better-Windows 2.1.2 的三路触发 + 三槽位校验）：
 //  - 覆盖面＝三类槽位：自愈锚点（补丁时记录的空白图标索引+尺寸）同时覆盖箭
@@ -1116,6 +1477,8 @@ static HWND WINAPI PICreateWindowExW_Hook(DWORD dwExStyle, LPCWSTR lpClassName,
 // 建的快捷方式；无需管理员；删除该值即恢复系统默认。
 // 安全策略：仅在该值缺失时写入（绝不覆盖用户已有的自定义模板）；关闭子项或
 // 卸载模组时，仅当「该值是本模组在本会话写入的」才删除，避免误删用户自建值。
+// （轻松设置 v1.12 的同功能走 HKCU\...\Explorer\link 经典变体，效果等价，见
+// 文件头「调研依据·二·4」。）
 // ---------------------------------------------------------------------------
 
 static bool g_PILinkValueOwnedByUs = false;
@@ -1202,7 +1565,7 @@ static void PIInstallHooks() {
         }
     }
 
-    // 提取期合成拦截与库存图标替换（shell32）。
+    // 提取期拦截与库存图标替换（shell32）。
     if (HMODULE hShell32 = GetModuleHandle(L"shell32.dll")) {
         if (auto p = (PISHGetFileInfoW_t)GetProcAddress(hShell32, "SHGetFileInfoW")) {
             WindhawkUtils::SetFunctionHook(p, PISHGetFileInfoW_Hook,
@@ -1211,6 +1574,11 @@ static void PIInstallHooks() {
         if (auto p = (PISHGetStockIconInfo_t)GetProcAddress(hShell32, "SHGetStockIconInfo")) {
             WindhawkUtils::SetFunctionHook(p, PISHGetStockIconInfo_Hook,
                                            &PISHGetStockIconInfo_Original);
+        }
+        // 1.1.0 新增：盾牌源图标提取拦截（桌面提取的真实路径）。
+        if (auto p = (PISHDefExtractIconW_t)GetProcAddress(hShell32, "SHDefExtractIconW")) {
+            WindhawkUtils::SetFunctionHook(p, PISHDefExtractIconW_Hook,
+                                           &PISHDefExtractIconW_Original);
         }
     }
 
@@ -1266,10 +1634,12 @@ BOOL Wh_ModInit() {
 void Wh_ModAfterInit() {
     Wh_Log(L"[CW] === PurifyIcons after init ===");
 
-    // 时序铁律：SHChangeNotify 会刷新图标缓存并重建系统图像列表，必须先通知、
-    // 后打图像列表补丁，否则补丁会被整体丢弃（上游实测结论）。
-    // 总开关全关时跳过通知与补丁，箭头/盾牌保持系统原样。
+    // 时序铁律（1.1.0 版）：注册表源重定向（第 0 层）写入 → SHChangeNotify
+    // 刷新图标缓存并重建图像列表 → 图像列表补丁。注册表值必须赶在缓存重建
+    // 之前写入（重建回填读取覆盖），补丁必须在重建之后打（否则被整体丢弃）。
+    // 总开关全关时跳过通知、覆盖与补丁，箭头/盾牌保持系统原样。
     if (g_PISettings.arrows || g_PISettings.shields) {
+        PIApplyShellIconsOverride(false);
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
         PIPatchImageLists();
     }
@@ -1285,9 +1655,13 @@ void Wh_ModUninit() {
 
     PIDetachDesktop();
 
-    // 已打过图像列表补丁（本会话 arrows/shields 曾生效）时，通知图标缓存刷
-    // 新即可重建图像列表、恢复箭头/盾牌原样（不再重新打补丁）。
-    if (g_PISelfHealArmed.load(std::memory_order_relaxed)) {
+    // 第 0 层覆盖清理：删除本模组写入的 Shell Icons 值（用户自建值不碰）。
+    // 返回值表示确有删除——此时需要一次缓存重建让箭头/盾牌恢复原样。
+    bool overrideRemoved = PIApplyShellIconsOverride(true);
+
+    // 已打过图像列表补丁（本会话 arrows/shields 曾生效）或有覆盖被删除时，
+    // 通知图标缓存刷新即可重建图像列表、恢复箭头/盾牌原样（不再重新打补丁）。
+    if (g_PISelfHealArmed.load(std::memory_order_relaxed) || overrideRemoved) {
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
     }
     g_PISelfHealArmed = false;
@@ -1306,8 +1680,8 @@ void Wh_ModUninit() {
 }
 
 // 任意设置变更 → 整模组重载（Wh_ModUninit → Wh_ModInit → Wh_ModAfterInit 重
-// 跑）：重新执行命名模板同步、图标缓存通知与图像列表补丁并重绘桌面，与独立
-// 上游模组行为一致，所有开关即时生效、无需重启资源管理器。
+// 跑）：重新执行命名模板同步、注册表覆盖写入、图标缓存通知与图像列表补丁并
+// 重绘桌面，与独立上游模组行为一致，所有开关即时生效、无需重启资源管理器。
 BOOL Wh_ModSettingsChanged(BOOL* bReload) {
     *bReload = TRUE;
     return TRUE;

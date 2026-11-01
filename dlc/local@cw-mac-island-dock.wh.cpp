@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-mac-island-dock
-// @name            CW-Mac 灵动岛与 Dock
-// @name:zh-CN      CW-Mac 灵动岛与 Dock
+// @name            CW-Mac 灵动岛与 Dock（独立进程版）
+// @name:zh-CN      CW-Mac 灵动岛与 Dock（独立进程版）
 // @name:pt-BR      Ilha e Dock estilo Mac
 // @description     An island at the top of the screen like the macOS menu bar and the iPhone's Dynamic Island (clock, control center, notifications, media, tray icons), and a macOS-like dock instead of the taskbar (or the Windows taskbar, transparent or as it is)
 // @description:zh-CN 屏幕顶部添加类似 macOS 菜单栏的灵动岛（时钟、控制中心、通知、媒体、托盘图标），并提供 macOS 风格的 Dock 任务栏（或保留 Windows 任务栏：透明或原样）。
@@ -30,9 +30,9 @@
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**caliberda**（[Mac Island & Dock](https://windhawk.net/mods/mac-island-dock)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：汉化元数据、说明与设置文案，代码逻辑与上游 2.1.0 一致。
+> 原作者：**caliberda**（[Mac Island & Dock](https://windhawk.net/mods/mac-island-dock)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：汉化元数据、说明与设置文案，代码逻辑与上游 2.1.0 一致。本模组另有一个**注入版**变体（见下文「与注入版变体的关系」）。
 
-# CW-Mac 灵动岛与 Dock
+# CW-Mac 灵动岛与 Dock（独立进程版）
 
 在 Windows 11 上重现 macOS 的顶部菜单栏与 iPhone 的灵动岛：屏幕顶部一条灵动岛（Island），带时钟、控制中心、通知、正在播放和托盘图标；并可把任务栏换成 macOS 风格的程序坞（Dock），或保留 Windows 任务栏（透明或原样）。模组自带简体中文界面（岛内设置 → Language 可切换语言或跟随 Windows）。
 
@@ -66,6 +66,20 @@ Windhawk 的 Settings 标签页只负责任务栏、Dock 与动画；灵动岛�
 - 双进程设计：灵动岛跑在独立的 windhawk.exe 进程里，程序坞注入 explorer.exe，一方出问题不影响另一方；显卡驱动重置后灵动岛会自动重启。
 - 联网功能（通知图片、天气、节假日、歌词、日历订阅、更新检查）默认全部关闭，按需开启；更新检查只在你操作时于终端里执行。
 - 设置、笔记等数据按整台电脑存储（各 Windows 账户共用；闹钟、计时器、文件夹固定等按账户区分），重装系统前请先在岛内设置导出备份。
+
+## 与注入版变体的关系
+
+本模组另有一个**注入版**变体：CW-Mac 灵动岛与 Dock（注入版）（`cw-mac-island-dock-inproc`，主套件根目录 `local@cw-mac-island-dock-inproc.wh.cpp`）。两者由同一份上游代码（Mac Island & Dock 2.1.1）衍生、版本号同源同号（2.1.1），功能与设置完全相同，仅运行方式不同：
+
+- **独立进程版（本模组，DLC）**：以 tool mod 形式运行——灵动岛与通知监视跑在独立的 windhawk.exe 进程里，Dock 注入 explorer.exe。优点是崩溃隔离——灵动岛一侧出错不影响 explorer 与 Dock；但会引发 windhawk.exe 宿主进程，内存占用较高。
+- **注入版（主套件）**：把同一份功能逻辑直接注入 explorer.exe 内运行，灵动岛与 Dock 都在 explorer 进程内，没有额外的后台进程、随 explorer 存活（重启资源管理器即随之重启），整体内存占用更低。
+
+两个版本**不可同时开启，只能二选一**：虽然两者 mod id 不同（Windhawk 允许同时处于启用状态），但两者都会创建灵动岛与 Dock——双份的岛窗口与 Dock 会互相重叠、抢夺任务栏改造与托盘监视，还带来双份图形设备开销，行为不可预测。请按需选择其中一个版本启用。
+
+另两点已知差异（其余功能相同）：
+
+- 两者的 mod id 不同，模组存储（灵动岛内部的配置文件、笔记、闹钟、计时器、托盘排列等）与 Windhawk 设置互不互通，换用另一版本时从默认开始；更换前可先在岛内设置导出备份，再在新版本导入。
+- 注入版的灵动岛随 explorer 内任务栏窗口出现而创建（explorer 启动的最初几秒暂不出现）；本独立进程版不依赖任务栏，启用即出现。
 
 ## 致谢与许可
 

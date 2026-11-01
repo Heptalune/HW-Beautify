@@ -276,11 +276,12 @@ if ($files.Count -eq 0) {
     Exit 1
 }
 
-# DLC 模组 id 清单（用于文档/脚本引用，安装本身按 dlc\ 目录扫描）
+# DLC 模组 id 清单（用于文档/脚本引用，安装本身按 dlc\ 目录扫描；
+# v2.8.0 双版本收尾：独立进程版的托盘悬停展开/晃动找指针/快速启动 Dock 已删除移出）
 $dlcModIds = @(
-    "local@cw-shake-find-cursor", "local@cw-overhauled-alt-tab",
+    "local@cw-overhauled-alt-tab",
     "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-    "local@cw-quick-launch-dock", "local@cw-pointer-afterimage",
+    "local@cw-pointer-afterimage",
     "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer"
 )
 

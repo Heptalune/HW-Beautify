@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-overhauled-alt-tab
-// @name            CW-现代 Alt+Tab 切换器
-// @name:zh-CN      CW-现代 Alt+Tab 切换器
+// @name            CW-现代 Alt+Tab 切换器（独立进程版）
+// @name:zh-CN      CW-现代 Alt+Tab 切换器（独立进程版）
 // @description     Replaces the boring Windows Alt+Tab with a modern and elegant window switcher.
 // @description:zh-CN 用现代优雅的窗口切换器替换 Windows 原生 Alt+Tab。
 // @version         1.3.1
@@ -20,11 +20,34 @@
 /*
 > 原作者：**IMiloDev**（[OverhauldedWin Alt+Tab](https://windhawk.net/mods/overhaulded-alt-tab)，MIT）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理。
 
-# CW-现代 Alt+Tab 切换器
+# CW-现代 Alt+Tab 切换器（独立进程版）
 
 用一套现代、流畅、高颜值的窗口切换器替换 Windows 原生的 Alt+Tab。
 
 由原生 C++ 从零打造，用于探索 Windows API、图形、动画系统与桌面自定义。问题反馈（英文）请前往原版 [GitHub 仓库](https://github.com/IMiloDev/OverhauldedWin)。
+
+## 与注入版变体的关系
+
+本模组另有一个**注入版**变体：CW-现代 Alt+Tab 切换器（注入版）（
+`cw-overhauled-alt-tab-inproc`，主套件根目录
+`local@cw-overhauled-alt-tab-inproc.wh.cpp`）。两者由同一份上游代码衍生、版本号
+同源同号（1.3.1），功能与设置完全相同，仅运行方式不同：
+
+- **独立进程版（本模组，DLC）**：以 tool mod 形式运行在独立的 windhawk.exe 进程中
+  （explorer 只负责把 Alt+Tab 热键移交给切换器）。优点是崩溃隔离——模组自身出错
+  不影响 explorer；但会引发 windhawk.exe 宿主进程，内存占用较高。
+- **注入版（主套件）**：把同一份功能逻辑直接注入 explorer.exe 内运行，切换器
+  UI、输入线程与热键转发全部在 explorer 进程内，没有额外的后台进程、随 explorer
+  存活（重启资源管理器即随之重启），整体内存占用更低；缺点是没有崩溃隔离，模组
+  自身出错可能连带影响 explorer 本身。
+
+两个版本**不可同时开启，只能二选一**：虽然两者 mod id 不同（Windhawk 允许同时
+处于启用状态），但两者都会接管 Alt+Tab——两套热键转发与输入处理互相争抢，切换器
+行为不可预测，还有双份图形设备开销。请按需选择其中一个版本启用。
+
+已知局限：注入版在系统开启「在单独的进程中打开文件夹窗口」（文件夹选项 → 常规）、
+存在多个 explorer 进程时，可能出现多实例等异常；遇到问题时请回到本独立进程版
+（独立进程只有一个，天然无此问题）。
 
 ## 截图
 

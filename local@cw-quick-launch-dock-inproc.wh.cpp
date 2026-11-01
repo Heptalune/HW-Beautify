@@ -1,32 +1,69 @@
 // ==WindhawkMod==
-// @id              cw-quick-launch-dock
-// @name            CW-快速启动 Dock
-// @name:zh-CN      CW-快速启动 Dock
-// @name:ru-RU      Панель быстрого запуска
+// @id              cw-quick-launch-dock-inproc
+// @name            CW-快速启动 Dock（注入版）
+// @name:zh-CN      CW-快速启动 Dock（注入版）
+// @name:ru-RU      Панель быстрого запуска (внедрённая версия)
 // @description     A slim animated dock on the screen edge: drop a shortcut or pick a program with "+", then launch it in one click
 // @description:zh-CN 屏幕边缘的纤细动画 Dock：把快捷方式拖上去，或点「+」选择程序，一键即可启动
 // @description:ru-RU Тонкая анимированная панель у края экрана: перетащи ярлык или выбери программу через «+» и запускай в один клик
 // @version         1.1.1
 // @author          cheliks1123
 // @github          https://github.com/cheliks1123
-// @include         windhawk.exe
+// @include         explorer.exe
 // @compilerOptions -lshell32 -lcomdlg32 -lgdi32 -luser32 -lole32 -loleaut32 -ldwmapi -lcomctl32 -ladvapi32 -lwininet
 // ==/WindhawkMod==
 
-// CW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.1.0 逐字节一致。
-// 原版 mod：https://windhawk.net/mods/quick-launch-dock
+// CW-Beautify 整合说明：本文件是 dlc\local@cw-quick-launch-dock.wh.cpp（独立进程版
+// tool mod，同源同版本号 1.1.1）的「注入版」变体：剥离 WhTool 独立进程启动样板
+// （windhawk.exe 专用进程互斥体、EntryPoint_Hook 入口挂钩、CreateProcessInternalW
+// 自拉起与 -tool-mod 参数解析、会话 0 判定、卸载时的 ExitProcess），改为
+// @include explorer.exe 的普通模组——Wh_ModInit 直接创建 UI 线程（COM 初始化、GDI+
+// 动态加载、消息泵与面板创建逻辑照原样），Wh_ModSettingsChanged 向控制窗口投递
+// WM_RELOAD，Wh_ModUninit 停止网站图标线程并结束 UI 线程；设置与功能逻辑与独立进程
+// 版逐字一致，仅生命周期接入方式不同。两种版本功能相同，不可同时开启，详见 readme
+// 「与独立进程版的区别」。
+// 原版 mod：https://windhawk.net/mods/quick-launch-dock（汉化元数据、说明与设置文案）
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**cheliks1123**（[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理：汉化元数据、说明与设置文案，代码逻辑与上游 1.1.0 逐字节一致。
+> 原作者：**cheliks1123**（[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，是原 DLC 模组「CW-快速启动 Dock（独立进程版）」（已从整合包移除，见下文）的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑与独立进程版 1.1.1 逐字一致。
 
-# CW-快速启动 Dock
+# CW-快速启动 Dock（注入版）
 
 ![CW-快速启动 Dock 演示动图 - 把快捷方式拖到 Dock 上](https://raw.githubusercontent.com/cheliks1123/Quick-launch-dock/main/quck-lauch-dock.gif)
 
 *把快捷方式拖到 Dock 上它就会留在那里，点击图标即可启动。*
 
 一条纤细、动画流畅的 Dock 常驻屏幕边缘，让你一键打开常用的程序、文件和文件夹。可以把它理解成一条带「+」槽位的迷你启动条：把快捷方式拖上去，或点「+」选择程序，它就会一直留在那里，直到你删除它。
+
+本版为「注入版」：以普通模组形式直接注入 explorer.exe 内运行，没有额外的后台进程，随 explorer 存活（重启资源管理器即随之重启）。
+
+## 与独立进程版的区别
+
+本模组是原 DLC 模组「CW-快速启动 Dock（独立进程版）」（`cw-quick-launch-dock`）的
+**注入版变体**：两者由同一份上游代码（Quick Launch Dock 1.1.0）衍生，版本号同源同号
+（1.1.1），功能与设置完全相同，仅运行方式不同：
+
+- **注入版（本模组，`cw-quick-launch-dock-inproc`）**：以普通模组形式注入
+  explorer.exe 内运行。没有额外的后台进程，随 explorer 存活（重启资源管理器即随之
+  重启），整体内存占用更低。
+- **独立进程版（`cw-quick-launch-dock`）**：以 tool mod 形式运行在独立的
+  windhawk.exe 进程中。优点是崩溃隔离——模组自身出错不影响 explorer；缺点是会引发
+  windhawk.exe 宿主进程，内存占用较高。
+
+两个版本不可同时开启：虽然两者 mod id 不同（Windhawk 允许同时处于启用状态），但它们
+会在相同的屏幕边缘各画一套 Dock——两套面板重叠、互相争抢鼠标输入与置顶层的显示层级，
+「运行中的程序显示圆点」还会带来双份进程轮询开销。
+
+**可能导致的问题**：本模组与 explorer 同进程运行，模组异常可能连带影响 explorer 的
+稳定性（独立进程版崩溃只影响自身）；此外，若系统开启了「在单独的进程中打开文件夹窗口」
+（文件夹选项 → 常规），每个资源管理器进程都会注入本模组，可能出现多个 Dock 实例。
+
+**独立进程版已从整合包移除**：如需找回，可从整合包仓库的 git 历史获取
+`dlc\local@cw-quick-launch-dock.wh.cpp`；也可以直接安装上游原版 mod：Quick Launch Dock
+（Quick-launch-dock），作者 cheliks1123，原版链接：
+<https://windhawk.net/mods/quick-launch-dock>（本包 1.1.1 与上游源码同源同号；原版为
+tool mod，运行在独立进程中，具备崩溃隔离）。
 
 > ⚠️ **关于网站图标请注意：**并非每个网站都提供图标，提供的也未必质量好。很多网站只有 16×16 或 32×32 的小图标，放在较大的 Dock 上会显得模糊，有些网站干脆没有图标，这时槽位里会显示一个灰色地球 🌐。你随时可以通过「更改图标」🖼️ 自选图片。
 
@@ -97,7 +134,7 @@
 
 ## 📝 说明与限制
 
-- 模组作为独立工具在自己的专属进程中运行（不注入 explorer，不挂钩任何函数），因此模组出问题也不会影响 Windows 外壳，且同时只会运行一个实例。
+- 模组不挂钩任何函数，但作为「注入版」运行在 explorer.exe 进程内：如模组自身出错，可能连带影响 Windows 外壳（资源管理器）；若系统开启了「在单独的进程中打开文件夹窗口」（文件夹选项 → 常规），每个资源管理器进程都会注入本模组，可能出现多个 Dock 实例。具备崩溃隔离的原独立进程版已从整合包移除，需要时可从整合包仓库的 git 历史找回，或安装上游原版 mod（见「与独立进程版的区别」一节）。
 - 从**以管理员身份**运行的窗口拖放会被 Windows（UIPI）阻止，此时请使用「+」按钮。
 - Dock 位于**主**显示器。开启自动隐藏且同侧还接有另一台显示器时，光标可能太快掠过边缘而唤不出 Dock——此时请关闭自动隐藏。
 - 槽位数量受屏幕边缘长度限制，角落处会留出空间，避免相邻边缘的面板相互重叠。
@@ -108,9 +145,9 @@
 
 ## 致谢与许可
 
-- 原版 mod：[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)，作者 cheliks1123（[GitHub](https://github.com/cheliks1123)）。
+- 原版 mod：[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)，作者 cheliks1123（[GitHub](https://github.com/cheliks1123)）。整合包曾另提供基于同一上游的 DLC 模组「CW-快速启动 Dock（独立进程版）」（1.1.1），该独立进程版已随双版本收编从整合包移除。
 - 感谢原作者 cheliks1123 的开发与分享。
-- 上游源码元数据未声明许可证字段；本汉化版由 CW-Beautify 整合包（作者 Heptalune，GPL-3.0）整理发布。
+- 上游源码元数据未声明许可证字段；本注入版由 CW-Beautify 整合包（作者 Heptalune，GPL-3.0）整理发布：功能逻辑与独立进程版 1.1.1 逐字一致，仅剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组生命周期。
 */
 // ==/WindhawkModReadme==
 
@@ -3668,19 +3705,23 @@ static DWORD WINAPI UiThread(LPVOID) {
     return 0;
 }
 
-BOOL WhTool_ModInit() {
+// ---- Mod lifecycle（注入版普通模组：原 WhTool_ModInit / WhTool_ModSettingsChanged /
+// WhTool_ModUninit 逻辑原样接入，UI 线程与网站图标线程在 Wh_ModUninit 释放，不再
+// 独立拉起进程）----
+
+BOOL Wh_ModInit() {
     g_stop = false;
     g_favStop = false;
     g_thread = CreateThread(nullptr, 0, UiThread, nullptr, 0, &g_threadId);
     return g_thread != nullptr;
 }
 
-void WhTool_ModSettingsChanged() {
+void Wh_ModSettingsChanged() {
     HWND h = g_ctrl.load();
     if (h) PostMessageW(h, WM_RELOAD, 0, 0);
 }
 
-void WhTool_ModUninit() {
+void Wh_ModUninit() {
     StopFavicons();
     g_stop = true;
     if (g_thread) {
@@ -3689,183 +3730,4 @@ void WhTool_ModUninit() {
         CloseHandle(g_thread);
         g_thread = nullptr;
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Windhawk tool mod implementation for mods which don't need to inject to other
-// processes or hook other functions. Context:
-// https://github.com/ramensoftware/windhawk/wiki/Mods-as-tools:-Running-mods-in-a-dedicated-process
-//
-// The mod will load and run in a dedicated windhawk.exe process.
-//
-// Paste the code below as part of the mod code, and use these callbacks:
-// * WhTool_ModInit
-// * WhTool_ModSettingsChanged
-// * WhTool_ModUninit
-//
-// Currently, other callbacks are not supported.
-
-bool g_isToolModProcessLauncher;
-HANDLE g_toolModProcessMutex;
-
-void WINAPI EntryPoint_Hook() {
-    Wh_Log(L">");
-    ExitThread(0);
-}
-
-BOOL Wh_ModInit() {
-    DWORD sessionId;
-    if (ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) &&
-        sessionId == 0) {
-        return FALSE;
-    }
-
-    bool isExcluded = false;
-    bool isToolModProcess = false;
-    bool isCurrentToolModProcess = false;
-    int argc;
-    LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
-    if (!argv) {
-        Wh_Log(L"CommandLineToArgvW failed");
-        return FALSE;
-    }
-
-    for (int i = 1; i < argc; i++) {
-        if (wcscmp(argv[i], L"-service") == 0 ||
-            wcscmp(argv[i], L"-service-start") == 0 ||
-            wcscmp(argv[i], L"-service-stop") == 0) {
-            isExcluded = true;
-            break;
-        }
-    }
-
-    for (int i = 1; i < argc - 1; i++) {
-        if (wcscmp(argv[i], L"-tool-mod") == 0) {
-            isToolModProcess = true;
-            if (wcscmp(argv[i + 1], WH_MOD_ID) == 0) {
-                isCurrentToolModProcess = true;
-            }
-            break;
-        }
-    }
-
-    LocalFree(argv);
-
-    if (isExcluded) {
-        return FALSE;
-    }
-
-    if (isCurrentToolModProcess) {
-        g_toolModProcessMutex =
-            CreateMutex(nullptr, TRUE, L"windhawk-tool-mod_" WH_MOD_ID);
-        if (!g_toolModProcessMutex) {
-            Wh_Log(L"CreateMutex failed");
-            ExitProcess(1);
-        }
-
-        if (GetLastError() == ERROR_ALREADY_EXISTS) {
-            Wh_Log(L"Tool mod already running (%s)", WH_MOD_ID);
-            ExitProcess(1);
-        }
-
-        if (!WhTool_ModInit()) {
-            ExitProcess(1);
-        }
-
-        IMAGE_DOS_HEADER* dosHeader =
-            (IMAGE_DOS_HEADER*)GetModuleHandle(nullptr);
-        IMAGE_NT_HEADERS* ntHeaders =
-            (IMAGE_NT_HEADERS*)((BYTE*)dosHeader + dosHeader->e_lfanew);
-
-        DWORD entryPointRVA = ntHeaders->OptionalHeader.AddressOfEntryPoint;
-        void* entryPoint = (BYTE*)dosHeader + entryPointRVA;
-
-        Wh_SetFunctionHook(entryPoint, (void*)EntryPoint_Hook, nullptr);
-        return TRUE;
-    }
-
-    if (isToolModProcess) {
-        return FALSE;
-    }
-
-    g_isToolModProcessLauncher = true;
-    return TRUE;
-}
-
-void Wh_ModAfterInit() {
-    if (!g_isToolModProcessLauncher) {
-        return;
-    }
-
-    WCHAR currentProcessPath[MAX_PATH];
-    switch (GetModuleFileName(nullptr, currentProcessPath,
-                              ARRAYSIZE(currentProcessPath))) {
-        case 0:
-        case ARRAYSIZE(currentProcessPath):
-            Wh_Log(L"GetModuleFileName failed");
-            return;
-    }
-
-    WCHAR
-    commandLine[MAX_PATH + 2 +
-                (sizeof(L" -tool-mod \"" WH_MOD_ID "\"") / sizeof(WCHAR)) - 1];
-    swprintf_s(commandLine, L"\"%s\" -tool-mod \"%s\"", currentProcessPath,
-               WH_MOD_ID);
-
-    HMODULE kernelModule = GetModuleHandle(L"kernelbase.dll");
-    if (!kernelModule) {
-        kernelModule = GetModuleHandle(L"kernel32.dll");
-        if (!kernelModule) {
-            Wh_Log(L"No kernelbase.dll/kernel32.dll");
-            return;
-        }
-    }
-
-    using CreateProcessInternalW_t = BOOL(WINAPI*)(
-        HANDLE hUserToken, LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
-        LPSECURITY_ATTRIBUTES lpProcessAttributes,
-        LPSECURITY_ATTRIBUTES lpThreadAttributes, WINBOOL bInheritHandles,
-        DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
-        LPSTARTUPINFOW lpStartupInfo,
-        LPPROCESS_INFORMATION lpProcessInformation,
-        PHANDLE hRestrictedUserToken);
-    CreateProcessInternalW_t pCreateProcessInternalW =
-        (CreateProcessInternalW_t)GetProcAddress(kernelModule,
-                                                 "CreateProcessInternalW");
-    if (!pCreateProcessInternalW) {
-        Wh_Log(L"No CreateProcessInternalW");
-        return;
-    }
-
-    STARTUPINFO si{
-        .cb = sizeof(STARTUPINFO),
-        .dwFlags = STARTF_FORCEOFFFEEDBACK,
-    };
-    PROCESS_INFORMATION pi;
-    if (!pCreateProcessInternalW(nullptr, currentProcessPath, commandLine,
-                                 nullptr, nullptr, FALSE, NORMAL_PRIORITY_CLASS,
-                                 nullptr, nullptr, &si, &pi, nullptr)) {
-        Wh_Log(L"CreateProcess failed");
-        return;
-    }
-
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-}
-
-void Wh_ModSettingsChanged() {
-    if (g_isToolModProcessLauncher) {
-        return;
-    }
-
-    WhTool_ModSettingsChanged();
-}
-
-void Wh_ModUninit() {
-    if (g_isToolModProcessLauncher) {
-        return;
-    }
-
-    WhTool_ModUninit();
-    ExitProcess(0);
 }

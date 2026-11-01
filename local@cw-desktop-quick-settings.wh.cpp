@@ -2,9 +2,9 @@
 // @id              cw-desktop-quick-settings
 // @name            CW-更好的Windows（小细节）
 // @name:zh-CN      CW-更好的Windows（小细节）
-// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the desktop marquee selection, turning off the change-file-extension warning, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
-// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面框选矩形松开后平滑淡出；重命名修改扩展名不再弹确认警告；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
-// @version         2.2.0
+// @description     Windows small-details collection: Aero Peek on the "Show desktop" button hover, desktop icon hiding through the system toggle (double-click / idle auto-hide, optional smooth fade), a fade-out for the marquee selection on the desktop and in File Explorer, turning off the change-file-extension warning, Start menu power buttons, drag files onto a floating target to move them to the Recycle Bin, restored logon/logoff/shutdown sounds, and window optimization (Alt+drag, slick window arrangement, invisible window borders)
+// @description:zh-CN Windows 细节功能大合集：悬停「显示桌面」按钮显示 Aero Peek 桌面速览；双击桌面空白处隐藏图标（系统开关方式，可选平滑过渡动画）；桌面与文件管理器中的框选矩形松开后平滑淡出；重命名修改扩展名不再弹确认警告；开始菜单一键电源按钮；拖动文件到悬浮目标移入回收站；恢复登录/注销/关机音效；窗口优化（按住触发键任意拖动/调整窗口大小、窗口滑动排列与吸附、隐形窗口边框）。
+// @version         2.2.1
 // @author          m417z, Heptalune, angel_lov, HeyOkay, Hakuuyosei（灵弦）, iMAboud, Toru the Red Fox, Bo0ii
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
@@ -73,7 +73,7 @@ Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能
 |---|------|-----------|-----------|-----------|---------------|
 | 1 | 显示桌面按钮预览 | `peek.*` | 开 | 悬停任务栏「显示桌面」按钮显示 Aero Peek 桌面速览 | m417z（GPL-3.0） |
 | 2 | 桌面图标隐藏设置 | `toggleIcons.*` | 开 | 双击桌面空白处/闲置自动隐藏图标（系统开关方式，可选平滑过渡动画） | Heptalune 原创 + HeyOkay 绘制技术（MIT） |
-| 3 | 桌面框选淡出 | `marquee.*` | 开 | 桌面框选矩形松开后平滑淡出 | angel_lov（MIT） |
+| 3 | 框选淡出 | `marquee.*` | 开 | 桌面与文件管理器中的框选矩形松开后平滑淡出 | angel_lov（MIT） |
 | 4 | 扩展名警告 | `extWarn.*` | **关** | 重命名修改扩展名时不再弹出确认警告 | m417z（GPL-3.0） |
 | 5 | 开始菜单电源按钮 | `powerBtn.*` | **关** | 开始菜单一键关机/重启/注销/睡眠/休眠/锁定 | Hakuuyosei/灵弦（MIT 惯例） |
 | 6 | 拖拽删除 | `dragDel.*` | **关** | 把文件拖到屏幕悬浮目标上移入回收站 | iMAboud（MIT） |
@@ -100,13 +100,14 @@ Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能
 
 如果想要开机就不显示图标，请先在桌面空白处右键 →「查看」，取消勾选「显示桌面图标」。想让任务栏也在闲置时淡出，可配合任务栏类 mod 使用。
 
-## 分组 3：桌面框选淡出（marquee.*）
+## 分组 3：框选淡出（marquee.*）
 
-在桌面按住鼠标拖动框选图标后，松开鼠标按钮的瞬间，框选矩形以平滑动画优雅淡出，而非凭空消失。动画速度（50-500%）、时长（100-2000 毫秒）、起始不透明度、自动计算不透明度、被遮挡时 4 倍速淡出、单实例模式与自定义填充/边框颜色（HEX）均可在组内调节。
+在桌面或文件管理器（资源管理器）文件夹窗口的视图空白处按住鼠标拖动框选后，松开鼠标按钮的瞬间，框选矩形以平滑动画优雅淡出，而非凭空消失。动画速度（50-500%）、时长（100-2000 毫秒）、起始不透明度、自动计算不透明度、被遮挡时 4 倍速淡出、单实例模式与自定义填充/边框颜色（HEX）均可在组内调节；「同时应用于文件管理器」（默认开启）控制覆盖面是否扩展到文件夹窗口。
 
-- 仅在持有桌面（Shell）的 explorer 实例中生效，以 /factory、-Embedding 等参数启动的实例自动跳过。
-- 依赖桌面经典的 Progman/WorkerW → SHELLDLL_DefView → SysListView32 结构；使用壁纸引擎等替换桌面视图的工具时可能不生效。
-- 在桌面图标上按下鼠标（命中图标）时不会触发淡出，仅在空白处框选时触发。
+- 桌面侧依赖经典的 Progman/WorkerW → SHELLDLL_DefView → SysListView32 结构，使用壁纸引擎等替换桌面视图的工具时可能不生效；文件管理器侧按「文件夹窗口（CabinetWClass）下的列表视图」判定，普通视图、多标签页与新建窗口均可覆盖。
+- 在图标/文件上按下鼠标（命中条目）或拖动滚动条时不会触发淡出，仅在视图空白处框选时触发；文件夹窗口内的淡出矩形与系统框选一样裁剪在视图范围内。
+- 框选淡出只替换松手瞬间的框选矩形覆盖层，不触碰文件夹窗口的内容切换与动画——与「CW-更好的文件管理器」（cw-file-explorer-plus，含 ContentAnim 内容动画段）等修改文件夹内容动画的模组作用面不同，可同时启用、互不干扰。
+- 生效于每一个 explorer.exe 实例（以 /factory、-Embedding 等参数启动的实例自动跳过），各实例只对自己持有的视图出动画：开启「在单独的进程中打开文件夹窗口」时同样生效且不会重复；「仅允许单个动画实例」按 explorer 实例各自去重。
 - 「使用自定义颜色」只作用于淡出覆盖层，拖动过程中的实时框选矩形仍为系统配色。
 
 ## 分组 4：扩展名警告（extWarn.*，默认关闭）
@@ -166,12 +167,13 @@ Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能
 
 本模组注入所有进程（`@include *`，排除 windhawk.exe、windhawk-ui.exe 与 devenv.exe），各分组按需门控：
 
-- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、桌面框选淡出、扩展名警告、拖拽删除、登录注销关机音效；
+- **仅在 explorer.exe 生效**：显示桌面按钮预览、桌面图标隐藏设置、框选淡出、扩展名警告、拖拽删除、登录注销关机音效；
 - **explorer.exe + StartMenuExperienceHost.exe 分流**：开始菜单电源按钮（按钮注入在开始菜单进程、电源动作由 explorer 的隐藏代理窗口执行）；
 - **全进程生效**：窗口拖动（Alt+拖动）、窗口排列、隐形窗口边框。
 
 ## 变更记录
 
+- **2.2.1**：「桌面框选淡出」扩展为「框选淡出」——覆盖面由仅桌面扩展到文件管理器：资源管理器文件夹窗口（CabinetWClass）内视图空白处的框选矩形松开后同样平滑淡出（文件夹视图的框选矩形与桌面一样由 SysListView32 绘制，淡出覆盖层机制完全复用，仅目标发现扩展：按按下点的最深窗口为 SysListView32、根窗口为 CabinetWClass 判定，逐次按下时解析，天然覆盖新建窗口与标签页切换；淡出矩形取拖动矩形与列表视图客户区的交集，与系统框选一样裁剪在视图范围内）。命中图标/文件（LVM_HITTEST）或滚动条等非客户区不触发；新增设置 `marquee.applyToExplorer`（默认开启，双语「同时应用于文件管理器」）控制文件管理器覆盖面。生效机制调整：低级鼠标钩子由仅 Shell 实例安装放宽为每个 explorer.exe 实例各自安装（/factory、-Embedding 实例仍跳过），每个实例只对自己持有的 SysListView32 动画（按进程归属去重，跨进程不发送指针消息），开启「在单独的进程中打开文件夹窗口」时同样生效且不会重复；「被遮挡时加速淡出」的判定由前台窗口类名（Progman/WorkerW）改为与动画宿主顶层窗口（桌面顶层或文件夹窗口）比较，文件夹窗口内框选淡出不再因自身在前台而被误加速。分组显示名由「桌面框选淡出」更名「框选淡出」，模组描述与功能表同步更新；与「CW-更好的文件管理器」（cw-file-explorer-plus，ContentAnim 内容动画）等内容切换类模组作用面不同（本功能只覆盖松手瞬间的框选矩形），可同时启用。设置变更即时生效，无需重启资源管理器，x86/x64 双架构编译。
 - **2.2.0**：「纯净化图标」分组（`purity.*`，上游 kivsak Hide Desktop Icon Text and Shortcut Arrows）整体移出本模组，后续将由独立新模组「CW-纯净化图标」替代。删除该分组设置块与全部实现代码（含 DrawTextW / DrawThemeTextEx 文字隐藏钩子、系统图像列表箭头/盾牌补丁及其持久自愈校验、SHGetFileInfoW / SHGetStockIconInfo 钩子、comctl32 ImageList_Create/Destroy 感知钩子、桌面 FolderView 子类与 SHChangeNotify 刷新时序逻辑），共享 CreateWindowExW 钩子的分发对象由三个功能减为两个（ToggleIcons / SmoothIcons）；设置页由十一个可收起分组变为十个。旧设置键 `purity.enable` 等不再被读取，如曾开启请留意该功能自本模组消失（已移除的箭头/盾牌待图标缓存刷新后恢复原样），更新后无需重启资源管理器，其余分组设置与行为不变，x86/x64 双架构编译。
 - **2.1.2**：「双击返回上级」分组（`dblUp.*`，上游 wrldspawn Explorer Double Click Up）整体移出本模组，后续将并入「CW-更好的文件管理器」模组。删除该分组设置块与全部实现代码（含 explorerframe.dll 的 FileCabinet_CreateViewWindow2 挂钩、SysListView32 / DirectUI 子类、UIAutomation 空白判定及 DblUp 专用的 UIAutomation/COM 头文件引入），共享 CreateWindowExW 钩子的分发对象由四个功能减为三个（ToggleIcons / SmoothIcons / Purity）；设置页由十二个可收起分组变为十一个。旧设置键 `dblUp.enable` 不再被读取，如曾开启请留意该功能自本模组消失，更新后无需重启资源管理器，其余分组设置与行为不变，x86/x64 双架构编译。
 - **2.1.1**：修复纯净化图标在 explorer 图标缓存彻底重建后（重启资源管理器、删除 iconcache 等），快捷方式小箭头与 UAC 盾牌重新出现且不再消失的问题。根因：图像列表补丁是对「当时那批共享系统图像列表」的原位改写，缓存重建会销毁并重建这批列表（新句柄、内容按注册表 Shell Icons 重定向重新回填），补丁随旧列表整体丢失；2.0.1 的自愈校验存在三处缺口——只校验盾牌 SYSIMAGE 槽位（箭头 overlay 槽位与盾牌 overlay 槽位完全不在范围，而桌面可见的箭头/盾牌恰恰主要经 overlay 路径绘制）、挂在「隐藏 UAC 管理员盾牌」开关之下（只开箭头隐藏时没有自愈）、只由桌面 WM_PAINT 驱动（闲置桌面不再绘制，重建尾声落在最后一次绘制之后的回填无人复查）。现重构为持久自愈：校验覆盖「箭头 overlay 槽位 ＋ 盾牌 overlay 槽位（两者经补丁时记录的自建空白锚点间接校验）＋ 盾牌 SYSIMAGE 槽位（像素级校验）」三类，任一失守立即整体重打补丁；触发面在桌面 WM_PAINT 之外新增桌面 2 秒兜底定时器与 comctl32 ImageList_Create/Destroy 轻量感知钩子（explorer 重建共享列表的必经路径，钩子内仅置位提示、零重活，不影响其他模组）；失守重打带 3 秒冷却防重建风暴循环，平时仅轻量抽查（深查 1s 节流、感知命中 200ms），补丁幂等。无需重启资源管理器，设置项无变化，x86/x64 双架构编译。
@@ -289,12 +291,24 @@ Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能
     $name: Enable this feature group
     $name:zh-CN: 启用本组功能
     $description: >-
-      Master switch for the desktop marquee fade-out. When turned off, the
+      Master switch for the marquee selection fade-out. When turned off, the
       marquee selection rectangle disappears instantly on release, exactly as
       without this mod.
     $description:zh-CN: >-
-      「桌面框选淡出」分组总开关。关闭后框选矩形在松开鼠标的瞬间直接消失
+      「框选淡出」分组总开关。关闭后框选矩形在松开鼠标的瞬间直接消失
       （与未启用本模组时一致），不播放淡出动画；重新开启立即恢复。
+  - applyToExplorer: true
+    $name: Also apply to File Explorer
+    $name:zh-CN: 同时应用于文件管理器
+    $description: >-
+      Extends the fade-out to File Explorer folder windows: releasing a
+      marquee selection in a folder view fades it out smoothly, just like on
+      the desktop. Marquees started on an item (dragging a file) never
+      trigger the fade. Default: on.
+    $description:zh-CN: >-
+      将框选淡出扩展到文件管理器（资源管理器）文件夹窗口：在文件夹视图空白
+      处框选后松开鼠标，矩形同样平滑淡出。在图标/文件上按住拖动不会触发。
+      默认开启。
   - speed: 100
     $name: Animation Speed (%)
     $name:zh-CN: 动画速度（%）
@@ -340,15 +354,17 @@ Windows 细节功能大合集：把八组互不冲突的桌面与系统小功能
     $name:zh-CN: 自定义边框颜色（HEX）
     $description: Hex border color for the fade overlay (e.g. FF8F8F).
     $description:zh-CN: 淡出覆盖层的十六进制边框颜色（例如 FF8F8F）。
-  $name: Desktop marquee fade
-  $name:zh-CN: 桌面框选淡出
+  $name: Marquee selection fade
+  $name:zh-CN: 框选淡出
   $description: >-
-    Adds a smooth fade-out animation to the desktop marquee selection
-    rectangle when you release the mouse button. Merged from the standalone
-    mod "Desktop Marquee Fade" by angel_lov (MIT).
+    Adds a smooth fade-out animation to the marquee selection rectangle when
+    you release the mouse button, on the desktop and (optional, on by
+    default) in File Explorer folder windows. Merged from the standalone mod
+    "Desktop Marquee Fade" by angel_lov (MIT).
   $description:zh-CN: >-
-    桌面框选矩形在松开鼠标按钮后以平滑动画淡出消散。由独立模组
-    「桌面框选淡出」（原作者 angel_lov，MIT）并入。
+    桌面与文件管理器文件夹窗口中的框选矩形在松开鼠标按钮后以平滑动画淡出
+    消散（文件管理器侧可关闭）。由独立模组「桌面框选淡出」
+    （原作者 angel_lov，MIT）并入。
 - extWarn:
   - enable: false
     $name: Enable this feature group
@@ -1852,11 +1868,14 @@ static void ToggleIconsUninit()
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能三：桌面框选淡出（Marquee*）
+// 功能三：框选淡出，桌面与文件管理器（Marquee*）
 // 来源：angel_lov Desktop Marquee Fade 1.0.0（MIT），
 // 原版链接：https://windhawk.net/mods/desktop-marquee-fade。
-// 逻辑与原版一致，全局符号与函数统一加 Marquee 前缀以与其他功能隔离，
-// 设置键迁移为 marquee.* 前缀。
+// 2.2.1 起在上游仅桌面的逻辑上扩展覆盖面：资源管理器文件夹窗口
+// （CabinetWClass）内的框选矩形同样由 SysListView32 列表视图绘制，淡出
+// 覆盖层机制完全复用，仅目标发现与归属判定扩展（见 MarqueeMatchExplorer
+// ListView 与 MarqueeInit 注释）。全局符号与函数统一加 Marquee 前缀以与
+// 其他功能隔离，设置键迁移为 marquee.* 前缀。
 // 原版在包含 windows.h 前 #define NOMINMAX；本文件更早处已包含 windows.h，
 // 故在此取消 min/max 宏，效果等同（本段代码使用 std::min/std::max）。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1872,6 +1891,7 @@ std::atomic<int>  g_MarqueeSettingSpeed{100};
 std::atomic<int>  g_MarqueeSettingDuration{300};
 std::atomic<int>  g_MarqueeSettingInitialAlpha{90};
 std::atomic<bool> g_MarqueeSettingEnabled{true};  // 分组总开关（marquee.enable）
+std::atomic<bool> g_MarqueeSettingApplyToExplorer{true};  // marquee.applyToExplorer
 std::atomic<bool> g_MarqueeSettingAutoCalcAlpha{false};
 std::atomic<bool> g_MarqueeSettingAccelerateIfCovered{true};
 std::atomic<bool> g_MarqueeSettingSingleInstance{false};
@@ -1888,8 +1908,11 @@ POINT g_MarqueeDragStart = {0};
 std::atomic<bool> g_MarqueeIsDragging{false};
 std::atomic<bool> g_MarqueeIsStartPointValid{false};
 
-HWND g_MarqueeCachedDesktopTopLevel  = NULL;
-HWND g_MarqueeCachedSysListView32    = NULL;
+// 框选起点所在的列表视图（桌面 FolderView 或文件管理器文件夹视图）与归属面。
+// 预检（WM_MARQUEE_PRECHECK_START）写入、动画（WM_MARQUEE_START_ANIMATION）
+// 消费；两个消息投递到同一 manager 窗口，按队列顺序处理，不存在交叉覆写。
+HWND g_MarqueeCachedTargetListView = NULL;
+bool g_MarqueeCachedTargetIsExplorer = false;
 
 #define MARQUEE_TIMER_ID_FADE        1
 #define WM_MARQUEE_START_ANIMATION   (WM_USER + 1)
@@ -1904,6 +1927,10 @@ constexpr int kMarqueeAnimBorderStartAlpha = 190;
 struct MarqueeAnimState {
     float alpha;
     float decrement;
+    // 宿主顶层窗口：桌面为 Progman/WorkerW，文件管理器为文件夹窗口
+    // （CabinetWClass）。被遮挡加速判定改为与其比较，文件管理器自身的
+    // 框选淡出不再因「文件夹窗口在前台」而被误加速。
+    HWND ownerTopLevel;
 };
 std::map<HWND, MarqueeAnimState> g_MarqueeAnimations;
 
@@ -1966,6 +1993,8 @@ DWORD MarqueeParseHexColorOrDefault(PCWSTR hexStr, DWORD defaultValue) {
 void MarqueeLoadSettings() {
     g_MarqueeSettingEnabled.store(
         Wh_GetIntSetting(L"marquee.enable") != 0);
+    g_MarqueeSettingApplyToExplorer.store(
+        Wh_GetIntSetting(L"marquee.applyToExplorer") != 0);
     g_MarqueeSettingSpeed.store(
         std::max(50, std::min(500, Wh_GetIntSetting(L"marquee.speed"))));
     g_MarqueeSettingDuration.store(
@@ -2076,10 +2105,11 @@ LRESULT CALLBACK MarqueeOverlayWndProc(HWND hwnd, UINT msg,
                 HWND fg = GetForegroundWindow();
                 if (fg) {
                     HWND hRoot = GetAncestor(fg, GA_ROOT);
-                    wchar_t cls[64];
-                    if (GetClassNameW(hRoot, cls, 64) &&
-                        wcscmp(cls, L"Progman") != 0 &&
-                        wcscmp(cls, L"WorkerW") != 0) {
+                    // 前台根窗口不是本动画的宿主（桌面顶层或文件夹窗口）
+                    // 时，框选矩形被其他窗口遮挡，按 4 倍速淡出。桌面路径
+                    // 原按 Progman/WorkerW 类名判定，改为按宿主窗口比较后
+                    // 文件管理器的框选淡出不再被自身文件夹窗口误判为遮挡。
+                    if (hRoot != st.ownerTopLevel) {
                         float fastDec = 255.0f / 5.0f;
                         if (st.decrement < fastDec) st.decrement = fastDec;
                     }
@@ -2102,7 +2132,7 @@ LRESULT CALLBACK MarqueeOverlayWndProc(HWND hwnd, UINT msg,
 }
 
 // ---------------------------------------------------------------------------
-// Desktop list-view discovery
+// Target discovery — desktop list view + File Explorer folder views
 // ---------------------------------------------------------------------------
 
 HWND MarqueeGetRealDesktopListView(HWND* outDesktopTopLevel) {
@@ -2128,6 +2158,32 @@ HWND MarqueeGetRealDesktopListView(HWND* outDesktopTopLevel) {
     return FindWindowExW(hDesktopDefView, NULL, L"SysListView32", L"FolderView");
 }
 
+// 文件管理器路径：文件资源管理器文件夹窗口（CabinetWClass）内的框选矩形
+// 与桌面一样由 SysListView32 列表视图绘制
+// （CabinetWClass → DirectUIHWND → SHELLDLL_DefView → SysListView32），
+// 淡出覆盖层机制完全复用，仅发现方式不同——桌面按固定父子链查找，
+// 文件夹窗口直接取按下点的最深窗口判定：WindowFromPoint 会下钻到最深的
+// 可见子窗口，起点落在文件夹视图上时即为其 SysListView32（导航窗格、
+// 地址栏等表面为 DirectUI，无独立子窗口，不会命中该类），根窗口应为
+// CabinetWClass。逐次按下时解析，天然覆盖新建窗口与标签页切换，
+// 无需枚举建表或捕获窗口创建。
+bool MarqueeMatchExplorerListView(HWND hwndAt, HWND hRootAt,
+                                  HWND* outListView) {
+    wchar_t clsAt[64]   = L"";
+    wchar_t clsRoot[64] = L"";
+    if (!hwndAt || !hRootAt) return false;
+    if (!GetClassNameW(hwndAt, clsAt, ARRAYSIZE(clsAt)) ||
+        !GetClassNameW(hRootAt, clsRoot, ARRAYSIZE(clsRoot))) {
+        return false;
+    }
+    if (wcscmp(clsAt, L"SysListView32") != 0 ||
+        wcscmp(clsRoot, L"CabinetWClass") != 0) {
+        return false;
+    }
+    *outListView = hwndAt;
+    return true;
+}
+
 // ---------------------------------------------------------------------------
 // Manager window — receives posted messages from the hook thread
 // ---------------------------------------------------------------------------
@@ -2137,48 +2193,112 @@ LRESULT CALLBACK MarqueeManagerWndProc(HWND hwnd, UINT msg,
     if (msg == WM_MARQUEE_PRECHECK_START) {
         POINT* ppt = (POINT*)lParam;
 
-        g_MarqueeCachedSysListView32 =
-            MarqueeGetRealDesktopListView(&g_MarqueeCachedDesktopTopLevel);
+        g_MarqueeCachedTargetListView = NULL;
+        g_MarqueeCachedTargetIsExplorer = false;
         bool isValid = false;
 
-        if (g_MarqueeCachedSysListView32 && g_MarqueeCachedDesktopTopLevel) {
-            RECT rcDesktop;
-            GetWindowRect(g_MarqueeCachedSysListView32, &rcDesktop);
+        // 按下点处的最深可见子窗口与根窗口：桌面分支用它确认桌面在该点
+        // 处于最前，文件管理器分支直接用它发现文件夹视图的 SysListView32。
+        HWND hwndAt  = WindowFromPoint(*ppt);
+        HWND hRootAt = hwndAt ? GetAncestor(hwndAt, GA_ROOT) : NULL;
 
-            if (PtInRect(&rcDesktop, *ppt)) {
-                // rcDesktop spans the whole screen regardless of covering
-                // windows, so confirm the desktop is actually topmost here.
-                HWND hwndAt     = WindowFromPoint(*ppt);
-                HWND hRootAt    = hwndAt ? GetAncestor(hwndAt, GA_ROOT) : NULL;
+        // ── 桌面（Progman / WorkerW）：原判定路径 ──
+        wchar_t clsRoot[64] = L"";
+        bool isDesktopRoot =
+            hRootAt && GetClassNameW(hRootAt, clsRoot, ARRAYSIZE(clsRoot)) &&
+            (wcscmp(clsRoot, L"Progman") == 0 ||
+             wcscmp(clsRoot, L"WorkerW") == 0);
 
-                if (hRootAt == g_MarqueeCachedDesktopTopLevel) {
-                    DWORD sysListViewPid = 0;
-                    GetWindowThreadProcessId(g_MarqueeCachedSysListView32,
-                                             &sysListViewPid);
+        if (isDesktopRoot) {
+            HWND hDesktopTopLevel = NULL;
+            HWND hDesktopLv = MarqueeGetRealDesktopListView(&hDesktopTopLevel);
 
-                    // Only the explorer.exe that owns the desktop SysListView32
-                    // should spawn an overlay. Any other instance must bail so
-                    // it doesn't produce a duplicate animation for the same drag.
-                    // In-process LVM_HITTEST via SendMessage is also only reliable
-                    // from the owning process.
-                    if (sysListViewPid != GetCurrentProcessId()) {
-                        // Not our SysListView32 — skip entirely.
-                        isValid = false;
-                    } else {
-                        LVHITTESTINFO lvhti;
-                        ZeroMemory(&lvhti, sizeof(lvhti));
-                        lvhti.pt = *ppt;
-                        ScreenToClient(g_MarqueeCachedSysListView32, &lvhti.pt);
-                        DWORD_PTR dwResult = 0;
+            if (hDesktopLv && hDesktopTopLevel) {
+                RECT rcDesktop;
+                GetWindowRect(hDesktopLv, &rcDesktop);
 
-                        bool isOnIcon = false;
-                        if (SendMessageTimeoutW(g_MarqueeCachedSysListView32,
-                                                LVM_HITTEST, 0, (LPARAM)&lvhti,
-                                                SMTO_ABORTIFHUNG | SMTO_NORMAL,
-                                                50, &dwResult)) {
-                            isOnIcon = ((int)dwResult != -1);
+                if (PtInRect(&rcDesktop, *ppt)) {
+                    // rcDesktop spans the whole screen regardless of covering
+                    // windows, so confirm the desktop is actually topmost here.
+                    if (hRootAt == hDesktopTopLevel) {
+                        DWORD sysListViewPid = 0;
+                        GetWindowThreadProcessId(hDesktopLv, &sysListViewPid);
+
+                        // Only the explorer.exe that owns the target
+                        // SysListView32 should spawn an overlay. Any other
+                        // instance must bail so it doesn't produce a duplicate
+                        // animation for the same drag. In-process LVM_HITTEST
+                        // via SendMessage is also only reliable from the
+                        // owning process. The same ownership rule is applied
+                        // to folder windows below: every SysListView32 is
+                        // owned by exactly one explorer.exe instance, so with
+                        // the hook installed in every instance exactly one of
+                        // them animates any given drag.
+                        if (sysListViewPid != GetCurrentProcessId()) {
+                            // Not our SysListView32 — skip entirely.
+                            isValid = false;
+                        } else {
+                            LVHITTESTINFO lvhti;
+                            ZeroMemory(&lvhti, sizeof(lvhti));
+                            lvhti.pt = *ppt;
+                            ScreenToClient(hDesktopLv, &lvhti.pt);
+                            DWORD_PTR dwResult = 0;
+
+                            bool isOnIcon = false;
+                            if (SendMessageTimeoutW(hDesktopLv,
+                                                    LVM_HITTEST, 0, (LPARAM)&lvhti,
+                                                    SMTO_ABORTIFHUNG | SMTO_NORMAL,
+                                                    50, &dwResult)) {
+                                isOnIcon = ((int)dwResult != -1);
+                            }
+                            isValid = !isOnIcon;
                         }
-                        isValid = !isOnIcon;
+                    }
+                }
+            }
+
+            if (isValid) {
+                g_MarqueeCachedTargetListView = hDesktopLv;
+                g_MarqueeCachedTargetIsExplorer = false;
+            }
+        }
+        // ── 文件管理器（CabinetWClass 文件夹窗口） ──
+        else if (g_MarqueeSettingApplyToExplorer.load()) {
+            HWND hFolderLv = NULL;
+            if (MarqueeMatchExplorerListView(hwndAt, hRootAt, &hFolderLv)) {
+                // 起点必须落在列表视图客户区内：拖动滚动条等非客户区
+                // 操作不会画出框选矩形，不应触发淡出。
+                RECT rcLvClient;
+                if (GetClientRect(hFolderLv, &rcLvClient)) {
+                    MapWindowPoints(hFolderLv, NULL, (POINT*)&rcLvClient, 2);
+                    if (PtInRect(&rcLvClient, *ppt)) {
+                        // 与桌面路径同一归属原则：只对本实例持有的
+                        // SysListView32 做进程内 LVM_HITTEST（跨进程指针
+                        // 消息不可靠），并保证同一拖动只有一个实例出动画。
+                        DWORD lvPid = 0;
+                        GetWindowThreadProcessId(hFolderLv, &lvPid);
+
+                        if (lvPid == GetCurrentProcessId()) {
+                            LVHITTESTINFO lvhti;
+                            ZeroMemory(&lvhti, sizeof(lvhti));
+                            lvhti.pt = *ppt;
+                            ScreenToClient(hFolderLv, &lvhti.pt);
+                            DWORD_PTR dwResult = 0;
+
+                            bool isOnIcon = false;
+                            if (SendMessageTimeoutW(hFolderLv,
+                                                    LVM_HITTEST, 0, (LPARAM)&lvhti,
+                                                    SMTO_ABORTIFHUNG | SMTO_NORMAL,
+                                                    50, &dwResult)) {
+                                isOnIcon = ((int)dwResult != -1);
+                            }
+
+                            if (!isOnIcon) {
+                                g_MarqueeCachedTargetListView = hFolderLv;
+                                g_MarqueeCachedTargetIsExplorer = true;
+                                isValid = true;
+                            }
+                        }
                     }
                 }
             }
@@ -2200,13 +2320,41 @@ LRESULT CALLBACK MarqueeManagerWndProc(HWND hwnd, UINT msg,
             g_MarqueeAnimations.clear();
         }
 
+        // 淡出矩形：桌面为整个拖动矩形（桌面列表视图铺满屏幕）；文件管理器
+        // 文件夹窗口中框选矩形由列表视图绘制并裁剪在其客户区内，取拖动矩形
+        // 与列表视图客户区（屏幕坐标）的交集。视图已在拖动期间销毁或交集为
+        // 空时直接放弃本次淡出。
+        RECT rcFade = payload->rc;
+        if (g_MarqueeCachedTargetIsExplorer) {
+            HWND hLv = g_MarqueeCachedTargetListView;
+            RECT rcLvClient;
+            if (!hLv || !IsWindow(hLv) ||
+                !GetClientRect(hLv, &rcLvClient)) {
+                delete payload;
+                return 0;
+            }
+            MapWindowPoints(hLv, NULL, (POINT*)&rcLvClient, 2);
+
+            RECT rcInter;
+            if (!IntersectRect(&rcInter, &rcFade, &rcLvClient)) {
+                delete payload;
+                return 0;
+            }
+            rcFade = rcInter;
+        }
+
+        // 宿主顶层窗口：桌面为 Progman/WorkerW，文件管理器为文件夹窗口
+        // （CabinetWClass）——两种来源下都等于列表视图的 GA_ROOT。
+        HWND hOwner = g_MarqueeCachedTargetListView
+            ? GetAncestor(g_MarqueeCachedTargetListView, GA_ROOT) : NULL;
+
         HWND hOverlay = CreateWindowExW(
             WS_EX_LAYERED | WS_EX_TRANSPARENT |
             WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
             L"FadeMarqueeOverlayClass", NULL, WS_POPUP,
-            payload->rc.left, payload->rc.top,
-            payload->rc.right  - payload->rc.left,
-            payload->rc.bottom - payload->rc.top,
+            rcFade.left, rcFade.top,
+            rcFade.right  - rcFade.left,
+            rcFade.bottom - rcFade.top,
             NULL, NULL, GetModuleHandle(NULL), NULL);
 
         if (hOverlay) {
@@ -2225,23 +2373,25 @@ LRESULT CALLBACK MarqueeManagerWndProc(HWND hwnd, UINT msg,
             if (dpi == 0) dpi = 96;
             int borderThickness = std::max(1, (int)lround((double)dpi / 96.0));
 
-            int w = payload->rc.right  - payload->rc.left;
-            int h = payload->rc.bottom - payload->rc.top;
+            int w = rcFade.right  - rcFade.left;
+            int h = rcFade.bottom - rcFade.top;
 
             MarqueeAnimState st;
             st.alpha      = 255.0f;
             st.decrement  = 255.0f / ((float)actualDuration / 16.0f);
+            st.ownerTopLevel = hOwner;
 
             g_MarqueeAnimations[hOverlay] = st;
-            
+
             // Build the bitmap exactly ONCE
             PaintMarqueeDIB(hOverlay, w, h,
                             kMarqueeAnimBorderStartAlpha, targetFillAlpha,
                             borderThickness);
 
-            // Insert just above whatever window sits directly above the desktop
-            // so the overlay is never drawn on top of real windows.
-            HWND hAbove = GetWindow(g_MarqueeCachedDesktopTopLevel, GW_HWNDPREV);
+            // Insert just above whatever window sits directly above the owner
+            // (the desktop top-level, or the folder window for File Explorer
+            // selections) so the overlay is never drawn on top of real windows.
+            HWND hAbove = hOwner ? GetWindow(hOwner, GW_HWNDPREV) : NULL;
             SetWindowPos(hOverlay,
                          hAbove ? hAbove : HWND_TOP,
                          0, 0, 0, 0,
@@ -2263,8 +2413,9 @@ LRESULT CALLBACK MarqueeManagerWndProc(HWND hwnd, UINT msg,
 // ---------------------------------------------------------------------------
 
 LRESULT CALLBACK MarqueeMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    // 分组总开关关闭：完全直通，不记录拖动状态、不做桌面命中预检、不创建
-    // 淡出动画（运行时短路，设置变更经 MarqueeLoadSettings 即时生效）。
+    // 分组总开关关闭：完全直通，不记录拖动状态、不做命中预检（桌面与
+    // 文件管理器）、不创建淡出动画（运行时短路，设置变更经
+    // MarqueeLoadSettings 即时生效）。
     if (!g_MarqueeSettingEnabled.load(std::memory_order_relaxed)) {
         // 清掉关闭前可能残留的拖动标记，避免重新开启后吃到过期的起点。
         g_MarqueeIsDragging.store(false);
@@ -2281,7 +2432,8 @@ LRESULT CALLBACK MarqueeMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
             g_MarqueeIsStartPointValid.store(false);
 
             // Asynchronous pre-check: post the click point to the manager
-            // window for desktop-ownership and icon-hit validation.
+            // window for desktop / folder-view discovery, ownership and
+            // icon-hit validation.
             POINT* ppt = new POINT{pMouse->pt.x, pMouse->pt.y};
             PostMessageW(g_MarqueeManagerWnd, WM_MARQUEE_PRECHECK_START, 0, (LPARAM)ppt);
 
@@ -2365,16 +2517,15 @@ BOOL MarqueeInit() {
         return FALSE;
     }
 
-    // Ensure we only install the hook on the shell explorer instance
-    HWND hShell = GetShellWindow();
-    if (hShell) {
-        DWORD shellPid = 0;
-        GetWindowThreadProcessId(hShell, &shellPid);
-        if (shellPid != 0 && shellPid != GetCurrentProcessId()) {
-            return FALSE;
-        }
-    }
-
+    // 2.2.1 起：桌面框选淡出不再限于 Shell 实例——本模组注入每一个
+    // explorer.exe 实例，每个实例都安装低级鼠标钩子与淡出线程；而预检按
+    // 「目标 SysListView32 是否为本进程持有」去重（每个列表视图恰好由一个
+    // explorer 实例持有），因此同一拖动永远只有一个实例出动画：
+    //   • 桌面框选 → 持有桌面列表视图的 Shell 实例；
+    //   • 文件夹窗口框选 → 持有该 CabinetWClass 的实例（默认与 Shell 同
+    //     进程；开启「在单独的进程中打开文件夹窗口」时由文件夹实例处理）。
+    // 文件夹窗口在独立进程时该实例也能在自己进程内完成 LVM_HITTEST，
+    // 无需跨进程发送指针消息。
     MarqueeLoadSettings();
     g_MarqueeThread = CreateThread(NULL, 0, MarqueeWorkerThreadProc, NULL, 0, &g_MarqueeThreadId);
     return g_MarqueeThread != NULL;

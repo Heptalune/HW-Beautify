@@ -380,7 +380,13 @@ $retiredMods = @(
     "local@cw-logon-logoff-shutdown-sounds", "local@cw-window-optimizer",
     "local@cw-file-operation-styler",
     # v2.7.1 回退：现代化的Windows 拆回四模组；桌面图标尺寸修复剔除
-    "local@cw-modernized", "local@cw-desktop-icon-size-fix"
+    "local@cw-modernized", "local@cw-desktop-icon-size-fix",
+    # v2.8.0 双版本收尾：托盘悬停展开/晃动找指针并入 CW-Convenient Windows
+    # （trayHover.* / shake.* 分组），快速启动 Dock 改由注入版 cw-quick-launch-dock-inproc
+    # 承接；三个独立进程版 DLC 模组从整合包移除。
+    # （注意：本清单仅收独立进程版 id——注入版 cw-tray-hover-expand-inproc、
+    #   cw-shake-find-cursor-inproc 与 cw-quick-launch-dock-inproc 仍保留，勿加入）
+    "local@cw-tray-hover-expand", "local@cw-shake-find-cursor", "local@cw-quick-launch-dock"
     # 注：cw-file-operation-styler 在 v2.1.0 周期移除、v2.3.0 重新整合回归；
     # cw-better-volume-mixer 曾于 v2.3.0 回归、v2.5.0 再次按用户要求移除。
 )
@@ -521,10 +527,12 @@ $coreModIds = @(
     "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
+# （v2.8.0 双版本收尾：三个独立进程版 DLC（托盘悬停展开/晃动找指针/快速启动 Dock）
+#   已删除移出，其注入版分别由 CW-Convenient Windows 与 cw-quick-launch-dock-inproc 承接）
 $dlcModIds = @(
-    "local@cw-shake-find-cursor", "local@cw-shake-find-cursor-inproc", "local@cw-overhauled-alt-tab",
+    "local@cw-shake-find-cursor-inproc", "local@cw-overhauled-alt-tab",
     "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-    "local@cw-quick-launch-dock", "local@cw-dynamic-island-windows"
+    "local@cw-dynamic-island-windows"
 )
 $preselected = @()
 if ($Optional) {
