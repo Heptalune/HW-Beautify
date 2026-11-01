@@ -96,7 +96,7 @@ cw-overhauled-alt-tab-inproc（现代 Alt+Tab 切换器；cw-alt-tab-flip-3d-inp
 对本清单逐个执行 `windhawk-cli --app-root <便携根> --yes mod enable local@<id>`（注意必须带 local@ 前缀），
 再逐个 `mod compile local@<id>` 触发编译注入。
 
-## 当前模组清单（v2.9.0 收尾，22 个 = 20 主套件 + 2 可选，0 DLC）
+## 当前模组清单（v2.9.0 后批次，21 个 = 19 主套件 + 2 可选，0 DLC）
 
 全部模组均为注入式（无 tool mod、无 windhawk.exe 宿主进程）。optional\ 目录仅是打包目录。
 清单按模组作用的**部位**分节（与 deploy-gui.ps1 分区一致）；七类功能分类的详细说明见桌面文档
@@ -107,7 +107,7 @@ cw-overhauled-alt-tab-inproc（现代 Alt+Tab 切换器；cw-alt-tab-flip-3d-inp
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
 | CW-任务栏样式美化 | cw-taskbar-acrylic | 4.5.0 | m417z Taskbar Styler 深度修改，已整合任务栏高度与图标大小；4.5.0 大幅瘦身：仅留顶层「等比缩放」（按固定基线 52/32/44/16/32 等比缩放），Win+X/托盘溢出/音量浮窗/最大化时一律无条件跟随任务栏背景美化 |
-| CW-更好的任务栏 | cw-taskbar-plus | 1.0.0 | 四合一融合模组（v2.8.0）：任务栏系统信息（sysInfo.*，Yevhenii Starychenko）+ 计数角标（countBadges.*，digART）+ 按钮中键关闭（middleClick.*，m417z）+ 任务栏动画（iconAnim.*/autoHide.*/maxHide.*/pill.* 四分组，incconutwo/Ph0en1x-dev/Bo0ii/Lockframe/m417z），七分组各带总开关；注册消息同名冲突已消歧 |
+| CW-更好的任务栏 | cw-taskbar-plus | 1.1.0 | 三合一融合模组（v2.8.0 合并；1.1.0 按用户要求整体移除系统信息分组，原作者 Yevhenii Starychenko 署名随之移除）：计数角标（countBadges.*，digART）+ 按钮中键关闭（middleClick.*，m417z）+ 任务栏动画（iconAnim.*/autoHide.*/maxHide.*/pill.* 四分组，incconutwo/Ph0en1x-dev/Bo0ii/Lockframe/m417z），六分组各带总开关；注册消息同名冲突已消歧 |
 | CW-Convenient Windows | cw-convenient-windows | 1.1.0 | 十三组合集（v2.8.0 新建）：globalVolume（全局音量，m417z）/deviceSwitch（媒体设备切换，参考 AudioSwitcher 重实现）/perApp（分应用音量，WASAPI）/trayHover（托盘悬停展开，wygodad）/shake（晃动找指针，Darius Vernelis+Jaali）/altDrag（窗口拖动，m417z）/winArrange（吸附排列，m417z）/peek（显示桌面预览，m417z）/toggleIcons（图标隐藏，Heptalune 原创）/dragDel（拖拽删除，iMAboud）/powerBtn（电源按钮，Hakuuyosei/灵弦）/extWarn（扩展名警告，m417z）/showDesktop（显示桌面全高，1.1.0 自托盘区域设置迁入、双定位路径重构）；窗口拖动/排列段全进程，其余按进程门控 |
 | CW-开始按钮居中 | cw-centered-start-split-icons | 2.1.1 | rick Taskbar Start Button Centered Origin (GPL-3.0) 汉化；开始按钮恒居正中，图标按出现顺序左右交替均衡分列；2.1.1 修复缩略图预览不跟随重排位置 |
 
@@ -132,7 +132,7 @@ cw-overhauled-alt-tab-inproc（现代 Alt+Tab 切换器；cw-alt-tab-flip-3d-inp
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
 | CW-更好的Windows（小细节） | cw-desktop-quick-settings | 2.2.1 | 十组细节合集：peek（显示桌面预览，m417z）/toggleIcons（图标隐藏，Heptalune 原创+HeyOkay）/marquee（框选淡出，angel_lov；2.2.1 起扩展至文件管理器[marquee.applyToExplorer，默认开]）/extWarn（扩展名警告，m417z）/powerBtn（电源按钮，Hakuuyosei/灵弦）/dragDel（拖拽删除，iMAboud）/sndLog（登录注销关机音效，Toru the Red Fox）/altDrag（窗口拖动，m417z）/winArrange（吸附排列，m417z）/invisBorders（隐形边框，Bo0ii）；与 CW-Convenient Windows 在 peek/toggleIcons/extWarn/powerBtn/dragDel/altDrag/winArrange 七组重叠，同组二选一 |
-| CW-动态视频壁纸 | cw-live-video-wallpaper | 1.1.2 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化（optional\ 目录）；MP4 硬解+性能 HUD+遮挡暂停 |
+| CW-动态视频壁纸 | cw-live-video-wallpaper | 1.1.3 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化（optional\ 目录）；MP4 硬解+性能 HUD+遮挡暂停；1.1.3 修复 videoPath 带英文引号时媒体源静默打开失败（读取时剥离首尾空白与成对引号，兼容存量 ini 带引号值） |
 
 **窗口与右键菜单（3 个）**
 
@@ -142,11 +142,10 @@ cw-overhauled-alt-tab-inproc（现代 Alt+Tab 切换器；cw-alt-tab-flip-3d-inp
 | CW-自定义右键菜单 | cw-custom-context-menu | 1.1.4 | BOLT Custom Cached Context Menu (MIT) 汉化；1.1.4 修复第三方扩展菜单标题乱码（UTF-8 字节被按 GBK 解码——缓存入口双重转换修复 + 坏条目自愈） |
 | CW-WinUI 右键菜单动画 | cw-winui-context-menu-animation | 1.0.2 | crazyboyybs (MIT) 汉化；经典右键菜单 WinUI 风格动画；与接管式菜单模组二选一 |
 
-**系统工具（2 个）**
+**系统工具（1 个）**
 
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
-| CW-资源重定向 | cw-resource-redirect | 1.3.1 | m417z Resource Redirect（GPL-3.0）汉化；为资源加载定义替代文件，免改系统文件美化 |
 | CW-设置样式美化 | cw-settings-styler | 1.2.3 | m417z Windows 11 Settings Styler 汉化；社区主题/自定义样式 |
 
 **注入版（4 个，原 DLC tool mod，v2.9.0 转正；id 保留 -inproc 后缀）**
@@ -173,4 +172,4 @@ tools\UAC-白名单管理.ps1（UAC 配置命令行工具）。standalone\ 目�
 
 公开性分类（可公开/不可公开/逆向）见 `docs/MOD_CLASSIFICATION.md`。
 
-已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；前两者 v2.3.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization（v2.2.0 移除、v2.5.0 回归）、cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）、cw-instant-thumbnail-previews 与 cw-thumbnail-size（合并为 cw-taskbar-thumbnail-settings 1.0.0）、cw-aero-peek 与 cw-desktop-toggle-icons（合并为 cw-desktop-quick-settings 1.0.0）、cw-taskbar-autohide-when-maximized（并入 cw-taskbar-animation 2.4.0）、cw-desktop-marquee-fade 与 cw-smooth-desktop-icons-autohide（并入快捷设置 1.1.0）、cw-pointer-afterimage/cw-macos-style-dock（v2.5.0 用户要求移除）。v2.6.0 退役 9 个：cw-taskbar-thumbnail-settings、cw-hide-desktop-icon-text、cw-alt-drag/cw-window-arrangement/cw-invisible-borders（三合一 cw-window-optimizer）、cw-taskbar-clock-customization/cw-tray-system-icons（合并为 cw-tray-area-settings）、cw-modern-folder-picker/cw-modern-run-dialog（合并为 cw-modernized；v2.7.1 按用户要求回退拆分回归）。v2.7.0 退役 10 个：cw-no-focus-rectangle、cw-dynamic-island-windows；六模组并入更好的Windows（小细节）2.0.0；cw-file-operation-styler/cw-overhauled-alt-tab 并入 cw-modernized（v2.7.1 随回退拆出）。v2.8.0 退役：cw-taskbar-system-info/cw-taskbar-count-badges/cw-taskbar-button-click/cw-taskbar-animation（四合一为 cw-taskbar-plus）、cw-tray-hover-expand 与 cw-shake-find-cursor（并入 cw-convenient-windows）、cw-explorer-details-better-file-sizes/cw-file-hover-info/cw-file-explorer-content-animation/cw-disk-usage-bar-customizer/cw-explorer-info-bar-plus/cw-explorer-double-click-up/cw-file-operation-styler（七合一为 cw-file-explorer-plus）、cw-win11-power-buttons/cw-drag-to-delete/cw-logon-logoff-shutdown-sounds/cw-window-optimizer/cw-extension-no-warning/cw-alt-drag/cw-window-arrangement/cw-invisible-borders（十三合一为 cw-convenient-windows）、cw-uac-prompt-manager（DLC）、cw-desktop-audio-visualizer-plus、cw-taskbar-labels、cw-desktop-icon-size-fix（按用户要求）、cw-modernized（回退拆分）。v2.9.0 退役：cw-tray-area-settings（显示桌面全高迁入 convenient-windows 1.1.0，时钟/托盘图标删除）、cw-purify-icons（重建版实测不达预期，按用户要求删除）、四个独立进程版 DLC——cw-alt-tab-flip-3d/cw-overhauled-alt-tab/cw-quick-launch-dock/cw-mac-island-dock（注入版转正承接）。全部进了 deploy 的退役清理列表。
+已退役：cw-audioswap（用户要求移除）、cw-volume-per-app（并入任务栏音量控制 1.4.0）、cw-taskbar-dock-animation 与 cw-taskbar-autohide-instant（合并为 cw-taskbar-animation 2.1.0）、cw-explorer-info-bar/cw-better-volume-mixer/cw-file-operation-styler/cw-taskbar-wheel-cycle（用户要求移除；前两者 v2.3.0 回归）、cw-desktop-clock 与 cw-explorer-details-file-sizes（v2.1.0 后移除）、cw-tray-system-icons/cw-taskbar-clock-customization（v2.2.0 移除、v2.5.0 回归）、cw-taskbar-lyrics/cw-translucent-windows/cw-wobbly-windows/cw-classic-context-menu（v2.2.0 用户要求移除）、cw-taskbar-elastic-pill（并入 cw-taskbar-animation 2.2.0）、cw-instant-thumbnail-previews 与 cw-thumbnail-size（合并为 cw-taskbar-thumbnail-settings 1.0.0）、cw-aero-peek 与 cw-desktop-toggle-icons（合并为 cw-desktop-quick-settings 1.0.0）、cw-taskbar-autohide-when-maximized（并入 cw-taskbar-animation 2.4.0）、cw-desktop-marquee-fade 与 cw-smooth-desktop-icons-autohide（并入快捷设置 1.1.0）、cw-pointer-afterimage/cw-macos-style-dock（v2.5.0 用户要求移除）。v2.6.0 退役 9 个：cw-taskbar-thumbnail-settings、cw-hide-desktop-icon-text、cw-alt-drag/cw-window-arrangement/cw-invisible-borders（三合一 cw-window-optimizer）、cw-taskbar-clock-customization/cw-tray-system-icons（合并为 cw-tray-area-settings）、cw-modern-folder-picker/cw-modern-run-dialog（合并为 cw-modernized；v2.7.1 按用户要求回退拆分回归）。v2.7.0 退役 10 个：cw-no-focus-rectangle、cw-dynamic-island-windows；六模组并入更好的Windows（小细节）2.0.0；cw-file-operation-styler/cw-overhauled-alt-tab 并入 cw-modernized（v2.7.1 随回退拆出）。v2.8.0 退役：cw-taskbar-system-info/cw-taskbar-count-badges/cw-taskbar-button-click/cw-taskbar-animation（四合一为 cw-taskbar-plus）、cw-tray-hover-expand 与 cw-shake-find-cursor（并入 cw-convenient-windows）、cw-explorer-details-better-file-sizes/cw-file-hover-info/cw-file-explorer-content-animation/cw-disk-usage-bar-customizer/cw-explorer-info-bar-plus/cw-explorer-double-click-up/cw-file-operation-styler（七合一为 cw-file-explorer-plus）、cw-win11-power-buttons/cw-drag-to-delete/cw-logon-logoff-shutdown-sounds/cw-window-optimizer/cw-extension-no-warning/cw-alt-drag/cw-window-arrangement/cw-invisible-borders（十三合一为 cw-convenient-windows）、cw-uac-prompt-manager（DLC）、cw-desktop-audio-visualizer-plus、cw-taskbar-labels、cw-desktop-icon-size-fix（按用户要求）、cw-modernized（回退拆分）。v2.9.0 退役：cw-tray-area-settings（显示桌面全高迁入 convenient-windows 1.1.0，时钟/托盘图标删除）、cw-purify-icons（重建版实测不达预期，按用户要求删除）、四个独立进程版 DLC——cw-alt-tab-flip-3d/cw-overhauled-alt-tab/cw-quick-launch-dock/cw-mac-island-dock（注入版转正承接）。v2.9.0 后批次退役：cw-resource-redirect（v2.9.0 收尾批次按用户要求移除，1.3.1）。全部进了 deploy 的退役清理列表。

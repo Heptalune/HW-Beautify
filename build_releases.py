@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-# CW-Beautify v2.9.0 打包清单
+# CW-Beautify v2.9.1 打包清单
 # 模组段（主套件 / 可选 / DLC）由本脚本运行时从磁盘自动生成：分别扫描根目录、
 # optional\ 与 dlc\ 下的 local@cw-*.wh.cpp，不再手工维护文件名——模组增删后无需
 # 改动本文件，也不会出现指向已删除文件的悬空条目。
@@ -46,7 +46,7 @@ common_files = root_mods + [
     'CHANGELOG_CW-Beautify_v2.6.0.md',
     'CHANGELOG_CW-Beautify_v2.7.0.md',
     'CHANGELOG_CW-Beautify_v2.7.1.md',
-    'CHANGELOG_CW-Beautify_v2.8.0.md','CHANGELOG_CW-Beautify_v2.9.0.md',
+    'CHANGELOG_CW-Beautify_v2.8.0.md','CHANGELOG_CW-Beautify_v2.9.0.md','CHANGELOG_CW-Beautify_v2.9.1.md',
     'README.md',
     'restart_explorer.bat',
     'tools/uninstall-ExplorerBlurMica.bat',  # for v4.1 upgraders: removes the old EBM registration
@@ -79,12 +79,12 @@ common_files = root_mods + [
 ] + dlc_mods
 
 releases = {
-    'CW-Beautify_OneKeyDeploy_v2.9.0.zip': common_files + ['windhawk_setup.exe'],
-    'CW-Beautify_OneKeyDeploy_v2.9.0_Online.zip': common_files
+    'CW-Beautify_OneKeyDeploy_v2.9.1.zip': common_files + ['windhawk_setup.exe'],
+    'CW-Beautify_OneKeyDeploy_v2.9.1_Online.zip': common_files
 }
 # 注：v1.0.0 的「Offline」zip 实为误打的 Online 内容（内无安装器），v2.0.0 起不再提供
 # Offline 变体；如后续拿到 windhawk_setup_offline.exe，可再加一行：
-#   'CW-Beautify_OneKeyDeploy_v2.9.0_Offline.zip': common_files + ['windhawk_setup_offline.exe']
+#   'CW-Beautify_OneKeyDeploy_v2.9.1_Offline.zip': common_files + ['windhawk_setup_offline.exe']
 
 for zip_name, file_list in releases.items():
     print(f"正在创建 {zip_name}...")

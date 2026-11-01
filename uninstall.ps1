@@ -102,6 +102,7 @@ foreach ($id in @(
     "local@cw-taskbar-button-click", "local@cw-taskbar-labels",
     "local@cw-taskbar-elastic-pill", "local@cw-tray-area-settings",
     "local@cw-purify-icons", "local@cw-uac-prompt-manager",
+    "local@cw-resource-redirect",
     "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc",
     "taskbar-icon-size",
     "taskbar-volume-control",

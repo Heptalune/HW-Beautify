@@ -3,7 +3,7 @@
 
 # CW-Beautify
 
-CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能等比缩放任务栏、滚动调音量（系统/分应用）、快捷键切换播放设备、给任务栏加计数角标/系统信息/中键关闭/悬停放大动画、Alt+拖动窗口、一键换成 Fluent 右键菜单，以及 Alt+Tab 切换器（现代卡片式与 Vista Flip 3D 双方案）、macOS 灵动岛与 Dock、快速启动 Dock、动态视频壁纸等一整套细节美化。一共 **22 个 mod（20 主套件 + 2 可选）**，一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
+CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在 [Windhawk](https://windhawk.net) 上：任务栏、开始菜单、通知栏和文件管理器统一换成透明玻璃风格，还能等比缩放任务栏、滚动调音量（系统/分应用）、快捷键切换播放设备、给任务栏加计数角标/中键关闭/悬停放大动画、Alt+拖动窗口、一键换成 Fluent 右键菜单，以及 Alt+Tab 切换器（现代卡片式与 Vista Flip 3D 双方案）、macOS 灵动岛与 Dock、快速启动 Dock、动态视频壁纸等一整套细节美化。一共 **21 个 mod（19 主套件 + 2 可选）**，一键部署，所有效果都在 Windhawk 的设置页里调，改完立即生效。
 
 v2.9.0 起**全部模组均为注入式**（直接注入目标进程），不再有任何引发 `windhawk.exe` 宿主进程的 tool mod，Windhawk 保持约 2 MB 的常驻轻量状态。
 
@@ -13,7 +13,7 @@ v2.9.0 起**全部模组均为注入式**（直接注入目标进程），不再
 
 ## Mod 介绍
 
-20 个主套件 mod（根目录 18 个 + 4 个自 DLC 注入版转正的模组，见「注入版」节）+ `optional\` 目录 2 个。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。模组按作用的部位分类：任务栏／开始菜单与通知中心／文件管理器／桌面／窗口与右键菜单／系统工具。合并与整合模组的设置页均按功能拆分为**可收起的分组**（每组带总开关）。
+19 个主套件 mod（根目录 15 个 + 4 个自 DLC 注入版转正的模组，见「注入版」节）+ `optional\` 目录 2 个。**部署后全部默认关闭**，在 Windhawk「已安装的 Mod」里想用哪个开哪个。模组按作用的部位分类：任务栏／开始菜单与通知中心／文件管理器／桌面／窗口与右键菜单／系统工具。合并与整合模组的设置页均按功能拆分为**可收起的分组**（每组带总开关）。
 
 ## 精选模组
 
@@ -59,9 +59,8 @@ v2.9.0 起**全部模组均为注入式**（直接注入目标进程），不再
 
 ### CW-更好的任务栏
 
-任务栏四合一（系统信息 + 计数角标 + 按钮中键关闭 + 任务栏动画），**七个可收起分组、每组带总开关**（五位原作者署名保留）：
+任务栏三合一（计数角标 + 按钮中键关闭 + 任务栏动画），**六个可收起分组、每组带总开关**（1.1.0 起系统信息分组按用户要求移除）：
 
-* **任务栏系统信息**（sysInfo）：CPU、GPU、内存与显存占用、温度等指标与历史曲线，布局自适应（完整/无图表/紧凑单两行），小部件宽度可调（Yevhenii Starychenko 作品）。
 * **任务栏计数角标**（countBadges）：在任务栏按钮上以数字角标或圆点显示窗口数量，样式/位置/阈值可调（digART 作品）。
 * **任务栏按钮中键关闭**（middleClick）：中键点击程序按钮直接关闭对应窗口，Ctrl+中键强制结束进程（m417z 作品）。
 * **任务栏图标动画**（iconAnim）：macOS 风格的任务栏图标悬停放大（三种动画曲线、相邻图标让位、空闲「呼吸」可调、弹跳抬升幅度与防裁剪保护）。
@@ -153,12 +152,6 @@ Windows 细节功能大合集（原「CW-关于桌面的快捷设置」，2.0.0 
 
 * 来源：caotu2k5 Modern Run Dialog UI，本整合包汉化整合。
 
-### CW-资源重定向
-
-为各种资源的加载定义替代文件（m417z 作品，GPL-3.0）。
-
-* 例如替换 imageres.dll 中的图标，无需修改系统文件即可完成简单的主题美化；改完即时生效。
-
 ### CW-设置样式美化
 
 用社区主题或自定义样式定制 Windows 设置应用（SystemSettings）的外观。
@@ -236,8 +229,8 @@ v2.9.0 前本包设有「DLC 额外内容」档（tool mod，引发 windhawk.exe
 
 | 文件 | 适合谁 |
 | --- | --- |
-| `CW-Beautify_OneKeyDeploy_v2.9.0.zip` | **大多数人选这个**。内含 Windhawk 安装器与全部模组 |
-| `CW-Beautify_OneKeyDeploy_v2.9.0_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
+| `CW-Beautify_OneKeyDeploy_v2.9.1.zip` | **大多数人选这个**。内含 Windhawk 安装器与全部模组 |
+| `CW-Beautify_OneKeyDeploy_v2.9.1_Online.zip` | **已经装好 Windhawk** 的人。只含 mod 和脚本，最小 |
 
 ## 安装
 
@@ -286,14 +279,14 @@ v2.9.0 变化：四个 DLC tool mod（Vista 窗口切换动画/现代 Alt+Tab/�
 *   **Mac 灵动岛与「CW-任务栏样式美化」想一起用**：灵动岛的「任务栏」模式选「windowsApps」或「windows」，两者分别管上下两条，避免同时接管任务栏。
 *   **两个行为合集模组（CW-Convenient Windows 与 CW-更好的Windows（小细节））功能重叠**：重叠分组（显示桌面预览/图标隐藏/拖拽删除/电源按钮/扩展名警告/窗口拖动/吸附排列）二选一开启即可，不要同时开同一功能。
 
-问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.9.0.md`。
+问题反馈：各 mod 说明里的「致谢与许可」列有原作者与原版链接；本整合包的改动见 `CHANGELOG_CW-Beautify_v2.9.1.md`。
 
 ## 致谢与许可证
 
 CW-Beautify 以 GNU General Public License v3.0 发布。
 
 *   Windhawk 和任务栏、开始菜单、通知中心、文件管理器的上游 Styler mod：m417z（GPL-3.0）。
-*   更好的任务栏（四合一）——系统信息：Yevhenii Starychenko（GPL-3.0）；计数角标：digART（GPL-3.0）；中键关闭、文件大小列增强、资源重定向：m417z（GPL-3.0）；任务栏动画（图标动画 + 秒显 + 指示条 + 最大化自动隐藏四合一）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、Lockframe（GPL-3.0）、m417z。
+*   更好的任务栏（三合一）——计数角标：digART（GPL-3.0）；中键关闭、文件大小列增强：m417z（GPL-3.0）；任务栏动画（图标动画 + 秒显 + 指示条 + 最大化自动隐藏四合一）：incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、Lockframe（GPL-3.0）、m417z。
 *   任务栏样式美化（含等比缩放）：m417z（GPL-3.0）；开始菜单/通知栏/设置样式美化：m417z（GPL-3.0）系 Styler 深度修改。
 *   CW-Convenient Windows 十三组来源——Aero Peek、扩展名警告：m417z；托盘悬停展开：wygodad（MIT）；晃动找指针：Darius Vernelis、Jaali；分应用音量：m417z；媒体设备快速切换参考 AudioSwitcher（xenolightning，MS-PL）重新实现；AltDrag 与 Slick Window Arrangement：m417z（GPL-3.0）；拖拽删除：iMAboud（MIT）；电源按钮：Hakuuyosei/灵弦（MIT 惯例）；显示桌面全高：m417z（任务栏高度系）。
 *   CW-更好的文件管理器七组来源——Better File Sizes：m417z（GPL-3.0）；文件悬停信息：HaVeN80；内容动画：crazyboyybs（MIT）；磁盘使用率条：Valer100；信息栏增强、文件操作样式：digART（GPL-3.0）；双击返回上级：wrldspawn（GPL-3.0）。
@@ -306,4 +299,4 @@ CW-Beautify 以 GNU General Public License v3.0 发布。
 
 * * *
 
-**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 22 Windhawk mods (20 main-suite mods in the package root plus 2 in `optional\`) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0 every mod is injected into its target process — no tool mods and no windhawk.exe host process at all; the four former DLC tool mods (Vista Alt+Tab switcher, modern Alt+Tab switcher, quick launch dock, Mac island & dock) were converted into regular injected mods (ids keep the `-inproc` suffix). Mods are grouped by the surface they restyle (taskbar / Start menu & notification center / File Explorer / desktop / windows & context menus / system tools). Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); `deploy-dlc.bat` is kept only as an extension channel for future tool mods. Upgrading keeps toggles and settings and auto-uninstalls retired mods. Uninstall: `uninstall.bat` or `uninstall-gui.bat`. License: GPL-3.0.
+**English** — CW-Beautify (formerly CW桌面美化) is a Windows 11 desktop styling suite of 21 Windhawk mods (19 main-suite mods in the package root plus 2 in `optional\`) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0 every mod is injected into its target process — no tool mods and no windhawk.exe host process at all; the four former DLC tool mods (Vista Alt+Tab switcher, modern Alt+Tab switcher, quick launch dock, Mac island & dock) were converted into regular injected mods (ids keep the `-inproc` suffix). Mods are grouped by the surface they restyle (taskbar / Start menu & notification center / File Explorer / desktop / windows & context menus / system tools). Install: extract, run `deploy.bat` as administrator, enable mods in Windhawk (all installed disabled); `deploy-dlc.bat` is kept only as an extension channel for future tool mods. Upgrading keeps toggles and settings and auto-uninstalls retired mods. Uninstall: `uninstall.bat` or `uninstall-gui.bat`. License: GPL-3.0.

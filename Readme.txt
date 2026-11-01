@@ -1,5 +1,5 @@
 ========================================================================
-             CW-Beautify 一键部署包 v2.9.0
+             CW-Beautify 一键部署包 v2.9.1
 ========================================================================
 
 CW-Beautify（原名 CW桌面美化）是一套 Windows 11 桌面美化 mod，运行在
@@ -7,7 +7,7 @@ Windhawk 上。整合自多个开源 Windhawk 模组项目（GPL-3.0）并全量
 各模组的原作者信息保留在每个 mod 的说明里。
 
 ========================================================================
-包含的 Mod（22 个 = 20 主套件 + 2 可选；装好后默认全部关闭，
+包含的 Mod（21 个 = 19 主套件 + 2 可选；装好后默认全部关闭，
 在 Windhawk 里按需打开）
 ========================================================================
 说明：v2.0.0 起提供两个压缩包——完整版（内含 Windhawk 安装器）与
@@ -21,13 +21,13 @@ v2.9.0 起 DLC（tool mod）档已全部退役：四个 tool mod 完成注入版
                                 Win+X 菜单、托盘溢出、音量浮窗一起美化；
                                 顶层「等比缩放」按固定基线 52/32/44/16/32
                                 整体缩放任务栏（4.5.0 瘦身后仅留此项）
-  CW-更好的任务栏               任务栏四合一（v2.8.0 大合并）：
-                                系统信息（CPU/GPU/内存/显存/温度+历史曲线）
-                                + 计数角标（窗口数量数字/圆点）
+  CW-更好的任务栏               任务栏三合一（v2.8.0 大合并；1.1.0 起系统信息
+                                分组按用户要求移除）：
+                                计数角标（窗口数量数字/圆点）
                                 + 按钮中键关闭（Ctrl+中键强结束）
                                 + 任务栏动画（图标悬停放大/显示动画/
                                 最大化自动隐藏/弹性指示条）
-                                ——七个分组各带总开关
+                                ——六个分组各带总开关
   CW-Convenient Windows         任务栏与窗口实用行为十三组合集（v2.8.0 大合并；
                                 1.1.0 承接显示桌面全高）：任务栏滚动调音量
                                 + 媒体设备快捷键切换 + 分应用音量
@@ -79,8 +79,6 @@ v2.9.0 起 DLC（tool mod）档已全部退役：四个 tool mod 完成注入版
                                 （optional\ 目录）
 
   —— 系统工具类 ——
-  CW-资源重定向                 为资源加载定义替代文件（如图标），
-                                免改系统文件即可美化
   CW-设置样式美化               用社区主题或自定义样式美化 Windows 设置应用
 
   —— 注入版模组（原 DLC tool mod，v2.9.0 起转正） ——
@@ -177,7 +175,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
   tools\UAC-白名单管理.ps1         UAC 配置命令行工具（白名单/自提权/四档滑块等价）
   windhawk_setup*.exe             Windhawk 官方安装程序（仅完整包）
   LICENSE                         GPL-3.0 许可证全文
-  CHANGELOG_CW-Beautify_v2.9.0.md 本版改动说明
+  CHANGELOG_CW-Beautify_v2.9.1.md 本版改动说明
   docs\MOD_CLASSIFICATION.md     模组公开性分类清单（可公开/不可公开/逆向）
 
 ========================================================================
@@ -201,8 +199,8 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 致谢与许可
 ========================================================================
 - Windhawk 与上游 Styler 系列 mod、音量控制、文件大小列等：m417z（GPL-3.0）。
-- 更好的任务栏（四合一）：系统信息 Yevhenii Starychenko（GPL-3.0）、
-  计数角标 digART（GPL-3.0）、中键关闭 m417z（GPL-3.0）、任务栏动画
+- 更好的任务栏（三合一）：计数角标 digART（GPL-3.0）、中键关闭
+  m417z（GPL-3.0）、任务栏动画
   incconutwo（Plus fork）、Ph0en1x-dev（原版）、Bo0ii（GPL-3.0）、
   Lockframe（GPL-3.0）。
 - CW-Convenient Windows 十三组：Aero Peek/扩展名警告/分应用音量/AltDrag/
@@ -231,7 +229,7 @@ dwm.exe（果冻窗口用，已随模组移除）、排除列表加过一些游�
 ========================================================================
 
 English: CW-Beautify (formerly CW桌面美化) is a Windows 11 styling suite of
-22 Windhawk mods (20 main-suite mods in the package root plus 2 in
+21 Windhawk mods (19 main-suite mods in the package root plus 2 in
 optional\) as of v2.9.0, localized into Simplified Chinese. Since v2.9.0
 every mod is injected into its target process — no tool mods and no
 windhawk.exe host process at all; the four former DLC tool mods (Vista

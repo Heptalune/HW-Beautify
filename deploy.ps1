@@ -515,7 +515,7 @@ $coreModIds = @(
     "local@cw-winui-context-menu-animation",
     "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
     "local@cw-centered-start-split-icons", "local@cw-desktop-quick-settings",
-    "local@cw-resource-redirect", "local@cw-settings-styler",
+    "local@cw-settings-styler",
     "local@cw-alt-tab-flip-3d-inproc", "local@cw-overhauled-alt-tab-inproc",
     "local@cw-quick-launch-dock-inproc", "local@cw-mac-island-dock-inproc"
 )

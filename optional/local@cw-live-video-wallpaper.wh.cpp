@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-动态视频壁纸
 // @description     Play MP4 videos as your Windows desktop wallpaper using hardware-accelerated Media Foundation rendering with a built-in runtime performance profiler (`Ctrl+Alt+D` to toggle HUD).
 // @description:zh-CN 通过 Media Foundation 硬件加速渲染，把本地 MP4 视频设为 Windows 桌面动态壁纸，并内置运行时性能分析器（按 Ctrl+Alt+D 切换 HUD）。
-// @version         1.1.2
+// @version         1.1.3
 // @author          AKS HAY
 // @github          https://github.com/sysakshay
 // @license         GPL-3.0
@@ -1630,6 +1630,29 @@ std::wstring LoadSettings() {
   std::wstring settingPath = videoPathSettingRaw ? videoPathSettingRaw : L"";
   if (videoPathSettingRaw)
     Wh_FreeStringSetting(videoPathSettingRaw);
+  // 1.1.3：用户常从资源管理器「复制文件地址」粘贴带英文双引号的路径
+  // （形如 ""D:\xxx.mp4""），引号会让媒体源打开失败、桌面无变化；
+  // 此处统一剥离首尾空白与成对引号（可多层嵌套），再做路径比较与播放。
+  {
+    size_t begin = settingPath.find_first_not_of(L" \t\r\n");
+    if (begin == std::wstring::npos) {
+      settingPath.clear();
+    } else {
+      size_t end = settingPath.find_last_not_of(L" \t\r\n");
+      settingPath = settingPath.substr(begin, end - begin + 1);
+      while (settingPath.size() >= 2 && settingPath.front() == L'"' &&
+             settingPath.back() == L'"') {
+        settingPath = settingPath.substr(1, settingPath.size() - 2);
+        size_t innerBegin = settingPath.find_first_not_of(L" \t\r\n");
+        if (innerBegin == std::wstring::npos) {
+          settingPath.clear();
+          break;
+        }
+        size_t innerEnd = settingPath.find_last_not_of(L" \t\r\n");
+        settingPath = settingPath.substr(innerBegin, innerEnd - innerBegin + 1);
+      }
+    }
+  }
 
   EnterCriticalSection(&g_pathLock);
   std::wstring oldPath = g_videoPath;

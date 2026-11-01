@@ -287,7 +287,6 @@ $script:ModCategoryMap = @{
     "local@cw-winui-context-menu-animation"       = "窗口与右键菜单"   # CW-WinUI 右键菜单动画
     # —— 系统工具 ——
     "local@cw-modernized"                         = "系统工具"   # CW-现代化的Windows
-    "local@cw-resource-redirect"                  = "系统工具"   # CW-资源重定向
     "local@cw-settings-styler"                    = "系统工具"   # CW-设置样式美化
 }
 
