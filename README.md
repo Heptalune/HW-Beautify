@@ -13,7 +13,8 @@
 ## 全部模组（46 个）
 
 | 模组 | id | 版本 | 作者 |
-|---|---|---|---|| HW-显示桌面按钮预览 | `hw-aero-peek` | 1.0.4 | m417z |
+|---|---|---|---|
+| HW-显示桌面按钮预览 | `hw-aero-peek` | 1.0.4 | m417z |
 | HW-窗口拖动（Alt+拖动） | `hw-alt-drag` | 1.2 | m417z |
 | HW-窗口切换动画（Vista 风格） | `hw-alt-tab-flip-3d-inproc` | 1.0.2 | caliberda, HW-Beautify |
 | HW-开始按钮居中 | `hw-centered-start-split-icons` | 2.1.1 | rick |
@@ -77,7 +78,7 @@ Windhawk 中开启。
 ## 版本方案
 
 - 各模组保留其原作者的上游版本号；每个模组元数据块后的「HW-Beautify 汉化修改版本」
-  跟随整合包项目版本（当前 v1.0.0）。
+  跟随整合包项目版本（当前 v2.0.0）。
 - 拆分自融合模组的 15 个组件：`hw-media-device-switch`、`hw-show-desktop-fullheight`
   为按源码剥离的 1.0.0 新独立模组；其余 13 个自 CW-Beautify 时期融合前的独立版恢复，
   版本号为恢复时点的上游版本。
