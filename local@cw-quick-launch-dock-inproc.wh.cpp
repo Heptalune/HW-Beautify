@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-quick-launch-dock-inproc
-// @name            CW-快速启动 Dock（注入版）
-// @name:zh-CN      CW-快速启动 Dock（注入版）
+// @name            CW-快速启动 Dock
+// @name:zh-CN      CW-快速启动 Dock
 // @name:ru-RU      Панель быстрого запуска (внедрённая версия)
 // @description     A slim animated dock on the screen edge: drop a shortcut or pick a program with "+", then launch it in one click
 // @description:zh-CN 屏幕边缘的纤细动画 Dock：把快捷方式拖上去，或点「+」选择程序，一键即可启动
@@ -28,7 +28,7 @@
 /*
 > 原作者：**cheliks1123**（[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，是原 DLC 模组「CW-快速启动 Dock（独立进程版）」（已从整合包移除，见下文）的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑与独立进程版 1.1.1 逐字一致。
 
-# CW-快速启动 Dock（注入版）
+# CW-快速启动 Dock
 
 ![CW-快速启动 Dock 演示动图 - 把快捷方式拖到 Dock 上](https://raw.githubusercontent.com/cheliks1123/Quick-launch-dock/main/quck-lauch-dock.gif)
 

@@ -506,34 +506,23 @@ if ($files.Count -eq 0) {
 
 $optionalDir = Join-Path $PSScriptRoot "optional"
 $optionalModIds = @("local@cw-windows-animations", "local@cw-live-video-wallpaper")
-# 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描）
+# 核心模组 id 清单（用于文档/脚本引用，部署本身按目录扫描；与根目录 local@cw-*.wh.cpp 一一对应）
 $coreModIds = @(
     "local@cw-taskbar-acrylic", "local@cw-startmenu-acrylic", "local@cw-notificationcenter-acrylic",
-    "local@cw-explorer-styler", "local@cw-taskbar-volume-control",
-    "local@cw-taskbar-animation", "local@cw-taskbar-button-click",
-    "local@cw-taskbar-count-badges", "local@cw-taskbar-labels", "local@cw-taskbar-system-info",
-    "local@cw-tray-area-settings", "local@cw-centered-start-split-icons",
-    "local@cw-desktop-quick-settings",
-    "local@cw-explorer-details-better-file-sizes", "local@cw-explorer-info-bar-plus",
-    "local@cw-file-explorer-content-animation", "local@cw-file-hover-info",
-    "local@cw-disk-usage-bar-customizer", "local@cw-desktop-audio-visualizer-plus",
+    "local@cw-explorer-styler", "local@cw-taskbar-plus",
+    "local@cw-convenient-windows", "local@cw-file-explorer-plus",
     "local@cw-fluent-context-menu", "local@cw-custom-context-menu",
     "local@cw-winui-context-menu-animation",
     "local@cw-modern-folder-picker", "local@cw-modern-run-dialog",
-    "local@cw-file-operation-styler",
+    "local@cw-centered-start-split-icons", "local@cw-desktop-quick-settings",
     "local@cw-resource-redirect", "local@cw-settings-styler",
-    "local@cw-purify-icons",
-    "local@cw-file-explorer-plus",
-    "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc"
+    "local@cw-alt-tab-flip-3d-inproc", "local@cw-overhauled-alt-tab-inproc",
+    "local@cw-quick-launch-dock-inproc", "local@cw-mac-island-dock-inproc"
 )
 # DLC 额外内容 id 清单：DLC 模组由 deploy-dlc.ps1 单独安装，主部署不扫描 dlc\ 目录
-# （v2.8.0 双版本收尾：三个独立进程版 DLC（托盘悬停展开/晃动找指针/快速启动 Dock）
-#   已删除移出，其注入版分别由 CW-Convenient Windows 与 cw-quick-launch-dock-inproc 承接）
-$dlcModIds = @(
-    "local@cw-shake-find-cursor-inproc", "local@cw-overhauled-alt-tab",
-    "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-    "local@cw-dynamic-island-windows"
-)
+# （v2.9.0 收尾：DLC 全部退役——独立进程版删除，注入版转入根目录由主部署承接，
+#   dlc\ 目录已移除；如需扩展 DLC，把模组放入 dlc\ 并用 deploy-dlc.ps1 安装）
+$dlcModIds = @()
 $preselected = @()
 if ($Optional) {
     $preselected = $Optional.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne "none" } | ForEach-Object {

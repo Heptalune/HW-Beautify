@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-mac-island-dock-inproc
-// @name            CW-Mac 灵动岛与 Dock（注入版）
-// @name:zh-CN      CW-Mac 灵动岛与 Dock（注入版）
+// @name            CW-Mac 灵动岛与 Dock
+// @name:zh-CN      CW-Mac 灵动岛与 Dock
 // @name:pt-BR      Ilha e Dock estilo Mac (versão injetada)
 // @description     An island at the top of the screen like the macOS menu bar and the iPhone's Dynamic Island (clock, control center, notifications, media, tray icons), and a macOS-like dock instead of the taskbar (or the Windows taskbar, transparent or as it is)
 // @description:zh-CN 屏幕顶部添加类似 macOS 菜单栏的灵动岛（时钟、控制中心、通知、媒体、托盘图标），并提供 macOS 风格的 Dock 任务栏（或保留 Windows 任务栏：透明或原样）。
@@ -43,7 +43,7 @@
 /*
 > 原作者：**caliberda**（[Mac Island & Dock](https://windhawk.net/mods/mac-island-dock)，GPL-3.0）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，是 DLC 模组「CW-Mac 灵动岛与 Dock（独立进程版）」的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑与独立进程版 2.1.1 逐字一致。
 
-# CW-Mac 灵动岛与 Dock（注入版）
+# CW-Mac 灵动岛与 Dock
 
 在 Windows 11 上重现 macOS 的顶部菜单栏与 iPhone 的灵动岛：屏幕顶部一条灵动岛（Island），带时钟、控制中心、通知、正在播放和托盘图标；并可把任务栏换成 macOS 风格的程序坞（Dock），或保留 Windows 任务栏（透明或原样）。模组自带简体中文界面（岛内设置 → Language 可切换语言或跟随 Windows）。
 

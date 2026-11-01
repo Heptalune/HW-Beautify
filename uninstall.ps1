@@ -88,6 +88,21 @@ foreach ($id in @(
     "local@wobbly-windows",
     "local@windows-animations",
     "local@macos-minimize-animation",
+
+    # v2.6–v2.9 退役模组（合并/删除批次遗留，兜底清理历史残留）
+    "local@cw-modernized", "local@cw-no-focus-rectangle", "local@cw-rightmenu",
+    "local@cw-alt-drag", "local@cw-hide-desktop-icon-text",
+    "local@cw-win11-power-buttons", "local@cw-drag-to-delete",
+    "local@cw-logon-logoff-shutdown-sounds", "local@cw-window-optimizer",
+    "local@cw-explorer-details-better-file-sizes", "local@cw-file-explorer-content-animation",
+    "local@cw-disk-usage-bar-customizer", "local@cw-explorer-info-bar-plus",
+    "local@cw-explorer-double-click-up", "local@cw-desktop-icon-size-fix",
+    "local@cw-desktop-audio-visualizer-plus",
+    "local@cw-taskbar-count-badges", "local@cw-taskbar-system-info",
+    "local@cw-taskbar-button-click", "local@cw-taskbar-labels",
+    "local@cw-taskbar-elastic-pill", "local@cw-tray-area-settings",
+    "local@cw-purify-icons", "local@cw-uac-prompt-manager",
+    "local@cw-tray-hover-expand-inproc", "local@cw-shake-find-cursor-inproc",
     "taskbar-icon-size",
     "taskbar-volume-control",
     "taskbar-dock-animation"

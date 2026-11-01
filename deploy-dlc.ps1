@@ -277,13 +277,10 @@ if ($files.Count -eq 0) {
 }
 
 # DLC 模组 id 清单（用于文档/脚本引用，安装本身按 dlc\ 目录扫描；
-# v2.8.0 双版本收尾：独立进程版的托盘悬停展开/晃动找指针/快速启动 Dock 已删除移出）
-$dlcModIds = @(
-    "local@cw-overhauled-alt-tab",
-    "local@cw-alt-tab-flip-3d", "local@cw-mac-island-dock",
-    "local@cw-pointer-afterimage",
-    "local@cw-dynamic-island-windows", "local@cw-better-volume-mixer"
-)
+# v2.9.0 收尾：DLC 全部退役——独立进程版删除，注入版转入根目录由 deploy.ps1 承接。
+# 本脚本保留作未来 DLC 扩展通道：把模组放入 dlc\ 后运行 deploy-dlc.bat 即可；
+# dlc\ 目录为空或缺失时本脚本会报错退出，属预期行为。）
+$dlcModIds = @()
 
 $modsSource = Join-Path $windhawkData "ModsSource"
 if (-not (Test-Path $modsSource)) {
@@ -296,7 +293,7 @@ Write-Status "提醒：DLC 模组均为 tool mod，启用后会生成 windhawk.e
 
 foreach ($file in $files) {
     # Dynamically derive Mod ID from filename
-    # Example: 'local@cw-mac-island-dock.wh.cpp' -> 'local@cw-mac-island-dock'
+    # Example: 'local@cw-example-dlc.wh.cpp' -> 'local@cw-example-dlc'
     $id = $file.BaseName -replace '\.wh$', ''
     Write-Status "正在添加 DLC 模组: $id ($($file.Name))..." "Cyan"
     $modTimer = [System.Diagnostics.Stopwatch]::StartNew()
@@ -392,21 +389,8 @@ foreach ($file in $files) {
 
     # Default settings for a fresh install: only seeded when missing, never
     # overwriting the user's settings.（种子只补缺失值，绝不覆盖用户已保存的设置）
-    $settingsPath = Join-Path $regPath "Settings"
-
-    if ($id -eq "local@cw-mac-island-dock") {
-        # 可选模组（默认关闭）。种子只覆盖关键项；默认任务栏模式为 windows
-        # （不改动系统任务栏），想要 Dock 效果需在设置里选 dock。
-        $label = "Mac Island Dock"
-        Set-RegValueIfMissing $settingsPath "taskbarMode" "windows" String $label
-        Set-RegValueIfMissing $settingsPath "showIsland" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "hiding.autoHide" 0 DWord $label
-        Set-RegValueIfMissing $settingsPath "icons.magnification" 170 DWord $label
-        Set-RegValueIfMissing $settingsPath "dock.iconSize" 32 DWord $label
-        Set-RegValueIfMissing $settingsPath "dock.backgroundOpacity" 50 DWord $label
-        Set-RegValueIfMissing $settingsPath "animations.enabled" 1 DWord $label
-        Set-RegValueIfMissing $settingsPath "animations.speed" 125 DWord $label
-    }
+    # v2.9.0 收尾：原 mac-island-dock 种子块随该模组退役删除；新 DLC 如需种子，
+    # 在此处按 id 添加 if 块，用 Set-RegValueIfMissing 只补缺失值。
 
     # Initialize ModsWritable runtime key（标准版；便携版由引擎自建 ini）
     if (-not $isPortable) {

@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-overhauled-alt-tab-inproc
-// @name            CW-现代 Alt+Tab 切换器（注入版）
-// @name:zh-CN      CW-现代 Alt+Tab 切换器（注入版）
+// @name            CW-现代 Alt+Tab 切换器
+// @name:zh-CN      CW-现代 Alt+Tab 切换器
 // @description     Replaces the boring Windows Alt+Tab with a modern and elegant window switcher. In-process build: runs inside explorer.exe, no dedicated background process.
 // @description:zh-CN 用现代优雅的窗口切换器替换 Windows 原生 Alt+Tab。注入版：直接在 explorer.exe 内运行，无额外后台进程。
 // @version         1.3.1
@@ -31,7 +31,7 @@
 /*
 > 原作者：**IMiloDev**（[OverhauldedWin Alt+Tab](https://windhawk.net/mods/overhaulded-alt-tab)，MIT）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，是 DLC 模组「CW-现代 Alt+Tab 切换器（独立进程版）」的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑与独立进程版 1.3.1 逐字一致。
 
-# CW-现代 Alt+Tab 切换器（注入版）
+# CW-现代 Alt+Tab 切换器
 
 用一套现代、流畅、高颜值的窗口切换器替换 Windows 原生的 Alt+Tab。
 

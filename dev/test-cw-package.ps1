@@ -22,6 +22,7 @@ Write-Host "`n=== 2. mod 清单与元数据一致性（名册由磁盘实况自�
 $expected = [ordered]@{}
 foreach ($dir in @('', 'optional\', 'dlc\')) {
     $scanDir = if ($dir) { Join-Path $root $dir.TrimEnd('\') } else { $root }
+    if (-not (Test-Path -LiteralPath $scanDir)) { continue }
     foreach ($f in (Get-ChildItem -LiteralPath $scanDir -Filter 'local@cw-*.wh.cpp' | Sort-Object Name)) {
         $t = [IO.File]::ReadAllText($f.FullName)
         $id = if ($t -match '//\s*@id\s+(\S+)') { $Matches[1] } else { '' }
@@ -70,6 +71,8 @@ import re, io, os
 # 文件清单 auto-gen：与第 2 节名册同源，扫描根目录 / optional / dlc
 files = []
 for d in ('.', 'optional', 'dlc'):
+    if not os.path.isdir(d):
+        continue
     for f in sorted(os.listdir(d)):
         if f.startswith('local@cw-') and f.endswith('.wh.cpp'):
             files.append(os.path.join(d, f))
@@ -129,16 +132,19 @@ Check "部署扫描与磁盘名册一致（$depRoster 个）" (($scanned.Count -
 Check "全部为 cw- id" (($scanned | Where-Object { $_.Id -notlike 'local@cw-*' }).Count -eq 0)
 Check "Include 全部可解析（非空）" (($scanned | Where-Object { -not $_.Include }).Count -eq 0)
 
+$dlcDir = Join-Path $root 'dlc'
 $dlcScanned = @()
-foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $root 'dlc') -Filter 'local@*.wh.cpp')) {
-    $id = $f.BaseName -replace '\.wh$',''
-    $dlcScanned += $id
+if (Test-Path -LiteralPath $dlcDir) {
+    foreach ($f in (Get-ChildItem -LiteralPath $dlcDir -Filter 'local@*.wh.cpp')) {
+        $id = $f.BaseName -replace '\.wh$',''
+        $dlcScanned += $id
+    }
 }
 $dlcScanned | Sort-Object | ForEach-Object { Write-Host "  dlc: $_" }
-$dlcDisk = @(Get-ChildItem -LiteralPath (Join-Path $root 'dlc') -Filter 'local@*.wh.cpp')
+$dlcDisk = @(Get-ChildItem -LiteralPath $dlcDir -Filter 'local@*.wh.cpp' -ErrorAction SilentlyContinue)
 $dlcRoster = @($expected.Keys | Where-Object { $_ -like 'dlc*' }).Count
-Check "dlc 目录扫描与磁盘实况一致（$($dlcDisk.Count) 个 DLC）" (($dlcScanned.Count -eq $dlcDisk.Count) -and ($dlcDisk.Count -gt 0)) "实际 $($dlcScanned.Count)"
-Check "dlc 目录与磁盘名册一致（$dlcRoster 个）" (($dlcScanned.Count -eq $dlcRoster) -and ($dlcRoster -gt 0))
+Check "dlc 目录扫描与磁盘实况一致（$($dlcDisk.Count) 个 DLC）" ($dlcScanned.Count -eq $dlcDisk.Count) "实际 $($dlcScanned.Count)"
+Check "dlc 目录与磁盘名册一致（$dlcRoster 个）" ($dlcScanned.Count -eq $dlcRoster)
 Check "dlc 全部为 cw- id" (($dlcScanned | Where-Object { $_ -notlike 'local@cw-*' }).Count -eq 0)
 
 Write-Host "`n=== 5. deploy.ps1 关键逻辑存在性 ===" -ForegroundColor Cyan
@@ -166,7 +172,7 @@ Check "deploy 不调用 clang/编译" (-not ($dep -match 'clang'))
 
 Write-Host "`n=== 5b. deploy-dlc.ps1 关键逻辑存在性 ===" -ForegroundColor Cyan
 $ddlc = Get-Content (Join-Path $root 'deploy-dlc.ps1') -Raw -Encoding UTF8
-Check "deploy-dlc 含 mac-island-dock 种子块" (($ddlc -match 'local@cw-mac-island-dock"') -and ($ddlc -match 'Set-RegValueIfMissing'))
+Check "deploy-dlc 退役 DLC 种子已清空（无 mac-island-dock 引用）" (-not ($ddlc -match 'local@cw-mac-island-dock'))
 Check "deploy-dlc 不调用 clang/编译" (-not ($ddlc -match 'clang'))
 Check "deploy-dlc 新装默认关闭（Disabled=1）" ($ddlc -match '\$targetDisabled = 1')
 Check "deploy-dlc 保留用户开关状态" ($ddlc -match 'currentDisabled')

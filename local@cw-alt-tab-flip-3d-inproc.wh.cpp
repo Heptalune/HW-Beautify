@@ -1,7 +1,7 @@
 // ==WindhawkMod==
 // @id              cw-alt-tab-flip-3d-inproc
-// @name            CW-窗口切换动画（Vista 风格）（注入版）
-// @name:zh-CN      CW-窗口切换动画（Vista 风格）（注入版）
+// @name            CW-窗口切换动画（Vista 风格）
+// @name:zh-CN      CW-窗口切换动画（Vista 风格）
 // @description     Replaces Alt+Tab with a fluid, Windows Vista-style Flip 3D stack of live windows. CW build of the community "Alt+Tab Flip 3D (Vista Style)" mod by caliberda (MIT).
 // @description:zh-CN 用流畅的 Windows Vista 风格 Flip 3D 实时窗口堆栈替换 Alt+Tab。CW 版，基于社区模组 "Alt+Tab Flip 3D (Vista Style)"（作者 caliberda，MIT 许可）。
 // @version         1.0.2
@@ -30,7 +30,7 @@
 /*
 > 原作者：**caliberda**（[Alt+Tab Flip 3D (Vista Style)](https://windhawk.net/mods/alt-tab-flip-3d)，MIT）。本版由 CW-Beautify 整合包（作者 Heptalune）汉化整理，是 DLC 模组「CW-窗口切换动画（Vista 风格）（独立进程版）」的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑与独立进程版 1.0.2 逐字一致。
 
-# CW-窗口切换动画（Vista 风格）（注入版）
+# CW-窗口切换动画（Vista 风格）
 
 在 Windows 11 上找回 Windows Vista 的 **Flip 3D** 窗口切换器，
 带 macOS 风格、弹簧阻尼的流畅动画。
