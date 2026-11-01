@@ -4,7 +4,7 @@
 // @name:zh-CN      CW-动态视频壁纸
 // @description     Play MP4 videos as your Windows desktop wallpaper using hardware-accelerated Media Foundation rendering with a built-in runtime performance profiler (`Ctrl+Alt+D` to toggle HUD).
 // @description:zh-CN 通过 Media Foundation 硬件加速渲染，把本地 MP4 视频设为 Windows 桌面动态壁纸，并内置运行时性能分析器（按 Ctrl+Alt+D 切换 HUD）。
-// @version         1.1.3
+// @version         1.1.4
 // @author          AKS HAY
 // @github          https://github.com/sysakshay
 // @license         GPL-3.0
@@ -1760,7 +1760,10 @@ std::wstring LoadSettings() {
 // behind-desktop WorkerW window on classic shell builds.
 constexpr UINT WM_SPAWN_WORKER = 0x052C;
 
-bool g_topLevelMode = false;
+// v1.1.4：true = 兜底模式（渲染窗口挂为 Progman 子窗口，位于图标视图之下）。
+// Win11 22H2 实测 0x052C 不再把 SHELLDLL_DefView 迁出 Progman：顶层 WorkerW 全部
+// 位于 Progman 之上（挂进去会盖住图标），独立顶层窗口钉 Z 底又会被壁纸位图盖住。
+bool g_progmanChildMode = false;
 int g_sourceRetryAttempts = 0;
 bool g_wallpaperHidden = false;
 bool g_isOnBattery = false;
@@ -2906,10 +2909,10 @@ void PinBehindTargetWindow() {
     // If we were previously top-level or attached to a stale/destroyed WorkerW parent,
     // reparent dynamically to the active WorkerW hosting desktop icons.
     HWND currentParent = GetParent(g_wallpaperWnd);
-    if (g_topLevelMode || currentParent != activeWorkerW) {
-      Wh_Log(L"PinBehindTargetWindow: attaching wallpaper window to active WorkerW 0x%p (old parent 0x%p, topLevel=%d)",
-             activeWorkerW, currentParent, g_topLevelMode ? 1 : 0);
-      g_topLevelMode = false;
+    if (g_progmanChildMode || currentParent != activeWorkerW) {
+      Wh_Log(L"PinBehindTargetWindow: attaching wallpaper window to active WorkerW 0x%p (old parent 0x%p, progmanChild=%d)",
+             activeWorkerW, currentParent, g_progmanChildMode ? 1 : 0);
+      g_progmanChildMode = false;
       SetParent(g_wallpaperWnd, activeWorkerW);
       DWORD style = GetWindowLongW(g_wallpaperWnd, GWL_STYLE);
       style = (style & ~WS_POPUP) | WS_CHILD | WS_CLIPSIBLINGS;
@@ -2934,13 +2937,22 @@ void PinBehindTargetWindow() {
         g_player.Resize(w, h);
       }
     }
-  } else if (!g_topLevelMode && !GetParent(g_wallpaperWnd)) {
-    // WorkerW disappeared or detached; switch to top-level fallback mode.
-    Wh_Log(L"PinBehindTargetWindow: WorkerW detached, switching to top-level fallback mode");
-    g_topLevelMode = true;
-    DWORD style = GetWindowLongW(g_wallpaperWnd, GWL_STYLE);
-    style = (style & ~WS_CHILD) | WS_POPUP | WS_CLIPSIBLINGS;
-    SetWindowLongW(g_wallpaperWnd, GWL_STYLE, style);
+  } else if (!activeWorkerW && !GetParent(g_wallpaperWnd)) {
+    // v1.1.4：宿主丢失时不再转为独立顶层窗口（会被壁纸位图盖住），
+    // 改回挂为 Progman 子窗口（图标视图之下）。
+    HWND progmanNow = FindWindowW(L"Progman", nullptr);
+    if (progmanNow) {
+      Wh_Log(L"PinBehindTargetWindow: re-attaching wallpaper window to Progman 0x%p",
+             progmanNow);
+      g_progmanChildMode = true;
+      SetParent(g_wallpaperWnd, progmanNow);
+      DWORD style = GetWindowLongW(g_wallpaperWnd, GWL_STYLE);
+      style = (style & ~WS_POPUP) | WS_CHILD | WS_CLIPSIBLINGS;
+      SetWindowLongW(g_wallpaperWnd, GWL_STYLE, style);
+      DWORD exStyle = GetWindowLongW(g_wallpaperWnd, GWL_EXSTYLE);
+      exStyle |= WS_EX_TRANSPARENT | WS_EX_NOACTIVATE;
+      SetWindowLongW(g_wallpaperWnd, GWL_EXSTYLE, exStyle);
+    }
   }
 
   // Always keep at the bottom of the Z-order (both inside WorkerW and in top-level mode)
@@ -3358,7 +3370,8 @@ LRESULT CALLBACK WallpaperWndProc(HWND hwnd, UINT msg, WPARAM wParam,
     // so the window itself (and the player's swap chain) kept the old
     // size until the next manual reload, leaving clipping or letterbox
     // artifacts on the new layout.
-    if (g_topLevelMode) {
+    if (!GetParent(hwnd)) {
+      // 无父窗口的异常态：按虚拟屏自恢复，并尝试重新挂载。
       RECT vr;
       GetVirtualScreenRect(vr);
       int w = vr.right - vr.left;
@@ -3622,7 +3635,6 @@ DWORD WINAPI WallpaperThreadProc(LPVOID) {
       CoUninitialize();
     return 0;
   }
-  g_topLevelMode = (classicWorkerW == nullptr);
 
   WNDCLASSW wc = {};
   wc.lpfnWndProc = WallpaperWndProc;
@@ -3642,37 +3654,39 @@ DWORD WINAPI WallpaperThreadProc(LPVOID) {
   HWND parentWnd = nullptr;
   DWORD style, exStyle;
 
-  if (g_topLevelMode) {
+  // v1.1.4：经典 WorkerW 缺失时的兜底宿主改为 Progman 本身（子窗口，图标视图
+  // 之下），不再使用独立顶层窗口（Z 序底部会被壁纸位图遮盖，用户看不到画面）。
+  HWND paintHost = classicWorkerW ? classicWorkerW : progman;
+  g_progmanChildMode = (classicWorkerW == nullptr);
+  if (!paintHost) {
+    Wh_Log(L"WallpaperThreadProc: desktop host unavailable");
+    MFShutdown();
+    if (g_comInitialized)
+      CoUninitialize();
+    return 0;
+  }
+  if (g_progmanChildMode) {
     Wh_Log(
-        L"WallpaperThreadProc: no classic sibling WorkerW -- using independent "
-        L"top-level window pinned to the bottom of the Z order");
-    RECT vr;
-    GetVirtualScreenRect(vr);
-    x = vr.left;
-    y = vr.top;
-    width = vr.right - vr.left;
-    height = vr.bottom - vr.top;
-    parentWnd = nullptr;
-    style = WS_POPUP | WS_CLIPSIBLINGS;
-    exStyle = WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT;
+        L"WallpaperThreadProc: no classic WorkerW -- parenting wallpaper window "
+        L"to Progman 0x%p (below SHELLDLL_DefView)", paintHost);
   } else {
     Wh_Log(
         L"WallpaperThreadProc: using classic child-of-WorkerW mode, host=0x%p",
-        classicWorkerW);
-    RECT hostClient = {};
-    GetClientRect(classicWorkerW, &hostClient);
-    x = 0;
-    y = 0;
-    width = hostClient.right - hostClient.left;
-    height = hostClient.bottom - hostClient.top;
-    if (width <= 0 || height <= 0) {
-      width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-      height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-    }
-    parentWnd = classicWorkerW;
-    style = WS_CHILD | WS_CLIPSIBLINGS | WS_DISABLED;
-    exStyle = WS_EX_TRANSPARENT | WS_EX_NOACTIVATE;
+        paintHost);
   }
+  RECT hostClient = {};
+  GetClientRect(paintHost, &hostClient);
+  x = 0;
+  y = 0;
+  width = hostClient.right - hostClient.left;
+  height = hostClient.bottom - hostClient.top;
+  if (width <= 0 || height <= 0) {
+    width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+  }
+  parentWnd = paintHost;
+  style = WS_CHILD | WS_CLIPSIBLINGS | WS_DISABLED;
+  exStyle = WS_EX_TRANSPARENT | WS_EX_NOACTIVATE;
 
   g_wallpaperWnd = CreateWindowExW(
       exStyle, kWindowClassName, L"VideoWallpaperEngine", style, x, y, width,
@@ -3688,15 +3702,10 @@ DWORD WINAPI WallpaperThreadProc(LPVOID) {
     return 1;
   }
 
-  if (g_topLevelMode) {
-    SetWindowPos(g_wallpaperWnd, HWND_BOTTOM, x, y, width, height,
-                 SWP_NOACTIVATE | SWP_HIDEWINDOW);
-  } else {
-    SetWindowPos(g_wallpaperWnd, nullptr, 0, 0, width, height,
-                 SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW);
-    SetWindowPos(g_wallpaperWnd, HWND_BOTTOM, 0, 0, 0, 0,
-                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-  }
+  SetWindowPos(g_wallpaperWnd, nullptr, 0, 0, width, height,
+               SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW);
+  SetWindowPos(g_wallpaperWnd, HWND_BOTTOM, 0, 0, 0, 0,
+               SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
   SetTimer(g_wallpaperWnd, kZOrderTimerId, 1000, nullptr);
 
   if (!g_player.InitD3DAndSwapChain(g_wallpaperWnd, width, height) ||

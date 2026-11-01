@@ -132,7 +132,7 @@ cw-overhauled-alt-tab-inproc（现代 Alt+Tab 切换器；cw-alt-tab-flip-3d-inp
 | 模组 | id | 版本 | 来源 |
 |---|---|---|---|
 | CW-更好的Windows（小细节） | cw-desktop-quick-settings | 2.2.1 | 十组细节合集：peek（显示桌面预览，m417z）/toggleIcons（图标隐藏，Heptalune 原创+HeyOkay）/marquee（框选淡出，angel_lov；2.2.1 起扩展至文件管理器[marquee.applyToExplorer，默认开]）/extWarn（扩展名警告，m417z）/powerBtn（电源按钮，Hakuuyosei/灵弦）/dragDel（拖拽删除，iMAboud）/sndLog（登录注销关机音效，Toru the Red Fox）/altDrag（窗口拖动，m417z）/winArrange（吸附排列，m417z）/invisBorders（隐形边框，Bo0ii）；与 CW-Convenient Windows 在 peek/toggleIcons/extWarn/powerBtn/dragDel/altDrag/winArrange 七组重叠，同组二选一 |
-| CW-动态视频壁纸 | cw-live-video-wallpaper | 1.1.3 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化（optional\ 目录）；MP4 硬解+性能 HUD+遮挡暂停；1.1.3 修复 videoPath 带英文引号时媒体源静默打开失败（读取时剥离首尾空白与成对引号，兼容存量 ini 带引号值） |
+| CW-动态视频壁纸 | cw-live-video-wallpaper | 1.1.4 | AKS HAY Live Video Wallpaper (GPL-3.0) 汉化（optional\ 目录）；MP4 硬解+性能 HUD+遮挡暂停；1.1.3 修复 videoPath 带英文引号时媒体源静默打开失败；1.1.4 兜底挂载改为 Progman 子窗口（Win11 22H2 上 0x052C 不迁出 DefView、顶层窗口被壁纸位图遮盖的实测兼容） |
 
 **窗口与右键菜单（3 个）**
 
