@@ -8,6 +8,7 @@
 // @author          crazyboyybs
 // @github          https://github.com/crazyboyybs
 // @include         *
+// @exclude         crashpad_handler.exe
 // @compilerOptions -lgdi32 -lcomctl32 -lmsimg32
 // @license         MIT
 // ==/WindhawkMod==

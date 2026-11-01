@@ -10,6 +10,7 @@
 // @twitter          https://twitter.com/m417z
 // @homepage         https://m417z.com/
 // @include          *
+// @exclude          crashpad_handler.exe
 // @compilerOptions  -lcomctl32 -lgdi32 -lole32 -loleaut32
 // ==/WindhawkMod==
 

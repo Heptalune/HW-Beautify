@@ -7,18 +7,7 @@
 // @version         1.1.0
 // @author          m417z, HaVeN80, crazyboyybs, Valer100, digART, wrldspawn
 // @github          https://github.com/m417z
-// @include         *
-// @exclude         conhost.exe
-// @exclude         Plex*.exe
-// @exclude         backgroundTaskHost.exe
-// @exclude         LockApp.exe
-// @exclude         SearchHost.exe
-// @exclude         ShellExperienceHost.exe
-// @exclude         StartMenuExperienceHost.exe
-// @exclude         msedgewebview2.exe
-// @exclude         windhawk.exe
-// @exclude         windhawk-ui.exe
-// @exclude         *\UI\VSCodium.exe
+// @include         explorer.exe
 // @architecture    x86-64
 // @compilerOptions -lole32 -loleaut32 -lpropsys -luuid -lshell32 -ld2d1 -ldwrite -ldwmapi -lshlwapi -lgdi32 -luser32 -loleacc -lcomctl32 -ld3d11 -ldxgi -luxtheme -lgdiplus -ladvapi32 -lmsimg32
 // ==/WindhawkMod==
@@ -72,7 +61,7 @@
 //    键或任一组开关变化、或 ContentAnim 因关闭位移动画请求重载时，整模组重载
 //    （与上游语义一致：文件操作样式上游为「任意设置变化即整模组重载」，并入后
 //    经快照比对收窄为本段设置键变化触发）。
-// 5. 进程门控：Sizes 段沿用上游 @include *（含 exclude 列表）全进程注入；
+// 5. 进程门控：全段仅 explorer.exe 注入（v2.9.1 起弃用全进程注入——非 v6 清单进程加载 comctl32 v6 独有导入会报「无法找到入口」）；
 //    其余六段仅 explorer.exe 内启用（与各自上游 @include explorer.exe 一致）。
 // 6. 信息栏运行时文案已汉化：InfoBar 段代码内用户可见格式串（「Drive …: …
 //    free」「Content: …」「Selected: …」「Content: Loading...」「no extension」
@@ -166,7 +155,7 @@
 
 ## 兼容性与已知问题
 
-- 注入进程：全进程注入（沿用文件大小列增强的 `@include *` 与排除列表），但除文件大小列外的六个功能段只在 `explorer.exe` 中生效；本模组声明 `@architecture x86-64`（64 位）。
+- 注入进程：仅 explorer.exe（v2.9.1 起，修复非 v6 清单进程的加载报错），除文件大小列外的六个功能段只在 `explorer.exe` 中生效；本模组声明 `@architecture x86-64`（64 位）。
 - 文件操作样式仅适用于 Windows 11 的原生新式文件操作窗口（Windows 10 无此类窗口，不支持）；其依赖 Explorer 与 Shell 的私有展示接口，其他 Windows 版本可能使用不同的符号或布局，不支持的展示状态自动回退原生 UI。
 - 磁盘使用率条与 StartAllBack 不兼容；信息栏增强请勿与 Classic Explorer Status Bar、PreVista Explorer Status Bar 或 Explorer Status Bar Metadata 同时启用（同一底部区域互相冲突/覆盖）。
 - 文件悬停信息不支持「主页」「图库」等非经典文件夹视图；亚克力/模糊背景使用未公开 API，个别系统版本上模糊背景可能不跟随圆角。
@@ -32060,7 +32049,7 @@ void NotifySettingsChanged()
 // 合并层（Wh_Mod* 生命周期统一分发 + 共用钩子）
 //
 // 七个功能段的初始化/卸载/设置变更由本层统一分发：
-//   • Sizes      段：全进程启用（沿用上游 @include *，见文件头 exclude 列表）；
+//   • Sizes      段：仅 explorer.exe（v2.9.1 起弃用全进程注入）；
 //   • HoverInfo / ContentAnim / DiskBar / InfoBar / DblUp / FileOpStyler 段：
 //     仅 explorer.exe。
 // 各段 Init 失败仅记录日志并降级，不影响其他功能段（任一段成功即返回 TRUE）。

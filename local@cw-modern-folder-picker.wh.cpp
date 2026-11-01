@@ -8,6 +8,7 @@
 // @author          aubymori
 // @github          https://github.com/aubymori
 // @include         *
+// @exclude         crashpad_handler.exe
 // @compilerOptions -lole32 -loleaut32
 // ==/WindhawkMod==
 

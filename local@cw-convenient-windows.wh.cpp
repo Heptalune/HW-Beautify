@@ -9,6 +9,7 @@
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
 // @include         *
+// @exclude         crashpad_handler.exe
 // @exclude         windhawk.exe
 // @exclude         windhawk-ui.exe
 // @exclude         devenv.exe
