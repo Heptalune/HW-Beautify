@@ -13,7 +13,7 @@
 // @github          https://github.com/Bolt-Scripts
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.1.4，原作者 BOLT）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.1.4，原作者 BOLT）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；v1.1.3 起自绘菜单的核心骨架标签
 // 也已全部汉化（见下第 1 条）；v1.1.4 起新增本地修复逻辑——第三方扩展菜单标题乱码
@@ -149,7 +149,7 @@
 
 - 原作 [Custom Cached Context Menu](https://github.com/Bolt-Scripts/custom-cached-context-menu) 由 **BOLT** 开发，以 MIT 协议发布；源码、问题反馈与完整配置指南见其 GitHub 仓库。
 - 原版 mod 页面：<https://windhawk.net/mods/custom-cached-context-menu>
-- 本整合版由 HW-Beautify 整合包（作者 Heptalune）维护：汉化元数据、说明、设置文案与菜单核心标签；其余代码逻辑与上游 1.1.1 一致。
+- 本汉化版由 HW-Beautify（作者 Heptalune）维护：汉化元数据、说明、设置文案与菜单核心标签；其余代码逻辑与上游 1.1.1 一致。
 */
 // ==/WindhawkModReadme==
 

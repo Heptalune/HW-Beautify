@@ -10,9 +10,8 @@
 // @compilerOptions -luser32 -lversion -lole32 -loleaut32 -lruntimeobject
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；自 HW-Convenient
-// Windows 1.1.0 的 ShowDesktopBtn 段独立拆分；功能思路出自 m417z 的 Windows 11
-// Taskbar Styler，GPL-3.0，原作者署名保留）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；功能实现思路出自
+// m417z 的 Windows 11 Taskbar Styler，GPL-3.0，原作者署名保留）
 
 // ==WindhawkModReadme==
 /*
@@ -33,8 +32,7 @@
 - 动态路径挂钩 SystemTray.dll / Taskbar.View.dll / ExplorerExtensions.dll 的
   IconView 构造函数，批量路径经 taskband 的 XamlRoot 定位；总开关关闭或卸载时
   按保存的原值还原本地 MinHeight/MaxHeight/VerticalAlignment。
-- 本模组自 HW-Convenient Windows 1.1.0 的 ShowDesktopBtn 段独立拆分而来，与该
-  融合模组功能相同，请勿同时开启（二者会重复写入同一元素的布局属性）。
+
 */
 // ==/WindhawkModReadme==
 
@@ -88,10 +86,9 @@
 
 using namespace winrt::Windows::UI::Xaml;
 
-// HW-Convenient Windows 1.1.0 段：显示桌面按钮（ShowDesktopBtn 前缀隔离）
+// 显示桌面按钮段（ShowDesktopBtn 前缀隔离）
 //
-// 自 HW-托盘区域设置（cw-tray-area-settings）1.1.0 迁入（该模组随本次迁移
-// 退役删除；其显示桌面段最早迁自 HW-任务栏样式美化 4.4.1，原实现基于 m417z
+// 把任务栏最右侧的「显示桌面」竖条撑到全高；原实现思路出自 m417z
 // 的 Windows 11 Taskbar Styler，GPL-3.0），设置键 showDesktop.enable /
 // showDesktop.FullHeight / showDesktop.ButtonHeight。原实现经由 Taskbar
 // Styler 框架注入 Rectangle#ShowDesktopPipe@CommonStates 的
@@ -835,7 +832,7 @@ BOOL Init() {
 
     LoadSettings();
 
-    // HW-Beautify：补上 DPI 指针初始化（融合版此命名空间内未赋值，-1 高度
+    // HW-Beautify：补上 DPI 指针初始化（原命名空间内未赋值，-1 高度
     // 换算恒按 96 DPI 处理；与 Peek 段同一做法，缩放显示器上换算才正确）。
     if (!pGetDpiForWindow) {
         pGetDpiForWindow = (GetDpiForWindow_t)GetProcAddress(

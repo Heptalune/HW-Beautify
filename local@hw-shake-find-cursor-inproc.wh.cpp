@@ -11,7 +11,7 @@
 // @compilerOptions -luser32 -lgdi32 -lshell32 -ladvapi32 -lshcore
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.5.0，原作者 Darius Varnelis；自 CW-Beautify 融合前独立版恢复）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.5.0，原作者 Darius Varnelis）
 
 // HW-Beautify 整合说明：本文件是 dlc\local@cw-shake-find-cursor.wh.cpp（独立进程版
 // tool mod，同源同版本号 1.5.0，合并来源与许可见下方 readme）的「注入版」变体：

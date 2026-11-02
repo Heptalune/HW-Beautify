@@ -24,7 +24,7 @@
 // @compilerOptions -lole32 -loleaut32 -lpropsys
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.7，原作者 m417z）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.7，原作者 m417z）
 
 // HW-Beautify 整合说明（hw-explorer-details-better-file-sizes 1.7）：
 // 本模组由社区模组 Better file sizes in Explorer details 1.6（m417z，GPL-3.0，
@@ -91,7 +91,7 @@
 // 6. Wh_ModInit / Wh_ModUninit / LoadSettings 相应扩展（引擎启停与设置读取）；
 //    Wh_ModSettingsChanged 仍返回整模组重载，设置变更后引擎带新参数重启。
 //
-// 许可：上游源码为 GPL-3.0（声明原样保留于下方）；本整合版的改动部分同样按
+// 许可：上游源码为 GPL-3.0（声明原样保留于下方）；本汉化版的改动部分同样按
 // GPL-3.0 发布。
 
 // Source code is published under The GNU General Public License v3.0.
@@ -112,7 +112,7 @@
 
 增强文件资源管理器「详细信息」视图的**大小**列，可选功能如下：
 
-- **显示文件夹大小**：系统原生不显示文件夹大小，本模组补上——既支持 [Everything](https://www.voidtools.com/) 集成的瞬时查询，也提供 **CW 创新的后台计算引擎**（本整合版的招牌改动，完全不依赖 Everything）。
+- **显示文件夹大小**：系统原生不显示文件夹大小，本模组补上——既支持 [Everything](https://www.voidtools.com/) 集成的瞬时查询，也提供 **创新的后台计算引擎**（本汉化版的招牌改动，完全不依赖 Everything）。
 - **按大小排序时文件/文件夹混排**：默认按大小排序时文件与文件夹各自成块，开启后按实际字节数混排。
 - **文件大小单位**：旧版 Windows 一律用 KB 显示，新版 Windows 11 对大文件逐步改用 MB/GB；本模组可无视系统版本统一为 MB/GB，或保持 KB。
 - **IEC 记法**：KB → KiB、MB → MiB、GB → GiB。相关趣闻（2009 年微软员工的旧博文）：[Why does Explorer use the term KB instead of KiB?](https://devblogs.microsoft.com/oldnewthing/20090611-00/?p=17933)。
@@ -169,7 +169,7 @@
 
 ## 更新日志
 
-- **1.7（2026-10-31，CW 整合版）**：上游手动计算路径整体替换为创新的后台计算引擎（后台化 + 会话级缓存 + ReadDirectoryChangesW 增量监视 + FindFirstFileEx 快速枚举 + 单队列低优先级线程），详见上文；新增 computedSizes.* 设置组（6 项，双语）；withShiftKey 语义适配为「Shift 控制计算开始，缓存值始终显示」；引擎仅限 explorer.exe；全中文本地化。上游 Everything 通道与单位/排序/注册表替换逻辑原样保留。
+- **1.7（2026-10-31，HW-Beautify 汉化版）**：上游手动计算路径整体替换为创新的后台计算引擎（后台化 + 会话级缓存 + ReadDirectoryChangesW 增量监视 + FindFirstFileEx 快速枚举 + 单队列低优先级线程），详见上文；新增 computedSizes.* 设置组（6 项，双语）；withShiftKey 语义适配为「Shift 控制计算开始，缓存值始终显示」；引擎仅限 explorer.exe；全中文本地化。上游 Everything 通道与单位/排序/注册表替换逻辑原样保留。
 - **1.6（上游）**：见上游发布说明（Everything SDK3、状态栏/平铺视图支持等）。
 */
 // ==/WindhawkModReadme==

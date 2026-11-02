@@ -13,7 +13,7 @@
 // @license         MIT
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.2，原作者 crazyboyybs）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.2，原作者 crazyboyybs）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.0.1 逐字节一致。
 // 原版 mod：https://windhawk.net/mods/winui-context-menu-animation

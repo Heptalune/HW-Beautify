@@ -13,7 +13,7 @@
 // @compilerOptions -lole32 -loleaut32 -lruntimeobject -lshcore -lwindowsapp -luser32 -lversion -ldwmapi -lkernel32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 2.4.2，原作者 incconutwo (Plus fork), Ph0en1x-dev (original), Bo0ii, Lockframe, m417z, HW-Beautify；自 CW-Beautify 融合前独立版恢复）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 2.4.2，原作者 incconutwo (Plus fork), Ph0en1x-dev (original), Bo0ii, Lockframe, m417z, HW-Beautify）
 
 // HW-Beautify 整合说明：本模组由「HW-任务栏 Dock 动画」「HW-任务栏秒显」「HW-任务栏弹性药丸」合并而成。
 // - 图标动画：Taskbar Dock Animation Plus（incconutwo fork），原版 Taskbar Dock Animation

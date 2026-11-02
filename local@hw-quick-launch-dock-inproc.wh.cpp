@@ -13,7 +13,7 @@
 // @compilerOptions -lshell32 -lcomdlg32 -lgdi32 -luser32 -lole32 -loleaut32 -ldwmapi -lcomctl32 -ladvapi32 -lwininet
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游 Quick Launch Dock 1.1.1，原作者 cheliks1123）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游 Quick Launch Dock 1.1.1，原作者 cheliks1123）
 //
 // HW-Beautify 整合说明：本文件是 dlc\local@cw-quick-launch-dock.wh.cpp（独立进程版
 // tool mod，同源同号 1.1.1；HW-Beautify 汉化修改版本 v1.0.0 起带自有改进）的「注入版」变体：剥离 WhTool 独立进程启动样板

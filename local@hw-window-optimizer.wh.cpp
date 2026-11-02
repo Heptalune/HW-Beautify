@@ -13,7 +13,7 @@
 // @compilerOptions -lcomctl32 -ldwmapi -luser32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.0，原作者 m417z, Bo0ii）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.0，原作者 m417z, Bo0ii）
 
 // Source code is published under The GNU General Public License v3.0.
 //

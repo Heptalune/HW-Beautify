@@ -13,7 +13,7 @@
 // @compilerOptions -lole32 -loleaut32 -lruntimeobject -lcomctl32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART；自 CW-Beautify 融合前独立版恢复）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART）
 // Copyright (C) 2026 digART
 //
 // This program is free software: you can redistribute it and/or modify

@@ -13,7 +13,7 @@
 // @license         MIT
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.3.1，原作者 IMiloDev）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.3.1，原作者 IMiloDev）
 
 // HW-Beautify 整合说明：本文件是 dlc\local@cw-overhauled-alt-tab.wh.cpp（独立进程版
 // tool mod，同源同版本号 1.3.1）的「注入版」变体：剥离 WhTool 独立进程启动样板

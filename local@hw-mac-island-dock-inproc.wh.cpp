@@ -16,7 +16,7 @@
 // @license         GPL-3.0
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 2.1.1，原作者 caliberda）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 2.1.1，原作者 caliberda）
 
 // The code that reaches the taskbar's XAML tree is based on "Taskbar tray
 // auto-hide (show on hover)" by m417z, published under the GNU General Public

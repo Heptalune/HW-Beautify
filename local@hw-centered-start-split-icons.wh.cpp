@@ -13,7 +13,7 @@
 // @license         GPL-3.0
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 2.1.1，原作者 rick）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 2.1.1，原作者 rick）
 
 // Source code is published under The GNU General Public License v3.0.
 

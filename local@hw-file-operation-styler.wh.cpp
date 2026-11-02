@@ -14,7 +14,7 @@
 // @compilerOptions -lcomctl32 -lgdi32 -lgdiplus -lshlwapi -ladvapi32 -luxtheme
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART；自 CW-Beautify 融合前独立版恢复）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART）
 
 // HW-Beautify 整合说明：基于上游 File Operation Styler 1.2.0（作者 digART）重新汉化整合；
 // 汉化元数据、说明与设置文案，补丁版本号在上游基础上 +1（1.2.0 → 1.2.1）。

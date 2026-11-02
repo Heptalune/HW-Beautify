@@ -12,7 +12,7 @@
 // @compilerOptions -lcomdlg32 -lshlwapi -lwinmm -luser32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.4，原作者 Toru the Red Fox）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.4，原作者 Toru the Red Fox）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.0.3 逐字节一致，未做任何改动。
 // x86 兼容性：上游全部线程/窗口回调本就是显式 static 或 WINAPI/CALLBACK 函数（无无捕获 lambda 传 stdcall 回调问题），两架构原生兼容。

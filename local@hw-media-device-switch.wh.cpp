@@ -10,12 +10,11 @@
 // @compilerOptions -lole32 -loleaut32 -luser32 -lgdi32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本，原创模组）。
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本，原创模组）。
 //
-// 来源说明：本模组自 HW-Beautify 融合模组 local@hw-convenient-windows.wh.cpp
-// 的「切换媒体设备」功能段（deviceSwitch.*）剥离而来，代码为重实现（参考
-// xenolightning/AudioSwitcher_v1 的思路，未复制其代码）；设置组键名、默认值
-// 与该段在融合模组中的生效范围（仅 explorer.exe）保持不变。
+// 来源说明：媒体设备切换功能为 HW-Beautify 重实现（参考
+// xenolightning/AudioSwitcher_v1 的思路，未复制其代码）；设置组键名与默认值
+// 贴近常用习惯，仅 explorer.exe 生效。
 
 // ==WindhawkModReadme==
 /*
@@ -46,7 +45,7 @@
 
 ## 限制与说明
 
-- 仅在 explorer.exe 中生效（与融合模组中该段的注入范围一致）。
+- 仅在 explorer.exe 中生效。
 - 设置默认设备使用 Windows 未公开的 IPolicyConfig 接口（与 AudioSwitcher、SoundSwitch 等工具同款做法），Windows 大版本更新理论上可能使其失效。
 - 快捷键被其他程序占用时注册失败，仅在 Windhawk 日志（`HW媒体设备切换` 前缀）中提示。
 - 已在运行的应用是否会跟随新默认设备由 Windows 音频会话机制决定，与系统手动切换行为一致。
@@ -140,8 +139,7 @@
 #define MOD_NOREPEAT 0x4000
 #endif
 
-// 以下两个 GUID 在融合模组中由音量功能段与设备切换段共用；独立模组按
-// 「公共 helper 复制所需部分」的规则原样复制（独立编译无同名冲突）。
+// 以下两个 GUID 为 WASAPI 设备枚举的标准接口 IID，原样保留。
 const static GUID XIID_IMMDeviceEnumerator = {
     0xA95664D2,
     0x9614,

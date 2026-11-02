@@ -13,7 +13,7 @@
 // @compilerOptions -lole32 -lshell32 -luuid -lgdi32 -lcomctl32 -lpropsys -ladvapi32 -lmsimg32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.2.1，原作者 digART）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 1.2.0 逐字节一致。
 // 原版 mod：https://windhawk.net/mods/explorer-info-bar

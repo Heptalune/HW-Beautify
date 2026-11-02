@@ -13,7 +13,7 @@
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 3.0.7，原作者 caotu2k5）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 3.0.7，原作者 caotu2k5）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；代码逻辑与上游 3.0.6 逐字节一致，未做任何改动。
 // 原版 mod：https://windhawk.net/mods/modern-run-dialog-ui

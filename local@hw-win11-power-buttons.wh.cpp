@@ -13,7 +13,7 @@
 // @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -Wl,--export-all-symbols -luser32 -lwtsapi32 -lpowrprof
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.4，原作者 Hakuuyosei）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.4，原作者 Hakuuyosei）
 
 // HW-Beautify 整合说明：汉化元数据、说明与设置文案；1.0.3 版代码与上游 1.0.2 逐字节一致，
 // 1.0.4 按用户要求新增逐按钮启用开关（enableShutdown / enableRestart / enableSignout /

@@ -12,7 +12,7 @@
 // @compilerOptions -lcomctl32 -ldwmapi -lgdi32 -lole32 -loleaut32 -lruntimeobject -lshcore -lshlwapi -lversion
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 4.5.0，原作者 Heptalune & m417z）
+// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 4.5.0，原作者 Heptalune & m417z）
 
 // Source code is published under The GNU General Public License v3.0.
 //
@@ -60,7 +60,7 @@
 - 原版主题按旧版任务栏编写，在 v1.10 基础上托盘区域的显示可能略有差异。
 
 ## 更新日志
-- **4.5.0**：设置瘦身：「任务栏尺寸与缩放」分组只留「等比缩放」并升为顶层设置（键名 ProportionalScale，按 size.ProportionalScale → look.ProportionalScale → ProportionalScale 的原优先顺序读取，旧保存值仍兼容；任务栏高度/图标大小/按钮宽度 5 个单项设置删除，代码改用包默认基线 52/32/44/16/32 参与等比缩放换算）；删除「托盘溢出面板」「音量/亮度浮窗」「最大化时」三组设置与「统一设置」开关，托盘溢出面板、音量/亮度浮窗与最大化时一律跟随任务栏背景美化（等价于原来统一设置开启的状态）；「显示桌面按钮全高 / 显示桌面竖条高度」两个设置及其 Rectangle#ShowDesktopPipe@CommonStates 注入实现整段迁至新模组 HW-托盘区域设置（cw-tray-area-settings，键名 showDesktop.FullHeight / showDesktop.ButtonHeight）。
+- **4.5.0**：设置瘦身：「任务栏尺寸与缩放」分组只留「等比缩放」并升为顶层设置（键名 ProportionalScale，按 size.ProportionalScale → look.ProportionalScale → ProportionalScale 的原优先顺序读取，旧保存值仍兼容；任务栏高度/图标大小/按钮宽度 5 个单项设置删除，代码改用包默认基线 52/32/44/16/32 参与等比缩放换算）；删除「托盘溢出面板」「音量/亮度浮窗」「最大化时」三组设置与「统一设置」开关，托盘溢出面板、音量/亮度浮窗与最大化时一律跟随任务栏背景美化（等价于原来统一设置开启的状态）；「显示桌面按钮全高 / 显示桌面竖条高度」两个设置及其 Rectangle#ShowDesktopPipe@CommonStates 注入实现已整段移出本模组（键名 showDesktop.FullHeight / showDesktop.ButtonHeight 转由独立模组承载）。
 - **4.4.1**：修复「显示桌面按钮全高」开启后无效的问题。原因：竖条（Rectangle#ShowDesktopPipe）的尺寸由 ShowDesktopStack/IconView 模板的 CommonStates 状态机掌控，原实现用普通规则在元素创建时一次性写入 Height/MinHeight，元素创建后的首次 GoToState 会把状态里的尺寸值重新盖回去，一次性赋值随即失效（上游 Aero Peek 议题 #854 中普通写法「被无视」、@CommonStates 写法生效为同一现象）。修复镜像两处成熟实现：样式目标改为 Rectangle#ShowDesktopPipe@CommonStates（上游 SunValley 主题 Height=500 的全高写法，样式进入视觉状态桶后模组会在每次状态切换后重新断言）；属性改用 MinHeight+MaxHeight（镜像 tray-system-icons 模组 showDesktopButtonWidth 的 MinWidth+MaxWidth 技法，Min/Max 在布局层优先于 Height，状态机与悬停动画碰不到，模板若用 MaxHeight 钉死竖条也一并覆盖）。功能行为不变：默认跟随任务栏高度，0-200 手动指定，悬停预览行为不受影响（CW 汉化版修复）。
 - **4.4.0**：新增「任务栏尺寸与缩放」分组：「等比缩放」从「主题与文字」移入该组（设置键 look.ProportionalScale 改为 size.ProportionalScale，旧键保存的值仍兼容，deploy 会自动迁移），并恢复任务栏高度/图标大小/任务栏按钮宽度/小图标大小/小任务栏按钮宽度 5 个单项设置（4.3.1 曾移除，键名加 size. 前缀，deploy 会自动迁移旧扁平键，行为与 4.3.0 一致：等比缩放以单项值为基础）；新增「显示桌面按钮全高」：把任务栏最右侧的「显示桌面」小竖条撑到与任务栏同高，悬停出桌面预览的行为不变，高度可跟随任务栏高度或手动指定（CW 汉化版新增/调整）。
 - **4.3.1**：设置精简：删除任务栏高度/图标大小/按钮宽度等 5 个单项设置，只保留「等比缩放」并移入「主题与文字」大类（设置键 look.ProportionalScale）；代码对缺失键回退到包默认值（52/32/44/16/32），任务栏高度不会塌陷（CW 汉化版调整）。
@@ -20952,8 +20952,8 @@ void CWApplyBrushPresets(StyleConstants& styleConstants) {
 // baselines scaled by ProportionalScale), filled by TBIS_LoadSettings (further
 // below) and read by the TBIS hooks; the type is defined here because the CW
 // sections above come first in this file. The "Show desktop" bar settings
-// (showDesktopFullHeight / showDesktopButtonHeight) were moved to the
-// cw-tray-area-settings mod together with their CWAddExtraStyles injection.
+// (showDesktopFullHeight / showDesktopButtonHeight) were moved out of this mod
+// together with their CWAddExtraStyles injection.
 struct TBIS_Settings {
     int taskbarHeight;
     int iconSize;
@@ -20984,9 +20984,9 @@ void CWAddExtraStyles() {
             }
         }
 
-        // CW 4.5.0: 「显示桌面」竖条全高的注入段已整段迁至新模组
-        // HW-托盘区域设置（cw-tray-area-settings），对应设置键
-        // showDesktop.FullHeight / showDesktop.ButtonHeight，本模组不再注入。
+        // CW 4.5.0: 「显示桌面」竖条全高的注入段已整段移出本模组，
+        // 对应设置键
+        // showDesktop.FullHeight / showDesktop.ButtonHeight 转由独立模组承载，本模组不再注入。
     } catch (...) {
         Wh_Log(L"Error %08X", winrt::to_hresult());
     }
