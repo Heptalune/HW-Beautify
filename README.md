@@ -51,4 +51,3 @@
 
 - 整合包自身以 **GPL-3.0** 发布；各模组的版权与许可归各自作者所有，署名、原版链接与许可头注释在每个模组文件头部原样保留。
 - 特别感谢主要上游作者：**m417z**（任务栏/开始菜单/通知中心/文件管理器 Styler 系列、任务栏音量控制、Alt 拖动、窗口排列、Aero Peek 等）、**caliberda**（Mac 灵动岛 Dock、Alt+Tab Flip 3D）、**cheliks1123**（Quick Launch Dock）、**digART**（计数角标、信息栏增强、文件操作美化）、**Bo0ii**（弹性药丸、隐形边框）、**crazyboyybs**（文件内容动画、WinUI 菜单动画）、**rick**（开始按钮居中）、**IMiloDev**（现代 Alt+Tab）、**Hakuuyosei（灵弦）**（开始菜单电源按钮）、**HeyOkay**（桌面图标平滑隐藏）、**angel_lov**（桌面框选淡出）、**kivsak**、**Toru the Red Fox**、**wrldspawn**、**HaVeN80**、**Valer100**、**aubymori**、**BOLT**、**wygodad**、**Darius Vernelis**、**Jaali**、**iMAboud**、**incconutwo**、**Lockframe**、**ReDrag** 等社区作者（完整署名清单见各模组文件头部）。
-- ⚠️ 公开发布提示：`hw-quick-launch-dock-inproc`、`hw-modern-run-dialog`、`hw-disk-usage-bar-customizer`、`hw-file-hover-info`、`hw-win11-power-buttons` 五个模组上游未声明许可证，公开分发前应先取得作者授权。
