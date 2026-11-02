@@ -59,7 +59,7 @@
 // @compilerOptions -ladvapi32 -ld2d1 -ld3d11 -ldcomp -ldwmapi -ldxgi -lgdi32 -lole32 -loleaut32 -lshell32 -luuid -luser32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.6.0，原作者 ReDrag, Abdullah Masood, Potassiumuncher, Heptalune）
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.6.0，原作者 ReDrag, Abdullah Masood, Potassiumuncher, Heptalune）
 
 // The explicit process exclusions above are pre-injection fast paths for
 // unsupported window hosts and known interactive-session helpers. The runtime

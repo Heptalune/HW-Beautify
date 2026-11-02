@@ -13,7 +13,7 @@
 // @license         MIT
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.2，原作者 caliberda, HW-Beautify）
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.2，原作者 caliberda, HW-Beautify）
 
 // HW-Beautify 整合说明：本文件是 dlc\local@cw-alt-tab-flip-3d.wh.cpp（独立进程版
 // tool mod，同源同版本号 1.0.2）的「注入版」变体：剥离 WhTool 独立进程启动样板
@@ -98,8 +98,8 @@
 ## 致谢与许可
 
 - 本模组整合自社区模组 **Alt+Tab Flip 3D (Vista Style)**，原作者 **caliberda**（[GitHub](https://github.com/cesarkali)），以 MIT 许可发布，原版链接：<https://windhawk.net/mods/alt-tab-flip-3d>。上游代码的版权归 caliberda 所有。
-- HW-Beautify 汉化版（作者 **Heptalune**）改动范围：全中文本地化（元数据、说明与设置文案）、更名为「HW-窗口切换动画（Vista 风格）」、showDelay 默认值调整；本注入版变体另剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组生命周期。
-- 本汉化版同样以 MIT 许可发布。
+- HW-Beautify 整合版（作者 **Heptalune**）改动范围：全中文本地化（元数据、说明与设置文案）、更名为「HW-窗口切换动画（Vista 风格）」、showDelay 默认值调整；本注入版变体另剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组生命周期。
+- 本整合版同样以 MIT 许可发布。
 - 上游仓库：https://github.com/ramensoftware/windhawk-mods（mods/alt-tab-flip-3d）。
 */
 // ==/WindhawkModReadme==

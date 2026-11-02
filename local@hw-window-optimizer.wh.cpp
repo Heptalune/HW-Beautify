@@ -13,7 +13,7 @@
 // @compilerOptions -lcomctl32 -ldwmapi -luser32
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.0.0，原作者 m417z, Bo0ii）
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.0.0，原作者 m417z, Bo0ii）
 
 // Source code is published under The GNU General Public License v3.0.
 //
@@ -47,7 +47,17 @@
 
 # HW-窗口优化
 
-窗口操作三合一：本模组把「窗口拖动（Alt+拖动）」「窗口滑动排列」与「隐形窗口边框」三个模组合并为一个，设置页按功能分为三个可收起分组。三者互相配合：按住触发键即可从窗口任意位置拖动移动或调整窗口大小，移动自带顺滑的滑动动画与吸附对齐，也可以按住 Alt 临时绕过吸附；窗口边框还可设为隐形、同时保留圆角。
+窗口操作三合一：本模组把「窗口拖动（Alt+拖动）」「窗口滑动排列」与「隐形窗口边框」三个模组合并为一个，设置页按功能分为三个可收起分组，每组组首各带一个「启用本组功能」总开关（默认开启）。三者互相配合：按住触发键即可从窗口任意位置拖动移动或调整窗口大小，移动自带顺滑的滑动动画与吸附对齐，也可以按住 Alt 临时绕过吸附；窗口边框还可设为隐形、同时保留圆角。
+
+## 功能分组一览
+
+> 1.0.0 起由 HW-Convenient Windows 与 HW-更好的Windows（小细节）拆分重组而来：原「窗口拖动（Alt+拖动）」「窗口排列」两段来自 HW-Convenient Windows，原「隐形窗口边框」来自 HW-更好的Windows（小细节）；相关说明与许可署名随功能一并迁入本模组。
+
+| # | 分组 | 设置键前缀 | 总开关默认 | 一句话说明 | 来源（原作者） |
+|---|------|-----------|-----------|-----------|---------------|
+| 1 | 窗口拖动（Alt+拖动） | `altDrag.*` | 开 | 按住触发键从窗口任意位置拖动/调整大小 | m417z（GPL-3.0） |
+| 2 | 窗口排列 | `winArrange.*` | 开 | 拖动/滑动窗口自动吸附，松手惯性滑动 | m417z（GPL-3.0） |
+| 3 | 隐形窗口边框 | `invisBorders.*` | 开 | 窗口边框隐形且保留圆角 | Bo0ii（MIT） |
 
 ## 窗口拖动（Alt+拖动）
 
@@ -128,6 +138,14 @@
 
 问题反馈（英文）：<https://github.com/Bo0ii/windhawk-mods/issues>
 
+## 进程生效范围
+
+本模组注入所有进程（`@include *`，排除 devenv.exe）：窗口拖动需要跨进程钩子，三个分组均在所有进程生效；不想生效的程序请在 Windhawk 模组设置「高级」选项卡的自定义进程排除列表中加入。
+
+## 变更记录
+
+- **1.0.0**：把「窗口拖动（Alt+拖动）」「窗口排列」「隐形窗口边框」合并为一个模组，设置页分为三个可收起分组，每组组首各带「启用本组功能」总开关（`altDrag.enable` / `winArrange.enable` / `invisBorders.enable`，默认开启）。代码取自原 WinOpt 命名空间的三段实现（更早来自 HW-窗口优化 1.1.0），上游分别为 m417z 的 AltDrag / Slick Window Arrangement（GPL-3.0）与 Bo0ii 的 Invisible Window Borders（MIT）；说明与许可署名随功能一并从 HW-Convenient Windows、HW-更好的Windows（小细节）迁入。x86/x64 双架构编译。
+
 ## 致谢与许可
 
 - **窗口拖动（Alt+拖动）**：原版 mod [AltDrag](https://windhawk.net/mods/alt-drag)，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证；创意来自 [Stefan Sundin 的 AltDrag](https://stefansundin.github.io/altdrag/)。
@@ -140,6 +158,11 @@
 // ==WindhawkModSettings==
 /*
 - altDrag:
+  - enable: true
+    $name: Enable this group
+    $name:zh-CN: 启用本组功能
+    $description: Master switch for this feature group. Turn it off to disable the whole feature.
+    $description:zh-CN: 本功能的组级总开关。关闭后本组功能完全失效。
   - moveTrigger:
     - button: left
       $name: Mouse button
@@ -225,6 +248,11 @@
     按住触发键从窗口任意位置拖动，即可移动或调整窗口大小，
     无需瞄准标题栏或边框。
 - winArrange:
+  - enable: true
+    $name: Enable this group
+    $name:zh-CN: 启用本组功能
+    $description: Master switch for this feature group. Turn it off to disable the whole feature.
+    $description:zh-CN: 本功能的组级总开关。关闭后本组功能完全失效。
   - SnapWindowsWhenDragging: true
     $name: Snap windows when dragging
     $name:zh-CN: 拖动窗口时吸附
@@ -268,6 +296,11 @@
   $description:zh-CN: >-
     拖动或滑动窗口时自动吸附对齐，窗口松手后带惯性顺滑滑动。
 - invisBorders:
+  - enable: true
+    $name: Enable this group
+    $name:zh-CN: 启用本组功能
+    $description: Master switch for this feature group. Turn it off to disable the whole feature.
+    $description:zh-CN: 本功能的组级总开关。关闭后本组功能完全失效。
   - SpecialWindows: false
     $name: Apply to Special Windows
     $name:zh-CN: 应用到特殊窗口
@@ -302,6 +335,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
 
 // ============================================================================
 // 窗口拖动（Alt+拖动）
@@ -429,6 +463,7 @@ struct TriggerSettings {
 };
 
 struct {
+    std::atomic<bool> enable;  // 分组总开关（altDrag.enable），关闭时本组功能完全不生效
     TriggerSettings moveTrigger;
     TriggerSettings sizeTrigger;
     std::atomic<bool> dragWindowsWithoutTitleBar;
@@ -667,7 +702,9 @@ bool IsAnyTriggerKeyless() {
 // per process. Activation is what puts it up and takes it down, the way a key
 // press and release do for a trigger which has keys.
 bool ShouldHoldKeylessHook() {
-    if (!IsAnyTriggerKeyless()) {
+    // 分组总开关关闭：不持有无修饰键触发的低级鼠标钩子（已安装的会因本
+    // 判断在空闲时被移除）。
+    if (!g_settings.enable || !IsAnyTriggerKeyless()) {
         return false;
     }
 
@@ -969,6 +1006,12 @@ UINT SizeCommandAtPoint(HWND hRootWnd, POINT pt) {
 // The drag a press of the button starts, given the modifier keys held, or 0.
 // When the press fits both triggers, the one with more keys is the closer fit.
 UINT DragCommandForPress(int button, DWORD held, HWND hRootWnd, POINT pt) {
+    // 分组总开关关闭：不把任何按键识别为拖动触发（消息路径、指针路径与
+    // 低级钩子路径都经由本函数，运行时短路，随设置重载即时生效）。
+    if (!g_settings.enable) {
+        return 0;
+    }
+
     bool move = button == g_settings.moveTrigger.button &&
                 IsTriggerHeld(g_settings.moveTrigger, held) &&
                 CanMoveRootWindow(hRootWnd);
@@ -2139,6 +2182,12 @@ void RemoveLowLevelMouseHook() {
 }
 
 void InstallLowLevelMouseHookIfNeeded() {
+    // 分组总开关关闭：不安装低级鼠标钩子，避免给全局鼠标输入添加无谓的
+    // 中转层；已安装的钩子会在触发条件解除后按原逻辑移除。
+    if (!g_settings.enable) {
+        return;
+    }
+
     // Outside the lock, the loader being out of bounds while it's held.
     HMODULE module = GetModuleHandle(nullptr);
 
@@ -2286,7 +2335,9 @@ void MaskWinKeyReleaseIfNeeded(UINT command) {
 }
 
 void SetThreadHooksIfNeeded() {
-    if (g_threadHooksAttempted) {
+    // 分组总开关关闭：不在新线程上安装钩子（g_threadHooksAttempted 不置位，
+    // 重新开启后下一条消息 retrieval 会自动补装）。
+    if (g_threadHooksAttempted || !g_settings.enable) {
         return;
     }
 
@@ -2454,6 +2505,7 @@ void LoadTriggerSettings(TriggerSettings& trigger, PCWSTR name) {
 }
 
 void LoadSettings() {
+    g_settings.enable = Wh_GetIntSetting(L"altDrag.enable") != 0;
     LoadTriggerSettings(g_settings.moveTrigger, L"altDrag.moveTrigger");
     LoadTriggerSettings(g_settings.sizeTrigger, L"altDrag.sizeTrigger");
     g_settings.dragWindowsWithoutTitleBar =
@@ -2570,6 +2622,7 @@ void SettingsChanged() {
 namespace WinArrange {
 
 struct {
+    bool enable;  // 分组总开关（winArrange.enable），关闭时本组功能完全不生效
     bool snapWindowsWhenDragging;
     int snapWindowsDistance;
     bool keysToDisableSnappingCtrl;
@@ -3342,6 +3395,12 @@ void OnEnterSizeMove(HWND hWnd)
 {
     KillWindowSlideTimer(hWnd);
 
+    // 分组总开关关闭：不登记吸附/滑动状态，WM_WINDOWPOSCHANGING/CHANGED 与
+    // 滑动定时器随之全部失效（运行时短路，随设置重载即时生效）。
+    if (!g_settings.enable) {
+        return;
+    }
+
     if (g_settings.snapWindowsWhenDragging) {
         g_winMoving.try_emplace(hWnd, hWnd);
     }
@@ -3546,6 +3605,12 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
     const CWPSTRUCT* cwp = (const CWPSTRUCT*)lParam;
 
     if (cwp->message == WM_ENTERSIZEMOVE) {
+        // 分组总开关关闭：不再为新的移动循环挂子类（已挂的子类行为由
+        // OnEnterSizeMove 内的总开关短路）。
+        if (!g_settings.enable) {
+            return CallNextHookEx(nullptr, nCode, wParam, lParam);
+        }
+
         WCHAR className[32];
         if (GetClassName(GetAncestor(cwp->hwnd, GA_ROOT), className, ARRAYSIZE(className)) &&
             (wcsicmp(className, L"Shell_TrayWnd") == 0 || wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0)) {
@@ -3565,6 +3630,12 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 void SetWindowHookForUiThreadIfNeeded(HWND hWnd)
 {
+    // 分组总开关关闭：不为新的 UI 线程安装 WH_CALLWNDPROC 钩子（重新开启后
+    // 下一条消息会自动补装）。
+    if (!g_settings.enable) {
+        return;
+    }
+
     if (!g_callWndProcHook && IsWindowVisible(GetAncestor(hWnd, GA_ROOT))) {
         std::lock_guard<std::mutex> guard(g_allCallWndProcHooksMutex);
         if (!g_uninitializing) {
@@ -3650,6 +3721,7 @@ void OnThreadDetach() {
 
 void LoadSettings()
 {
+    g_settings.enable = Wh_GetIntSetting(L"winArrange.enable") != 0;
     g_settings.snapWindowsWhenDragging = Wh_GetIntSetting(L"winArrange.SnapWindowsWhenDragging");
     g_settings.snapWindowsDistance = Wh_GetIntSetting(L"winArrange.SnapWindowsDistance");
     g_settings.keysToDisableSnappingCtrl = Wh_GetIntSetting(L"winArrange.KeysToDisableSnapping.Ctrl");
@@ -3758,6 +3830,9 @@ namespace InvisBorders {
 const COLORREF BorderInvisible = DWMWA_COLOR_NONE;  // No border color
 const COLORREF ColorDefault = DWMWA_COLOR_DEFAULT;
 
+// 分组总开关（invisBorders.enable），关闭时本组功能完全不生效；
+// SpecialWindows 同样仅在总开关开启时被应用。
+bool enable = true;
 bool SpecialWindows = false;
 
 BOOL IsValidWindow(HWND hWnd) {
@@ -3771,6 +3846,11 @@ BOOL IsValidWindow(HWND hWnd) {
 using DwmSetWindowAttribute_t = decltype(&DwmSetWindowAttribute);
 DwmSetWindowAttribute_t DwmSetWindowAttribute_orig;
 HRESULT WINAPI DwmSetWindowAttribute_hook(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute) {
+    // 分组总开关关闭：完全放行，应用程序设置的边框颜色保持原样。
+    if (!enable) {
+        return DwmSetWindowAttribute_orig(hwnd, dwAttribute, pvAttribute, cbAttribute);
+    }
+
     if (dwAttribute == DWMWA_BORDER_COLOR && IsValidWindow(hwnd)) {
         Wh_Log(L"Intercepted DWMWA_BORDER_COLOR - setting to invisible");
         // Override with invisible border
@@ -3782,7 +3862,9 @@ HRESULT WINAPI DwmSetWindowAttribute_hook(HWND hwnd, DWORD dwAttribute, LPCVOID 
 
 void SetBorderInvisible(HWND hWnd)
 {
-    if (!IsValidWindow(hWnd))
+    // 分组总开关关闭：不把任何窗口边框设为隐形（DefWindowProc/DefDlgProc
+    // 钩子与启用枚举都经由本函数，运行时短路，随设置重载即时生效）。
+    if (!enable || !IsValidWindow(hWnd))
         return;
 
     Wh_Log(L"Setting invisible border");
@@ -3880,6 +3962,7 @@ BOOL CALLBACK DisableEnumWindowsCallback(HWND hWnd, LPARAM lParam) {
 BOOL Init() {
     Wh_Log(L"Init - Invisible Borders");
 
+    enable = Wh_GetIntSetting(L"invisBorders.enable") != 0;
     SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
 
     Wh_SetFunctionHook(
@@ -3916,6 +3999,12 @@ BOOL Init() {
 
 void AfterInit() {
     Wh_Log(L"AfterInit - Applying invisible borders");
+
+    // 分组总开关关闭：不把现有窗口的边框设为隐形。
+    if (!enable) {
+        return;
+    }
+
     EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
 }
 
@@ -3926,9 +4015,15 @@ void BeforeUninit() {
 
 void SettingsChanged() {
     Wh_Log(L"SettingsChanged");
+
+    // 先整体还原默认边框，再按新设置（含总开关）决定是否重新应用：
+    // 总开关关闭时还原即终点，本组功能完全失效；重新开启则立即恢复隐形。
     EnumWindows(DisableEnumWindowsCallback, GetCurrentProcessId());
+    enable = Wh_GetIntSetting(L"invisBorders.enable") != 0;
     SpecialWindows = Wh_GetIntSetting(L"invisBorders.SpecialWindows");
-    EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+    if (enable) {
+        EnumWindows(EnableEnumWindowsCallback, GetCurrentProcessId());
+    }
 }
 
 }  // namespace InvisBorders

@@ -2,80 +2,61 @@
 // @id              hw-taskbar-volume-control
 // @name            HW-任务栏音量控制
 // @name:zh-CN      HW-任务栏音量控制
-// @description     Control the system volume by scrolling over the taskbar or anywhere with modifier keys; also cycle media (playback/capture) devices with global hotkeys. Also control the per-app volume by scrolling over taskbar buttons.
-// @description:zh-CN 在任务栏上滚动滚轮控制系统音量，也可按住修饰键在屏幕任意位置滚动调节；还支持全局快捷键快速切换媒体（播放/录音）设备。还可悬停任务栏按钮滚动调节对应应用自己的音量。
-// @version         1.6.2
-// @author          m417z
+// @description     Taskbar volume control: scroll on the taskbar to change the global volume, global hotkeys to switch the playback/capture device, and scroll over a taskbar button to change that app's own volume.
+// @description:zh-CN 任务栏音量控制三合一：在任务栏滚动调节系统总音量；全局快捷键循环切换播放/录音设备；悬停任务栏按钮滚动调节对应应用自己的音量。
+// @version         1.0.0
+// @author          m417z, Heptalune
 // @github          https://github.com/m417z
-// @twitter         https://twitter.com/m417z
 // @homepage        https://m417z.com/
 // @include         explorer.exe
 // @include         ShellExperienceHost.exe
 // @include         SndVol.exe
-// @compilerOptions -lcomctl32 -ldwmapi -lgdi32 -lole32 -lversion -lntdll -loleaut32 -lruntimeobject
+// @architecture    x86-64
+// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm -lwtsapi32 -lpowrprof -lgdiplus -ldwmapi -lcomdlg32 -lntdll -ladvapi32 -lshcore
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.6.2，原作者 m417z）
-
-// Source code is published under The GNU General Public License v3.0.
-//
-// For bug reports and feature requests, please open an issue here:
-// https://github.com/ramensoftware/windhawk-mods/issues
-//
-// For pull requests, development takes place here:
-// https://github.com/m417z/my-windhawk-mods
-//
-// 中文界面与整合由 HW-Beautify 整合包（作者 Heptalune）完成：汉化元数据与设置文案；1.3.4 起新增
-// 媒体设备快速切换（参考 AudioSwitcher 重新实现，非搬运上游代码）。1.4.0 起并入分应用音量控制
-// 功能（上游 Taskbar Volume Control Per-App，同为 m417z 作品）。
-// 原版 mod：https://windhawk.net/mods/taskbar-volume-control
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游逻辑与
+// HW-Convenient Windows 中的音量段一致，原作者 m417z，GPL-3.0）。
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**m417z**（[Taskbar Volume Control](https://windhawk.net/mods/taskbar-volume-control)，GPL-3.0）。本版由 HW-Beautify 整合包（作者 Heptalune）汉化维护，并新增媒体设备快速切换功能。
+> 自 HW-Convenient Windows（HW-Beautify 整合包）1.2.0 拆分而来，整合并保留其「任务栏音量控制」相关的三个可收起分组，每组各带一个「启用本组功能」总开关。原作者与许可见文末。
 
 # HW-任务栏音量控制
 
+HW-Beautify 整合包的「任务栏音量控制」三合一模组：把「全局音量控制」「切换媒体设备」「分应用音量控制」三个互不冲突的音量功能合并进一个模组，由 Windhawk 直接注入目标进程运行。设置页共三个可收起分组，每个分组的第一项均为「启用本组功能」总开关（默认开启）。
+
+## 功能分组一览
+
+| # | 分组 | 设置键前缀 | 总开关默认 | 一句话说明 | 来源（原作者） |
+|---|------|-----------|-----------|-----------|---------------|
+| 1 | 全局音量控制 | `globalVolume.*` | 开 | 任务栏/屏幕任意位置滚动调节系统音量 | m417z（GPL-3.0） |
+| 2 | 切换媒体设备 | `deviceSwitch.*` | 开 | 全局快捷键循环切换播放/录音设备 | m417z（GPL-3.0，参考 AudioSwitcher 重新实现） |
+| 3 | 分应用音量控制 | `perApp.*` | 开 | 悬停任务栏按钮滚动调节对应应用音量 | m417z（GPL-3.0） |
+## 分组 1：全局音量控制（globalVolume.*）
+
 在任务栏上滚动鼠标滚轮即可调节系统音量。
 
-## 功能
-
 - **音量指示器**：可选 Windows 11、Windows 10、Windows 7 风格，或不显示。
-- **滚动区域**：可限定整条任务栏、仅托盘区域，或自定义附加区域。
-- **任意位置滚动**：按住设定的修饰键组合后，在屏幕任意位置滚动滚轮都能调音量。
-- **全屏时滚动**：任务栏被全屏窗口遮住时，在任务栏位置滚动仍然有效。
-- **中键静音**：中键点击音量托盘图标即可切换静音。
-- **分应用音量**：悬停在任务栏按钮上滚动滚轮，调节对应应用自己的音量；Ctrl+点击按钮可切换该应用静音，调节时按钮旁弹出提示。
-
-## 设置说明
-
-- **音量控制指示器**：滚动时显示的样式，默认为 Windows 11 风格。
-- **滚动区域**：默认整条任务栏；也可只选托盘区域、或不用区域（只用附加滚动区域）。
+- **滚动区域**：可限定整条任务栏、仅托盘区域、除托盘外的任务栏，或不用区域（只用附加滚动区域）。
 - **附加滚动区域**：逗号分隔的范围列表，如 "100-200"（像素）或 "20%-50%"（任务栏长度的百分比）。
-- **中键点击静音**：默认开启（需 Windows 11 22H2 或更新）。
 - **Ctrl + 滚轮调音量**：默认关闭；开启后只有按住 Ctrl 滚动才改音量。
-- **任意位置滚动的修饰键**：按住哪组键才生效；前台是提权进程（如 Windhawk 或任务管理器）时无效。
-- **全屏时滚动**：默认关闭。
-- **不自动切换静音**：默认关闭，即音量降到 0 自动静音、调高自动取消静音；开启后不再改变静音状态。
-- **音量步长**：每格滚轮变化的音量，默认 2；Windows 11 指示器下必须是 2 的倍数。
-- **自定义 Windows 11 旧版任务栏**：配合 ExplorerPatcher 等工具使用。
+- **任意位置滚动的修饰键**：按住设定的修饰键组合后，在屏幕任意位置滚动滚轮都能调音量；前台是提权进程（如 Windhawk 或任务管理器）时无效。
+- **全屏时滚动**：任务栏被全屏窗口遮住时，在任务栏位置滚动仍然有效（可选带/不带指示器）。
+- 部分笔记本触控板不支持在任务栏上滚动，可改用「双指捏合」手势（原作者说明）。
 
-### 切换媒体设备
 
-媒体设备快捷切换相关设置（1.6.0 起从「全局音量控制」分组移出，收进独立的可收起分组）：
+## 分组 2：切换媒体设备（deviceSwitch.*）
 
 - **媒体（播放）设备快速切换**：全局快捷键，按下后把默认播放设备切到下一个，左下角短暂提示设备名；设为 None 关闭。
 - **录音（采集）设备快速切换**：同上，作用于麦克风等录音设备，默认关闭。
 - **跳过未激活的设备**：切换时跳过已禁用或未插入的设备。
-- **切换后提示**：切换成功后在屏幕左下角短暂显示新设备名称（播放/录音切换共用该提示；1.6.0 修复了提示从不显示的问题）。
+- **切换后提示**：切换成功后在屏幕左下角短暂显示新设备名称（播放/录音切换共用该提示）。
 - **提示持续时间（毫秒）**：提示停留的时长，到时后淡出，默认 1500（范围 500-5000）。
 
-### 分应用音量控制
+## 分组 3：分应用音量控制（perApp.*）
 
-悬停在任务栏按钮上滚动滚轮即可调节该应用自己的音量（仅 Windows 11 XAML 任务栏，仅
-explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务栏时，在任务栏按钮上滚动以系统
-音量优先；若只想调分应用音量，可把「滚动区域」改为「托盘区域」，或开启系统音量侧的
-「Ctrl + 滚轮调音量」（按住 Ctrl 调系统音量，直接滚动调分应用音量）。
+悬停在任务栏按钮上滚动滚轮即可调节该应用自己的音量（仅 Windows 11 XAML 任务栏，仅 explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务栏时，在任务栏按钮上滚动以系统音量优先；若只想调分应用音量，可把「滚动区域」改为「托盘区域」，或开启系统音量侧的「Ctrl + 滚轮调音量」。
 
 - **音量步长**：每格滚轮变化的该应用音量，默认 10。
 - **Ctrl + 点击静音**：默认开启；按住 Ctrl 并左键点击任务栏按钮，切换该应用静音。
@@ -83,99 +64,37 @@ explorer.exe 进程生效）。注意：默认「滚动区域」为整条任务�
 - **精简格式**：默认关闭；开启后提示改用表情符号紧凑格式（如 "🔊 64%"、"🔇"）。
 - **不自动切换静音**：默认关闭，即应用音量降到 0 时自动静音、调到非 0 时自动取消静音；开启后不再改变应用的静音状态。
 
-## 兼容性与已知问题
 
-- 注入 `explorer.exe`、`ShellExperienceHost.exe`、`SndVol.exe`。
-- 部分笔记本触控板不支持在任务栏上滚动，可改用「双指捏合」手势（原作者说明）。
+## 进程生效范围
 
-## 原作者的相关 mod
+本模组注入 explorer.exe、ShellExperienceHost.exe 与 SndVol.exe（与原「HW-任务栏音量控制」的注入范围一致；ShellExperienceHost / SndVol 仅承载音量指示器），三个分组均在其中生效。
 
-- 按应用单独调音量：[Taskbar Volume Control Per-App](https://windhawk.net/mods/taskbar-volume-control-per-app)（1.4.0 起已并入本模组）。
-- 让音量条显示在鼠标所在显示器：[Volume Control open location](https://windhawk.net/mods/volume-control-open-location)。
-- 滚动触发更多动作：[Taskbar Scroll Actions](https://windhawk.net/mods/taskbar-scroll-actions)。
+## 变更记录
 
-## 更新日志
-- **1.6.2**：
-  - 修复「切换媒体设备后，提示永远显示 (未知设备)」的问题。根因在设备名读取（IMMDevice::OpenPropertyStore → IPropertyStore::GetValue(PKEY_Device_FriendlyName)）：Windows 的 MMDevice 端点属性存储对字符串属性实际返回 **VT_LPWSTR** 类型，而代码只接受 VT_BSTR——GetValue 本身成功，值却因类型不符被当作空值丢弃，于是永远落到「(未知设备)」占位文案。该缺陷自 1.3.4 加入设备切换功能时就已存在，只是 1.6.0 修复提示窗口从不显示的问题之前一直没被看到（切换本身始终正常）。现改为兼容 VT_LPWSTR / VT_BSTR 两种类型读取，FriendlyName 为空时回退 PKEY_Device_DeviceDesc（设备描述），两者都取不到才显示「(未知设备)」。
-  - 时序说明：提示中的设备名取自切换目标设备对象自身，在 IPolicyConfig::SetDefaultEndpoint 对 console 与 multimedia 两个角色均返回成功（同步确认）之后读取；目标设备的属性存储随设备对象即时可读，不依赖系统默认端点刷新，无需延迟重试。
-  - 核对：快捷键注册与切换、提示显示均在专用常驻线程上完成，该线程启动即调用 CoInitializeEx(STA)，COM 状态全程就绪。
-
-- **1.6.1**：
-  - 修复「整个模组在 explorer.exe 中失效」的问题（分应用音量、任务栏滚动调音量、中键静音同时失灵，直到重启资源管理器或重启电脑）。根因：中键静音与分应用音量依赖的 taskbar.dll / Taskbar.View.dll 符号需要引擎在目标进程内加载调试符号（msdia + PDB，其中 Taskbar.View.pdb 约 43MB），系统内存/提交压力大时这一步会瞬时失败（实测 explorer.exe 内 msdia 加载返回 ERROR_NOT_ENOUGH_MEMORY / 0x80070008，可复现）；而引擎会把这类失败按模组缓存最长 4 小时（开机加载场景），且本模组初始化遇到失败会直接整体放弃——三层叠加导致一次性失败被放大成长时间不可用。现改为：初始化中符号加载失败只降级对应功能（任务栏/托盘滚动调音量本就不依赖符号，不再被连坐拖垮），并转入后台自动重试（首次 30 秒后，指数退避、最长 30 分钟一次，持续 24 小时；重试用 Wh_FindFirstSymbol 直接解析符号，绕过引擎的失败节流缓存），环境恢复后无需重启即可自动恢复全部功能。
-  - 说明：该问题与「媒体设备快速切换」无关——切换默认播放设备不会影响音频会话枚举（模组每次调节都实时获取当前默认设备与其会话，无缓存）。
-
-- **1.6.0**：
-  - 设置分组：媒体（播放）/录音（采集）设备快捷切换、跳过未激活的设备、切换后提示四项设置从「全局音量控制」分组移出，收进新的可收起分组「**切换媒体设备**」（键名改为 deviceSwitch.* 前缀；「全局音量控制」分组只保留滚动调音量相关设置，已保存的自定义值在 deploy 脚本同步迁移前会回落为默认值）。
-  - 修复「切换后提示」从不显示的问题：toast 窗口此前创建时样式只有 WS_POPUP（未带 WS_VISIBLE），之后也从未调用 ShowWindow，窗口一直处于隐藏状态——计时与淡出逻辑其实都在正常运行，只是画在了一个看不见的窗口上；现改为分层属性设置完成后立即以 SW_SHOWNOACTIVATE 显示（不抢前台焦点），播放与录音设备切换共用该提示。
-  - 新增「提示持续时间（毫秒）」设置（deviceSwitch.toastDuration，默认 1500，范围 500-5000），控制切换提示停留时长（此前硬编码 2200 毫秒），与「切换后提示」开关并存（开关决定是否显示，时长决定显示多久）。
-
-- **1.5.0**：设置页重组——模组最初的核心功能（滚动调音量、修饰键任意位置滚动、媒体设备快捷切换等）收进「全局音量控制」可收起分组，键名加 globalVolume. 前缀（与「分应用音量控制」分组并列；deploy 会自动迁移旧扁平键的值）。分组归类只影响设置页展示，功能行为与默认值完全不变。
-
-- **1.4.0**：分应用音量控制模组并入本模组（上游 Taskbar Volume Control Per-App，同为 m417z
-  作品）：悬停任务栏按钮滚动调节对应应用自己的音量、Ctrl+点击切换该应用静音、调节时按钮旁
-  弹出提示；其设置项迁移为本模组的 perApp.* 前缀（设置页「分应用音量控制」嵌套组），原独立
-  模组（HW-分应用音量控制）可移除。
-
-- **1.3.5**：修复「媒体设备快速切换」按快捷键无反应的问题。原因：热键原来注册在
-Windhawk 的临时工作线程上，线程退出后热键和消息窗口随之失效；现改在专用常驻
-线程上注册热键并处理消息。同时修正实现：设置默认设备改用系统 IPolicyConfig
-接口（CPolicyConfigClient，AudioSwitcher/SoundSwitch 同款做法），修正设备枚举、
-设备名读取，提示字体改为正常大小。
-
-- **1.3.4**：恢复音量控制指示器的「Windows 11」选项（代码一直支持 win11，之前只是设置页删掉了选项，现已加回）；
-新增「媒体设备快速切换」——快捷键循环切换系统默认播放/录音设备，切换后左下角短暂提示设备名
-（参考并重新实现了 AudioSwitcher 的热键切换设备功能，AudioSwitcher 作者 xenolightning，MS-PL 许可）。
-
-- **1.3.3**：移除静音相关设置（中键点击静音、不自动切换静音；自动静音行为永久关闭）与「Windows 11 旧版任务栏」指示器选项（指示器默认改为 Windows 10 风格）；滚轮/修饰键/全屏滚动功能保留（CW 汉化版调整）。
-
-- **1.3.2**：中文汉化与整合（仅元数据、说明与设置文案，代码与原版 1.3.1 一致）。
+- **1.0.0**：由 HW-Convenient Windows 1.2.0 拆分而来，「任务栏音量控制」三组（`globalVolume.*` / `deviceSwitch.*` / `perApp.*`）独立成模组：设置键路径原样保留、组首各带「启用本组功能」总开关，功能零改动；代码取自原 Volume 命名空间（该段源自 HW-任务栏音量控制 1.6.2）。x64 编译。
 
 ## 致谢与许可
 
-- 媒体设备快速切换功能参考自 **AudioSwitcher**（https://github.com/xenolightning/AudioSwitcher_v1，
-  作者 xenolightning，MS-PL 许可；本包重新实现该功能，未复制其代码）。
-- 原版 mod：Taskbar Volume Control，作者 [m417z](https://github.com/m417z)，GPL-3.0，原版链接：<https://windhawk.net/mods/taskbar-volume-control>。
-- 本汉化版同样以 GPL-3.0 发布。
-
-## 附录：原版说明（英文）
-
-Control the system volume by scrolling over the taskbar.
-
-Features:
-
-* **Volume indicator**: Choose between Windows 11, Windows 10, Windows 7, or no
-  indicator.
-* **Scroll area**: Limit scrolling to the full taskbar, the tray area, or define
-  custom regions along the taskbar.
-* **Scroll anywhere**: Hold a configurable combination of modifier keys to
-  control the volume by scrolling anywhere on screen.
-* **Full screen scrolling**: Scroll at the taskbar position to control the
-  volume even when a full screen window covers the taskbar.
-* **Middle click to mute**: Middle click the volume tray icon to toggle mute.
-
-**Note:** Some laptop touchpads might not support scrolling over the taskbar. A
-workaround is to use the "pinch to zoom" gesture. For details, check out [a
-relevant
-issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt-trigger-mouse-wheel-options).
-
-![Demonstration](https://i.imgur.com/B6mtUj9.gif)
-
-## Related mods
-
-* For per-app volume control, check out the [Taskbar Volume Control
-  Per-App](https://windhawk.net/mods/taskbar-volume-control-per-app) mod.
-* For showing the volume control on the monitor where the mouse cursor is
-  located, or on a custom monitor of choice, check out the [Volume Control open
-  location](https://windhawk.net/mods/volume-control-open-location) mod.
-* For additional actions that can be triggered by scrolling over the taskbar,
-  check out the [Taskbar Scroll
-  Actions](https://windhawk.net/mods/taskbar-scroll-actions) mod.
+- 原版 mod：Taskbar Volume Control，作者 [m417z](https://github.com/m417z)，GPL-3.0 许可证，原版链接：<https://windhawk.net/mods/taskbar-volume-control>；媒体设备快捷切换功能参考 [AudioSwitcher](https://github.com/xenlightning/AudioSwitcher_v1)（作者 xenolightning，MS-PL 许可）重新实现、未复制其代码；分应用音量控制来自同作者的 Taskbar Volume Control Per-App：<https://windhawk.net/mods/taskbar-volume-control-per-app>。
+- 本模组以 GPL-3.0 发布，由 HW-Beautify 整合包（作者 Heptalune）整合维护，原作者署名与许可声明原样保留。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
 - globalVolume:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for the global volume control group. When turned off,
+      scrolling no longer adjusts the system volume (taskbar, tray, custom
+      regions, modifier-key anywhere scrolling and full-screen scrolling are
+      all inactive); the rest of this group has no effect.
+    $description:zh-CN: >-
+      「全局音量控制」分组总开关。关闭后滚动不再调节系统音量（任务栏滚动、
+      托盘滚动、附加区域、修饰键任意位置滚动与全屏时滚动全部停用），组内
+      其余设置不再生效；重新开启立即恢复。
   - volumeIndicator: modern
     $name: Volume control indicator
     $name:zh-CN: 音量控制指示器
@@ -250,6 +169,16 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     modifier-key anywhere scrolling.
   $description:zh-CN: 模组最初始的核心功能：滚动调音量与修饰键任意位置滚动。
 - deviceSwitch:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for media device switching. When turned off, the global
+      hotkeys are unregistered and no device switch or toast happens; the
+      rest of this group has no effect.
+    $description:zh-CN: >-
+      「切换媒体设备」分组总开关。关闭后全局快捷键立即注销，不再切换设备、
+      也不再显示切换提示，组内其余设置不再生效；重新开启立即恢复。
   - playbackKey: "Ctrl+Alt+A"
     $name: Quick switch media device
     $name:zh-CN: 媒体（播放）设备快速切换
@@ -290,6 +219,17 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
     optional bottom-left toast showing the new device name.
   $description:zh-CN: 用全局快捷键循环切换默认播放/录音设备，并可在屏幕左下角短暂提示新设备名称。
 - perApp:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for per-app volume control. When turned off, scrolling
+      over taskbar buttons passes through and no per-app volume tooltip is
+      shown.
+    $description:zh-CN: >-
+      「分应用音量控制」分组总开关。关闭后悬停任务栏按钮滚动不再调节对应
+      应用音量（Ctrl+点击静音同样停用），组内其余设置不再生效；重新开启
+      立即恢复。
   - volumeChangeStep: 10
     $name: Volume change step (per-app)
     $name:zh-CN: 音量步长（分应用）
@@ -334,22 +274,107 @@ issue](https://tweaker.userecho.com/topics/826-scroll-on-trackpadtouchpad-doesnt
 */
 // ==/WindhawkModSettings==
 
-#include <windhawk_utils.h>
-
+#include <windows.h>
+#include <windowsx.h>
 #include <commctrl.h>
+#include <shellapi.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <objbase.h>
+#include <oleidl.h>
+#include <uxtheme.h>
+#include <mmsystem.h>
+#include <powrprof.h>
 #include <dwmapi.h>
+#include <shellscalingapi.h>
+#include <shobjidl.h>
+#include <tlhelp32.h>
+#include <windhawk_utils.h>
 #include <endpointvolume.h>
 #include <mmdeviceapi.h>
-#include <objbase.h>
 #include <psapi.h>
-#include <windowsx.h>
+#include <uiautomation.h>
+#include <deque>
+#include <string_view>
 
 #include <algorithm>
 #include <atomic>
+#include <bit>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
+#include <cwctype>
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
 #include <optional>
-#include <string_view>
+#include <set>
+#include <string>
+#include <tuple>
+#include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
+
+#include <gdiplus.h>
+
+#undef GetCurrentTime
+
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Input.h>
+#include <winrt/Windows.UI.Xaml.Input.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.h>
+
+using namespace winrt::Windows::UI::Xaml;
+
+#include <audiopolicy.h>
+#include <winternl.h>
+#undef GetCurrentTime
+#include <winrt/Windows.UI.ViewManagement.h>
+
+// 宿主进程判定：音量段在 explorer / ShellExperienceHost / SndVol 三个进程内生效。
+enum class HostProcessKind {
+    Explorer,
+    ShellExperienceHost,
+    SndVol,
+    Other,
+};
+
+static HostProcessKind GetHostProcessKind() {
+    WCHAR path[MAX_PATH]{};
+    GetModuleFileNameW(nullptr, path, ARRAYSIZE(path));
+    PCWSTR fileName = wcsrchr(path, L'\\');
+    fileName = fileName ? fileName + 1 : path;
+    if (_wcsicmp(fileName, L"explorer.exe") == 0) {
+        return HostProcessKind::Explorer;
+    }
+    if (_wcsicmp(fileName, L"ShellExperienceHost.exe") == 0) {
+        return HostProcessKind::ShellExperienceHost;
+    }
+    if (_wcsicmp(fileName, L"SndVol.exe") == 0) {
+        return HostProcessKind::SndVol;
+    }
+    return HostProcessKind::Other;
+}
+
+static bool InVolumeHost() {
+    HostProcessKind kind = GetHostProcessKind();
+    return kind == HostProcessKind::Explorer ||
+           kind == HostProcessKind::ShellExperienceHost ||
+           kind == HostProcessKind::SndVol;
+}
+
+namespace Volume {
 
 enum class VolumeIndicator {
     None,
@@ -402,6 +427,12 @@ enum class Target {
 };
 
 Target g_target;
+
+// 合并版分组总开关（各组内第一项，默认开启；运行时短路，设置变更经各自
+// LoadSettings 即时生效，无需重启资源管理器）。
+std::atomic<bool> g_globalVolumeEnabled{true};
+std::atomic<bool> g_deviceSwitchEnabled{true};
+std::atomic<bool> g_perAppEnabled{true};
 
 std::atomic<bool> g_systemTrayModuleHooked;
 std::atomic<bool> g_initialized;
@@ -1362,6 +1393,9 @@ static void ShowDevToast(const std::wstring& text) {
 }
 
 static void LoadDevSettings() {
+    // 分组总开关（deviceSwitch.enable，组内第一项，默认开启）。
+    g_deviceSwitchEnabled = Wh_GetIntSetting(L"deviceSwitch.enable") != 0;
+
     PCWSTR s = Wh_GetStringSetting(L"deviceSwitch.playbackKey");
     g_dev.hasPlay = ParseHotkey(s, g_dev.playMods, g_dev.playKey);
     Wh_FreeStringSetting(s);
@@ -1387,6 +1421,10 @@ static void RegisterDevHotkeys() {
         return;
     UnregisterHotKey(g_devMsgWnd, 1);
     UnregisterHotKey(g_devMsgWnd, 2);
+    // 分组总开关关闭：不再注册快捷键（上面的注销保证关闭瞬间立即失效）。
+    if (!g_deviceSwitchEnabled.load()) {
+        return;
+    }
     if (g_dev.hasPlay) {
         if (!RegisterHotKey(g_devMsgWnd, 1, g_dev.playMods | MOD_NOREPEAT,
                             g_dev.playKey)) {
@@ -2147,6 +2185,11 @@ static BOOL CALLBACK EnumThreadFindSndVolTrayControlWnd(HWND hWnd,
 ////////////////////////////////////////////////////////////
 
 bool OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam) {
+    // 分组总开关关闭：滚动不再调节音量（直通系统行为）。
+    if (!g_globalVolumeEnabled.load()) {
+        return false;
+    }
+
     if (GetCapture()) {
         return false;
     }
@@ -2242,7 +2285,8 @@ LRESULT CALLBACK TaskbarWindowSubclassProc(_In_ HWND hWnd,
             break;
 
         default:
-            if (uMsg == g_scrollAnywhereMsg) {
+            if (uMsg == g_scrollAnywhereMsg &&
+                g_globalVolumeEnabled.load()) {
                 if (LOWORD(wParam) == 1) {
                     AdjustVolumeLevelWithMouseWheel(
                         GET_WHEEL_DELTA_WPARAM(wParam), 0);
@@ -2405,25 +2449,14 @@ HWND FindCurrentProcessTaskbarWindows(
     return hWnd;
 }
 
-using CreateWindowExW_t = decltype(&CreateWindowExW);
-CreateWindowExW_t CreateWindowExW_Original;
-HWND WINAPI CreateWindowExW_Hook(DWORD dwExStyle,
-                                 LPCWSTR lpClassName,
-                                 LPCWSTR lpWindowName,
-                                 DWORD dwStyle,
-                                 int X,
-                                 int Y,
-                                 int nWidth,
-                                 int nHeight,
-                                 HWND hWndParent,
-                                 HMENU hMenu,
-                                 HINSTANCE hInstance,
-                                 LPVOID lpParam) {
-    HWND hWnd = CreateWindowExW_Original(dwExStyle, lpClassName, lpWindowName,
-                                         dwStyle, X, Y, nWidth, nHeight,
-                                         hWndParent, hMenu, hInstance, lpParam);
-    if (!hWnd)
-        return hWnd;
+// 合并版：CreateWindowExW 钩子由文件末尾的共享钩子统一安装并分发
+// （hw-desktop-quick-settings 共享钩子先例），本段只保留任务栏窗口识别逻辑，
+// 经 VolumeHandleCreatedWindow 供共享钩子调用（explorer 路径且 Volume::Init
+// 成功后激活，见合并入口）。
+void VolumeHandleCreatedWindow(HWND hWnd, LPCWSTR lpClassName) {
+    if (!hWnd || !lpClassName) {
+        return;
+    }
 
     BOOL bTextualClassName = ((ULONG_PTR)lpClassName & ~(ULONG_PTR)0xffff) != 0;
 
@@ -2436,8 +2469,6 @@ HWND WINAPI CreateWindowExW_Hook(DWORD dwExStyle,
                (DWORD)(ULONG_PTR)hWnd);
         HandleIdentifiedSecondaryTaskbarWindow(hWnd);
     }
-
-    return hWnd;
 }
 
 using CreateWindowInBand_t = HWND(WINAPI*)(DWORD dwExStyle,
@@ -2498,6 +2529,9 @@ DWORD_PTR WINAPI ForceFocusBasedMouseWheelRouting_Hook(BOOL enabled) {
 }
 
 void LoadSettings() {
+    // 分组总开关（globalVolume.enable，组内第一项，默认开启）。
+    g_globalVolumeEnabled = Wh_GetIntSetting(L"globalVolume.enable") != 0;
+
     PCWSTR volumeIndicator = Wh_GetStringSetting(L"globalVolume.volumeIndicator");
     g_settings.volumeIndicator = VolumeIndicator::Win11;
     if (wcscmp(volumeIndicator, L"modern") == 0) {
@@ -3245,31 +3279,10 @@ void ScrollAnywhereThreadUninit() {
 // Wh_ModUninit / Wh_ModSettingsChanged）。
 // ---------------------------------------------------------------------------
 
-#include <windhawk_utils.h>
 
-#include <atomic>
-#include <cmath>
-#include <functional>
-#include <optional>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
-#include <audiopolicy.h>
-#include <endpointvolume.h>
-#include <mmdeviceapi.h>
-#include <tlhelp32.h>
-#include <winternl.h>
 
-#undef GetCurrentTime
 
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.UI.Input.h>
-#include <winrt/Windows.UI.ViewManagement.h>
-#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
-#include <winrt/Windows.UI.Xaml.Controls.h>
-#include <winrt/Windows.UI.Xaml.Input.h>
-#include <winrt/Windows.UI.Xaml.Media.h>
 
 namespace PerAppVolume {
 
@@ -4266,6 +4279,11 @@ int WINAPI TaskListButton_OnPointerWheelChanged_Hook(void* pThis, void* pArgs) {
         return TaskListButton_OnPointerWheelChanged_Original(pThis, pArgs);
     };
 
+    // 分组总开关关闭：直通原函数（分应用音量调节不再生效）。
+    if (!g_perAppEnabled.load()) {
+        return original();
+    }
+
     UIElement element = nullptr;
     ((IUnknown*)pThis)
         ->QueryInterface(winrt::guid_of<UIElement>(), winrt::put_abi(element));
@@ -4407,6 +4425,11 @@ int WINAPI TaskListButton_OnPointerPressed_Hook(void* pThis, void* pArgs) {
         return TaskListButton_OnPointerPressed_Original(pThis, pArgs);
     };
 
+    // 分组总开关关闭：直通原函数（分应用 Ctrl+点击静音不再生效）。
+    if (!g_perAppEnabled.load()) {
+        return original();
+    }
+
     if (!g_settings.ctrlClickToMute) {
         return original();
     }
@@ -4456,6 +4479,9 @@ int WINAPI TaskListButton_OnPointerPressed_Hook(void* pThis, void* pArgs) {
 }
 
 void LoadSettings() {
+    // 分组总开关（perApp.enable，组内第一项，默认开启）。
+    g_perAppEnabled = Wh_GetIntSetting(L"perApp.enable") != 0;
+
     g_settings.volumeChangeStep = Wh_GetIntSetting(L"perApp.volumeChangeStep");
     g_settings.ctrlClickToMute = Wh_GetIntSetting(L"perApp.ctrlClickToMute");
     g_settings.ctrlScrollVolumeChange =
@@ -4779,7 +4805,7 @@ bool RetryPerAppHooks() {
     return PerAppVolume::RetryHooksForRetryWorker();
 }
 
-BOOL Wh_ModInit() {
+BOOL Init() {
     Wh_Log(L">");
 
     LoadSettings();
@@ -4873,8 +4899,8 @@ BOOL Wh_ModInit() {
         }
     }
 
-    WindhawkUtils::SetFunctionHook(CreateWindowExW, CreateWindowExW_Hook,
-                                   &CreateWindowExW_Original);
+    // 合并版：CreateWindowExW 钩子由文件末尾的共享钩子统一安装并分发，
+    // 此处不再单独安装（任务栏窗口识别经 VolumeHandleCreatedWindow 分发）。
 
     HMODULE user32Module =
         LoadLibraryEx(L"user32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -4908,7 +4934,7 @@ BOOL Wh_ModInit() {
     return TRUE;
 }
 
-void Wh_ModAfterInit() {
+void AfterInit() {
     Wh_Log(L">");
 
     if (g_target != Target::Explorer) {
@@ -4949,7 +4975,7 @@ void Wh_ModAfterInit() {
     DevSwitchThreadInit();
 }
 
-void Wh_ModUninit() {
+void Uninit() {
     Wh_Log(L">");
 
     if (g_target != Target::Explorer) {
@@ -4974,7 +5000,7 @@ void Wh_ModUninit() {
     DevSwitchThreadUninit();
 }
 
-BOOL Wh_ModSettingsChanged(BOOL* bReload) {
+BOOL SettingsChanged(BOOL* bReload) {
     Wh_Log(L">");
 
     bool prevOldTaskbarOnWin11 = g_settings.oldTaskbarOnWin11;
@@ -5024,4 +5050,95 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
     }
 
     return TRUE;
+}
+
+}  // namespace Volume
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CreateWindowExW 钩子：捕获新建的任务栏窗口（Shell_TrayWnd /
+// Shell_SecondaryTrayWnd），供音量段定位音量指示器与任务栏按钮。
+// ─────────────────────────────────────────────────────────────────────────────
+using VolCreateWindowExW_t = decltype(&CreateWindowExW);
+VolCreateWindowExW_t VolReal_CreateWindowExW;
+
+static HWND WINAPI VolHookCreateWindowExW(
+    DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName,
+    DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
+    HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
+
+static BOOL VolInstallCreateWindowExWHook() {
+    return Wh_SetFunctionHook(
+        (void*)CreateWindowExW,
+        (void*)VolHookCreateWindowExW,
+        (void**)&VolReal_CreateWindowExW);
+}
+
+static HWND WINAPI VolHookCreateWindowExW(
+    DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName,
+    DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
+    HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam) {
+    HWND hWnd = VolReal_CreateWindowExW(
+        dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight,
+        hWndParent, hMenu, hInstance, lpParam);
+
+    if (hWnd && lpClassName && !IS_INTRESOURCE(lpClassName)) {
+        if (Volume::g_initialized.load(std::memory_order_acquire)) {
+            Volume::VolumeHandleCreatedWindow(hWnd, lpClassName);
+        }
+    }
+
+    return hWnd;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 模组入口（Windhawk 调用）
+// ─────────────────────────────────────────────────────────────────────────────
+BOOL Wh_ModInit() {
+    Wh_Log(L">");
+
+    if (!InVolumeHost()) {
+        return TRUE;
+    }
+
+    if (!VolInstallCreateWindowExWHook()) {
+        Wh_Log(L"CreateWindowExW hook failed, continuing without it");
+    }
+
+    if (!Volume::Init()) {
+        Wh_Log(L"Volume init failed");
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+void Wh_ModAfterInit() {
+    Wh_Log(L">");
+
+    if (!InVolumeHost()) {
+        return;
+    }
+
+    Volume::AfterInit();
+}
+
+void Wh_ModUninit() {
+    Wh_Log(L">");
+
+    if (!InVolumeHost()) {
+        return;
+    }
+
+    Volume::Uninit();
+}
+
+void Wh_ModSettingsChanged() {
+    Wh_Log(L">");
+
+    if (!InVolumeHost()) {
+        return;
+    }
+
+    BOOL bReload = FALSE;
+    Volume::SettingsChanged(&bReload);
 }

@@ -1,203 +1,232 @@
 // ==WindhawkMod==
-// @id              hw-shake-find-cursor-inproc
-// @name            HW-晃动找指针（注入版）
-// @name:zh-CN      HW-晃动找指针（注入版）
-// @description     Temporarily enlarges the mouse cursor when you shake the mouse, like macOS "Shake to locate"
-// @description:zh-CN 复刻 macOS「摇晃以定位」：晃动鼠标（或在触摸板上快速来回滑动）时临时放大指针，停下后自动缩回。Raw Input 事件驱动 + 系统光标原位放大：无覆盖窗口、无拖尾、空闲零 CPU。
-// @version         1.5.0
-// @author          Darius Varnelis
-// @github          https://github.com/Darius-Varnelis
+// @id              hw-shake-find-cursor
+// @name            HW-晃动找指针
+// @name:zh-CN      HW-晃动找指针
+// @description     Shake the mouse cursor to temporarily enlarge it, like macOS.
+// @description:zh-CN 晃动鼠标指针即临时放大定位，复刻 macOS。Raw Input 零轮询零 CPU。
+// @version         1.0.0
+// @author          m417z, wygodad, Darius Varnelis, Jaali, Heptalune, HeyOkay, Hakuuyosei（灵弦）, iMAboud
+// @github          https://github.com/m417z
+// @homepage        https://m417z.com/
 // @include         explorer.exe
-// @compilerOptions -luser32 -lgdi32 -lshell32 -ladvapi32 -lshcore
+// @architecture    x86-64
+// @compilerOptions -lcomctl32 -lole32 -loleaut32 -lruntimeobject -lshell32 -lshlwapi -lversion -luser32 -lgdi32 -luxtheme -lwinmm -lwtsapi32 -lpowrprof -lgdiplus -ldwmapi -lcomdlg32 -lntdll -ladvapi32 -lshcore -Wl,--export-all-symbols
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游版本 1.5.0，原作者 Darius Varnelis）
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游版本 1.1.0，原作者 m417z, wygodad, Darius Varnelis, Jaali, Heptalune, HeyOkay, Hakuuyosei（灵弦）, iMAboud）
 
-// HW-Beautify 整合说明：本文件是 dlc\local@cw-shake-find-cursor.wh.cpp（独立进程版
-// tool mod，同源同版本号 1.5.0，合并来源与许可见下方 readme）的「注入版」变体：
-// 剥离 WhTool 独立进程启动样板（windhawk.exe 专用进程互斥体、EntryPoint_Hook 入口
-// 挂钩、CreateProcessInternalW 自拉起与 -tool-mod 参数解析、会话 0 判定），改为
-// @include explorer.exe 的普通模组——Wh_ModInit 直接创建工作线程（消息泵照原逻辑），
-// Wh_ModUninit 释放线程与资源。Raw Input 按基底上游（Shake to Find Cursor v1.4.1）
-// 的注册方式移植：message-only 消息专用窗口 + RegisterRawInputDevices(RIDEV_INPUTSINK)
-// 全局接收（独立进程版为接收会话结束广播用隐藏顶层窗口；message-only 窗口收不到
-// 该广播，注入版的注销/关机还原依赖 Wh_ModUninit 安全网与下次启动 cursorsModified
-// 兜底）。设置与功能逻辑与独立进程版逐字一致，仅生命周期接入方式与工作窗口形态
-// 不同。两种版本功能相同，不可同时开启，详见 readme「注入版与独立进程版的区别」。
-
-// 原合并版整合说明：本模组由以下两个模组合并而成（HW-Beautify 整合汉化，GPL-3.0）：
-// - 基底：Shake to Find Cursor v1.4.1（Darius Varnelis，MIT 许可证）
-//     https://windhawk.net/mods/shake-to-find-cursor
-//     https://github.com/Darius-Varnelis/shake-to-find-cursor
-//   代码主体与上游一致（Raw Input 监听 + SetSystemCursor 原位放大系统光标）。
-// - 被吸收方：macOS magnifying cursor v1.4.7（Jaali，MIT 许可证）
-//     https://windhawk.net/mods/mac-magnifying-cursor
-//     https://github.com/alivca
-//   吸收其注销/关机（WM_QUERYENDSESSION/WM_ENDSESSION）还原系统光标的保护；其覆盖
-//   窗口式放大机制未吸收（与基底机制互斥且基底方案更优），理由见 readme「与原版差异」。
-// 吸收的代码在 WindowProc 与 CreateWindowExW 处均有 [HW-Beautify] 注释标记；
-// 设置项与基底 v1.4.1 一一对应，键名未改动。
+// HW-Beautify 整合说明：本模组（HW-Convenient Windows）当前由以下两个功能组成
+// （模组 id 与文件名保持 hw-convenient-windows 不变）：
+//   1.「托盘悬停展开」：原 local@cw-tray-hover-expand-inproc 1.7.2 全量迁入
+//      （上游 wygodad Tray hover expand，MIT）；
+//   2.「晃动找指针」：原 local@cw-shake-find-cursor-inproc 1.5.0 全量迁入
+//      （基底 Darius Varnelis Shake to Find Cursor v1.4.1，MIT；吸收 Jaali
+//      macOS magnifying cursor 的会话结束保护，MIT）。
+// 1.3.0 删除说明（按用户要求）：移除「显示桌面按钮预览」「桌面图标隐藏设置」
+// 「拖拽删除」「开始菜单电源按钮」「关闭扩展名警告」五个分组，连同其设置组、
+// 代码段、说明文字与许可署名一并删除；仅被「桌面图标隐藏设置」使用的平滑绘制器
+// （SmoothIcons）与共享 CreateWindowExW 钩子（及其激活标志）随之移除。
+// 各段代码独立收进各自命名空间（TrayHover / Shake），入口统一改名
+// （Wh_ModInit→Init、Wh_ModUninit→Uninit、Wh_ModSettingsChanged→SettingsChanged），
+// 由文件末尾的入口统一调用：初始化失败仅记录日志并降级，不影响其他功能。
+// 进程门控：@include 为 explorer.exe，两个分组均在其中生效。
+// 设置键：trayHover.* 与 shake.*，各组首项均为「启用本组功能」总开关（默认开启）。
+// 显式 static ... CALLBACK/WINAPI 函数。
 
 // ==WindhawkModReadme==
 /*
-# HW-晃动找指针（注入版）
+> 自 HW-Convenient Windows 拆出（1.0.0），保留其「晃动找指针」分组。原作者与许可见文末。
+
+# HW-晃动找指针
+
+晃动鼠标指针即放大定位（复刻 macOS 的 magnifying cursor）。Raw Input 实现，零轮询、零 CPU 占用。仅注入 explorer.exe，设置页一个分组、组首带「启用本组功能」总开关。
+
+
+## 分组 2：晃动找指针（shake.*）
 
 晃动鼠标（或在触摸板上快速来回滑动），指针随即放大，一眼就能找到；停止晃动后自动缩回。复刻 macOS 的「摇晃以定位」（Shake to locate）。
 
-## 注入版与独立进程版的区别
+- **主要设置**：放大尺寸（默认 400%）、持续晃动继续放大（默认 50%，越晃越慢）、尺寸上限（0 = 屏幕高度）、触发距离（默认 800 像素）、往返比例（默认 350%）、时间窗口（默认 1000 毫秒）、保持放大时长（默认 500 毫秒）、放大/缩小动画时长（默认 150/250 毫秒）、全屏应用与游戏中禁用（默认开）。
+- Raw Input 事件驱动：不轮询、鼠标空闲时零 CPU 占用，也不会像低级鼠标钩子那样给输入增加延迟。
+- 放大的实现是把系统光标替换为按目标尺寸重绘的「当前光标方案」大号版本：没有覆盖窗口、没有拖尾，保留你的光标样式与颜色；动态光标（.ani）同样平滑放大缩小且动画不中断。
+- 模组卸载或崩溃时自动还原系统光标（Uninit 安全网 + 崩溃过滤器 + 下次启动兜底）；若模组进程在光标放大时被杀掉，正常光标会在模组下次启动时自动还原（在鼠标属性里重新应用一次指针方案也能立即修复）。
+- 自己绘制光标的应用会保留它们自己的小光标，不受影响；取决于 Windows 版本，提权窗口（任务管理器、UAC 提示）持有焦点时 Raw Input 可能到不了模组。
+- **与独立进程版的区别**：整合包曾另提供 DLC 模组「HW-晃动找指针（独立进程版）」（`cw-shake-find-cursor`，与本分组功能相同、不可同时开启），它以 tool mod 形式运行在独立的 windhawk.exe 进程中；本分组即其「注入版」形态——功能代码随 Windhawk 注入 explorer.exe 内运行，没有额外的后台进程，随 explorer 存活（重启资源管理器即随之重启）。注入方式的注意点：功能代码与 explorer 同进程，模组异常理论上可能影响 explorer 的稳定性（独立进程版崩溃只影响自身）。该独立进程版已从整合包移除；如需原版 mod：Shake to Find Cursor，作者 Darius Varnelis，MIT 许可证，原版链接：<https://windhawk.net/mods/shake-to-find-cursor>（其会话结束光标还原保护吸收自 Jaali 的 macOS magnifying cursor，原版链接：<https://windhawk.net/mods/mac-magnifying-cursor>；另见文末致谢）。
 
-本模组是 DLC 模组「HW-晃动找指针（独立进程版）」（`cw-shake-find-cursor`，整合包
-`dlc\` 目录）的**注入版变体**：两者由同一份合并代码（基底 Shake to Find Cursor
-v1.4.1 + 吸收 macOS magnifying cursor）衍生，版本号同源同号（1.5.0），功能与设置
-完全相同，仅运行方式不同：
 
-- **注入版（本模组，`hw-shake-find-cursor-inproc`）**：以普通模组形式注入
-  explorer.exe 内运行，没有额外的后台进程，随 explorer 存活；Raw Input 按基底上游
-  方式经 message-only 消息专用窗口 + `RegisterRawInputDevices`（`RIDEV_INPUTSINK`，
-  无论前台焦点在哪都全局接收）监听，鼠标空闲时依旧零 CPU。
-- **独立进程版（DLC，`cw-shake-find-cursor`）**：以 tool mod 形式运行在独立的
-  windhawk.exe 进程中，崩溃隔离、完全不触碰 Explorer，但会引发 windhawk.exe 宿主
-  进程，内存占用较高。
+## 进程生效范围
 
-两个版本**不可同时开启，只能二选一**。虽然两者 mod id 不同（Windhawk 允许同时处于
-启用状态），但二者的放大实现都是「替换系统光标」（SetSystemCursor）：一旦同开，
-两个实例会互相争抢与还原系统光标，放大状态来回跳变，且 Raw Input 事件被两份逻辑
-重复消费。这就是两者互斥的原因——请按需选择其中一个版本启用。
+本模组仅注入 explorer.exe（`@include explorer.exe`）。
 
-另一处细微差别在注销/关机保护：独立进程版的工作窗口是隐藏顶层窗口，能接收会话
-结束广播（WM_QUERYENDSESSION/WM_ENDSESSION）即时还原光标；注入版改用 message-only
-窗口（message-only 窗口收不到系统广播），注销/关机时的还原依赖模组卸载安全网与
-下次启动时的 cursorsModified 兜底（与基底 v1.4.1 行为一致；在鼠标属性里重新应用
-一次指针方案也能立即修复）。
+## 变更记录
 
-## 致谢与来源
+- **1.0.0**：自 HW-Convenient Windows 拆出「晃动找指针」分组独立成模组；设置键 `shake.*` 原样保留、组首带总开关。x86/x64 双架构编译。
 
-本模组是 HW-Beautify 的整合汉化版，由以下两个开源模组合并而成，版权归各自作者所有：
+## 致谢与许可
 
-- **基底**：Shake to Find Cursor v1.4.1 —— Darius Varnelis（MIT 许可证）
-  - 原版：https://windhawk.net/mods/shake-to-find-cursor
-  - 源码：https://github.com/Darius-Varnelis/shake-to-find-cursor
-- **被吸收方**：macOS magnifying cursor v1.4.7 —— Jaali（MIT 许可证）
-  - 原版：https://windhawk.net/mods/mac-magnifying-cursor
-  - 作者：https://github.com/alivca
-
-两个上游模组均为 MIT 许可证（基底由其作者仓库 README 明示；被吸收方按 Windhawk 官方模组合集规则「未标注许可证的模组按 MIT 提交」）。本整合包以 GPL-3.0 发布，两位原作者的版权与署名在此原样保留。
-
-## 工作原理
-
-- 以**普通模组**形式注入 explorer.exe 内运行（「注入版」），没有额外的后台进程。
-- 监听鼠标 Raw Input 原始输入：不轮询、鼠标空闲时零 CPU 占用，也不会像低级鼠标钩子那样给输入增加延迟。
-- 「晃动」的判定：光标在**时间窗口**内移动了很长的路程（**触发距离**），而活动范围却很小（**往返比例**）。
-- 放大的实现是把系统光标替换为按目标尺寸重绘的「当前光标方案」大号版本。放大后的光标就是真正的指针：没有覆盖窗口、没有拖尾，并保留你的光标样式与颜色。还原方式与控制面板应用指针方案完全相同。
-- 持续晃动时指针持续变大、越来越慢：每再放大同样一步所需的时间翻倍。默认上限是屏幕高度，晃到上限需要数小时。
-- 放大与缩小动画基于时间、按显示器刷新率驱动。每帧只重绘屏幕上的那一种光标；其余光标类型每帧在微小的时间预算内分批处理，保证每帧开销都很低。
-- 动态光标（.ani）同样平滑地放大缩小，且放大期间继续播放动画：模组自行逐帧播放，结束后交还给真实光标。
-- 模组卸载或崩溃时还原系统光标（Uninit 安全网 + 崩溃过滤器 + 下次启动 cursorsModified 兜底）。与独立进程版不同，注入版的 message-only 窗口收不到会话结束广播，注销/关机前的即时还原不可用，依赖上述兜底机制。
-
-## 与原版差异
-
-### 相对基底 Shake to Find Cursor v1.4.1
-
-- 注销/关机（WM_QUERYENDSESSION/WM_ENDSESSION）时的即时系统光标还原保护：基底只能依赖「模组下次启动时还原」兜底。独立进程版（DLC）吸收自 macOS magnifying cursor，把工作窗口改为隐藏顶层工具窗口以接收该广播、会话结束前即时还原；本注入版保留基底的消息专用窗口形态，无法接收广播，因此与基底一样依赖下次启动兜底（WindowProc 中仍保留两个广播的处理分支，与独立进程版逻辑一致，若日后改回顶层窗口即恢复生效）。
-- 全量中文本地化；版本号 1.4.1 → 1.5.0。设置项与基底一一对应，无增减。
-- 剥离独立进程版（DLC）的 tool mod 启动样板，改为注入 explorer.exe 的普通模组生命周期（功能逻辑不变）。
-
-### 相对被吸收方 macOS magnifying cursor v1.4.7（未吸收的部分及理由）
-
-- **覆盖窗口式放大**（隐藏系统光标 + 自绘覆盖窗口每 16-40ms 轮询重绘）：未吸收。基底以 SetSystemCursor 原位放大，无拖尾、无覆盖窗口、空闲零 CPU，且保留真实光标样式与颜色；被吸收方的方案快速移动时会出现拖尾，空闲时仍有轮询开销，且其把系统光标替换为透明占位，自绘失败期间会出现「无光标」。两种机制互斥（不能同时启用），基底明显更优，故整体不采纳。
-- **应用自绘光标的放大**：被吸收方可在覆盖窗口中放大应用自定义的光标；基底只替换 Windows 的系统光标，应用自绘光标保持原尺寸（基底原版即注明该限制）。实现该能力必须引入覆盖窗口机制，与基底设计冲突，故不吸收，保留该限制。
-- **放大/缩小速度分别调节**（lerpSpeedUpPercent / lerpSpeedDownPercent）：未吸收。基底的「放大动画时长 / 缩小动画时长（毫秒）」已覆盖同一能力，且按时间驱动、缓动曲线固定、必定到达目标尺寸；被吸收方的 lerp 系数按帧外推，理论上不收敛且受帧率影响。
-- **摇晃判定的双阈值迟滞**（触发与释放用不同阈值）：未吸收。基底以「晃动→放大→缩回」阶段状态机加「保持放大时长」实现等效效果，且触发距离、往返比例、时间窗口均可调，粒度更细。
-- **全屏检测的 500ms 结果缓存**：未吸收。基底只在触发放大前查询一次系统状态，开销更低。
-- 被吸收方的 maxScalePercent、shakeThreshold 与基底的「放大尺寸」「触发距离」一一对应，无新增能力，不重复引入。
-
-## 注意事项
-
-- 很大的光标（Windows 无障碍设置里的大指针、大尺寸光标方案或很高的放大倍数）会让 Windows 每一步画得更久，放大缩小动画可能不够顺滑。
-- 自己绘制光标的应用会保留它们自己的小光标，不受影响。
-- 光标文件里的图像最大 256 像素，超过后只能拉伸放大，边缘会变软。
-- 如果模组进程在光标放大时被杀掉，正常光标会在模组下次启动时自动还原（在鼠标属性里重新应用一次指针方案也能立即修复）。
-- 取决于 Windows 版本，当提权窗口（任务管理器、UAC 提示、安装程序）持有焦点时，Raw Input 可能到不了模组；此时在这些窗口上晃动不会被检测到，焦点移开后恢复。
+- 基底：Shake to Find Cursor v1.4.1，作者 Darius Varnelis（MIT）；并吸收 Jaali 的 macOS magnifying cursor 会话结束保护（MIT）。
+- 本模组以 GPL-3.0 发布，由 HW-Beautify 整合包（作者 Heptalune）整合维护。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- scalePercent: 400
-  $name: Enlarged size (%)
-  $name:zh-CN: 放大尺寸（%）
-  $description: Size of the enlarged cursor relative to its normal size (400 = 4x bigger) (default = 400)
-  $description:zh-CN: 放大后光标相对原始尺寸的大小（400 = 放大到 4 倍）（默认 = 400）
-- keepGrowing: 50
-  $name: Keep growing while shaking (%)
-  $name:zh-CN: 持续晃动继续放大（%）
+- shake:
+  - enable: true
+    $name: Enable this feature group
+    $name:zh-CN: 启用本组功能
+    $description: >-
+      Master switch for shake to find cursor. When turned off, mouse shaking
+      is ignored; if the cursor is currently enlarged it shrinks back at once.
+    $description:zh-CN: >-
+      「晃动找指针」分组总开关。关闭后忽略晃动动作，不再放大指针；关闭瞬间
+      若指针处于放大状态会立即缩回。重新开启立即恢复。
+  - scalePercent: 400
+    $name: Enlarged size (%)
+    $name:zh-CN: 放大尺寸（%）
+    $description: Size of the enlarged cursor relative to its normal size (400 = 4x bigger) (default = 400)
+    $description:zh-CN: 放大后光标相对原始尺寸的大小（400 = 放大到 4 倍）（默认 = 400）
+  - keepGrowing: 50
+    $name: Keep growing while shaking (%)
+    $name:zh-CN: 持续晃动继续放大（%）
+    $description: >-
+      If you keep shaking after the first enlargement, the cursor keeps growing.
+      It grows by this much in the first second, then slower and slower (the next
+      step of the same size takes 2 s, then 4 s, 8 s and so on).
+      0 = stop at the first enlargement (default = 50)
+    $description:zh-CN: 首次放大后若继续晃动，光标会继续变大：第一秒再变大这么多，之后越来越慢（同样大小的下一步分别需要 2 秒、4 秒、8 秒……）。0 = 首次放大后不再变大（默认 = 50）
+  - sizeLimit: 0
+    $name: Size limit (px)
+    $name:zh-CN: 尺寸上限（像素）
+    $description: The cursor never grows past this size (0 = the height of your screen) (default = 0)
+    $description:zh-CN: 光标不会放大超过此尺寸（0 = 屏幕高度）（默认 = 0）
+  - shakeDistance: 800
+    $name: Shake distance (px)
+    $name:zh-CN: 触发距离（像素）
+    $description: How far the cursor has to travel within the time window. Lower = easier to trigger (default = 800)
+    $description:zh-CN: 在时间窗口内光标需要移动的路程。越低越容易触发（默认 = 800）
+  - shakeRatio: 350
+    $name: Back-and-forth ratio (%)
+    $name:zh-CN: 往返比例（%）
+    $description: >-
+      Distance travelled divided by the diagonal of the area the cursor stayed in.
+      A straight swipe is about 100, four strokes left and right about 400.
+      Lower = easier to trigger, but fast normal movements may start to count as shakes (default = 350)
+    $description:zh-CN: 移动总路程除以光标活动区域对角线之比。直线划过约为 100，左右往返四次约为 400。越低越容易触发，但普通的快速移动也可能被误判为晃动（默认 = 350）
+  - shakeWindow: 1000
+    $name: Time window (ms)
+    $name:zh-CN: 时间窗口（毫秒）
+    $description: How much recent movement is looked at when detecting a shake (default = 1000)
+    $description:zh-CN: 判定晃动时回看最近多长时间内的移动（默认 = 1000）
+  - holdTime: 500
+    $name: Stay enlarged for (ms)
+    $name:zh-CN: 保持放大时长（毫秒）
+    $description: How long the cursor stays big after you stop shaking (default = 500)
+    $description:zh-CN: 停止晃动后光标保持放大的时长（默认 = 500）
+  - growDuration: 150
+    $name: Grow animation (ms)
+    $name:zh-CN: 放大动画时长（毫秒）
+    $description: How long the cursor takes to grow (0 = instant) (default = 150)
+    $description:zh-CN: 光标放大动画的时长（0 = 立即放大）（默认 = 150）
+  - shrinkDuration: 250
+    $name: Shrink animation (ms)
+    $name:zh-CN: 缩小动画时长（毫秒）
+    $description: How long the cursor takes to shrink back (0 = instant) (default = 250)
+    $description:zh-CN: 光标缩回动画的时长（0 = 立即缩回）（默认 = 250）
+  - disableInFullscreen: true
+  $name: Shake to find cursor
+  $name:zh-CN: 晃动找指针
   $description: >-
-    If you keep shaking after the first enlargement, the cursor keeps growing.
-    It grows by this much in the first second, then slower and slower (the next
-    step of the same size takes 2 s, then 4 s, 8 s and so on).
-    0 = stop at the first enlargement (default = 50)
-  $description:zh-CN: 首次放大后若继续晃动，光标会继续变大：第一秒再变大这么多，之后越来越慢（同样大小的下一步分别需要 2 秒、4 秒、8 秒……）。0 = 首次放大后不再变大（默认 = 50）
-- sizeLimit: 0
-  $name: Size limit (px)
-  $name:zh-CN: 尺寸上限（像素）
-  $description: The cursor never grows past this size (0 = the height of your screen) (default = 0)
-  $description:zh-CN: 光标不会放大超过此尺寸（0 = 屏幕高度）（默认 = 0）
-- shakeDistance: 800
-  $name: Shake distance (px)
-  $name:zh-CN: 触发距离（像素）
-  $description: How far the cursor has to travel within the time window. Lower = easier to trigger (default = 800)
-  $description:zh-CN: 在时间窗口内光标需要移动的路程。越低越容易触发（默认 = 800）
-- shakeRatio: 350
-  $name: Back-and-forth ratio (%)
-  $name:zh-CN: 往返比例（%）
-  $description: >-
-    Distance travelled divided by the diagonal of the area the cursor stayed in.
-    A straight swipe is about 100, four strokes left and right about 400.
-    Lower = easier to trigger, but fast normal movements may start to count as shakes (default = 350)
-  $description:zh-CN: 移动总路程除以光标活动区域对角线之比。直线划过约为 100，左右往返四次约为 400。越低越容易触发，但普通的快速移动也可能被误判为晃动（默认 = 350）
-- shakeWindow: 1000
-  $name: Time window (ms)
-  $name:zh-CN: 时间窗口（毫秒）
-  $description: How much recent movement is looked at when detecting a shake (default = 1000)
-  $description:zh-CN: 判定晃动时回看最近多长时间内的移动（默认 = 1000）
-- holdTime: 500
-  $name: Stay enlarged for (ms)
-  $name:zh-CN: 保持放大时长（毫秒）
-  $description: How long the cursor stays big after you stop shaking (default = 500)
-  $description:zh-CN: 停止晃动后光标保持放大的时长（默认 = 500）
-- growDuration: 150
-  $name: Grow animation (ms)
-  $name:zh-CN: 放大动画时长（毫秒）
-  $description: How long the cursor takes to grow (0 = instant) (default = 150)
-  $description:zh-CN: 光标放大动画的时长（0 = 立即放大）（默认 = 150）
-- shrinkDuration: 250
-  $name: Shrink animation (ms)
-  $name:zh-CN: 缩小动画时长（毫秒）
-  $description: How long the cursor takes to shrink back (0 = instant) (default = 250)
-  $description:zh-CN: 光标缩回动画的时长（0 = 立即缩回）（默认 = 250）
-- disableInFullscreen: true
-  $name: Disable in fullscreen apps and games
-  $name:zh-CN: 全屏应用与游戏中禁用
-  $description: Don't enlarge the cursor while a fullscreen app, game or presentation is in the foreground (default = on)
-  $description:zh-CN: 前台为全屏应用、游戏或演示时不放大光标（默认 = 开）
+    Temporarily enlarges the mouse cursor when you shake the mouse, like
+    macOS "Shake to locate". Merged from "Shake to Find Cursor" by
+    Darius Varnelis (MIT) with session-end protection from
+    "macOS magnifying cursor" by Jaali (MIT).
+  $description:zh-CN: >-
+    复刻 macOS「摇晃以定位」：晃动鼠标（或在触摸板上快速来回滑动）时临时
+    放大指针，停下后自动缩回。由「晃动找指针」（基底 Darius Varnelis，
+    MIT；吸收 Jaali macOS magnifying cursor 的保护逻辑，MIT）并入。
 */
 // ==/WindhawkModSettings==
 
+
 #include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
 #include <shellapi.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <objbase.h>
+#include <oleidl.h>
+#include <uxtheme.h>
+#include <mmsystem.h>
+#include <powrprof.h>
+#include <dwmapi.h>
 #include <shellscalingapi.h>
+#include <shobjidl.h>
+#include <tlhelp32.h>
+#include <windhawk_utils.h>
+#include <endpointvolume.h>
+#include <mmdeviceapi.h>
+#include <psapi.h>
+#include <uiautomation.h>
+#include <deque>
+#include <string_view>
 
 #include <algorithm>
-#include <cmath>
-#include <deque>
 #include <atomic>
+#include <bit>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
+#include <cwctype>
+#include <functional>
+#include <list>
+#include <map>
 #include <memory>
+#include <mutex>
+#include <optional>
+#include <set>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
-////////////////////////////////////////////////////////////////////////////////
-// Settings
+#include <gdiplus.h>
 
+#undef GetCurrentTime
+
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Input.h>
+#include <winrt/Windows.UI.Xaml.Input.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.h>
+
+using namespace winrt::Windows::UI::Xaml;
+
+#include <audiopolicy.h>
+#include <winternl.h>
+#undef GetCurrentTime
+#include <winrt/Windows.UI.ViewManagement.h>
+
+// WinRT 命名空间别名（托盘/晃动段内沿用原模组写法）。
+namespace wux = winrt::Windows::UI::Xaml;
+namespace wuxc = winrt::Windows::UI::Xaml::Controls;
+namespace wuxm = winrt::Windows::UI::Xaml::Media;
+namespace wu = winrt::Windows::UI;
+namespace wuc = winrt::Windows::UI::Core;
+
+namespace Shake {
 struct Settings {
+    bool enable = true;  // 分组总开关（shake.enable，组内第一项，默认开启）
     int scalePercent = 400;
     int keepGrowingPercent = 50;
     int sizeLimit = 0;  // 0 = height of the screen.
@@ -223,17 +252,18 @@ int PositiveIntSetting(PCWSTR name, int fallback, int minValue, int maxValue) {
 
 Settings LoadSettings() {
     Settings s;
-    s.scalePercent = PositiveIntSetting(L"scalePercent", 400, 110, 1000);
-    s.keepGrowingPercent = std::clamp(Wh_GetIntSetting(L"keepGrowing"), 0, 500);
-    const int sizeLimit = Wh_GetIntSetting(L"sizeLimit");
+    s.enable = Wh_GetIntSetting(L"shake.enable") != 0;
+    s.scalePercent = PositiveIntSetting(L"shake.scalePercent", 400, 110, 1000);
+    s.keepGrowingPercent = std::clamp(Wh_GetIntSetting(L"shake.keepGrowing"), 0, 500);
+    const int sizeLimit = Wh_GetIntSetting(L"shake.sizeLimit");
     s.sizeLimit = sizeLimit <= 0 ? 0 : std::clamp(sizeLimit, 32, 4096);
-    s.shakeDistance = PositiveIntSetting(L"shakeDistance", 800, 100, 20000);
-    s.shakeRatioPercent = PositiveIntSetting(L"shakeRatio", 350, 150, 2000);
-    s.shakeWindowMs = PositiveIntSetting(L"shakeWindow", 1000, 200, 5000);
-    s.holdMs = std::clamp(Wh_GetIntSetting(L"holdTime"), 0, 10000);
-    s.growMs = std::clamp(Wh_GetIntSetting(L"growDuration"), 0, 5000);
-    s.shrinkMs = std::clamp(Wh_GetIntSetting(L"shrinkDuration"), 0, 5000);
-    s.disableInFullscreen = Wh_GetIntSetting(L"disableInFullscreen") != 0;
+    s.shakeDistance = PositiveIntSetting(L"shake.shakeDistance", 800, 100, 20000);
+    s.shakeRatioPercent = PositiveIntSetting(L"shake.shakeRatio", 350, 150, 2000);
+    s.shakeWindowMs = PositiveIntSetting(L"shake.shakeWindow", 1000, 200, 5000);
+    s.holdMs = std::clamp(Wh_GetIntSetting(L"shake.holdTime"), 0, 10000);
+    s.growMs = std::clamp(Wh_GetIntSetting(L"shake.growDuration"), 0, 5000);
+    s.shrinkMs = std::clamp(Wh_GetIntSetting(L"shake.shrinkDuration"), 0, 5000);
+    s.disableInFullscreen = Wh_GetIntSetting(L"shake.disableInFullscreen") != 0;
     return s;
 }
 
@@ -1708,6 +1738,12 @@ void OnShake(ULONGLONG now) {
 }
 
 void OnRawMouseInput() {
+    // 分组总开关关闭：忽略晃动（关闭瞬间若指针正处于放大状态，设置变更路径
+    // 会先经 ResetToIdle 缩回，见 WM_APP_SETTINGS_CHANGED）。
+    if (!g_settings.enable) {
+        return;
+    }
+
     POINT pt;
     if (!GetCursorPos(&pt)) {
         return;
@@ -1912,7 +1948,7 @@ LONG WINAPI RestoreCursorsOnCrash(EXCEPTION_POINTERS* exceptionInfo) {
 // WhTool_ModUninit 逻辑原样接入，线程与资源在 Wh_ModUninit 释放，不再独立拉起进程、
 // 不再 ExitProcess）----
 
-BOOL Wh_ModInit() {
+BOOL Init() {
     Wh_Log(L">");
 
     g_settings = LoadSettings();
@@ -1946,7 +1982,7 @@ BOOL Wh_ModInit() {
     return g_hwnd != nullptr;
 }
 
-void Wh_ModSettingsChanged() {
+void SettingsChanged() {
     Wh_Log(L">");
 
     // Settings are read here and handed over to the worker thread, which owns
@@ -1958,7 +1994,7 @@ void Wh_ModSettingsChanged() {
     }
 }
 
-void Wh_ModUninit() {
+void Uninit() {
     Wh_Log(L">");
 
     if (g_hwnd) {
@@ -1982,4 +2018,36 @@ void Wh_ModUninit() {
     }
 
     SetUnhandledExceptionFilter(g_previousExceptionFilter);
+}
+
+}  // namespace Shake
+// -----------------------------------------------------------------------------
+// 模组入口：本模组仅注入 explorer.exe，只含「晃动找指针」一个功能分组。
+// 自 HW-Convenient Windows 拆出。
+// -----------------------------------------------------------------------------
+BOOL Wh_ModInit() {
+    Wh_Log(L">");
+    if (!Shake::Init()) {
+        Wh_Log(L"Shake init failed");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void Wh_ModAfterInit() {
+    Wh_Log(L">");
+}
+
+void Wh_ModBeforeUninit() {
+    Wh_Log(L">");
+}
+
+void Wh_ModUninit() {
+    Wh_Log(L">");
+    Shake::Uninit();
+}
+
+void Wh_ModSettingsChanged() {
+    Wh_Log(L">");
+    Shake::SettingsChanged();
 }

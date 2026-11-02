@@ -6,14 +6,14 @@
 // @description     A slim animated dock on the screen edge: drop a shortcut or pick a program with "+", then launch it in one click
 // @description:zh-CN 屏幕边缘的纤细动画 Dock：把快捷方式拖上去，或点「+」选择程序，一键即可启动
 // @description:ru-RU Тонкая анимированная панель у края экрана: перетащи ярлык или выбери программу через «+» и запускай в один клик
-// @version         1.1.1
+// @version         1.1.3
 // @author          cheliks1123
 // @github          https://github.com/cheliks1123
 // @include         explorer.exe
 // @compilerOptions -lshell32 -lcomdlg32 -lgdi32 -luser32 -lole32 -loleaut32 -ldwmapi -lcomctl32 -ladvapi32 -lwininet
 // ==/WindhawkMod==
 //
-// HW-Beautify 汉化修改版本：v2.1.0（跟随 HW-Beautify 项目版本；上游 Quick Launch Dock 1.1.1，原作者 cheliks1123）
+// HW-Beautify 汉化修改版本：v1.0.0（跟随 HW-Beautify 项目版本；上游 Quick Launch Dock 1.1.1，原作者 cheliks1123）
 //
 // HW-Beautify 整合说明：本文件是 dlc\local@cw-quick-launch-dock.wh.cpp（独立进程版
 // tool mod，同源同号 1.1.1；HW-Beautify 汉化修改版本 v1.0.0 起带自有改进）的「注入版」变体：剥离 WhTool 独立进程启动样板
@@ -28,7 +28,7 @@
 
 // ==WindhawkModReadme==
 /*
-> 原作者：**cheliks1123**（[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)）。本版由 HW-Beautify 整合包（作者 Heptalune）汉化整理，是原 DLC 模组「CW-快速启动 Dock（独立进程版）」（已从整合包移除，见下文）的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑原本与独立进程版 1.1.1 逐字一致；HW-Beautify 汉化修改版本 v1.0.0 起新增运行时界面文案汉化与「已运行则切换到已有窗口」（见「✨ 功能」与「⚙️ 设置」）。
+> 原作者：**cheliks1123**（[Quick Launch Dock](https://windhawk.net/mods/quick-launch-dock)）。本版由 HW-Beautify 整合包（作者 Heptalune）汉化整理，是原 DLC 模组「CW-快速启动 Dock（独立进程版）」（已从整合包移除，见下文）的**注入版**变体：剥离 tool mod 启动样板、改为注入 explorer.exe 的普通模组，功能逻辑原本与独立进程版 1.1.1 逐字一致；HW-Beautify 汉化修改版本 v1.0.0 起新增运行时界面文案汉化与「已运行则切换到已有窗口」（见「✨ 功能」与「⚙️ 设置」）；1.1.3 起托盘隐藏形态经其托盘消息窗口原生唤醒（模拟真实托盘双击，由程序自行恢复窗口），唤不醒才走正常启动。
 
 # HW-快速启动 Dock
 
@@ -76,7 +76,7 @@ tool mod，运行在独立进程中，具备崩溃隔离）。
   - 点击「+」槽位，在文件对话框中选择程序（快捷方式会按快捷方式保存，图标保持正确）。
   - 右键点击「+」槽位：选择程序、添加网站，或粘贴剪贴板里的路径或链接（自动处理引号与 `%ENVIRONMENT%` 环境变量）。
 - 🌐 **网站槽位** — 右键任意图标选「添加到 Dock」，再选「添加网站…」（或用「粘贴路径或链接」直接粘贴网址）。点击图标会用默认浏览器打开该网址。每个网站默认配一个灰色地球图标；可选设置「下载网站图标」（默认关闭）让模组在后台请求网站的 /favicon.ico 并用它替代地球。下载期间显示转圈动画，下载失败则保留地球。也可以用「更改图标」自选图片。
-- 🚀 **一键启动** — 点击图标即启动，工作目录会自动设置。程序已在运行时，点击图标会切换到它已有的窗口，而不是再开一个新实例（可在设置中关闭；「以管理员身份运行」始终启动新实例）。
+- 🚀 **一键启动** — 点击图标即启动，工作目录会自动设置。程序已在运行时，点击图标会切换到它已有的可见窗口，而不是再开一个新实例（可在设置中关闭；「以管理员身份运行」始终启动新实例；程序最小化到托盘只剩隐藏窗口时，会模拟真实托盘双击把它自己的窗口唤出来，唤不醒才走正常启动、由程序自身恢复窗口）。
 - 🖱️ **右键菜单** — 在任意图标上右键：打开、以管理员身份运行、在文件夹中显示、更改图标 / 重置图标、上移 / 下移、添加到 Dock（选择程序、添加网站、粘贴路径或链接）、移除。网站槽位则为：打开、更改图标 / 重置图标、刷新网站图标、上移 / 下移、添加到 Dock、移除。
 - ↕️ **拖动排序** — 按住图标沿 Dock 拖动，放到想要的位置，其余图标会平滑让位。拖动过程中所有面板都会滑出，可以把图标拖放到另一块面板上。菜单里的「上移 / 下移」依然可用。
 - 📐 **Dock 尺寸** — 面板厚度、图标四周留白与面板内边距均独立于图标大小设置。
@@ -128,7 +128,7 @@ tool mod，运行在独立进程中，具备崩溃隔离）。
 | 动画刷新率 | 「自动」（默认）按显示器刷新率逐帧绘制；可选择 120、144、180、240 或 360 Hz 固定刷新率，适合刷新率会变化的笔记本或动画不流畅的情况。数值越高，CPU 与电池消耗越大。 |
 | 显示「+」槽位 | 关闭后隐藏「+」槽位。仍可把程序拖到 Dock 上，或通过任意图标右键菜单中的「添加到 Dock」添加。 |
 | 运行中的程序显示圆点 | 程序正在运行时，在其图标靠屏幕边缘一侧显示小圆点。程序按其文件路径匹配，因此通过启动器或更新器启动的程序可能检测不到；Dock 打开期间每隔几秒检查一次进程列表。默认开启。 |
-| 已运行则切换到窗口，而不是重复启动 | 点击图标时，若该程序已在运行，则把它已有的窗口带到前台，而不是再启动一个新实例。对左键点击与右键菜单「打开」生效；「以管理员身份运行」始终启动新实例。仅对程序（exe 及指向 exe 的快捷方式）生效，网站与文件夹不受影响；匹配口径与「运行中的程序显示圆点」一致。默认开启。 |
+| 已运行则切换到窗口，而不是重复启动 | 点击图标时，若该程序已在运行，则把它已有的窗口带到前台，而不是再启动一个新实例。对左键点击与右键菜单「打开」生效；「以管理员身份运行」始终启动新实例。仅对程序（exe 及指向 exe 的快捷方式）生效，网站与文件夹不受影响；匹配口径与「运行中的程序显示圆点」一致；可见窗口直接前置；程序最小化到托盘只剩隐藏窗口时，模拟真实托盘双击由其自行恢复窗口，唤不醒才改走正常启动。默认开启。 |
 | 使用快捷方式目标程序的图标 | 显示快捷方式所指向程序的图标，而不是快捷方式自身保存的图标；通过「更改图标」自选的图标始终优先。 |
 | 图标放大 | macOS 风格的光标周围图标放大，可与任意动画样式搭配。默认关闭。 |
 | 面板不透明度 | 面板背景的不透明度，10–100%。图标始终保持完全不透明。 |
@@ -145,6 +145,13 @@ tool mod，运行在独立进程中，具备崩溃隔离）。
 - 列表按 Windows 账户分开存储。旧版本保存的列表由第一个运行本版本的账户接管。
 - 未开启「下载网站图标」时模组不发起任何网络请求；开启后也只访问你添加的网站、每站一次请求，图标保存在模组存储文件夹中，卸载模组时由 Windhawk 一并删除。
 - 旧版本保存的列表保留在右边缘面板上。关闭某块面板不会清空其列表，重新开启即可恢复。
+
+## 📝 变更记录
+
+- 1.1.3（HW-Beautify）：修复 1.1.2 的退化——点击 Dock 图标时，托盘隐藏的窗口改经其托盘消息窗口模拟真实托盘双击原生唤醒（由程序自行恢复，窗口输入正常），唤不醒才走正常启动；可见窗口前置与任务栏最小化窗口拉出行为不变。
+- 1.1.2（HW-Beautify）：修复点击 Dock 图标激活已运行的托盘常驻程序（如微信，主窗口最小化到托盘只剩隐藏窗口）时，对隐藏窗口强行 ShowWindow 拉起导致窗口出现但卡住不响应的问题——现仅前置本来就可见的窗口，只余隐藏窗口时改走正常启动，由程序自身的单实例逻辑恢复窗口。
+- 1.0.0（HW-Beautify）：新增运行时界面文案汉化与「已运行则切换到已有窗口」。
+- 1.1.1：上游原版 Quick Launch Dock 版本号。
 
 ## 致谢与许可
 
@@ -3109,7 +3116,10 @@ static void RunShell(const std::wstring& file, const std::wstring& args, const s
 // ---- HW-Beautify 汉化修改版本 v1.0.0 新增：已运行程序激活 ----
 // 点击 Dock 图标时，若目标程序已在运行，则找到它的顶层窗口并前置，而不是再启动一个
 // 新实例。匹配口径与「运行中的程序显示圆点」一致（ComputeExeKey：快捷方式解析到
-// 目标 exe 后的完整路径优先，其次 exe 文件名）。
+// 目标 exe 后的完整路径优先，其次 exe 文件名）。可见窗口直接前置；目标程序
+// 只余隐藏窗口（最小化到托盘，如微信）时，向其托盘消息窗口模拟真实托盘双击，由程序
+// 自己的恢复逻辑把窗口拉起来（v1.1.3：直接 ShowWindow 或向主窗口强发恢复消息，都会
+// 让微信等 Qt 程序出现「窗口显示但点不动」的假活）；唤不醒才改走正常启动。
 
 struct EnumRunWnd {
     const std::wstring* exeKey;    // 小写完整目标路径（可为空）
@@ -3172,11 +3182,67 @@ static BOOL CALLBACK EnumRunningWndProc(HWND hwnd, LPARAM lp) {
     return TRUE;
 }
 
+// ---- v1.1.3：托盘隐藏窗口的原生唤醒 ----
+// 微信等程序把托盘图标挂在专用的托盘消息窗口上（如微信的 WxTrayIconMessageWindow）。
+// 向它投递与真实托盘双击完全相同的鼠标消息序列（DOWN→UP→DBLCLK→UP），程序会走
+// 自己的恢复逻辑正常拉起窗口，输入一切正常。直接 ShowWindow 或向主窗口强发
+// SC_RESTORE/DBLCLK 会绕过程序状态机，出现「窗口显示但点不动」的假活。
+struct TrayWndFind {
+    DWORD pid = 0;
+    HWND found = nullptr;
+};
+
+static BOOL CALLBACK FindTrayWndProc(HWND hwnd, LPARAM lp) {
+    TrayWndFind* f = (TrayWndFind*)lp;
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hwnd, &pid);
+    if (pid != f->pid || IsWindowVisible(hwnd)) return TRUE;
+    wchar_t cls[128]{};
+    GetClassNameW(hwnd, cls, ARRAYSIZE(cls));
+    std::wstring clsS(cls);
+    if (clsS.find(L"Tray") != std::wstring::npos ||
+        clsS.find(L"tray") != std::wstring::npos) {
+        f->found = hwnd;
+        return FALSE;
+    }
+    wchar_t title[128]{};
+    GetWindowTextW(hwnd, title, ARRAYSIZE(title));
+    std::wstring titleS(title);
+    if (titleS.find(L"Tray") != std::wstring::npos ||
+        titleS.find(L"tray") != std::wstring::npos) {
+        f->found = hwnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// 唤醒托盘隐藏的主窗口；成功返回 true（主窗口已可见）
+static bool WakeHiddenWindow(HWND mainHwnd) {
+    DWORD pid = 0;
+    GetWindowThreadProcessId(mainHwnd, &pid);
+    HWND target = mainHwnd;  // 找不到专用托盘窗口时，多数程序的托盘图标就挂在主窗口上
+    if (pid) {
+        TrayWndFind f{};
+        f.pid = pid;
+        EnumWindows(FindTrayWndProc, (LPARAM)&f);
+        if (f.found) target = f.found;
+    }
+    // 真实托盘双击投递到图标属主窗口的完整消息序列
+    PostMessageW(target, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(8, 8));
+    PostMessageW(target, WM_LBUTTONUP, 0, MAKELPARAM(8, 8));
+    PostMessageW(target, WM_LBUTTONDBLCLK, MK_LBUTTON, MAKELPARAM(8, 8));
+    PostMessageW(target, WM_LBUTTONUP, 0, MAKELPARAM(8, 8));
+    // 短暂轮询等窗口出现（正常百毫秒内），避免长时间卡住 Dock 界面
+    for (int i = 0; i < 10; ++i) {
+        if (IsWindowVisible(mainHwnd)) return true;
+        Sleep(40);
+    }
+    return IsWindowVisible(mainHwnd) != 0;
+}
+
 static void ForceForegroundWnd(HWND hwnd) {
     if (IsIconic(hwnd)) {
         ShowWindow(hwnd, SW_RESTORE);
-    } else if (!IsWindowVisible(hwnd)) {
-        ShowWindow(hwnd, SW_SHOW);
     }
     DWORD curTid = GetCurrentThreadId();
     DWORD fgTid = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
@@ -3201,8 +3267,18 @@ static bool ActivateRunningInstance(const std::wstring& path) {
     HWND hwnd = m.bestVis ? m.bestVis : m.bestHid;
     if (!hwnd) return false;
     AllowSetForegroundWindow(ASFW_ANY);
-    ForceForegroundWnd(hwnd);
-    return true;
+    if (m.bestVis) {
+        ForceForegroundWnd(hwnd);
+        return true;
+    }
+    // 隐藏窗口（最小化到托盘）：模拟真实托盘双击，由程序自己的恢复逻辑拉起窗口
+    //（v1.1.3：直接 ShowWindow 或向主窗口强发恢复消息会让微信等程序假活卡死）。
+    if (WakeHiddenWindow(hwnd)) {
+        ForceForegroundWnd(hwnd);
+        return true;
+    }
+    // 唤不醒（非托盘程序等）：走正常启动，由程序自身的单实例逻辑恢复窗口
+    return false;
 }
 
 static void Launch(const std::wstring& path, bool admin) {
