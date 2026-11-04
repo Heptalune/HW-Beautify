@@ -2,8 +2,8 @@
 // @id              hw-file-explorer-plus
 // @name            HW-更好的文件管理器
 // @name:zh-CN      HW-更好的文件管理器
-// @description     Seven File Explorer enhancements merged into one mod: better file sizes, file hover info card, content animations, disk usage bar customizer, info bar plus, double-click-up navigation and a desktop/File Explorer marquee selection fade-out.
-// @description:zh-CN 七项文件管理器增强合一：文件大小列增强、文件悬停信息、内容动画、磁盘使用率条自定义、信息栏增强、双击返回上级与框选淡出，各分组带总开关。
+// @description     Six File Explorer enhancements merged into one mod: better file sizes, file hover info card, content animations, info bar plus, double-click-up navigation and a desktop/File Explorer marquee selection fade-out.
+// @description:zh-CN 六项文件管理器增强合一：文件大小列增强、文件悬停信息、内容动画、信息栏增强、双击返回上级与框选淡出，各分组带总开关。
 // @version         1.2.0
 // @author          m417z, HaVeN80, crazyboyybs, Valer100, digART, wrldspawn
 // @github          https://github.com/m417z
@@ -18,7 +18,7 @@
 // HW-Beautify 整合说明（hw-file-explorer-plus 1.1.0）
 //
 // 本模组由六个文件管理器模组 + 「双击返回上级」功能合并而成，七段代码分别收进
-// 独立命名空间（Sizes / HoverInfo / ContentAnim / DiskBar / InfoBar / DblUp /
+// 独立命名空间（Sizes / HoverInfo / ContentAnim / InfoBar / DblUp /
 // 生命周期由合并层统一分发；各段 Init 失败仅记录日志并降级，
 // 不影响其他功能段。
 //
@@ -30,18 +30,16 @@
 //               （HaVeN80 File Hover Info）。
 // 3. ContentAnim 段 ← local@hw-file-explorer-content-animation.wh.cpp 1.0.3
 //               （crazyboyybs File Explorer WinUI-Like Content Animation，MIT）。
-// 4. DiskBar    段 ← local@hw-disk-usage-bar-customizer.wh.cpp 1.2.2
-//               （Valer100 Disk Usage Bar Customizer）。
-// 5. InfoBar    段 ← local@hw-explorer-info-bar-plus.wh.cpp 1.2.1
+// 4. InfoBar    段 ← local@hw-explorer-info-bar-plus.wh.cpp 1.2.1
 //               （digART Explorer Info Bar+，GPL-3.0-only）。
-// 6. DblUp      段 ← wrldspawn Explorer Double Click Up 1.0.1（GPL-3.0），取自
+// 5. DblUp      段 ← wrldspawn Explorer Double Click Up 1.0.1（GPL-3.0），取自
 //               HW-更好的Windows（小细节）2.0.0 的 dblUp 并入段。
 
 // ==WindhawkModReadme==
 /*
 # HW-更好的文件管理器
 
-把七个互不冲突的文件管理器增强合并进一个模组，由 Windhawk 直接注入运行，不需要额外的后台程序。设置页共七个可收起分组（文件大小列增强、文件悬停信息、内容动画、磁盘使用率条、信息栏增强、双击返回上级、框选淡出），每个分组的第一项均为「启用本组功能」总开关（「双击返回上级」默认关闭，其余六组默认开启），关闭总开关后该分组功能完全停止；除注明处外，切换即时生效。
+把六个互不冲突的文件管理器增强合并进一个模组，由 Windhawk 直接注入运行，不需要额外的后台程序。设置页共六个可收起分组（文件大小列增强、文件悬停信息、内容动画、信息栏增强、双击返回上级、框选淡出），每个分组的第一项均为「启用本组功能」总开关（「双击返回上级」默认关闭，其余五组默认开启），关闭总开关后该分组功能完全停止；除注明处外，切换即时生效。
 
 ## 功能一：文件大小列增强（Sizes）
 
@@ -73,13 +71,8 @@
 
 > 来源：**crazyboyybs** [File Explorer WinUI-Like Content Animation](https://windhawk.net/mods/file-explorer-content-animation) 1.0.2 汉化版 1.0.3，**MIT**。
 
-## 功能四：磁盘使用率条（DiskBar）
 
-自定义资源管理器「此电脑」中磁盘使用率条的各项外观：渲染模式（自定义 / 视觉样式 / WinUI 风格）、主题感知颜色（浅色与深色模式各自六项颜色）、以剩余空间代替已用空间显示、警告与中间状态百分比阈值、高度系数、圆角半径系数、进度条边框、百分比标签浮层等。与 StartAllBack 不兼容。
-
-> 来源：**Valer100** [Disk Usage Bar Customizer](https://windhawk.net/mods/disk-usage-bar-customizer) 1.2.1 汉化版 1.2.2（原版文件未标注许可证；上游 fork 自 dirtyrazkl 的 Disk Usage Bar Color）。
-
-## 功能五：信息栏增强（InfoBar）
+## 功能四：信息栏增强（InfoBar）
 
 增强 Windows 11 文件资源管理器底部信息栏：显示磁盘剩余空间、当前文件夹内容统计（文件夹/文件数量与直接文件大小合计）、选中项信息（数量与大小合计），以及单个选中文件的详情（真实扩展名、照片/RAW 尺寸与相机/镜头元数据、视频/音频时长与分辨率等，分「标准」与「扩展」两档）。三种显示样式（简约 / 平面板块 / 软卡片）、纯色或四向渐变面板填充、可配置分段顺序、字体字号与自定义颜色；可选隐藏资源管理器右下角原生视图按钮。
 
@@ -87,13 +80,13 @@
 
 > 来源：**digART** [Explorer Info Bar+](https://windhawk.net/mods/explorer-info-bar) 1.2.0 汉化版 1.2.1，**GPL-3.0-only**；本版在汉化基础上进一步汉化了运行时文案。
 
-## 功能六：双击返回上级（DblUp）
+## 功能五：双击返回上级（DblUp）
 
 在文件资源管理器内容区空白处双击即返回上一级文件夹：经典列表视图（SysListView32）与 Windows 11 DirectUI 视图（DirectUIHWND）均支持，每个标签页独立处理。分组总开关 `dblUp.enable` 默认关闭，开启后即时生效，无需重启资源管理器。
 
 > 来源：**wrldspawn** [Explorer Double Click Up](https://windhawk.net/mods/explorer-double-click-up) 1.0.1，**GPL-3.0**（原实现致谢：「Click on empty taskbar space」「Classic Explorer Treeview」与 Open-Shell）；本版代码取自 HW-Beautify「更好的Windows（小细节）」2.0.0 的并入段。
 
-## 功能七：框选淡出（Marquee）
+## 功能六：框选淡出（Marquee）
 
 > 1.2.0 起自「HW-更好的Windows（小细节）」（hw-desktop-quick-settings）的「框选淡出」分组迁入（分组名与说明随功能一并迁移）。
 
@@ -113,7 +106,6 @@
 - **文件大小列增强**：「显示文件夹大小」推荐「启用（后台计算，推荐）」或「启用（通过 Everything 集成）」；「按住 Shift」选项表示按住 Shift 浏览/刷新时才开始计算，算好的缓存值始终显示。「后台文件夹大小计算」子组控制引擎参数（线程优先级、实时监视上限、自动重算、缓存过期时间、算完自动刷新），默认值即可获得良好体验。
 - **文件悬停信息**：默认隐藏系统自带悬停提示；「卡片语言」默认跟随 Windows；「文件夹大小 - 最长计算时间（秒）」默认 10 秒；日期格式默认「短日期 + 相对时间」。
 - **内容动画**：动画时长默认 450 毫秒（WinUI 节奏：150 毫秒停留 + 300 毫秒运动）；「位移动画」依赖 dui70.dll/duser.dll/explorerframe.dll 符号，符号失效时可关闭降级；「条目错落显现」依赖「位移动画」，默认关闭。
-- **磁盘使用率条**：渲染模式默认「自定义」；「视觉样式」模式下无法自定义渲染（深色部件渲染需 Windows 11 build 26200.6899+）；「WinUI 风格」模式下「自定义渲染」分组除百分比标签外均被忽略。
 - **信息栏增强**：样式默认「简约」，面板填充与颜色仅对「平面板块 / 软卡片」生效；「照片详情」「视频 / 音频详情」「其他文件详情」分别控制单文件详情的显示程度；左缘边距与分段间距默认「自动」。
 - **双击返回上级**：仅一个总开关；开启后在内容区空白处双击返回上级，对空白处双击选中等原生行为无影响。
 
@@ -121,7 +113,7 @@
 
 - 注入进程：仅 explorer.exe（v2.9.1 起，修复非 v6 清单进程的加载报错），除文件大小列外的六个功能段只在 `explorer.exe` 中生效；本模组声明 `@architecture x86-64`（64 位）。
 - 文件操作样式仅适用于 Windows 11 的原生新式文件操作窗口（Windows 10 无此类窗口，不支持）；其依赖 Explorer 与 Shell 的私有展示接口，其他 Windows 版本可能使用不同的符号或布局，不支持的展示状态自动回退原生 UI。
-- 磁盘使用率条与 StartAllBack 不兼容；信息栏增强请勿与 Classic Explorer Status Bar、PreVista Explorer Status Bar 或 Explorer Status Bar Metadata 同时启用（同一底部区域互相冲突/覆盖）。
+信息栏增强请勿与 Classic Explorer Status Bar、PreVista Explorer Status Bar 或 Explorer Status Bar Metadata 同时启用（同一底部区域互相冲突/覆盖）。
 - 文件悬停信息不支持「主页」「图库」等非经典文件夹视图；亚克力/模糊背景使用未公开 API，个别系统版本上模糊背景可能不跟随圆角。
 - 内容动画依赖 Windhawk 自动解析 explorerframe.dll、dui70.dll、duser.dll 的符号（删除动画另需 windows.storage.dll）；符号失效时关闭「位移动画」即可降级。
 - Everything 集成需要 Everything 处于运行状态；后台计算引擎与 Everything 互不依赖，可随时切换。
@@ -135,7 +127,7 @@
 
 - **1.1.0（2026-11-01）**：新增第七段「文件操作样式」：并入文件操作样式美化 1.2.1（digART File Operation Styler，GPL-3.0，取自 HW-Beautify 汉化整合版），为原生文件操作窗口提供可换肤的现代展示（进度圆环、当前文件进度、多款主题与磨砂玻璃），仅在 explorer.exe 中生效；设置新增第七个可收起分组 fileOp.*（原 3 个顶层键加前缀、customization 子组平铺为 fileOp.customization.*，组首总开关默认开启），本段设置键变化经重载快照触发整模组重载；移除独立模组文件 local@cw-file-operation-styler.wh.cpp。
 
-- **1.0.0（2026-10-31）**：首个版本。合并六个来源模组：文件大小列增强 1.7（m417z，GPL-3.0）、文件悬停信息 1.1.3（HaVeN80）、内容动画 1.0.3（crazyboyybs，MIT）、磁盘使用率条 1.2.2（Valer100）、信息栏增强 1.2.1（digART，GPL-3.0-only）与双击返回上级 1.0.1（wrldspawn，GPL-3.0，取自「更好的Windows（小细节）」并入段）；设置分六个可收起分组并加组级总开关；信息栏运行时文案汉化为中文。
+- **1.0.0（2026-10-31）**：首个版本。合并六个来源模组：文件大小列增强 1.7（m417z，GPL-3.0）、文件悬停信息 1.1.3（HaVeN80）、内容动画 1.0.3（crazyboyybs，MIT）、信息栏增强 1.2.1（digART，GPL-3.0-only）与双击返回上级 1.0.1（wrldspawn，GPL-3.0，取自「更好的Windows（小细节）」并入段）；设置分六个可收起分组并加组级总开关；信息栏运行时文案汉化为中文。
 
 ## 致谢与许可
 
@@ -146,7 +138,6 @@
 | 文件大小列增强 | m417z | <https://windhawk.net/mods/explorer-details-better-file-sizes> | GPL-3.0 |
 | 文件悬停信息 | HaVeN80 | <https://windhawk.net/mods/file-hover-info> | 未标注（经作者同意的汉化分发惯例沿用） |
 | 内容动画 | crazyboyybs | <https://windhawk.net/mods/file-explorer-content-animation> | MIT |
-| 磁盘使用率条 | Valer100 | <https://windhawk.net/mods/disk-usage-bar-customizer> | 未标注 |
 | 信息栏增强 | digART | <https://windhawk.net/mods/explorer-info-bar> | GPL-3.0-only |
 | 双击返回上级 | wrldspawn | <https://windhawk.net/mods/explorer-double-click-up> | GPL-3.0 |
 | 框选淡出 | angel_lov | <https://windhawk.net/mods/desktop-marquee-fade> | MIT |
@@ -598,224 +589,6 @@
     为文件资源管理器内容区提供 WinUI 风格的平滑页面切换动画，可选条目错落显现、
     导航窗格与属性页动画。
 
-
-- diskBar:
-  - enable: true
-    $name: Enable this feature group
-    $name:zh-CN: 启用本组功能
-    $description: >-
-      Master switch of the disk usage bar customizations. Turning it off skips
-      the whole group at load time.
-    $description:zh-CN: >-
-      「磁盘使用率条」分组总开关。关闭后在下次加载时跳过本组全部功能（修改后会
-      触发整模组重载）。
-  - general:
-    - remainingSpaceAsProgress: false
-      $name: Show remaining space as progress instead of used space
-      $name:zh-CN: 以剩余空间代替已用空间作为进度显示
-    - warningPercentageThreshold: 90
-      $name: Warning percentage threshold
-      $name:zh-CN: 警告百分比阈值
-      $description: >-
-        Use the warning progress color/style when the warning threshold (in percents) is reached (default: 90%).
-      $description:zh-CN: >-
-        当使用率达到警告阈值（百分比）时，使用警告进度的颜色/样式（默认：90%）。
-      #! $format: slider
-      #! $min: 0
-      #! $max: 100
-    - intermediatePercentageThreshold: 0
-      $name: Intermediate percentage threshold
-      $name:zh-CN: 中间状态百分比阈值
-      $description: >-
-        Use the intermediate progress color/style when the intermediate threshold (in percents) is reached. This threshold must be lower than the warning threshold for the intermediate state to be displayed. Setting this threshold to 0 will make the intermediate state not being displayed on the usage bar (default: 0%).
-      $description:zh-CN: >-
-        当使用率达到中间阈值（百分比）时，使用中间状态的进度颜色/样式。该阈值必须低于警告阈值，中间状态才会显示。将此阈值设为 0 时，使用率条上将不显示中间状态（默认：0%）。
-      #! $format: slider
-      #! $min: 0
-      #! $max: 100
-    $name: General
-    $name:zh-CN: 常规
-  - rendering:
-    - renderingMode: custom
-      $name: Rendering mode
-      $name:zh-CN: 渲染模式
-      $description: >-
-        Choose the bar rendering mode (default: Custom):
-
-
-        Custom - Renders the bar by making it look similar to the one rendered using the parts from the original Aero theme from Windows 8.x, 10 and 11, but allows additional customization, like changing colors, height and corner radius.
-
-
-        Visual styles - Renders the bar using the parts provided by the theme to match the system's appearance. You won't be able to customize the bar rendering if this rendering mode is selected.
-
-
-        WinUI-like - Renders the bar using the WinUI ProgressBar control's style to better match Windows 11's design language. If this rendering mode is selected, every single option from the "Custom rendering" section, except the ones related to the percentage label, will be ignored.
-      $description:zh-CN: >-
-        选择使用率条的渲染模式（默认：自定义）：
-
-
-        自定义 - 渲染效果接近 Windows 8.x/10/11 原版 Aero 主题部件所渲染的外观，但允许额外的自定义，例如更改颜色、高度与圆角半径。
-
-
-        视觉样式 - 使用主题提供的部件渲染使用率条，以匹配系统外观。选择此渲染模式后，将无法自定义使用率条的渲染。
-
-
-        WinUI 风格 - 使用 WinUI ProgressBar 控件的样式渲染使用率条，以更好地匹配 Windows 11 的设计语言。选择此渲染模式后，「自定义渲染」分组中除百分比标签相关选项外的所有选项都会被忽略。
-      $options:
-        - custom: 自定义
-        - visualStyles: 视觉样式
-        - winuiLike: WinUI 风格
-    - darkModeVSRendering: true
-      $name: Render using dark mode parts when using visual styles
-      $name:zh-CN: 使用视觉样式时以深色模式部件渲染
-      $description: >-
-        Render the usage bar using the dark mode parts from the "DarkMode_CopyEngine::Progress" class when dark mode is enabled. You must have Windows 11 build 26200.6899 or higher installed and the "Visual styles" rendering mode selected for this to work.
-      $description:zh-CN: >-
-        深色模式启用时，使用「DarkMode_CopyEngine::Progress」类的深色模式部件渲染使用率条。需要安装 Windows 11 build 26200.6899 或更高版本，并选择「视觉样式」渲染模式，此选项才能生效。
-      #! $showIf: {diskBar.rendering.renderingMode: visualStyles}
-    - winuiLikeRenderingCustomColors: false
-      $name: Allow using custom colors when rendering using the WinUI style
-      $name:zh-CN: 允许在使用 WinUI 风格渲染时使用自定义颜色
-      #! $showIf: {diskBar.rendering.renderingMode: winuiLike}
-    $name: Rendering
-    $name:zh-CN: 渲染
-  - customRendering:
-    - useSystemAccentColor: false
-      $name: Use system's accent color for the normal progress color
-      $name:zh-CN: 正常进度颜色使用系统强调色
-    - renderBarBorder: true
-      $name: Render bar border
-      $name:zh-CN: 渲染进度条边框
-      #! $hideIf: {diskBar.rendering.renderingMode: winuiLike}
-    - heightFactor: 100
-      $name: Height factor
-      $name:zh-CN: 高度系数
-      $description: >-
-        A factor that determines the height of the usage bar (in percents; default: 100%). The factor cannot be greater than 100%.
-      $description:zh-CN: >-
-        决定使用率条高度的系数（百分比；默认：100%）。该系数不能大于 100%。
-      #! $format: slider
-      #! $min: 0
-      #! $max: 100
-      #! $hideIf: {diskBar.rendering.renderingMode: winuiLike}
-    - cornerRadiusFactor: 0
-      $name: Corner radius factor
-      $name:zh-CN: 圆角半径系数
-      $description: >-
-        A factor that determines how rounded the bar's corners are (in percents; default: 0%). The factor cannot be greater than 100%.
-      $description:zh-CN: >-
-        决定使用率条圆角程度的系数（百分比；默认：0%）。该系数不能大于 100%。
-      #! $format: slider
-      #! $min: 0
-      #! $max: 100
-      #! $hideIf: {diskBar.rendering.renderingMode: winuiLike}
-    - roundProgressRightCorners: true
-      $name: Round progress' right corners
-      $name:zh-CN: 进度右侧圆角
-      #! $hideIf: {diskBar.rendering.renderingMode: winuiLike}
-    - percentageLabel: dontShow
-      $name: Percentage label
-      $name:zh-CN: 百分比标签
-      $description: >-
-        Show a label on the usage bar indicating the percentage of used or free space.
-      $description:zh-CN: >-
-        在使用率条上显示一个标签，指示已用或剩余空间的百分比。
-      $options:
-      - dontShow: 不显示
-      - usedSpace: 显示已用空间
-      - freeSpace: 显示剩余空间
-    - percentageLabelFont: Segoe UI Semibold
-      $name: Percentage label font
-      $name:zh-CN: 百分比标签字体
-      #! $format: fontFamily
-      #! $hideIf: {diskBar.customRendering.percentageLabel: dontShow}
-    - percentageLabelSize: 70
-      $name: Percentage label font size factor
-      $name:zh-CN: 百分比标签字号系数
-      $description: >-
-        Font size as a factor of the maximum bar's height (in percents; default: 70%). This is independent of the "Height factor" setting, so the label stays legible even if the bar's height is very thin.
-      $description:zh-CN: >-
-        字号以使用率条最大高度的系数表示（百分比；默认：70%）。该设置独立于「高度系数」，因此即使使用率条非常细，标签仍保持清晰可读。
-      #! $format: slider
-      #! $min: 0
-      #! $max: 100
-      #! $hideIf: {diskBar.customRendering.percentageLabel: dontShow}
-    - lightModeColors:
-      - barColor: "#E6E6E6"
-        $name: Bar color
-        $name:zh-CN: 使用率条颜色
-        #! $format: colorRgb
-      - barBorderColor: "#BCBCBC"
-        $name: Bar border color
-        $name:zh-CN: 使用率条边框颜色
-        #! $format: colorRgb
-      - progressColorNormal: "#0070CB"
-        $name: Normal progress color
-        $name:zh-CN: 正常进度颜色
-        #! $format: colorRgb
-      - progressColorIntermediate: "#9D5D00"
-        $name: Intermediate progress color
-        $name:zh-CN: 中间状态进度颜色
-        #! $format: colorRgb
-      - progressColorFull: "#C42B1C"
-        $name: Warning progress color
-        $name:zh-CN: 警告进度颜色
-        #! $format: colorRgb
-      - percentageLabelColor: "#000000"
-        $name: Percentage label color
-        $name:zh-CN: 百分比标签颜色
-        #! $format: colorRgb
-      $name: Light mode colors
-      $name:zh-CN: 浅色模式颜色
-    - darkModeColors:
-      - barColor: "#383838"
-        $name: Bar color
-        $name:zh-CN: 使用率条颜色
-        #! $format: colorRgb
-      - barBorderColor: "#646464"
-        $name: Bar border color
-        $name:zh-CN: 使用率条边框颜色
-        #! $format: colorRgb
-      - progressColorNormal: "#60CDFF"
-        $name: Normal progress color
-        $name:zh-CN: 正常进度颜色
-        #! $format: colorRgb
-      - progressColorIntermediate: "#FCE100"
-        $name: Intermediate progress color
-        $name:zh-CN: 中间状态进度颜色
-        #! $format: colorRgb
-      - progressColorFull: "#FF3D53"
-        $name: Warning progress color
-        $name:zh-CN: 警告进度颜色
-        #! $format: colorRgb
-      - percentageLabelColor: "#FFFFFF"
-        $name: Percentage label color
-        $name:zh-CN: 百分比标签颜色
-        #! $format: colorRgb
-      $name: Dark mode colors
-      $name:zh-CN: 深色模式颜色
-    $name: Custom rendering
-    $name:zh-CN: 自定义渲染
-    $description: >-
-      These options will be ignored when the "Visual styles" rendering mode is used.
-
-
-      If the "WinUI-like" rendering mode is used, every single option from this section will be ignored, except the options related to the percentage label. If you want to customize the bar's colors and still render it using the WinUI style, enable the "Allow using custom colors when rendering using the WinUI style" option.
-    $description:zh-CN: >-
-      使用「视觉样式」渲染模式时，这些选项将被忽略。
-
-
-      使用「WinUI 风格」渲染模式时，本分组中除百分比标签相关选项外的所有选项都会被忽略。如果想自定义使用率条颜色并仍以 WinUI 风格渲染，请启用「允许在使用 WinUI 风格渲染时使用自定义颜色」选项。
-    #! $showIf: {diskBar.rendering.renderingMode: [custom, winuiLike]}
-  $name: Disk usage bar
-  $name:zh-CN: 磁盘使用率条
-  $description: >-
-    Customizes everything about the disk usage bar from the This PC section in
-    the File Explorer, including theme-aware colors, height, border and rounded
-    corners.
-  $description:zh-CN: >-
-    自定义资源管理器「此电脑」中磁盘使用率条的各项外观，包括主题感知颜色、
-    高度、边框与圆角等。
 
 
 - infoBar:
@@ -11725,547 +11498,6 @@ bool NotifySettingsChanged() {
 }  // namespace ContentAnim
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 四、磁盘使用率条（DiskBar 段）
-// ─────────────────────────────────────────────────────────────────────────────
-
-namespace DiskBar {
-
-// （整合改动）本段原文件顶部的 #include（windhawk_utils/uxtheme/vsstyle/
-// versionhelpers/gdiplus/string）已并入文件头全局包含块，命名空间内不再包含
-// 头文件；Gdiplus 的 using 指令保留在本命名空间内（仅段内可见）。
-using namespace Gdiplus;
-
-// Undocumented functions
-using fnGetThemeClass                      = HRESULT(WINAPI*)(HTHEME, LPWSTR, INT);
-using fnGetImmersiveColorFromColorSetEx    = DWORD (WINAPI *)(DWORD, DWORD, BOOL, DWORD);
-using fnGetImmersiveUserColorSetPreference = DWORD (WINAPI *)(BOOL, BOOL);
-
-fnGetThemeClass GetThemeClass = nullptr;
-fnGetImmersiveColorFromColorSetEx GetImmersiveColorFromColorSetEx = nullptr;
-fnGetImmersiveUserColorSetPreference GetImmersiveUserColorSetPreference = nullptr;
-
-
-static decltype(&DrawThemeBackground) DrawThemeBackground_orig = nullptr;
-
-
-// General
-static BOOL     g_remainingSpaceAsProgress       = FALSE;
-static INT      g_warningThreshold               = 90;
-static INT      g_intermediateThreshold          = 0;
-
-// Rendering
-static WindhawkUtils::StringSetting g_renderingMode;
-static BOOL     g_darkModeVSRendering            = TRUE;
-static BOOL     g_winuiLikeRenderingCustomColors = FALSE;
-
-// Custom rendering
-static BOOL     g_useSystemAccentColor           = FALSE;
-static BOOL     g_renderBarBorder                = TRUE;
-static INT      g_heightFactor                   = 100;
-static INT      g_cornerRadiusFactor             = 0;
-static BOOL     g_roundProgressRightCorners      = TRUE;
-static WindhawkUtils::StringSetting g_percentageLabel;
-static INT      g_percentageLabelSize            = 70;
-static WindhawkUtils::StringSetting g_percentageLabelFont;
-
-// Light mode colors
-static COLORREF g_barColorLight                  = 0x00E6E6E6;
-static COLORREF g_barBorderColorLight            = 0x00BCBCBC;
-static COLORREF g_progressColorNormalLight       = 0x00CB7000;
-static COLORREF g_progressColorIntermediateLight = 0x00005D9D;
-static COLORREF g_progressColorFullLight         = 0x001C2BC4;
-static COLORREF g_percentageLabelColorLight      = 0x00000000;
-
-// Dark mode colors
-static COLORREF g_barColorDark                   = 0x00383838;
-static COLORREF g_barBorderColorDark             = 0x00646464;
-static COLORREF g_progressColorNormalDark        = 0x00FFCD60;
-static COLORREF g_progressColorIntermediateDark  = 0x0000E1FC;
-static COLORREF g_progressColorFullDark          = 0x00533DFF;
-static COLORREF g_percentageLabelColorDark       = 0x00FFFFFF;
-
-// Other
-thread_local int g_barWidth  = 1;
-
-static ULONG_PTR g_gdiplusToken = 0;
-HTHEME g_darkHTheme = nullptr;
-HMODULE g_uxtheme = nullptr;
-HMODULE g_shell32 = nullptr;
-
-
-static COLORREF LoadColorSetting(PCWSTR colorName, COLORREF fallback) {
-    WindhawkUtils::StringSetting originalHexString = WindhawkUtils::StringSetting::make(colorName);
-    PCWSTR hexString = originalHexString;
-
-    if (hexString[0] == L'#') hexString++;
-
-    if (wcslen(hexString) != 6)
-        return fallback;
-
-    auto h = [](wchar_t c) -> int {
-        if (c >= L'0' && c <= L'9') return c - L'0';
-        if (c >= L'A' && c <= L'F') return c - L'A' + 10;
-        if (c >= L'a' && c <= L'f') return c - L'a' + 10;
-        return -1;
-    };
-
-    int h0 = h(hexString[0]); 
-    int h1 = h(hexString[1]);
-    int h2 = h(hexString[2]);
-    int h3 = h(hexString[3]);
-    int h4 = h(hexString[4]);
-    int h5 = h(hexString[5]);
-
-    if (h0 < 0 || h1 < 0 || h2 < 0 || h3 < 0 || h4 < 0 || h5 < 0)
-        return fallback;
-
-    return RGB((h0 << 4) | h1, (h2 << 4) | h3, (h4 << 4) | h5);
-}
-
-
-static void LoadSettings() {
-    // General
-    g_remainingSpaceAsProgress       = Wh_GetIntSetting(L"diskBar.general.remainingSpaceAsProgress");
-    g_warningThreshold               = Wh_GetIntSetting(L"diskBar.general.warningPercentageThreshold");
-    g_intermediateThreshold          = Wh_GetIntSetting(L"diskBar.general.intermediatePercentageThreshold");
-
-    // Rendering
-    g_renderingMode                  = WindhawkUtils::StringSetting::make(L"diskBar.rendering.renderingMode");
-    g_darkModeVSRendering            = Wh_GetIntSetting(L"diskBar.rendering.darkModeVSRendering");
-    g_winuiLikeRenderingCustomColors = Wh_GetIntSetting(L"diskBar.rendering.winuiLikeRenderingCustomColors");
-    
-    // Custom rendering
-    g_useSystemAccentColor           = Wh_GetIntSetting(L"diskBar.customRendering.useSystemAccentColor");
-    g_renderBarBorder                = Wh_GetIntSetting(L"diskBar.customRendering.renderBarBorder");
-    g_heightFactor                   = Wh_GetIntSetting(L"diskBar.customRendering.heightFactor");
-    g_cornerRadiusFactor             = Wh_GetIntSetting(L"diskBar.customRendering.cornerRadiusFactor");
-    g_roundProgressRightCorners      = Wh_GetIntSetting(L"diskBar.customRendering.roundProgressRightCorners");
-    g_percentageLabel                = WindhawkUtils::StringSetting::make(L"diskBar.customRendering.percentageLabel");
-    g_percentageLabelFont            = WindhawkUtils::StringSetting::make(L"diskBar.customRendering.percentageLabelFont");
-    g_percentageLabelSize            = Wh_GetIntSetting(L"diskBar.customRendering.percentageLabelSize");
-
-    if (g_heightFactor > 100) g_heightFactor = 100;
-    else if (g_heightFactor < 0) g_heightFactor = 0;
-
-    if (g_cornerRadiusFactor > 100) g_cornerRadiusFactor = 100;
-    else if (g_cornerRadiusFactor < 0) g_cornerRadiusFactor = 0;
-
-    if (g_percentageLabelSize > 100) g_percentageLabelSize = 100;
-    else if (g_percentageLabelSize < 1) g_percentageLabelSize = 1;
-
-    // Light mode colors
-    g_barColorLight                  = LoadColorSetting(L"diskBar.customRendering.lightModeColors.barColor",                  0x00E6E6E6);
-    g_barBorderColorLight            = LoadColorSetting(L"diskBar.customRendering.lightModeColors.barBorderColor",            0x00BCBCBC);
-    g_progressColorNormalLight       = LoadColorSetting(L"diskBar.customRendering.lightModeColors.progressColorNormal",       0x00CB7000);
-    g_progressColorIntermediateLight = LoadColorSetting(L"diskBar.customRendering.lightModeColors.progressColorIntermediate", 0x00005D9D);
-    g_progressColorFullLight         = LoadColorSetting(L"diskBar.customRendering.lightModeColors.progressColorFull",         0x001C2BC4);
-    g_percentageLabelColorLight      = LoadColorSetting(L"diskBar.customRendering.lightModeColors.percentageLabelColor",      0x00000000);
-
-    // Dark mode colors
-    g_barColorDark                   = LoadColorSetting(L"diskBar.customRendering.darkModeColors.barColor",                   0x00383838);
-    g_barBorderColorDark             = LoadColorSetting(L"diskBar.customRendering.darkModeColors.barBorderColor",             0x00646464);
-    g_progressColorNormalDark        = LoadColorSetting(L"diskBar.customRendering.darkModeColors.progressColorNormal",        0x00FFCD60);
-    g_progressColorIntermediateDark  = LoadColorSetting(L"diskBar.customRendering.darkModeColors.progressColorIntermediate",  0x0000E1FC);
-    g_progressColorFullDark          = LoadColorSetting(L"diskBar.customRendering.darkModeColors.progressColorFull",          0x00533DFF);
-    g_percentageLabelColorDark       = LoadColorSetting(L"diskBar.customRendering.darkModeColors.percentageLabelColor",       0x00FFFFFF);
-
-    if (wcscmp(g_renderingMode, L"winuiLike") == 0) {
-        g_renderBarBorder           = FALSE;
-        g_roundProgressRightCorners = TRUE;
-        
-        if (!g_winuiLikeRenderingCustomColors) {
-            g_useSystemAccentColor           = TRUE;
-
-            g_barColorLight                  = 0x00868686;
-            g_progressColorIntermediateLight = 0x00005D9D;
-            g_progressColorFullLight         = 0x001C2BC4;
-
-            g_barColorDark                   = 0x009A9A9A;
-            g_progressColorIntermediateDark  = 0x0000E1FC;
-            g_progressColorFullDark          = 0x00533DFF;
-        }
-    }
-}
-
-
-static bool AreAppsUsingDarkTheme() {
-    DWORD value = 1;
-    DWORD size = sizeof(value);
-
-    LONG result = RegGetValueW(
-        HKEY_CURRENT_USER,
-        L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-        L"AppsUseLightTheme",
-        RRF_RT_REG_DWORD, nullptr, &value, &size
-    );
-
-    return result == ERROR_SUCCESS && !value;
-}
-
-
-static std::wstring GetModulePath(HMODULE module) {
-    if (!module) return L"<unknown>";
-
-    std::wstring path(MAX_PATH, L'\0');
-
-    while (true) {
-        DWORD len = GetModuleFileName(module, path.data(), path.size());
-        if (len == 0) return L"<unknown>";
-
-        // A result equal to the buffer size means the path was truncated.
-        if (len == path.size()) {
-            path.resize(len * 2);
-            continue;
-        }
-
-        path.resize(len);
-        return path;
-    }
-}
-
-
-static bool IsSystemModulePath(PCWSTR path) {
-    WCHAR windowsDir[MAX_PATH];
-    UINT len = GetSystemWindowsDirectory(windowsDir, ARRAYSIZE(windowsDir));
-
-    if (len == 0 || len >= ARRAYSIZE(windowsDir)) return false;
-
-    return _wcsnicmp(path, windowsDir, len) == 0 && path[len] == L'\\';
-}
-
-
-[[clang::noinline]] bool IsExpectedCallerModule(HMODULE expectedModule, void* address) {
-    HMODULE callerModule = nullptr;
-
-    if (
-        GetModuleHandleEx(
-            GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
-            (PCWSTR) address, &callerModule
-        ) && callerModule == expectedModule
-    ) {
-        return true;
-    }
-
-    std::wstring callerPath = GetModulePath(callerModule);
-    if (IsSystemModulePath(callerPath.c_str())) return false;
-
-    void* frames[4];
-    WORD count = CaptureStackBackTrace(3, ARRAYSIZE(frames), frames, nullptr);
-    
-    for (WORD i = 0; i < count; i++) {
-        callerModule = nullptr;
-
-        if (
-            GetModuleHandleEx(
-                GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
-                (PCWSTR) frames[i], &callerModule
-            ) && callerModule == expectedModule
-        ) {
-            return true;
-        }
-        
-        callerPath = GetModulePath(callerModule);
-        if (IsSystemModulePath(callerPath.c_str())) return false;
-    }
-
-    return false;
-}
-
-
-static COLORREF GetSystemAccentColorShade(int shade) {
-    if (GetImmersiveColorFromColorSetEx && GetImmersiveUserColorSetPreference)
-        return GetImmersiveColorFromColorSetEx(
-            GetImmersiveUserColorSetPreference(FALSE, FALSE), shade, FALSE, 0
-        );
-    else
-        return 0xFFFF00FF;
-}
-
-
-static int GetCornerRadius(const RECT& rect) {
-    int height = rect.bottom - rect.top;
-    if (height <= 0 || g_cornerRadiusFactor <= 0) return 0;
-
-    int radius = ((height / 2) * g_cornerRadiusFactor + 50) / 100;
-    return (radius < 1) ? 1 : radius;
-}
-
-
-static void FillRoundedRect(
-    HDC hdc, const RECT& rect, int radius, COLORREF color, bool roundLeft, bool roundRight
-) {
-    if (rect.right <= rect.left || rect.bottom <= rect.top) return;
-
-    Graphics graphics(hdc);
-    graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-    graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
-
-    SolidBrush brush(Color(255, GetRValue(color), GetGValue(color), GetBValue(color)));
-
-    int width = rect.right - rect.left;
-    int height = rect.bottom - rect.top;
-
-    if (radius <= 0 || (!roundLeft && !roundRight)) {
-        graphics.FillRectangle(&brush, rect.left, rect.top, width, height);
-        return;
-    }
-
-    int diameter = radius * 2;
-
-    GraphicsPath path;
-    path.AddArc(rect.left, rect.top, diameter, diameter, 180, 90);
-    path.AddArc(rect.right - diameter, rect.top, diameter, diameter, 270, 90);
-    path.AddArc(rect.right - diameter, rect.bottom - diameter, diameter, diameter, 0, 90);
-    path.AddArc(rect.left, rect.bottom - diameter, diameter, diameter, 90, 90);
-    path.CloseFigure();
-
-    graphics.FillPath(&brush, &path);
-
-    if (!roundLeft)
-        graphics.FillRectangle(&brush, rect.left, rect.top, radius, height);
-
-    if (!roundRight)
-        graphics.FillRectangle(&brush, rect.right - radius, rect.top, radius, height);
-}
-
-
-static void DrawPercentageLabel(
-    HDC hdc, RECT &rect, LPCWSTR fontFamily, int fontHeight, int percentage, COLORREF color
-) {
-    if (fontHeight == 0) return;
-
-    HFONT font = CreateFontW(
-        fontHeight, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, 
-        DEFAULT_PITCH | FF_DONTCARE, fontFamily
-    );
-
-    if (!font) return;
-
-    WCHAR text[16];
-    swprintf(text, 16, L"%d%%", percentage);
-
-    HGDIOBJ oldFont = SelectObject(hdc, font);
-    COLORREF oldColor = SetTextColor(hdc, color);
-    int oldBkMode = SetBkMode(hdc, TRANSPARENT);
-    
-    DrawTextW(hdc, text, -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP);
-
-    SetBkMode(hdc, oldBkMode);
-    SetTextColor(hdc, oldColor);
-    SelectObject(hdc, oldFont);
-    DeleteObject(font);
-}
-
-
-HRESULT WINAPI HookedDrawThemeBackground(
-    HTHEME hTheme, HDC hdc, INT iPartId, INT iStateId, LPCRECT pRect, LPCRECT pClipRect
-) {
-    // I know the rect left point and shell32 caller checks are some really 
-    // weird checks, but I have no idea for a better check that actually works 
-    // and that can actually distinguish from Explorer's progress bar drawing 
-    // inside an item from This PC's drive list and an actual progress bar 
-    // control drawing. From my inspection, Explorer seems to custom draw a 
-    // progress bar like this only inside the drive list from the This PC section.
-
-    if ((iPartId != PP_FILL && iPartId != PP_TRANSPARENTBAR) || WindowFromDC(hdc) || !pRect || pRect->left <= 0)
-        return DrawThemeBackground_orig(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-
-    WCHAR themeClass[256] = {};
-
-    BOOL isThemeClassValid = (
-        GetThemeClass && SUCCEEDED(GetThemeClass(hTheme, themeClass, 256)) 
-        && wcscmp(themeClass, L"Progress") == 0
-    );
-
-    if (isThemeClassValid) {
-        if (!IsExpectedCallerModule(g_shell32, __builtin_return_address(0)))
-            return DrawThemeBackground_orig(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-
-        COLORREF color;
-        INT progressStyle;
-        RECT clipRect = *pRect;
-        BOOL darkMode = AreAppsUsingDarkTheme();
-
-        if (pClipRect) IntersectRect(&clipRect, &clipRect, pClipRect);
-
-        if (wcscmp(g_renderingMode, L"visualStyles") == 0 && g_darkModeVSRendering && darkMode && g_darkHTheme) 
-            hTheme = g_darkHTheme;
-
-        RECT fullBarRect = { 
-            clipRect.left, clipRect.top, clipRect.left + g_barWidth, clipRect.bottom 
-        };
-
-        int maxBarHeight = clipRect.bottom - clipRect.top;
-        int percentageLabelFontHeight = -(maxBarHeight * g_percentageLabelSize / 100);
-        int heightFactor = g_heightFactor;
-        int radius = 0;
-        
-        if (wcscmp(g_renderingMode, L"winuiLike") == 0) {
-            if (iPartId == PP_FILL) heightFactor = 20;
-            else if (iPartId == PP_TRANSPARENTBAR) heightFactor = 1;
-
-            radius = (clipRect.bottom - clipRect.top) * heightFactor / 200 + 1;
-        }
-
-        if (wcscmp(g_renderingMode, L"visualStyles") != 0) {
-            int inset = (clipRect.bottom - clipRect.top) * (100 - heightFactor) / 200;
-
-            clipRect.top = clipRect.top + inset;
-            clipRect.bottom = clipRect.bottom - inset;
-        }
-        
-        if (wcscmp(g_renderingMode, L"custom") == 0)
-            radius = GetCornerRadius(clipRect);
-
-        if (iPartId == PP_FILL) {
-            int progressWidth = clipRect.right - clipRect.left;
-            int usedPercentage = progressWidth * 100 / g_barWidth;
-
-            if (g_remainingSpaceAsProgress)
-                clipRect.right = clipRect.left + g_barWidth - progressWidth;
-
-            if (wcscmp(g_renderingMode, L"visualStyles") == 0) {
-                if (usedPercentage >= g_warningThreshold)
-                    progressStyle = PBFS_ERROR;
-                else if (g_intermediateThreshold && usedPercentage >= g_intermediateThreshold)
-                    progressStyle = PBFS_PAUSED;
-                else 
-                    progressStyle = PBFS_PARTIAL;
-
-                DrawThemeBackground_orig(hTheme, hdc, PP_FILL, progressStyle, &clipRect, 0);
-            } else {
-                if (iStateId == PBFS_ERROR || iStateId == PBFS_PARTIAL) 
-                    if (usedPercentage >= g_warningThreshold) {
-                        color = (darkMode) ? g_progressColorFullDark : g_progressColorFullLight;
-                    } else if (g_intermediateThreshold && usedPercentage >= g_intermediateThreshold) {
-                        color = (darkMode) ? g_progressColorIntermediateDark : g_progressColorIntermediateLight;
-                    } else {
-                        if (g_useSystemAccentColor)
-                            if (IsWindows10OrGreater())
-                                color = ((darkMode) ? GetSystemAccentColorShade(2) : GetSystemAccentColorShade(5)) & 0xFFFFFF;
-                            else if (IsWindows8OrGreater())
-                                color = GetSystemAccentColorShade(9) & 0xFFFFFF;
-                            else
-                                color = 0x00FF00FF;
-                        else
-                            color = (darkMode) ? g_progressColorNormalDark : g_progressColorNormalLight;
-                    }
-                else 
-                    return DrawThemeBackground_orig(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-
-                if (g_renderBarBorder) {
-                    clipRect.top++; clipRect.left++; clipRect.bottom--; clipRect.right--;
-                    if (radius > 0) radius--;
-                }
-
-                if (radius * 2 <= clipRect.right - clipRect.left)
-                    FillRoundedRect(hdc, clipRect, radius, color, TRUE, g_roundProgressRightCorners);
-
-                if (wcscmp(g_percentageLabel, L"dontShow") != 0) {
-                    DrawPercentageLabel(
-                        hdc, fullBarRect, g_percentageLabelFont, percentageLabelFontHeight, 
-                        (wcscmp(g_percentageLabel, L"usedSpace") == 0) ? usedPercentage : (100 - usedPercentage),
-                        (darkMode) ? g_percentageLabelColorDark : g_percentageLabelColorLight
-                    );
-                }
-            }
-            
-            return S_OK;
-        }
-
-        else if (iPartId == PP_TRANSPARENTBAR) {
-            g_barWidth  = clipRect.right - clipRect.left;
-            if (g_barWidth < 1) g_barWidth = 1;
-
-            if (wcscmp(g_renderingMode, L"visualStyles") == 0)
-                DrawThemeBackground_orig(hTheme, hdc, PP_TRANSPARENTBAR, PBS_NORMAL, &clipRect, 0);
-            else {
-                if (g_renderBarBorder) {
-                    FillRoundedRect(
-                        hdc, clipRect, radius, (darkMode) ? g_barBorderColorDark : g_barBorderColorLight, 
-                        true, true
-                    );
-
-                    clipRect.top++; clipRect.left++; clipRect.bottom--; clipRect.right--;
-                    if (radius > 0) radius--;
-                }
-
-                FillRoundedRect(
-                    hdc, clipRect, radius, (darkMode) ? g_barColorDark : g_barColorLight, 
-                    true, true
-                );
-            }
-            
-            return S_OK;
-        }
-    }
-    
-    return DrawThemeBackground_orig(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
-}
-
-
-static BOOL CALLBACK RefreshExplorerCallback(HWND hwnd, LPARAM lParam) {
-    DWORD pid;
-    WCHAR windowClass[256];
-
-    GetWindowThreadProcessId(hwnd, &pid); 
-
-    if (
-        pid == GetCurrentProcessId() && GetClassName(hwnd, windowClass, 256) 
-        && wcscmp(windowClass, L"CabinetWClass") == 0
-    )
-        SendMessage(hwnd, WM_SETTINGCHANGE, SPI_SETHIGHCONTRAST, 0);
-    
-    return TRUE;
-}
-
-
-BOOL Init() {
-    GdiplusStartupInput gdiplusStartupInput;
-
-    if (GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, nullptr) != 0)  // Status.Ok
-        return FALSE;
-
-    g_shell32 = GetModuleHandle(L"shell32.dll");
-    g_uxtheme = GetModuleHandle(L"uxtheme.dll");
-
-    g_darkHTheme = OpenThemeData(0, L"DarkMode_CopyEngine::Progress");
-    
-    GetThemeClass = (fnGetThemeClass)GetProcAddress(g_uxtheme, MAKEINTRESOURCEA(74));
-    GetImmersiveColorFromColorSetEx = (fnGetImmersiveColorFromColorSetEx)GetProcAddress(g_uxtheme, MAKEINTRESOURCEA(95));
-    GetImmersiveUserColorSetPreference = (fnGetImmersiveUserColorSetPreference)GetProcAddress(g_uxtheme, MAKEINTRESOURCEA(98));
-
-    LoadSettings();
-    WindhawkUtils::SetFunctionHook(DrawThemeBackground, HookedDrawThemeBackground, &DrawThemeBackground_orig);
-
-    return TRUE;
-}
-
-
-void Uninit() {
-    if (g_darkHTheme) CloseThemeData(g_darkHTheme);
-
-    EnumWindows(RefreshExplorerCallback, 0);
-
-    if (g_gdiplusToken) {
-        GdiplusShutdown(g_gdiplusToken);
-        g_gdiplusToken = 0;
-    }
-}
-
-
-void AfterInit() {
-    EnumWindows(RefreshExplorerCallback, 0);
-}
-
-
-void NotifySettingsChanged() {
-    LoadSettings();
-    EnumWindows(RefreshExplorerCallback, 0);
-}
-
-}  // namespace DiskBar
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 五、信息栏增强（InfoBar 段，运行时文案已汉化）
@@ -19512,11 +18744,11 @@ static void NotifySettingsChanged() {
 //
 // 七个功能段的初始化/卸载/设置变更由本层统一分发：
 //   • Sizes      段：仅 explorer.exe（v2.9.1 起弃用全进程注入）；
-//   • HoverInfo / ContentAnim / DiskBar / InfoBar / DblUp / Marquee 段：
+//   • HoverInfo / ContentAnim / InfoBar / DblUp / Marquee 段：
 //     仅 explorer.exe。
 // 各段 Init 失败仅记录日志并降级，不影响其他功能段（任一段成功即返回 TRUE）。
 // 组级总开关（sizes.enable / hoverInfo.enable / contentAnim.enable /
-// diskBar.enable / infoBar.enable / dblUp.enable / marquee.enable）在 Init 时
+// infoBar.enable / dblUp.enable / marquee.enable）在 Init 时
 // 决定是否装载该段；开关或 sizes / fileOp 设置变化经下方快照比对触发整模组
 // 重载，与上游语义一致。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19623,7 +18855,6 @@ static std::wstring CwFexPlusBuildReloadSnapshot() {
     snapshot += readInt(L"sizes.computed.refreshView");
     snapshot += readInt(L"hoverInfo.enable");
     snapshot += readInt(L"contentAnim.enable");
-    snapshot += readInt(L"diskBar.enable");
     snapshot += readInt(L"infoBar.enable");
     snapshot += readInt(L"dblUp.enable");
     snapshot += readInt(L"marquee.enable");
@@ -20316,7 +19547,6 @@ static bool g_marqueeInited = false;
 static bool g_sizesInited = false;
 static bool g_hoverInfoInited = false;
 static bool g_contentAnimInited = false;
-static bool g_diskBarInited = false;
 static bool g_infoBarInited = false;
 static bool g_dblUpInited = false;
 
@@ -20374,17 +19604,6 @@ BOOL Wh_ModInit() {
                    L"shared hook failure");
         }
 
-        if (Wh_GetIntSetting(L"diskBar.enable")) {
-            if (DiskBar::Init()) {
-                g_diskBarInited = true;
-                anyOk = true;
-            } else {
-                Wh_Log(L"DiskBar (disk usage bar) init failed, continuing "
-                       L"without it");
-            }
-        } else {
-            Wh_Log(L"DiskBar group disabled by diskBar.enable");
-        }
 
         if (Wh_GetIntSetting(L"infoBar.enable")) {
             if (InfoBar::Init()) {
@@ -20430,7 +19649,7 @@ BOOL Wh_ModInit() {
 
     } else {
         Wh_Log(L"Non-explorer process detected; hover info, content "
-               L"animations, disk usage bar, info bar, double-click-up and "
+               L"animations, info bar, double-click-up and "
                L"skipped");
         // 非 explorer 进程中若 Sizes 组也未启用，本进程无任何功能段需要
         // 运行：返回 TRUE（配置性跳过，不算初始化失败）。
@@ -20451,9 +19670,6 @@ void Wh_ModAfterInit() {
     // 与各段 Init 顺序一致，按初始化状态分发。
     if (g_contentAnimInited) {
         ContentAnim::AfterInit();
-    }
-    if (g_diskBarInited) {
-        DiskBar::AfterInit();
     }
     if (g_infoBarInited) {
         InfoBar::AfterInit();
@@ -20494,10 +19710,6 @@ void Wh_ModUninit() {
         InfoBar::Uninit();
         g_infoBarInited = false;
     }
-    if (g_diskBarInited) {
-        DiskBar::Uninit();
-        g_diskBarInited = false;
-    }
     if (g_contentAnimInited) {
         ContentAnim::Uninit();
         g_contentAnimInited = false;
@@ -20535,9 +19747,6 @@ BOOL Wh_ModSettingsChanged(BOOL* bReload) {
         // 位移动画从开到关时请求整模组重载（DirectUI 钩子随重载摘除，
         // 与上游语义一致）。
         wantsReload = ContentAnim::NotifySettingsChanged() || wantsReload;
-    }
-    if (g_diskBarInited) {
-        DiskBar::NotifySettingsChanged();
     }
     if (g_infoBarInited) {
         InfoBar::NotifySettingsChanged();

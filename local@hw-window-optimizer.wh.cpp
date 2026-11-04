@@ -9,6 +9,9 @@
 // @github          https://github.com/m417z
 // @homepage        https://m417z.com/
 // @include         *
+// @exclude         secedit.exe
+// @exclude         subinacl.exe
+// @exclude         TrustedInstaller.exe
 // @exclude         devenv.exe
 // @compilerOptions -lcomctl32 -ldwmapi -luser32
 // ==/WindhawkMod==

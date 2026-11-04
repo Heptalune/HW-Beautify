@@ -9,6 +9,9 @@
 // @github          https://github.com/redrag2105
 // @donateUrl       https://ko-fi.com/redrag2105
 // @include         *
+// @exclude         secedit.exe
+// @exclude         subinacl.exe
+// @exclude         TrustedInstaller.exe
 // @exclude         crashpad_handler.exe
 // @exclude         TextInputHost.exe
 // @exclude         ShellExperienceHost.exe
