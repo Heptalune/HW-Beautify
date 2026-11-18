@@ -2,14 +2,14 @@
 // @id              taskbar-volume-control-per-app
 // @name            任务栏分应用音量控制
 // @description     在任务栏按钮上滚动调节各应用自己的音量
-// @version         1.1.4
+// @version         1.2
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
 // @homepage        https://m417z.com/
 // @include         explorer.exe
 // @architecture    x86-64
-// @compilerOptions -lcomctl32 -lntdll -lole32 -loleaut32 -lruntimeobject
+// @compilerOptions -lcomctl32 -lhid -lntdll -lole32 -loleaut32 -lruntimeobject
 // ==/WindhawkMod==
 
 // Source code is published under The GNU General Public License v3.0.
@@ -52,24 +52,70 @@
 // ==WindhawkModSettings==
 /*
 - volumeChangeStep: 10
+  $name: Volume change step
   $name:zh-CN: 音量变化步长
+  $description: >-
+    Allows to configure the volume change that will occur with each notch of
+    mouse wheel movement.
   $description:zh-CN: >-
     配置鼠标滚轮每格滚动时发生的音量变化。
 - ctrlClickToMute: true
+  $name: Ctrl + Click to mute
   $name:zh-CN: Ctrl + 点击静音
+  $description: >-
+    When enabled, Ctrl+clicking on a taskbar button will toggle the mute state
+    of the application.
   $description:zh-CN: >-
     启用后，Ctrl+点击任务栏按钮将切换该应用的静音状态。
+- middleClickToMute: false
+  $name: Middle Click to mute
+  $name:zh-CN: 中键静音
+  $description: >-
+    When enabled, middle-clicking (clicking the mouse wheel) on a taskbar
+    button will toggle the mute state of the application.
+  $description:zh-CN: >-
+    启用后，在任务栏按钮上按下鼠标中键（滚轮）可切换该应用程序的静音状态。
 - ctrlScrollVolumeChange: false
+  $name: Ctrl + Scroll to change volume
   $name:zh-CN: Ctrl + 滚轮调音量
+  $description: >-
+    When enabled, scrolling with the mouse wheel or the touchpad will only
+    change the volume when the Ctrl key is held down.
   $description:zh-CN: >-
     启用后，只有按住 Ctrl 键滚动鼠标滚轮才会改变音量。
+- touchpadScroll: false
+  $name: Touchpad scrolling
+  $name:zh-CN: 触控板滚动调节音量
+  $description: >-
+    Change the volume with two-finger scrolling on a precision touchpad, for
+    touchpads whose scrolling doesn't work over the taskbar. Moving two fingers
+    up raises the volume.
+  $description:zh-CN: >-
+    在精准触控板上用双指滚动来调节音量，适用于在任务栏上无法使用滚轮的触控板。向上滑动双指即为增大音量。
 - terseFormat: false
+  $name: Terse format
   $name:zh-CN: 精简格式
+  $description: >-
+    When enabled, the tooltip shows a compact format with emojis instead of
+    text (e.g., "🔊 64%" instead of "Volume: 64%").
   $description:zh-CN: >-
     启用后，工具提示使用表情符号的紧凑格式代替文字（例如「🔊 64%」代替
     「音量：64%」）。
+- tooltipColor: ""
+  $name: Tooltip color
+  $name:zh-CN: 提示气泡颜色
+  $description: >-
+    Custom tooltip background color in #RRGGBB or #AARRGGBB format (e.g.,
+    #FF0000 for red). Leave empty to use the system accent color.
+  $description:zh-CN: >-
+    自定义提示气泡的背景色，格式为 #RRGGBB 或 #AARRGGBB（例如 #FF0000 表示红色）。留空则使用系统强调色。
 - noAutomaticMuteToggle: false
+  $name: No automatic mute toggle
   $name:zh-CN: 不自动切换静音
+  $description: >-
+    By default, the app is muted once the volume reaches zero, and is unmuted
+    on any change to a non-zero volume. Enabling this option turns off this
+    functionality, such that the app mute status is not changed.
   $description:zh-CN: >-
     默认情况下，应用音量降到 0 时自动静音，调到非 0 时自动取消静音。
     启用此选项将关闭该功能，即不改变应用的静音状态。
@@ -78,6 +124,7 @@
 
 #include <windhawk_utils.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <functional>
@@ -88,9 +135,13 @@
 
 #include <audiopolicy.h>
 #include <endpointvolume.h>
+#include <hidusage.h>
 #include <mmdeviceapi.h>
 #include <tlhelp32.h>
 #include <winternl.h>
+
+// Depends on hidusage.h.
+#include <hidpi.h>
 
 #undef GetCurrentTime
 
@@ -107,8 +158,11 @@ using namespace winrt::Windows::UI::Xaml;
 struct {
     int volumeChangeStep;
     bool ctrlClickToMute;
+    bool middleClickToMute;
     bool ctrlScrollVolumeChange;
+    bool touchpadScroll;
     bool terseFormat;
+    std::optional<winrt::Windows::UI::Color> tooltipColor;
     bool noAutomaticMuteToggle;
 } g_settings;
 
@@ -116,11 +170,11 @@ std::atomic<bool> g_taskbarViewDllLoaded;
 
 IMMDeviceEnumerator* g_pDeviceEnumerator;
 
-// 分应用音量：任务栏按钮集成。
+// Per-app volume: taskbar button integration.
 thread_local bool g_captureTaskGroup;
 thread_local void* g_capturedTaskGroup;
 
-// 用于从 WindowsUdk 获取原生任务项/组的点击哨兵模式。
+// Click sentinel pattern for getting native task item/group from WindowsUdk.
 WCHAR g_clickSentinel[] = L"click-sentinel";
 void* g_clickSentinel_TaskGroup = nullptr;
 void* g_clickSentinel_TaskItem = nullptr;
@@ -165,15 +219,15 @@ void SndVolUninit() {
     }
 }
 
-// 处理音频会话的回调类型。
-// 接收会话的进程 ID 与会话控制接口。
-// 返回 true 继续迭代，false 停止。
+// Callback type for processing audio sessions.
+// Receives the session's process ID and session control interface.
+// Returns true to continue iterating, false to stop.
 using AudioSessionCallback =
     std::function<bool(DWORD pid, IAudioSessionControl2* sessionControl)>;
 
-// 遍历所有音频会话。
-// 对每个会话调用回调，传入其 PID 和 IAudioSessionControl2。
-// 如果至少处理了一个会话则返回 true。
+// Iterates over all audio sessions.
+// Calls the callback for each session with its PID and IAudioSessionControl2.
+// Returns true if at least one session was processed.
 bool ForEachAudioSession(const AudioSessionCallback& callback) {
     if (!g_pDeviceEnumerator) {
         SndVolInit();
@@ -224,7 +278,7 @@ bool ForEachAudioSession(const AudioSessionCallback& callback) {
             continue;
         }
 
-        // 跳过系统声音会话。
+        // Skip system sounds session.
         if (sessionControl2->IsSystemSoundsSession() == S_OK) {
             continue;
         }
@@ -244,8 +298,8 @@ bool ForEachAudioSession(const AudioSessionCallback& callback) {
     return foundSession;
 }
 
-// 从进程句柄获取命令行。
-// 失败时返回空字符串。
+// Get the command line of a process from its handle.
+// Returns empty string on failure.
 std::wstring GetProcessCommandLine(HANDLE hProcess) {
     PROCESS_BASIC_INFORMATION pbi;
     ULONG returnLength;
@@ -277,9 +331,10 @@ std::wstring GetProcessCommandLine(HANDLE hProcess) {
     return cmdLine;
 }
 
-// 查找给定父进程的 Chromium 音频子进程。
-// 基于 Chromium 的浏览器在单独的实用程序进程中运行音频，带有特定的命令行
-// 标志。返回音频子进程的 PID，如果未找到则返回 0。
+// Find Chromium's audio subprocess for a given parent process.
+// Chromium-based browsers run audio in a separate utility process with
+// specific command line flags. Returns the audio subprocess PID or 0 if not
+// found.
 DWORD FindChromiumAudioSubprocessUncached(DWORD parentPID) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) {
@@ -312,7 +367,7 @@ DWORD FindChromiumAudioSubprocessUncached(DWORD parentPID) {
                 continue;
             }
 
-            // 解析命令行并检查 Chromium 音频服务标志。
+            // Parse command line and check for Chromium audio service flags.
             int argc = 0;
             LPWSTR* argv = CommandLineToArgvW(cmdLine.c_str(), &argc);
             if (!argv) {
@@ -351,7 +406,7 @@ DWORD FindChromiumAudioSubprocessUncached(DWORD parentPID) {
         return audioSubprocessPID;
     }
 
-    // 回退：返回第一个有音频会话的渲染进程。
+    // Fallback: return first renderer process with audio session.
     if (rendererPIDs.empty()) {
         return 0;
     }
@@ -361,27 +416,28 @@ DWORD FindChromiumAudioSubprocessUncached(DWORD parentPID) {
         for (DWORD pid : rendererPIDs) {
             if (sessionPID == pid) {
                 rendererAudioPID = pid;
-                return false;  // 停止迭代。
+                return false;  // Stop iterating.
             }
         }
-        return true;  // 继续迭代。
+        return true;  // Continue iterating.
     });
     return rendererAudioPID;
 }
 
-// Chromium 音频子进程查找的缓存，避免昂贵的重复进程枚举。
+// Cache for Chromium audio subprocess lookups to avoid expensive repeated
+// process enumeration.
 struct ChromiumAudioSubprocessCache {
     DWORD audioSubprocessPID;
     ULONGLONG timestamp;
 };
 std::unordered_map<DWORD, ChromiumAudioSubprocessCache>
     g_chromiumAudioSubprocessCache;
-constexpr ULONGLONG kChromiumCacheTTL = 5000;  // 5 秒。
+constexpr ULONGLONG kChromiumCacheTTL = 5000;  // 5 seconds.
 
 DWORD FindChromiumAudioSubprocess(DWORD parentPID) {
     ULONGLONG now = GetTickCount64();
 
-    // 先检查缓存。
+    // Check cache first.
     auto it = g_chromiumAudioSubprocessCache.find(parentPID);
     if (it != g_chromiumAudioSubprocessCache.end()) {
         if (now - it->second.timestamp < kChromiumCacheTTL) {
@@ -389,10 +445,10 @@ DWORD FindChromiumAudioSubprocess(DWORD parentPID) {
         }
     }
 
-    // 缓存未命中或已过期，执行查找。
+    // Cache miss or expired, do the lookup.
     DWORD audioSubprocessPID = FindChromiumAudioSubprocessUncached(parentPID);
 
-    // 清理过期条目。
+    // Clean up expired entries.
     for (auto cacheIt = g_chromiumAudioSubprocessCache.begin();
          cacheIt != g_chromiumAudioSubprocessCache.end();) {
         if (now - cacheIt->second.timestamp >= kChromiumCacheTTL) {
@@ -402,37 +458,37 @@ DWORD FindChromiumAudioSubprocess(DWORD parentPID) {
         }
     }
 
-    // 更新缓存。
+    // Update cache.
     g_chromiumAudioSubprocessCache[parentPID] = {audioSubprocessPID, now};
 
     return audioSubprocessPID;
 }
 
 struct AppVolumeResult {
-    int volume;  // 0-100。
+    int volume;  // 0-100.
     bool muted;
 };
 
-// 调整匹配给定进程 ID 的所有音频会话的音量。
+// Adjust volume for all audio sessions matching the given process ID.
 std::optional<AppVolumeResult> AdjustAppVolumeForPID(DWORD targetPID,
                                                      float fVolumeAdd) {
     std::optional<AppVolumeResult> result;
 
     ForEachAudioSession([&](DWORD pid, IAudioSessionControl2* sessionControl) {
         if (pid != targetPID) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         winrt::com_ptr<ISimpleAudioVolume> vol;
         if (FAILED(sessionControl->QueryInterface(__uuidof(ISimpleAudioVolume),
                                                   vol.put_void()))) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         float currentVolume = 0.0f;
         HRESULT hr = vol->GetMasterVolume(&currentVolume);
         if (FAILED(hr)) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         float newVolume = currentVolume + fVolumeAdd;
@@ -447,7 +503,7 @@ std::optional<AppVolumeResult> AdjustAppVolumeForPID(DWORD targetPID,
             AppVolumeResult r;
             r.volume = (int)(newVolume * 100.0f + 0.5f);
 
-            // 根据音量处理静音状态。
+            // Handle mute state based on volume.
             if (!g_settings.noAutomaticMuteToggle) {
                 if (newVolume < 0.005f) {
                     vol->SetMute(TRUE, NULL);
@@ -457,7 +513,7 @@ std::optional<AppVolumeResult> AdjustAppVolumeForPID(DWORD targetPID,
                     r.muted = false;
                 }
             } else {
-                // 读取实际静音状态。
+                // Read actual mute state.
                 BOOL isMuted = FALSE;
                 r.muted = SUCCEEDED(vol->GetMute(&isMuted)) && isMuted;
             }
@@ -465,7 +521,7 @@ std::optional<AppVolumeResult> AdjustAppVolumeForPID(DWORD targetPID,
             result = r;
         }
 
-        return true;  // 继续处理所有会话。
+        return true;  // Continue to process all sessions.
     });
 
     return result;
@@ -478,7 +534,7 @@ std::optional<AppVolumeResult> AdjustAppVolume(DWORD targetPID,
         return result;
     }
 
-    // 如果未找到会话，尝试 Chromium 音频子进程。
+    // Try Chromium audio subprocess if no session found.
     DWORD audioSubprocessPID = FindChromiumAudioSubprocess(targetPID);
     if (audioSubprocessPID) {
         result = AdjustAppVolumeForPID(audioSubprocessPID, fVolumeAdd);
@@ -487,25 +543,26 @@ std::optional<AppVolumeResult> AdjustAppVolume(DWORD targetPID,
     return result;
 }
 
-// 切换进程的静音状态。返回新状态和音量，如果没有会话则返回 nullopt。
+// Toggle mute state for a process. Returns new state with volume, or nullopt
+// if no session.
 std::optional<AppVolumeResult> ToggleAppMuteForPID(DWORD targetPID) {
     std::optional<AppVolumeResult> result;
 
     ForEachAudioSession([&](DWORD pid, IAudioSessionControl2* sessionControl) {
         if (pid != targetPID) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         winrt::com_ptr<ISimpleAudioVolume> vol;
         if (FAILED(sessionControl->QueryInterface(__uuidof(ISimpleAudioVolume),
                                                   vol.put_void()))) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         BOOL isMuted = FALSE;
         HRESULT hr = vol->GetMute(&isMuted);
         if (FAILED(hr)) {
-            return true;  // 继续下一个会话。
+            return true;  // Continue to next session.
         }
 
         hr = vol->SetMute(!isMuted, NULL);
@@ -523,7 +580,7 @@ std::optional<AppVolumeResult> ToggleAppMuteForPID(DWORD targetPID) {
             result = r;
         }
 
-        return true;  // 继续处理所有会话。
+        return true;  // Continue to process all sessions.
     });
 
     return result;
@@ -535,7 +592,7 @@ std::optional<AppVolumeResult> ToggleAppMute(DWORD targetPID) {
         return result;
     }
 
-    // 如果未找到会话，尝试 Chromium 音频子进程。
+    // Try Chromium audio subprocess if no session found.
     DWORD audioSubprocessPID = FindChromiumAudioSubprocess(targetPID);
     if (audioSubprocessPID) {
         result = ToggleAppMuteForPID(audioSubprocessPID);
@@ -662,17 +719,19 @@ using CTaskGroup_GetNumItems_t = int(WINAPI*)(void* pThis);
 CTaskGroup_GetNumItems_t CTaskGroup_GetNumItems;
 
 HDPA GetTaskItemsArray(void* taskGroup) {
-    // 这是一个糟糕的黑客手段，但这是我找到的获取任务组中任务项数组的最佳
-    // 方式。它依赖于 CTaskGroup::GetNumItems 的实现仅仅是：
+    // This is a horrible hack, but it's the best way I found to get the array
+    // of task items from a task group. It relies on the implementation of
+    // CTaskGroup::GetNumItems being just this:
     //
     // return DPA_GetPtrCount(this->taskItemsArray);
     //
-    // 换句话说：
+    // Or in other words:
     //
     // return *(int*)this[taskItemsArrayOffset];
     //
-    // 我们不使用真实的 taskGroup 对象调用它，而是使用一个指向 int 的指针
-    // 数组来调用。返回的 int 值实际上是数组成员的偏移量。
+    // Instead of calling it with a real taskGroup object, we call it with an
+    // array of pointers to ints. The returned int value is actually the offset
+    // to the array member.
 
     static size_t offset = []() {
         constexpr int kIntArraySize = 256;
@@ -716,14 +775,16 @@ TaskItem_ReportClicked_t TaskItem_ReportClicked_Original;
 using TaskGroup_ReportClicked_t = int(WINAPI*)(void* pThis, void* param);
 TaskGroup_ReportClicked_t TaskGroup_ReportClicked_Original;
 
-// 触发哨兵以从 WindowsUdk 任务项捕获真实的原生任务项。
+// Triggers the sentinel to capture real native task item from WindowsUdk task
+// item.
 void* GetNativeTaskItemFromWindowsUdkTaskItem(void* windowsUdkTaskItem) {
     g_clickSentinel_TaskItem = nullptr;
     TaskItem_ReportClicked_Original(windowsUdkTaskItem, &g_clickSentinel);
     return g_clickSentinel_TaskItem;
 }
 
-// 触发哨兵以从 WindowsUdk 任务组捕获真实的原生任务组。
+// Triggers the sentinel to capture real native task group from WindowsUdk task
+// group.
 void* GetNativeTaskGroupFromWindowsUdkTaskGroup(void* windowsUdkTaskGroup) {
     g_clickSentinel_TaskGroup = nullptr;
     TaskGroup_ReportClicked_Original(windowsUdkTaskGroup, &g_clickSentinel);
@@ -775,10 +836,10 @@ HWND GetWindowFromTaskItem(void* taskItem) {
     return CWindowTaskItem_GetWindow(taskItem);
 }
 
-// 从任务栏按钮元素获取进程 ID。
-// 先尝试从单个任务项获取，然后从任务组获取。
+// Get process ID from a taskbar button element.
+// Tries to get from individual task item first, then from task group.
 DWORD GetProcessIdFromTaskListButton(UIElement element) {
-    // 先用哨兵模式从单个任务项获取。
+    // First try to get from individual task item using sentinel pattern.
     auto windowsUdkTaskItem = GetWindowsUdkTaskItemFromTaskListButton(element);
     if (windowsUdkTaskItem) {
         void* nativeTaskItem =
@@ -793,7 +854,7 @@ DWORD GetProcessIdFromTaskListButton(UIElement element) {
         }
     }
 
-    // 尝试从任务组获取（对于合并项）。
+    // Try to get from task group (for grouped items).
     void* windowsUdkTaskGroup =
         GetWindowsUdkTaskGroupFromTaskListButton(element);
     if (windowsUdkTaskGroup) {
@@ -816,14 +877,19 @@ DWORD GetProcessIdFromTaskListButton(UIElement element) {
     return 0;
 }
 
-struct {
+struct VolumeTooltipState {
     Controls::Primitives::Popup popup = nullptr;
     winrt::weak_ref<FrameworkElement> taskbarFrame;
-    double rotationAngle = 0.0;
+    bool vertical = false;
+    // The cursor's monitor in root coordinates.
+    winrt::Windows::Foundation::Rect monitorRect{};
     double cursorX = 0.0;
     double cursorY = 0.0;
     UINT_PTR hideTimer = 0;
-} g_volumeTooltipState;
+};
+
+// Released on the UI thread by HideVolumeTooltip.
+[[clang::no_destroy]] VolumeTooltipState g_volumeTooltipState;
 
 struct TaskbarFrameAncestorResult {
     FrameworkElement element = nullptr;
@@ -857,20 +923,12 @@ void CALLBACK HideVolumeTooltipTimerProc(HWND hwnd,
     }
 }
 
-// 工具提示相对于光标的像素偏移。
+// Tooltip positioning offset from cursor in pixels.
 constexpr int kTooltipOffset = 12;
 constexpr int kTooltipOffsetTaskbarEdge = 4;
 
-// 从元素的父级 RenderTransform 获取旋转角度。
-// 用于检测垂直任务栏方向。
-double GetParentRotationAngle(FrameworkElement element) {
-    auto parent =
-        Media::VisualTreeHelper::GetParent(element).try_as<UIElement>();
-    if (!parent) {
-        return 0.0;
-    }
-
-    auto transform = parent.RenderTransform();
+double GetRotationAngle(UIElement element) {
+    auto transform = element.RenderTransform();
     if (!transform) {
         return 0.0;
     }
@@ -897,37 +955,165 @@ void UpdateTooltipPosition() {
 
     auto popup = g_volumeTooltipState.popup;
     auto border = popup.Child().try_as<FrameworkElement>();
+    double tooltipWidth = border ? border.ActualWidth() : 0;
     double tooltipHeight = border ? border.ActualHeight() : 0;
+
+    double cursorX = g_volumeTooltipState.cursorX;
+    double cursorY = g_volumeTooltipState.cursorY;
+    const auto& monitorRect = g_volumeTooltipState.monitorRect;
+    double monitorRight = monitorRect.X + monitorRect.Width;
 
     auto taskbarFrame = g_volumeTooltipState.taskbarFrame.get();
     if (!taskbarFrame) {
-        // 溢出弹出面板：使用存储的光标坐标。
-        popup.HorizontalOffset(g_volumeTooltipState.cursorX + kTooltipOffset);
-        popup.VerticalOffset(g_volumeTooltipState.cursorY - tooltipHeight / 2);
-    } else {
-        // 主任务栏：使用元素相对坐标。
-        double cursorX = g_volumeTooltipState.cursorX;
-        double cursorY = g_volumeTooltipState.cursorY;
+        // Overflow popup: to the right of the cursor, or to the left if
+        // there's no room, as with a vertical taskbar docked to the right.
+        double x = cursorX + kTooltipOffset;
+        if (x + tooltipWidth > monitorRight) {
+            x = cursorX - kTooltipOffset - tooltipWidth;
+        }
+        popup.HorizontalOffset(x);
+        popup.VerticalOffset(cursorY - tooltipHeight / 2);
+        return;
+    }
 
-        // 获取 TaskbarFrame 在根坐标中的位置。在某些情况下，
-        // taskbarFrame 可能包含在一个高度更大的元素中，其上方区域不可见。
+    if (!g_volumeTooltipState.vertical) {
+        // Get TaskbarFrame's position in root coordinates. In some cases,
+        // taskbarFrame may be contained in an element with a larger height,
+        // with a region above that's invisible.
         auto transform = taskbarFrame.TransformToVisual(nullptr);
         auto frameOrigin = transform.TransformPoint({0, 0});
 
-        if (g_volumeTooltipState.rotationAngle == 0.0) {
-            // 横向任务栏。
-            double taskbarHeight = taskbarFrame.ActualHeight();
-            popup.HorizontalOffset(cursorX + kTooltipOffset);
-            popup.VerticalOffset(
-                frameOrigin.Y +
-                std::fmax((taskbarHeight - tooltipHeight) / 2,
-                          static_cast<double>(kTooltipOffsetTaskbarEdge)));
-        } else {
-            // 垂直任务栏。
-            popup.HorizontalOffset(kTooltipOffsetTaskbarEdge);
-            popup.VerticalOffset(cursorY + kTooltipOffset);
+        double taskbarHeight = taskbarFrame.ActualHeight();
+        popup.HorizontalOffset(cursorX + kTooltipOffset);
+        popup.VerticalOffset(
+            frameOrigin.Y +
+            std::fmax((taskbarHeight - tooltipHeight) / 2,
+                      static_cast<double>(kTooltipOffsetTaskbarEdge)));
+    } else {
+        // At the screen edge which the taskbar is docked to, extending over
+        // the taskbar towards the screen center.
+        bool dockedRight = cursorX > monitorRect.X + monitorRect.Width / 2;
+        popup.HorizontalOffset(
+            dockedRight ? monitorRight - kTooltipOffsetTaskbarEdge - tooltipWidth
+                        : monitorRect.X + kTooltipOffsetTaskbarEdge);
+        popup.VerticalOffset(cursorY + kTooltipOffset);
+    }
+}
+
+// Set while the tooltip popup opens, which creates the popup's window if it's a
+// windowed popup.
+thread_local bool g_openingTooltipPopup;
+
+// ZBID_SYSTEM_TOOLS, an undocumented window band above the band of the taskbar
+// thumbnail previews.
+constexpr DWORD kZbidSystemTools = 16;
+
+using CreateWindowInBand_t = HWND(WINAPI*)(DWORD dwExStyle,
+                                           LPCWSTR lpClassName,
+                                           LPCWSTR lpWindowName,
+                                           DWORD dwStyle,
+                                           int X,
+                                           int Y,
+                                           int nWidth,
+                                           int nHeight,
+                                           HWND hWndParent,
+                                           HMENU hMenu,
+                                           HINSTANCE hInstance,
+                                           LPVOID lpParam,
+                                           DWORD dwBand);
+
+bool IsWindowedPopupClass(LPCWSTR className, HINSTANCE hInstance) {
+    constexpr WCHAR kWindowedPopupClassName[] = L"Xaml_WindowedPopupClass";
+    if (!IS_INTRESOURCE(className)) {
+        return _wcsicmp(className, kWindowedPopupClassName) == 0;
+    }
+
+    // GetClassInfoEx returns the class atom.
+    WNDCLASSEX wc{
+        .cbSize = sizeof(wc),
+    };
+    ATOM atom =
+        (ATOM)GetClassInfoEx(hInstance, kWindowedPopupClassName, &wc);
+    return atom && atom == (ATOM)(ULONG_PTR)className;
+}
+
+using CreateWindowExW_t = decltype(&CreateWindowExW);
+CreateWindowExW_t CreateWindowExW_Original;
+HWND WINAPI CreateWindowExW_Hook(DWORD dwExStyle,
+                                 LPCWSTR lpClassName,
+                                 LPCWSTR lpWindowName,
+                                 DWORD dwStyle,
+                                 int X,
+                                 int Y,
+                                 int nWidth,
+                                 int nHeight,
+                                 HWND hWndParent,
+                                 HMENU hMenu,
+                                 HINSTANCE hInstance,
+                                 LPVOID lpParam) {
+    if (!g_openingTooltipPopup ||
+        !IsWindowedPopupClass(lpClassName, hInstance)) {
+        return CreateWindowExW_Original(dwExStyle, lpClassName, lpWindowName,
+                                        dwStyle, X, Y, nWidth, nHeight,
+                                        hWndParent, hMenu, hInstance, lpParam);
+    }
+
+    // The window takes mouse input regardless of the popup's IsHitTestVisible,
+    // and the tooltip follows the cursor, so the window is made transparent to
+    // mouse input to keep the pointer on the taskbar.
+    dwExStyle |= WS_EX_LAYERED | WS_EX_TRANSPARENT;
+
+    static auto pCreateWindowInBand = (CreateWindowInBand_t)GetProcAddress(
+        GetModuleHandle(L"user32.dll"), "CreateWindowInBand");
+
+    HWND hWnd = nullptr;
+    if (pCreateWindowInBand) {
+        // A window can't be owned by a window of another band. Without an
+        // owner, it's a tool window to stay off the taskbar and Alt+Tab.
+        hWnd = pCreateWindowInBand(dwExStyle | WS_EX_TOOLWINDOW, lpClassName,
+                                   lpWindowName, dwStyle, X, Y, nWidth, nHeight,
+                                   nullptr, hMenu, hInstance, lpParam,
+                                   kZbidSystemTools);
+        if (!hWnd) {
+            Wh_Log(L"CreateWindowInBand failed: %u", GetLastError());
         }
     }
+
+    if (!hWnd) {
+        hWnd = CreateWindowExW_Original(dwExStyle, lpClassName, lpWindowName,
+                                        dwStyle, X, Y, nWidth, nHeight,
+                                        hWndParent, hMenu, hInstance, lpParam);
+    }
+
+    if (hWnd) {
+        SetLayeredWindowAttributes(hWnd, 0, 255, LWA_ALPHA);
+    }
+
+    return hWnd;
+}
+
+// Returns the cursor's monitor in root coordinates, given the cursor's root
+// coordinates.
+winrt::Windows::Foundation::Rect GetCursorMonitorRect(
+    double cursorX,
+    double cursorY,
+    double rasterizationScale) {
+    POINT pt;
+    GetCursorPos(&pt);
+
+    MONITORINFO monitorInfo{
+        .cbSize = sizeof(MONITORINFO),
+    };
+    GetMonitorInfo(MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST),
+                   &monitorInfo);
+    const RECT& rc = monitorInfo.rcMonitor;
+
+    return {
+        static_cast<float>(cursorX + (rc.left - pt.x) / rasterizationScale),
+        static_cast<float>(cursorY + (rc.top - pt.y) / rasterizationScale),
+        static_cast<float>((rc.right - rc.left) / rasterizationScale),
+        static_cast<float>((rc.bottom - rc.top) / rasterizationScale),
+    };
 }
 
 void ShowVolumeTooltip(FrameworkElement taskbarFrame,
@@ -935,11 +1121,23 @@ void ShowVolumeTooltip(FrameworkElement taskbarFrame,
                        double cursorY,
                        bool isOverflowPopup,
                        PCWSTR text) {
-    if (!taskbarFrame) {
+    auto xamlRoot = taskbarFrame ? taskbarFrame.XamlRoot() : nullptr;
+    if (!xamlRoot) {
         return;
     }
 
-    // 如果弹窗不存在则创建。
+    // The XAML root of a vertical taskbar is taller than it's wide, unless a
+    // mod rotates the XAML root content to make the taskbar vertical.
+    bool vertical = false;
+    if (!isOverflowPopup) {
+        auto xamlRootSize = xamlRoot.Size();
+        auto xamlRootContent = xamlRoot.Content();
+        vertical = xamlRootSize.Height > xamlRootSize.Width ||
+                   (xamlRootContent &&
+                    GetRotationAngle(xamlRootContent) != 0.0);
+    }
+
+    // Create the popup if it doesn't exist.
     if (!g_volumeTooltipState.popup) {
         Controls::Border border;
         border.IsHitTestVisible(false);
@@ -952,55 +1150,63 @@ void ShowVolumeTooltip(FrameworkElement taskbarFrame,
 
         Controls::Primitives::Popup popup;
         popup.IsHitTestVisible(false);
-        if (isOverflowPopup) {
+        // A vertical taskbar is usually narrower than the tooltip.
+        if (isOverflowPopup || vertical) {
             popup.ShouldConstrainToRootBounds(false);
         }
         popup.Child(border);
 
-        // 边框大小变化时更新位置。
+        // Update position when the border size changes.
         border.SizeChanged([](auto&&, auto&&) { UpdateTooltipPosition(); });
 
         g_volumeTooltipState.popup = popup;
     }
 
-    // 仅为主任务栏存储 taskbarFrame（元素相对坐标）。
-    // null taskbarFrame 表示屏幕坐标模式。
+    // Store taskbarFrame only for main taskbar (element-relative coords).
+    // null taskbarFrame indicates screen coordinates mode.
     g_volumeTooltipState.taskbarFrame =
         isOverflowPopup ? nullptr : taskbarFrame;
+    g_volumeTooltipState.vertical = vertical;
+    g_volumeTooltipState.monitorRect = GetCursorMonitorRect(
+        cursorX, cursorY, xamlRoot.RasterizationScale());
     g_volumeTooltipState.cursorX = cursorX;
     g_volumeTooltipState.cursorY = cursorY;
 
     auto popup = g_volumeTooltipState.popup;
     auto border = popup.Child().try_as<Controls::Border>();
 
-    // 更新文字。
+    // Update the text.
     if (auto textBlock = border.Child().try_as<Controls::TextBlock>()) {
         textBlock.Text(text);
     }
 
-    // 使用系统强调色进行样式。
-    winrt::Windows::UI::ViewManagement::UISettings uiSettings;
-    auto accentColor = uiSettings.GetColorValue(
-        winrt::Windows::UI::ViewManagement::UIColorType::Accent);
-    border.Background(Media::SolidColorBrush(accentColor));
+    // Use custom color or system accent color for styling.
+    winrt::Windows::UI::Color bgColor;
+    if (g_settings.tooltipColor) {
+        bgColor = *g_settings.tooltipColor;
+    } else {
+        winrt::Windows::UI::ViewManagement::UISettings uiSettings;
+        bgColor = uiSettings.GetColorValue(
+            winrt::Windows::UI::ViewManagement::UIColorType::Accent);
+    }
+    border.Background(Media::SolidColorBrush(bgColor));
 
-    // 将文字颜色设为白色以提高对比度。
+    // Set text color to white for contrast.
     if (auto textBlock = border.Child().try_as<Controls::TextBlock>()) {
         textBlock.Foreground(
             Media::SolidColorBrush(winrt::Windows::UI::Colors::White()));
     }
 
-    // 设置 XamlRoot 并定位在光标附近。
-    popup.XamlRoot(taskbarFrame.XamlRoot());
-
-    // 检查任务栏框架的父级是否旋转（垂直任务栏）。
-    g_volumeTooltipState.rotationAngle = GetParentRotationAngle(taskbarFrame);
+    // Set XamlRoot and position near cursor.
+    popup.XamlRoot(xamlRoot);
 
     UpdateTooltipPosition();
 
+    g_openingTooltipPopup = true;
     popup.IsOpen(true);
+    g_openingTooltipPopup = false;
 
-    // 重置隐藏计时器。
+    // Reset the hide timer.
     if (g_volumeTooltipState.hideTimer) {
         KillTimer(nullptr, g_volumeTooltipState.hideTimer);
     }
@@ -1018,46 +1224,679 @@ void HideVolumeTooltip() {
         g_volumeTooltipState.popup.IsOpen(false);
     }
 
-    // 销毁弹窗以断开与 XamlRoot 的关联。下次将创建新的。
+    // Destroy popup to disassociate from XamlRoot. A new one will be
+    // created next time.
     g_volumeTooltipState.popup = nullptr;
     g_volumeTooltipState.taskbarFrame = nullptr;
-    g_volumeTooltipState.rotationAngle = 0.0;
+    g_volumeTooltipState.vertical = false;
+    g_volumeTooltipState.monitorRect = {};
     g_volumeTooltipState.cursorX = 0.0;
 }
 
 void ShowVolumeResultTooltip(UIElement element,
-                             Input::PointerRoutedEventArgs args,
+                             winrt::Windows::Foundation::Point rootPoint,
                              std::optional<AppVolumeResult> volumeResult) {
     auto [taskbarFrame, isOverflowPopup] = FindTaskbarFrameAncestor(element);
     if (!taskbarFrame) {
         return;
     }
 
-    auto point = args.GetCurrentPoint(taskbarFrame);
-    // 从 taskbarFrame 相对坐标转换到根坐标。
-    auto transform = taskbarFrame.TransformToVisual(nullptr);
-    auto rootPoint =
-        transform.TransformPoint({static_cast<float>(point.Position().X),
-                                  static_cast<float>(point.Position().Y)});
-    double cursorX = rootPoint.X;
-    double cursorY = rootPoint.Y;
-
     WCHAR tooltipText[64];
     if (!volumeResult) {
         wcscpy_s(tooltipText,
-                 g_settings.terseFormat ? L"🔕" : L"无音频会话");
+                 g_settings.terseFormat ? L"🔕" : L"No audio session");
     } else if (volumeResult->muted) {
-        wcscpy_s(tooltipText, g_settings.terseFormat ? L"🔇" : L"已静音");
+        wcscpy_s(tooltipText, g_settings.terseFormat ? L"🔇" : L"Muted");
     } else {
         swprintf_s(tooltipText,
-                   g_settings.terseFormat ? L"🔊 %d%%" : L"音量：%d%%",
+                   g_settings.terseFormat ? L"🔊 %d%%" : L"Volume: %d%%",
                    volumeResult->volume);
     }
-    ShowVolumeTooltip(taskbarFrame, cursorX, cursorY, isOverflowPopup,
+    ShowVolumeTooltip(taskbarFrame, rootPoint.X, rootPoint.Y, isOverflowPopup,
                       tooltipText);
 }
 
-// 分应用音量滚轮滚动处理。
+void ShowVolumeResultTooltip(UIElement element,
+                             Input::PointerRoutedEventArgs args,
+                             std::optional<AppVolumeResult> volumeResult) {
+    // Transform from element-relative to root-relative coordinates.
+    auto rootPoint = element.TransformToVisual(nullptr).TransformPoint(
+        args.GetCurrentPoint(element).Position());
+    ShowVolumeResultTooltip(element, rootPoint, volumeResult);
+}
+
+float VolumeChangeFromWheelDelta(double delta) {
+    int step = g_settings.volumeChangeStep;
+    if (!step) {
+        step = 2;
+    }
+    return (float)delta * step * (0.01f / WHEEL_DELTA);
+}
+
+// Touchpad scrolling. Two-finger scrolling on some precision touchpads doesn't
+// produce wheel input over the taskbar, so the touchpad is read as raw HID
+// input instead, only while the cursor is over a taskbar button. A dedicated
+// thread receives the input, and the volume is changed on the taskbar thread.
+
+constexpr USAGE kHidUsageTouchPad = 0x05;
+constexpr USAGE kHidUsageContactId = 0x51;
+constexpr USAGE kHidUsageContactCount = 0x54;
+
+// The finger movement of one volume step, relative to the touchpad height.
+constexpr double kTouchpadStepHeight = 1.0 / 16;
+
+// Wheel input is ignored for this long after two fingers were on the touchpad,
+// for touchpads which produce wheel input too.
+constexpr ULONGLONG kTouchpadWheelSuppressMs = 1000;
+
+constexpr WCHAR kTouchpadWndClassName[] = L"Windhawk_TouchpadScroll_" WH_MOD_ID;
+
+// wParam: whether the cursor is over a taskbar button.
+constexpr UINT kTouchpadMsgHover = WM_APP + 1;
+// Applies g_touchpadScrollDelta.
+constexpr UINT kTouchpadMsgScroll = WM_APP + 2;
+
+bool g_touchpadWndClassRegistered;
+HANDLE g_touchpadThread;
+// The window of the touchpad thread.
+std::atomic<HWND> g_touchpadWnd;
+// The window of the taskbar thread, created on the first hover.
+std::atomic<HWND> g_touchpadUiWnd;
+std::atomic<ULONGLONG> g_touchpadTwoFingersTick;
+// The wheel delta which the taskbar thread didn't apply yet, WHEEL_DELTA per
+// volume step, positive to raise the volume. A scroll message is posted when it
+// becomes non-zero.
+std::atomic<int> g_touchpadScrollDelta;
+
+// Belongs to the taskbar thread.
+struct {
+    winrt::weak_ref<UIElement> element;
+    // The touchpad thread window which was notified about the hover.
+    HWND touchpadWnd;
+    // The button's screen rectangle.
+    RECT rect;
+    // Map XAML root coordinates to screen coordinates.
+    double originX;
+    double originY;
+    double scale;
+} g_touchpadHover;
+
+void TouchpadHoverClear() {
+    HWND hTouchpadWnd = g_touchpadHover.touchpadWnd;
+    g_touchpadHover.element = nullptr;
+    g_touchpadHover.touchpadWnd = nullptr;
+    if (hTouchpadWnd && hTouchpadWnd == g_touchpadWnd) {
+        PostMessage(hTouchpadWnd, kTouchpadMsgHover, FALSE, 0);
+    }
+}
+
+void ApplyTouchpadScroll(int delta) {
+    auto element = g_touchpadHover.element.get();
+    if (!element) {
+        return;
+    }
+
+    // The hover isn't ended by exits with the pointer still over the button,
+    // see TouchpadHoverEnd.
+    POINT pt;
+    GetCursorPos(&pt);
+    if (!PtInRect(&g_touchpadHover.rect, pt)) {
+        TouchpadHoverClear();
+        return;
+    }
+
+    DWORD processId = GetProcessIdFromTaskListButton(element);
+    if (!processId) {
+        Wh_Log(L"Could not get process ID from taskbar button");
+        return;
+    }
+
+    Wh_Log(L"Per-app volume (touchpad): PID=%u, delta=%d", processId, delta);
+
+    auto volumeResult =
+        AdjustAppVolume(processId, VolumeChangeFromWheelDelta(delta));
+
+    ShowVolumeResultTooltip(
+        element,
+        winrt::Windows::Foundation::Point{
+            static_cast<float>((pt.x - g_touchpadHover.originX) /
+                               g_touchpadHover.scale),
+            static_cast<float>((pt.y - g_touchpadHover.originY) /
+                               g_touchpadHover.scale),
+        },
+        volumeResult);
+}
+
+// Everything below up to TouchpadWndProc belongs to the touchpad thread.
+
+struct TouchpadDevice {
+    std::vector<BYTE> preparsed;
+    // The link collections of the contact slots.
+    std::vector<USHORT> fingerCollections;
+    USHORT contactCountCollection;
+    double rangeY;
+};
+
+// Devices which can't be used are kept as nullopt.
+std::unordered_map<HANDLE, std::optional<TouchpadDevice>> g_touchpadDevices;
+
+struct TouchpadContact {
+    ULONG id;
+    ULONG y;
+};
+
+struct {
+    bool registered;
+    std::vector<BYTE> inputBuffer;
+    // A frame's contacts can be spread over several reports, the first of
+    // which has the contact count.
+    std::vector<TouchpadContact> frame;
+    ULONG frameExpected;
+    ULONG frameReceived;
+    // Two contacts are tracked while they move.
+    bool tracking;
+    ULONG trackedIds[2];
+    double lastY;
+    double accumulatedY;
+} g_touchpadState;
+
+const TouchpadDevice* GetTouchpadDevice(HANDLE hDevice) {
+    auto [it, inserted] = g_touchpadDevices.try_emplace(hDevice);
+    if (!inserted) {
+        return it->second ? &*it->second : nullptr;
+    }
+
+    TouchpadDevice dev{};
+
+    UINT size = 0;
+    if (GetRawInputDeviceInfo(hDevice, RIDI_PREPARSEDDATA, nullptr, &size) !=
+            0 ||
+        !size) {
+        return nullptr;
+    }
+
+    dev.preparsed.resize(size);
+    if (GetRawInputDeviceInfo(hDevice, RIDI_PREPARSEDDATA, dev.preparsed.data(),
+                              &size) == (UINT)-1) {
+        return nullptr;
+    }
+
+    auto preparsed = (PHIDP_PREPARSED_DATA)dev.preparsed.data();
+    HIDP_CAPS caps;
+    if (HidP_GetCaps(preparsed, &caps) != HIDP_STATUS_SUCCESS) {
+        return nullptr;
+    }
+
+    USHORT valueCapsCount = caps.NumberInputValueCaps;
+    std::vector<HIDP_VALUE_CAPS> valueCaps(valueCapsCount);
+    if (!valueCapsCount ||
+        HidP_GetValueCaps(HidP_Input, valueCaps.data(), &valueCapsCount,
+                          preparsed) != HIDP_STATUS_SUCCESS) {
+        return nullptr;
+    }
+
+    bool hasContactCount = false;
+    for (USHORT i = 0; i < valueCapsCount; i++) {
+        const HIDP_VALUE_CAPS& vc = valueCaps[i];
+        if (vc.IsRange) {
+            continue;
+        }
+
+        if (vc.UsagePage == HID_USAGE_PAGE_DIGITIZER &&
+            vc.NotRange.Usage == kHidUsageContactCount) {
+            hasContactCount = true;
+            dev.contactCountCollection = vc.LinkCollection;
+        } else if (vc.UsagePage == HID_USAGE_PAGE_GENERIC &&
+                   vc.NotRange.Usage == HID_USAGE_GENERIC_Y) {
+            dev.fingerCollections.push_back(vc.LinkCollection);
+            if (!dev.rangeY) {
+                LONGLONG range = (LONGLONG)vc.LogicalMax - vc.LogicalMin;
+                // Some devices declare a maximum which only fits unsigned.
+                if (range <= 0 && vc.BitSize > 0 && vc.BitSize <= 32) {
+                    range = (1LL << vc.BitSize) - 1;
+                }
+                dev.rangeY = (double)range;
+            }
+        }
+    }
+
+    bool valid =
+        hasContactCount && !dev.fingerCollections.empty() && dev.rangeY > 0;
+
+    Wh_Log(L"Touchpad %p: valid=%d, slots=%u, range=%.0f", hDevice, valid,
+           (UINT)dev.fingerCollections.size(), dev.rangeY);
+
+    if (!valid) {
+        return nullptr;
+    }
+
+    it->second = std::move(dev);
+    return &*it->second;
+}
+
+void OnTouchpadFrame(const TouchpadDevice& dev) {
+    auto& state = g_touchpadState;
+
+    if (state.frame.size() != 2) {
+        state.tracking = false;
+        return;
+    }
+
+    g_touchpadTwoFingersTick = GetTickCount64();
+
+    const TouchpadContact& a = state.frame[0];
+    const TouchpadContact& b = state.frame[1];
+    double y = ((double)a.y + b.y) / 2;
+
+    if (!state.tracking ||
+        !((a.id == state.trackedIds[0] && b.id == state.trackedIds[1]) ||
+          (a.id == state.trackedIds[1] && b.id == state.trackedIds[0]))) {
+        state.tracking = true;
+        state.trackedIds[0] = a.id;
+        state.trackedIds[1] = b.id;
+        state.lastY = y;
+        state.accumulatedY = 0;
+        return;
+    }
+
+    // Y grows downwards, and moving up raises the volume.
+    state.accumulatedY += state.lastY - y;
+    state.lastY = y;
+
+    double deltaHeight = dev.rangeY * kTouchpadStepHeight / WHEEL_DELTA;
+    int delta = (int)(state.accumulatedY / deltaHeight);
+    if (!delta) {
+        return;
+    }
+
+    state.accumulatedY -= delta * deltaHeight;
+
+    // GetKeyState doesn't reflect the keyboard on this thread.
+    if (g_settings.ctrlScrollVolumeChange &&
+        GetAsyncKeyState(VK_CONTROL) >= 0) {
+        return;
+    }
+
+    if (HWND hUiWnd = g_touchpadUiWnd) {
+        if (g_touchpadScrollDelta.fetch_add(delta) == 0) {
+            PostMessage(hUiWnd, kTouchpadMsgScroll, 0, 0);
+        }
+    }
+}
+
+void OnTouchpadReport(const TouchpadDevice& dev, PCHAR report, ULONG length) {
+    auto& state = g_touchpadState;
+    auto preparsed = (PHIDP_PREPARSED_DATA)dev.preparsed.data();
+
+    ULONG count = 0;
+    if (HidP_GetUsageValue(HidP_Input, HID_USAGE_PAGE_DIGITIZER,
+                           dev.contactCountCollection, kHidUsageContactCount,
+                           &count, preparsed, report,
+                           length) == HIDP_STATUS_SUCCESS &&
+        count > 0) {
+        state.frame.clear();
+        state.frameExpected = count;
+        state.frameReceived = 0;
+    }
+
+    // The rest of a frame whose start was missed.
+    if (!state.frameExpected) {
+        return;
+    }
+
+    for (USHORT collection : dev.fingerCollections) {
+        if (state.frameReceived == state.frameExpected) {
+            break;
+        }
+
+        ULONG y;
+        if (HidP_GetUsageValue(HidP_Input, HID_USAGE_PAGE_GENERIC, collection,
+                               HID_USAGE_GENERIC_Y, &y, preparsed, report,
+                               length) != HIDP_STATUS_SUCCESS) {
+            continue;
+        }
+
+        state.frameReceived++;
+
+        USAGE usages[16];
+        ULONG usageCount = ARRAYSIZE(usages);
+        if (HidP_GetUsages(HidP_Input, HID_USAGE_PAGE_DIGITIZER, collection,
+                           usages, &usageCount, preparsed, report,
+                           length) != HIDP_STATUS_SUCCESS ||
+            std::find(usages, usages + usageCount,
+                      HID_USAGE_DIGITIZER_TIP_SWITCH) == usages + usageCount) {
+            continue;
+        }
+
+        ULONG id = collection;
+        HidP_GetUsageValue(HidP_Input, HID_USAGE_PAGE_DIGITIZER, collection,
+                           kHidUsageContactId, &id, preparsed, report, length);
+
+        state.frame.push_back({id, y});
+    }
+
+    if (state.frameReceived == state.frameExpected) {
+        OnTouchpadFrame(dev);
+        state.frameExpected = 0;
+    }
+}
+
+void OnTouchpadRawInput(HRAWINPUT hRawInput) {
+    auto& state = g_touchpadState;
+
+    // Input which was queued before the registration was removed.
+    if (!state.registered) {
+        return;
+    }
+
+    UINT size = 0;
+    if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size,
+                        sizeof(RAWINPUTHEADER)) != 0 ||
+        !size) {
+        return;
+    }
+
+    state.inputBuffer.resize(size);
+    if (GetRawInputData(hRawInput, RID_INPUT, state.inputBuffer.data(), &size,
+                        sizeof(RAWINPUTHEADER)) == (UINT)-1) {
+        return;
+    }
+
+    const RAWINPUT* raw = (const RAWINPUT*)state.inputBuffer.data();
+    if (raw->header.dwType != RIM_TYPEHID) {
+        return;
+    }
+
+    const TouchpadDevice* dev = GetTouchpadDevice(raw->header.hDevice);
+    if (!dev) {
+        return;
+    }
+
+    const RAWHID& hid = raw->data.hid;
+    for (DWORD i = 0; i < hid.dwCount; i++) {
+        OnTouchpadReport(*dev, (PCHAR)hid.bRawData + i * hid.dwSizeHid,
+                         hid.dwSizeHid);
+    }
+}
+
+// Returns whether the touchpad raw input of the process is registered, and to
+// which window.
+bool GetTouchpadRawInputTarget(HWND* hTargetWnd) {
+    UINT count = 0;
+    GetRegisteredRawInputDevices(nullptr, &count, sizeof(RAWINPUTDEVICE));
+    if (!count) {
+        return false;
+    }
+
+    std::vector<RAWINPUTDEVICE> devices(count);
+    if (GetRegisteredRawInputDevices(devices.data(), &count,
+                                     sizeof(RAWINPUTDEVICE)) == (UINT)-1) {
+        return false;
+    }
+
+    for (const auto& device : devices) {
+        if (device.usUsagePage == HID_USAGE_PAGE_DIGITIZER &&
+            device.usUsage == kHidUsageTouchPad) {
+            *hTargetWnd = device.hwndTarget;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Raw input of a device type goes to a single window in a process, so a
+// registration of someone else is neither taken over nor removed.
+void SetTouchpadHovered(HWND hWnd, bool hovered) {
+    auto& state = g_touchpadState;
+    if (hovered == state.registered) {
+        return;
+    }
+
+    HWND hTargetWnd = nullptr;
+    bool hasTarget = GetTouchpadRawInputTarget(&hTargetWnd);
+
+    if (hovered) {
+        if (hasTarget) {
+            Wh_Log(L"Touchpad raw input is already registered to %p",
+                   hTargetWnd);
+            return;
+        }
+
+        RAWINPUTDEVICE rid{
+            .usUsagePage = HID_USAGE_PAGE_DIGITIZER,
+            .usUsage = kHidUsageTouchPad,
+            .dwFlags = RIDEV_INPUTSINK,
+            .hwndTarget = hWnd,
+        };
+        if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
+            Wh_Log(L"RegisterRawInputDevices failed: %u", GetLastError());
+            return;
+        }
+    } else {
+        if (hasTarget && hTargetWnd == hWnd) {
+            RAWINPUTDEVICE rid{
+                .usUsagePage = HID_USAGE_PAGE_DIGITIZER,
+                .usUsage = kHidUsageTouchPad,
+                .dwFlags = RIDEV_REMOVE,
+            };
+            RegisterRawInputDevices(&rid, 1, sizeof(rid));
+        }
+
+        // A device handle can be reused by another device.
+        g_touchpadDevices.clear();
+        state.frameExpected = 0;
+        state.tracking = false;
+    }
+
+    state.registered = hovered;
+}
+
+// Serves both the touchpad thread window and the taskbar thread window.
+LRESULT CALLBACK TouchpadWndProc(HWND hWnd,
+                                 UINT uMsg,
+                                 WPARAM wParam,
+                                 LPARAM lParam) {
+    switch (uMsg) {
+        case WM_INPUT:
+            OnTouchpadRawInput((HRAWINPUT)lParam);
+            break;
+
+        case kTouchpadMsgHover:
+            SetTouchpadHovered(hWnd, wParam);
+            return 0;
+
+        case kTouchpadMsgScroll:
+            if (int delta = g_touchpadScrollDelta.exchange(0)) {
+                ApplyTouchpadScroll(delta);
+            }
+            return 0;
+    }
+
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+HINSTANCE GetTouchpadWndInstance() {
+    HINSTANCE hInstance = nullptr;
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                          GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                      (LPCWSTR)&TouchpadWndProc, &hInstance);
+    return hInstance;
+}
+
+HWND CreateTouchpadWnd() {
+    HWND hWnd = CreateWindowEx(0, kTouchpadWndClassName, nullptr, 0, 0, 0, 0, 0,
+                               HWND_MESSAGE, nullptr, GetTouchpadWndInstance(),
+                               nullptr);
+    if (!hWnd) {
+        Wh_Log(L"CreateWindowEx failed: %u", GetLastError());
+    }
+
+    return hWnd;
+}
+
+// Called on the taskbar thread on pointer moves over a taskbar button.
+void TouchpadHoverUpdate(UIElement element,
+                         Input::PointerRoutedEventArgs args) {
+    HWND hTouchpadWnd = g_touchpadWnd;
+    if (!hTouchpadWnd) {
+        return;
+    }
+
+    auto frameworkElement = element.try_as<FrameworkElement>();
+    auto xamlRoot = element.XamlRoot();
+    if (!frameworkElement || !xamlRoot) {
+        return;
+    }
+
+    if (g_touchpadHover.element.get() != element ||
+        g_touchpadHover.touchpadWnd != hTouchpadWnd) {
+        HWND hUiWnd = g_touchpadUiWnd;
+        if (!hUiWnd) {
+            hUiWnd = CreateTouchpadWnd();
+            g_touchpadUiWnd = hUiWnd;
+        }
+
+        // The scrolling is applied on the thread of this window.
+        if (!hUiWnd ||
+            GetWindowThreadProcessId(hUiWnd, nullptr) != GetCurrentThreadId()) {
+            return;
+        }
+
+        g_touchpadHover.element = element;
+        g_touchpadHover.touchpadWnd = hTouchpadWnd;
+        PostMessage(hTouchpadWnd, kTouchpadMsgHover, TRUE, 0);
+    }
+
+    // The cursor position is read later than the event's position, so the
+    // geometry is refreshed on each move, until the cursor rests.
+    POINT pt;
+    GetCursorPos(&pt);
+
+    auto transform = element.TransformToVisual(nullptr);
+    auto rootPoint =
+        transform.TransformPoint(args.GetCurrentPoint(element).Position());
+    auto bounds = transform.TransformBounds(winrt::Windows::Foundation::Rect{
+        0,
+        0,
+        static_cast<float>(frameworkElement.ActualWidth()),
+        static_cast<float>(frameworkElement.ActualHeight()),
+    });
+
+    double scale = xamlRoot.RasterizationScale();
+    double originX = pt.x - rootPoint.X * scale;
+    double originY = pt.y - rootPoint.Y * scale;
+
+    g_touchpadHover.rect = {
+        .left = (LONG)std::lround(originX + bounds.X * scale),
+        .top = (LONG)std::lround(originY + bounds.Y * scale),
+        .right = (LONG)std::lround(originX + (bounds.X + bounds.Width) * scale),
+        .bottom =
+            (LONG)std::lround(originY + (bounds.Y + bounds.Height) * scale),
+    };
+    g_touchpadHover.originX = originX;
+    g_touchpadHover.originY = originY;
+    g_touchpadHover.scale = scale;
+}
+
+// Called on the taskbar thread when the pointer exits a taskbar button.
+void TouchpadHoverEnd(UIElement element, Input::PointerRoutedEventArgs args) {
+    if (g_touchpadHover.element.get() != element) {
+        return;
+    }
+
+    // An exit with the pointer still over the button might be due to something
+    // else taking the pointer, such as a touchpad gesture.
+    auto frameworkElement = element.try_as<FrameworkElement>();
+    auto position = args.GetCurrentPoint(element).Position();
+    if (frameworkElement && position.X >= 0 && position.Y >= 0 &&
+        position.X < frameworkElement.ActualWidth() &&
+        position.Y < frameworkElement.ActualHeight()) {
+        return;
+    }
+
+    TouchpadHoverClear();
+}
+
+DWORD WINAPI TouchpadThread(LPVOID lpParameter) {
+    HANDLE hReadyEvent = (HANDLE)lpParameter;
+
+    HWND hWnd = CreateTouchpadWnd();
+    g_touchpadWnd = hWnd;
+
+    SetEvent(hReadyEvent);
+
+    if (!hWnd) {
+        return 1;
+    }
+
+    BOOL bRet;
+    MSG msg;
+    while ((bRet = GetMessage(&msg, nullptr, 0, 0)) != 0) {
+        if (bRet == -1) {
+            break;
+        }
+
+        if (msg.hwnd == nullptr && msg.message == WM_APP) {
+            PostQuitMessage(0);
+            continue;
+        }
+
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    SetTouchpadHovered(hWnd, false);
+    DestroyWindow(hWnd);
+    return 0;
+}
+
+void TouchpadThreadInit() {
+    if (g_touchpadThread) {
+        return;
+    }
+
+    // Kept registered until the mod is unloaded, since the taskbar thread
+    // window outlives the thread.
+    if (!g_touchpadWndClassRegistered) {
+        WNDCLASS wc{
+            .lpfnWndProc = TouchpadWndProc,
+            .hInstance = GetTouchpadWndInstance(),
+            .lpszClassName = kTouchpadWndClassName,
+        };
+        if (!RegisterClass(&wc)) {
+            Wh_Log(L"RegisterClass failed: %u", GetLastError());
+            return;
+        }
+
+        g_touchpadWndClassRegistered = true;
+    }
+
+    HANDLE hReadyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    if (!hReadyEvent) {
+        return;
+    }
+
+    g_touchpadThread =
+        CreateThread(nullptr, 0, TouchpadThread, hReadyEvent, 0, nullptr);
+    if (g_touchpadThread) {
+        WaitForSingleObject(hReadyEvent, INFINITE);
+    }
+
+    CloseHandle(hReadyEvent);
+}
+
+void TouchpadThreadUninit() {
+    if (g_touchpadThread) {
+        g_touchpadWnd = nullptr;
+        PostThreadMessage(GetThreadId(g_touchpadThread), WM_APP, 0, 0);
+        WaitForSingleObject(g_touchpadThread, INFINITE);
+        CloseHandle(g_touchpadThread);
+        g_touchpadThread = nullptr;
+    }
+}
+
+// Per-app volume wheel scroll handling.
 using TaskListButton_OnPointerWheelChanged_t = int(WINAPI*)(void* pThis,
                                                             void* pArgs);
 TaskListButton_OnPointerWheelChanged_t
@@ -1089,8 +1928,14 @@ int WINAPI TaskListButton_OnPointerWheelChanged_Hook(void* pThis, void* pArgs) {
         return original();
     }
 
-    // 如果需要 Ctrl + 滚动，则在未按 Ctrl 时跳过。
+    // If Ctrl + Scroll is required, skip if Ctrl is not pressed.
     if (g_settings.ctrlScrollVolumeChange && GetKeyState(VK_CONTROL) >= 0) {
+        return original();
+    }
+
+    if (g_settings.touchpadScroll &&
+        GetTickCount64() - g_touchpadTwoFingersTick <
+            kTouchpadWheelSuppressMs) {
         return original();
     }
 
@@ -1099,7 +1944,7 @@ int WINAPI TaskListButton_OnPointerWheelChanged_Hook(void* pThis, void* pArgs) {
         return original();
     }
 
-    // 从任务栏按钮获取进程 ID。
+    // Get process ID from the taskbar button.
     DWORD processId = GetProcessIdFromTaskListButton(element);
     if (!processId) {
         Wh_Log(L"Could not get process ID from taskbar button");
@@ -1108,19 +1953,13 @@ int WINAPI TaskListButton_OnPointerWheelChanged_Hook(void* pThis, void* pArgs) {
 
     Wh_Log(L"Per-app volume: PID=%u, delta=%f", processId, delta);
 
-    // 计算音量变化。
-    int step = g_settings.volumeChangeStep;
-    if (!step) {
-        step = 2;
-    }
-    float volumeChange = (float)delta * step * (0.01f / WHEEL_DELTA);
-
-    // 调整应用音量。
-    auto volumeResult = AdjustAppVolume(processId, volumeChange);
+    // Adjust the app's volume.
+    auto volumeResult =
+        AdjustAppVolume(processId, VolumeChangeFromWheelDelta(delta));
 
     ShowVolumeResultTooltip(element, args, volumeResult);
 
-    // 将事件标记为已处理。
+    // Mark event as handled.
     args.Handled(true);
     return 0;
 }
@@ -1148,20 +1987,27 @@ int WINAPI TaskListButton_OnPointerExited_Hook(void* pThis, void* pArgs) {
 
     HideVolumeTooltip();
 
+    Input::PointerRoutedEventArgs args = nullptr;
+    ((IUnknown*)pArgs)
+        ->QueryInterface(winrt::guid_of<Input::PointerRoutedEventArgs>(),
+                         winrt::put_abi(args));
+    if (args) {
+        TouchpadHoverEnd(element, args);
+    }
+
     return original();
 }
 
 using TaskListButton_OnPointerMoved_t = int(WINAPI*)(void* pThis, void* pArgs);
 TaskListButton_OnPointerMoved_t TaskListButton_OnPointerMoved_Original;
 int WINAPI TaskListButton_OnPointerMoved_Hook(void* pThis, void* pArgs) {
-    Wh_Log(L">");
-
     auto original = [=]() {
         return TaskListButton_OnPointerMoved_Original(pThis, pArgs);
     };
 
-    // 仅当工具提示当前显示时更新。
-    if (!g_volumeTooltipState.popup || !g_volumeTooltipState.popup.IsOpen()) {
+    bool tooltipShown =
+        g_volumeTooltipState.popup && g_volumeTooltipState.popup.IsOpen();
+    if (!tooltipShown && !g_touchpadWnd) {
         return original();
     }
 
@@ -1185,10 +2031,17 @@ int WINAPI TaskListButton_OnPointerMoved_Hook(void* pThis, void* pArgs) {
         return original();
     }
 
+    TouchpadHoverUpdate(element, args);
+
+    // Only update if tooltip is currently shown.
+    if (!tooltipShown) {
+        return original();
+    }
+
     auto ancestorFrame = FindTaskbarFrameAncestor(element).element;
     if (ancestorFrame) {
         auto point = args.GetCurrentPoint(ancestorFrame);
-        // 从 ancestorFrame 相对坐标转换到根坐标。
+        // Transform from ancestorFrame-relative to root-relative coordinates.
         auto transform = ancestorFrame.TransformToVisual(nullptr);
         auto rootPoint =
             transform.TransformPoint({static_cast<float>(point.Position().X),
@@ -1212,12 +2065,12 @@ int WINAPI TaskListButton_OnPointerPressed_Hook(void* pThis, void* pArgs) {
         return TaskListButton_OnPointerPressed_Original(pThis, pArgs);
     };
 
-    if (!g_settings.ctrlClickToMute) {
+    if (!g_settings.ctrlClickToMute && !g_settings.middleClickToMute) {
         return original();
     }
 
-    // 检查是否按住 Ctrl。
-    if (GetKeyState(VK_CONTROL) >= 0) {
+    // Skip if Ctrl is not pressed and middle click to mute is not enabled.
+    if (GetKeyState(VK_CONTROL) >= 0 && !g_settings.middleClickToMute) {
         return original();
     }
 
@@ -1241,21 +2094,31 @@ int WINAPI TaskListButton_OnPointerPressed_Hook(void* pThis, void* pArgs) {
         return original();
     }
 
-    // 从任务栏按钮获取进程 ID。
+    // Check if Ctrl is pressed or middle button is pressed.
+    bool isCtrlPressed = GetKeyState(VK_CONTROL) < 0;
+    auto point = args.GetCurrentPoint(element);
+    bool isMiddleButton = point.Properties().IsMiddleButtonPressed();
+
+    if (!(g_settings.ctrlClickToMute && isCtrlPressed) &&
+        !(g_settings.middleClickToMute && isMiddleButton)) {
+        return original();
+    }
+
+    // Get process ID from the taskbar button.
     DWORD processId = GetProcessIdFromTaskListButton(element);
     if (!processId) {
         Wh_Log(L"Could not get process ID from taskbar button");
         return original();
     }
 
-    Wh_Log(L"Ctrl+click to toggle mute: PID=%u", processId);
+    Wh_Log(L"Click to toggle mute: PID=%u", processId);
 
-    // 切换静音状态。
+    // Toggle mute state.
     auto muteResult = ToggleAppMute(processId);
 
     ShowVolumeResultTooltip(element, args, muteResult);
 
-    // 将事件标记为已处理，防止正常的点击行为。
+    // Mark event as handled to prevent normal click behavior.
     args.Handled(true);
     return 0;
 }
@@ -1263,9 +2126,29 @@ int WINAPI TaskListButton_OnPointerPressed_Hook(void* pThis, void* pArgs) {
 void LoadSettings() {
     g_settings.volumeChangeStep = Wh_GetIntSetting(L"volumeChangeStep");
     g_settings.ctrlClickToMute = Wh_GetIntSetting(L"ctrlClickToMute");
+    g_settings.middleClickToMute = Wh_GetIntSetting(L"middleClickToMute");
     g_settings.ctrlScrollVolumeChange =
         Wh_GetIntSetting(L"ctrlScrollVolumeChange");
+    g_settings.touchpadScroll = Wh_GetIntSetting(L"touchpadScroll");
     g_settings.terseFormat = Wh_GetIntSetting(L"terseFormat");
+
+    g_settings.tooltipColor.reset();
+    PCWSTR tooltipColorStr = Wh_GetStringSetting(L"tooltipColor");
+    size_t len = wcslen(tooltipColorStr);
+    if (tooltipColorStr[0] == L'#' && (len == 7 || len == 9)) {
+        unsigned long hex = wcstoul(tooltipColorStr + 1, nullptr, 16);
+        if (len == 7) {
+            hex |= 0xFF000000;
+        }
+        g_settings.tooltipColor = winrt::Windows::UI::Color{
+            static_cast<uint8_t>((hex >> 24) & 0xFF),
+            static_cast<uint8_t>((hex >> 16) & 0xFF),
+            static_cast<uint8_t>((hex >> 8) & 0xFF),
+            static_cast<uint8_t>(hex & 0xFF),
+        };
+    }
+    Wh_FreeStringSetting(tooltipColorStr);
+
     g_settings.noAutomaticMuteToggle =
         Wh_GetIntSetting(L"noAutomaticMuteToggle");
 }
@@ -1420,9 +2303,16 @@ BOOL Wh_ModInit() {
     HMODULE kernelBaseModule = GetModuleHandle(L"kernelbase.dll");
     auto pKernelBaseLoadLibraryExW = (decltype(&LoadLibraryExW))GetProcAddress(
         kernelBaseModule, "LoadLibraryExW");
-    WindhawkUtils::Wh_SetFunctionHookT(pKernelBaseLoadLibraryExW,
-                                       LoadLibraryExW_Hook,
-                                       &LoadLibraryExW_Original);
+    WindhawkUtils::SetFunctionHook(pKernelBaseLoadLibraryExW,
+                                   LoadLibraryExW_Hook,
+                                   &LoadLibraryExW_Original);
+
+    WindhawkUtils::SetFunctionHook(CreateWindowExW, CreateWindowExW_Hook,
+                                   &CreateWindowExW_Original);
+
+    if (g_settings.touchpadScroll) {
+        TouchpadThreadInit();
+    }
 
     return TRUE;
 }
@@ -1446,6 +2336,16 @@ void Wh_ModAfterInit() {
 void Wh_ModUninit() {
     Wh_Log(L">");
 
+    TouchpadThreadUninit();
+
+    if (HWND hTouchpadUiWnd = g_touchpadUiWnd.exchange(nullptr)) {
+        SendMessage(hTouchpadUiWnd, WM_CLOSE, 0, 0);
+    }
+
+    if (g_touchpadWndClassRegistered) {
+        UnregisterClass(kTouchpadWndClassName, GetTouchpadWndInstance());
+    }
+
     HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd();
     if (hTaskbarWnd) {
         RunFromWindowThread(
@@ -1453,6 +2353,7 @@ void Wh_ModUninit() {
             [](void*) {
                 HideVolumeTooltip();
                 SndVolUninit();
+                g_touchpadHover.element = nullptr;
             },
             nullptr);
     }
@@ -1462,4 +2363,10 @@ void Wh_ModSettingsChanged() {
     Wh_Log(L">");
 
     LoadSettings();
+
+    if (g_settings.touchpadScroll) {
+        TouchpadThreadInit();
+    } else {
+        TouchpadThreadUninit();
+    }
 }

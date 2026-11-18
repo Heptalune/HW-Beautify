@@ -2,9 +2,9 @@
 // @id              hw-taskbar-plus
 // @name            HW-更好的任务栏
 // @name:zh-CN      HW-更好的任务栏
-// @description     Count badges, middle-click close, taskbar animations, tray hover expand, and proportional scaling for Windows 11, merged into one mod with six collapsible groups, each with its own master switch
-// @description:zh-CN 任务栏多合一：等比缩放、计数角标、按钮中键关闭、任务栏动画（图标动画、显示动画）、托盘悬停展开，六个可收起分组、每组带总开关。
-// @version 1.0.0
+// @description     Taskbar size settings, count badges, middle-click close, taskbar animations, tray hover expand for Windows 11, merged into one mod with six collapsible groups, each with its own master switch
+// @description:zh-CN 任务栏多合一：任务栏尺寸设置、计数角标、按钮中键关闭、任务栏动画（图标动画、显示动画）、托盘悬停展开，六个可收起分组、每组带总开关。
+// @version 1.1.0
 // @author Heptalune & digART, m417z, incconutwo, Bo0ii
 // @license         GPL-3.0
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @compilerOptions -lole32 -loleaut32 -lruntimeobject -lcomctl32 -lwindowsapp -luser32 -ldwmapi -lkernel32 -DWIN32_LEAN_AND_MEAN
 // ==/WindhawkMod==
 //
-// HW-Beautify 修改说明：1.0.0
+// HW-Beautify 修改说明：1.1.0（跟进上游 Taskbar Auto-Hide Instant Show 2.2）
 
 // HW-Beautify 整合说明：本模组由以下三个任务栏模组合并而成（@id hw-taskbar-plus，
 // v1.0.0，原三个模组随合并退役；1.1.0 起系统信息分组按用户要求整体移除，
@@ -29,6 +29,23 @@
 //      1.4.0 起按用户要求整体移除）——两个既有代码段原样迁移：图标动画收进
 //      TaskbarDockAnimation 命名空间（键路径 iconAnim.* 不变），秒显沿用
 //      TaskbarAutoHide（autoHide.* 不变），代码读取零改动。
+// 上游跟进记录（本次）：
+//   - 跟进上游 Taskbar Auto-Hide Instant Show 2.2（作者 Bo0ii，GPL-3.0，
+//     2026-04-22）。上游 2.2 相对 2.1 的改动如下，本地 autoHide 段已全部
+//     同步（代码与上游逐行一致）：
+//       a) 动画类型下拉新增「无动画（none）」与「轻微过冲（overshoot）」两项
+//          —— 上游把「无动画」映射为 animType = -1（直接就位、不走动画），
+//          「轻微过冲」映射为 animType = 5（位置动画 + EaseOutBack/EaseInBack
+//          回弹曲线）；
+//       b) 「滑动+淡入淡出」（slideFade，animType = 4）的缓动由三次升级为五次
+//          （EaseOutQuint/EaseInQuint），动作更顺滑；
+//       c) 边沿检测由一次性触发（g_edgeTriggered 闩锁）改为节流重试
+//          （150ms 重试间隔），修复全屏程序吞掉鼠标边缘事件时任务栏不出现。
+//   - 在上游 2.2 之上新增两个独立开关（autoHide.NoAnimation /
+//     autoHide.Overshoot），把上游「无动画」「轻微过冲」从下拉项提升为可
+//     独立勾选的开关：优先级 NoAnimation > Overshoot > animationType 下拉项。
+//     两者复用上游已实现的 animType = -1 与 animType = 5 代码路径，未改写
+//     上游动画算法本身。
 // 合并层改动：
 //   - 各段生命周期入口统一为 Init/AfterInit/BeforeUninit/Uninit/SettingsChanged，
 //     由本模组的 Wh_ModInit 等入口统一分发；某段初始化失败仅记录日志并降级本段，
@@ -53,24 +70,27 @@
 
 # HW-更好的任务栏
 
-HW-Beautify 整合包的任务栏六合一模组，整合了「等比缩放」「计数角标」「按钮中键关闭」「任务栏图标动画」「任务栏显示动画」「托盘悬停展开」六项功能。设置页分**六个可收起分组**，每组组首都有「启用本组功能」总开关（默认开启，关闭即整组停用）。
+HW-Beautify 整合包的任务栏六合一模组，整合了「任务栏尺寸设置」「计数角标」「按钮中键关闭」「任务栏图标动画」「任务栏显示动画」「托盘悬停展开」六项功能。设置页分**六个可收起分组**，每组组首都有「启用本组功能」总开关（默认开启，关闭即整组停用）。
 
 | 分组 | 功能 | 设置键前缀 |
 | --- | --- | --- |
-| 等比缩放 | 任务栏各项尺寸按百分比等比缩放 | iconSize.* |
+| 任务栏尺寸设置 | 任务栏高度、图标大小、按钮宽度等尺寸逐项设置 | iconSize.* |
 | 计数角标 | 任务栏按钮以数字角标或圆点显示窗口数量 | countBadges.* |
 | 按钮中键关闭 | 中键点击任务栏按钮直接关闭窗口 | middleClick.* |
 | 任务栏图标动画 | macOS 风格图标悬停放大、相邻让位与空闲呼吸弹跳 | iconAnim.* |
 | 任务栏显示动画 | 自动隐藏任务栏的秒显与出现/隐藏动画 | autoHide.* |
 | 托盘悬停展开 | 悬停托盘箭头自动展开隐藏图标面板 | trayHover.* |
 
-## 功能一：等比缩放（iconSize 分组）
+## 功能一：任务栏尺寸设置（iconSize 分组）
 
-原 HW-任务栏图标大小（local@hw-taskbar-icon-size）模组的等比缩放功能，独立保留为等比缩放分组：
+原 HW-任务栏图标大小（local@hw-taskbar-icon-size / Taskbar height and icon size）模组的功能，迁移为本分组，支持两种尺寸控制方式：
 
-- **等比缩放**（`iconSize.ProportionalScale`）：把任务栏高度、图标大小、按钮宽度、托盘图标大小与系统图标大小一起按百分比等比缩放，基线 52/32/44/24/24，默认 100%（不缩放），取值范围 80%-200%。
+- **等比缩放**：启用「等比缩放」（`iconSize.ProportionalScalingEnabled`）后按「缩放比例」（`iconSize.ScaleRatio`，百分比，默认 100，范围 50–200）整体等比缩放任务栏；关闭时不读取缩放比例。
+- **像素控制**：启用「像素控制」（`iconSize.PixelControlEnabled`）后才读取以下两个数值；关闭时忽略它们，任务栏保持系统默认尺寸：
+  - **任务栏高度**（`iconSize.TaskbarHeight`，默认 52）：任务栏高度（像素，范围 24–96）。
+  - **图标大小**（`iconSize.IconSize`，默认 32）：任务栏图标大小（像素，范围 12–64）。
 
-由组总开关（`iconSize.Enabled`）控制整组启用。实现方式参考 HW-任务栏样式美化（taskbar-acrylic）：系统动态图标缩放标志由 `TaskbarConfiguration_GetIconHeightInViewPixels` 钩子自重置，确保缩放钩子正常执行。
+两种控制方式互斥，等比缩放启用时优先生效。由组总开关（`iconSize.Enabled`）控制整组启用。图标位图缩放不再受系统动态图标缩放标志门控，确保尺寸设置真正生效。
 
 ## 功能二：计数角标（countBadges 分组）
 
@@ -96,6 +116,13 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
 
 配合系统「自动隐藏任务栏」秒显——出现/隐藏延迟默认降到 1ms，动画类型七种（无/滑动/弹性/回弹/淡入淡出/滑动+淡入淡出/轻微过冲），速度/时长/帧率可调，另有空显示器边沿检测。原作者：**Bo0ii**（Taskbar Auto-Hide Instant Show，GPL-3.0，<https://windhawk.net/mods/taskbar-autohide-instant-show>）。原「窗口最大化时自动隐藏任务栏」设置已移除。
 
+已跟进上游 **2.2**（2026-04-22），本地 autoHide 段与上游逐行一致：
+
+- **动画类型新增两项**：「无动画」（none，任务栏直接就位、不走动画）与「轻微过冲」（overshoot，位置动画 + 回弹曲线，滑过目标后小幅回落）。
+- **滑动+淡入淡出升级为五次缓动**（quintic ease），动作更顺滑。
+- **边沿检测改为节流重试**（150ms 重试间隔），修复全屏程序吞掉鼠标边缘事件时任务栏不出现的问题。
+- 另提供两个独立开关：「不使用动画」（`autoHide.NoAnimation`）与「动画过冲」（`autoHide.Overshoot`），可脱离动画类型下拉项单独勾选。优先级为「不使用动画」>「动画过冲」>「动画类型」下拉项。
+
 功能四与功能五相互独立、可只用其一；图标动画/显示动画初始化失败时仅降级对应功能，不影响其余功能。
 
 ## 功能六：托盘悬停展开（trayHover 分组）
@@ -115,19 +142,26 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
 
 ## 兼容性
 
+- **Bandizip 现代右键菜单兼容性（已修复）**：早期版本中「托盘悬停展开」分组会在资源管理器进程内**常驻创建 UI Automation（UIA）对象**并持续轮询。该常驻 UIA 会改变 explorer 进程的 COM/UIA 状态，导致 Bandizip 的 shell 扩展在 Windows 11 现代右键菜单（XAML/UIA 派发）中的「压缩/解压」命令点击无反应——菜单项可见但点击不执行，而「显示更多选项」的经典菜单走 Win32 `WM_COMMAND`、不受影响，WinRAR 等其它压缩软件的菜单也不受影响。修复方式：**取消常驻 UIA 对象**，改为仅在需要查找托盘「显示隐藏的图标」箭头时临时创建 `IUIAutomation`、用完立即 `Release`，托盘悬停展开功能不受影响，Bandizip 右键菜单恢复正常。
 - 仅注入 explorer.exe（x86-64），支持 Windows 10/11（各分组的具体系统要求与原模组一致：图标动画需要 Windows 11 的 XAML 任务栏；显示动画支持 Windows 10/11；计数角标面向 Windows 11）。
 - 各分组的详细兼容性说明见上文各功能小节与对应原版模组页面。
 
 ## 修改说明
 
+- **1.1.0：跟进上游 Taskbar Auto-Hide Instant Show 2.2**（作者 Bo0ii，GPL-3.0，2026-04-22），仅改动 autoHide 段：
+  - 同步上游 2.2 的动画类型新增「无动画」「轻微过冲」、「滑动+淡入淡出」升级为五次缓动、边沿检测改为节流重试三处改动（本地 autoHide 段代码与上游逐行一致）。
+  - 新增两个独立开关：「不使用动画」（`autoHide.NoAnimation`，默认关闭）与「动画过冲」（`autoHide.Overshoot`，默认关闭），优先级为「不使用动画」>「动画过冲」>「动画类型」下拉项。
+  - iconSize 等比缩放（`ProportionalScalingEnabled` / `ScaleRatio`）、托盘悬停展开的 UIA 按需创建/即用即释放（Bandizip 修复）等既有改动均未触碰。
+
 - 将「等比缩放」「计数角标」「按钮中键关闭」「任务栏图标动画」「任务栏显示动画」「托盘悬停展开」六个功能整合进一个模组，各段代码收进独立命名空间，生命周期由合并层统一分发，某段初始化失败仅降级本段、不影响其余段。
 - 各分组新增组首「启用本组功能」总开关（默认开启，总开关变化时整体重载模组）。
 - 图标动画段与计数角标段的 `Windhawk_RunFromWindowThread_<id>` 注册消息名冲突处理：为图标动画段追加 `_DockAnim` 后缀，避免同进程多条 WH_CALLWNDPROC 钩子互相响应同一条消息。
 - 保留各段原有的 x86 兼容修复（显式 static ... CALLBACK 回调、_M_IX86 兜底分支、IID_PPV_ARGS 展开改写等）。
-- 「等比缩放」置于设置页最顶部并只保留 `iconSize.ProportionalScale`（80%-200%），尺寸单项设置删除、改用包默认基线（52/32/44/24/24）参与换算；动态图标缩放标志由 `TaskbarConfiguration_GetIconHeightInViewPixels` 钩子自重置。
+- 「等比缩放」删除，分组改为「任务栏尺寸设置」，迁移 Taskbar height and icon size 的单项尺寸设置（任务栏高度/图标大小/按钮宽度/小图标/小按钮宽度/托盘图标/系统图标），并接入小尺寸模式；图标位图缩放移除动态图标缩放标志门控，确保单项设置生效。
 - 移除「任务栏外观美化」分组、原「窗口最大化时自动隐藏任务栏」设置，以及系统信息分组。
 - 新增「托盘悬停展开」分组（`trayHover.*`），基于 UI Automation 实现，鼠标悬停托盘箭头自动展开隐藏图标面板。
-- 全中文本地化与整合维护由 HW-Beautify 完成；版本号统一为 1.0.0。
+- 全中文本地化与整合维护由 HW-Beautify 完成；版本号统一为 1.1.0（1.0.0 为整合首发版）。
+- **修复 Bandizip 现代右键菜单失效**：TrayHover 的 `IUIAutomation` 对象从常驻改为「每次查找托盘箭头时临时创建、用完立即释放」。详见「兼容性」。
 
 ## 致谢与许可
 
@@ -145,42 +179,59 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
     $name: Enable group features
     $name:zh-CN: 启用本组功能
     $description: Master switch of this group. Turn it off to disable the whole group.
-    $description:zh-CN: 本组功能总开关，false后整组功能停用并还原已生效的修改。
-  - ProportionalScale: "100"
-    $name: Proportional scale
-    $name:zh-CN: 等比缩放
+    $description:zh-CN: 本组功能总开关，关闭后整组功能停用并还原已生效的修改。
+  - PixelControlEnabled: false
+    $name: Enable pixel control
+    $name:zh-CN: 启用像素控制
     $description: >-
-      Scales the taskbar height, icon size, button widths, tray icon size and
-      system icon size together by this percentage. Baselines: 52/32/44/24/24.
-      100 means no extra scaling.
+      Enable to apply the taskbar height and icon size values. When disabled,
+      those pixel values are ignored.
     $description:zh-CN: >-
-      把任务栏高度、图标大小、按钮宽度、托盘图标大小与系统图标大小一起按百分比等比缩放，
-      基线 52/32/44/24/24，100 为不缩放。
-    $options:
-      - "80": "80%"
-      - "90": "90%"
-      - "100": "100%"
-      - "110": "110%"
-      - "125": "125%"
-      - "150": "150%"
-      - "175": "175%"
-      - "200": "200%"
-  $name: Proportional scale
-  $name:zh-CN: 等比缩放
+      启用后应用任务栏高度与图标大小的数值设置；关闭后忽略这两个像素数值，
+      不修改任务栏尺寸。
+  - TaskbarHeight: 52
+    $name: Taskbar height
+    $name:zh-CN: 任务栏高度
+    $description: >-
+      The height, in pixels, of the taskbar (Windows 11 default: 48).
+    $description:zh-CN: >-
+      任务栏高度（像素），Windows 11 默认 48。
+  - IconSize: 32
+    $name: Icon size
+    $name:zh-CN: 图标大小
+    $description: >-
+      The size, in pixels, of icons on the taskbar (Windows 11 default: 24).
+    $description:zh-CN: >-
+      任务栏图标大小（像素），Windows 11 默认 24。
+  - ProportionalScalingEnabled: false
+    $name: Enable proportional scaling
+    $name:zh-CN: 启用等比缩放
+    $description: >-
+      Enable to scale the taskbar size proportionally. The scale ratio is read
+      only when enabled.
+    $description:zh-CN: >-
+      启用后按等比方式整体缩放任务栏尺寸。仅在启用后读取缩放比例。
+  - ScaleRatio: 100
+    $name: Scale ratio (%)
+    $name:zh-CN: 缩放比例（%）
+    $description: >-
+      Proportional scale ratio applied to the taskbar (100 = no scaling).
+    $description:zh-CN: >-
+      任务栏等比缩放比例（100 = 不缩放）。
+  $name: Taskbar size settings
+  $name:zh-CN: 任务栏尺寸设置
   $description: >-
-    Scales the taskbar height, icon size, button widths, tray icon size and
-    system icon size together by a percentage, based on the package default
-    baselines.
+    Sets the taskbar height and icon size individually, or scales the taskbar
+    proportionally.
   $description:zh-CN: >-
-    按百分比把任务栏高度、图标大小、按钮宽度、托盘图标大小与系统图标大小一起等比缩放，
-    基于包默认基线。
+    逐项设置任务栏高度与图标大小，或按比例整体等比缩放任务栏尺寸。
 
 - countBadges:
   - Enabled: true
     $name: Enable group features
     $name:zh-CN: 启用本组功能
     $description: Master switch of this group. Turn it off to disable the whole group.
-    $description:zh-CN: 本组功能总开关，false后整组功能停用并还原已生效的修改。
+    $description:zh-CN: 本组功能总开关，关闭后整组功能停用并还原已生效的修改。
   - Display:
     - style: number
       $name: Display style
@@ -191,8 +242,8 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       - number: NumberBadge
       - Dots: Dots
       $options:zh-CN:
-      - number: NumberBadge
-      - Dots: Dots
+      - number: 数字角标
+      - Dots: 圆点
     $name: Display
     $name:zh-CN: 显示
 
@@ -206,14 +257,14 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       - Top: Top
       - Bottom: Bottom
       $options:zh-CN:
-      - left: Left
-      - right: Right
-      - Top: Top
-      - Bottom: Bottom
+      - left: 左侧
+      - right: 右侧
+      - Top: 顶部
+      - Bottom: 底部
 
     - size: 4
       $name: Dot size
-      $name:zh-CN: Dots大小
+      $name:zh-CN: 圆点大小
 
     - offsetX: 0
       $name: Horizontal offset
@@ -229,13 +280,13 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
 
     - color: "#FFFFFF"
       $name: Dot color
-      $name:zh-CN: Dots颜色
+      $name:zh-CN: 圆点颜色
       $description: Hex color in #RRGGBB or #AARRGGBB format.
       $description:zh-CN: 十六进制颜色，#RRGGBB 或 #AARRGGBB 格式。
     $name: Dots
-    $name:zh-CN: Dots
+    $name:zh-CN: 圆点
     $description: Left/right Dots are vertical; Top/Bottom Dots are horizontal. Bottom replaces the Windows running indicator.
-    $description:zh-CN: 左/右Dots纵向排列，上/下Dots横向排列；BottomDots会替换 Windows 运行指示器。
+    $description:zh-CN: 左/右圆点纵向排列，上/下圆点横向排列；底部圆点会替换 Windows 运行指示器。
 
   - Badge:
     - shape: 圆形
@@ -304,9 +355,9 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       $description: 0 disables the border.
       $description:zh-CN: 0 表示不显示边框。
     $name: NumberBadge
-    $name:zh-CN: NumberBadge
+    $name:zh-CN: 数字角标
     $description: These settings apply only when Display style is set to NumberBadge.
-    $description:zh-CN: 仅当显示样式设为「NumberBadge」时，这些设置才会生效。
+    $description:zh-CN: 仅当显示样式设为「数字角标」时，这些设置才会生效。
 
   - Text:
     - color: "#FFFFFF"
@@ -342,9 +393,9 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       - semiBold: SemiBold
       - Bold: Bold
       $options:zh-CN:
-      - Normal: Normal
-      - semiBold: SemiBold
-      - Bold: Bold
+      - Normal: 常规
+      - semiBold: 半粗体
+      - Bold: 粗体
     $name: Number text
     $name:zh-CN: 角标数字
     $description: These settings apply only when Display style is set to NumberBadge.
@@ -386,7 +437,7 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
     $name: Enable group features
     $name:zh-CN: 启用本组功能
     $description: Master switch of this group. Turn it off to disable the whole group.
-    $description:zh-CN: 本组功能总开关，false后整组功能停用并还原已生效的修改。
+    $description:zh-CN: 本组功能总开关，关闭后整组功能停用并还原已生效的修改。
   - multipleItemsBehavior: closeAll
     $name: Multiple items behavior
     $name:zh-CN: 多项组合行为
@@ -396,12 +447,12 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
     $description:zh-CN: >-
       选择中键点击一组（合并的多个）窗口时的行为
     $options:
-    - closeAll: false所有窗口
-    - closeForeground: 仅false前台窗口
-    - none: 不操作
+    - closeAll: Close all windows
+    - closeForeground: Only close the foreground window
+    - none: Do nothing
     $options:zh-CN:
-    - closeAll: false所有窗口
-    - closeForeground: false前台窗口
+    - closeAll: 关闭所有窗口
+    - closeForeground: 仅关闭前台窗口
     - none: 不进行任何操作
   - keysToEndTask:
     - Ctrl: true
@@ -427,16 +478,16 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       启用此选项以在 Windows 11 上自定义旧版任务栏（如果使用 ExplorerPatcher
       或类似工具）。
   $name: Middle click to close
-  $name:zh-CN: 按钮中键false
+  $name:zh-CN: 按钮中键关闭
   $description: Close programs with a middle click on the taskbar instead of creating a new instance.
-  $description:zh-CN: 中键点击任务栏按钮直接false窗口，而不是打开新实例。
+  $description:zh-CN: 中键点击任务栏按钮直接关闭窗口，而不是打开新实例。
 
 - iconAnim:
   - Enabled: true
     $name: Enable group features
     $name:zh-CN: 启用本组功能
     $description: Master switch of this group. Turn it off to disable the whole group.
-    $description:zh-CN: 本组功能总开关，false后整组功能停用并还原已生效的修改。
+    $description:zh-CN: 本组功能总开关，关闭后整组功能停用并还原已生效的修改。
   - AnimationType: 0
     $name: Animation Curve
     $name:uk-UA: Крива анімації
@@ -624,7 +675,7 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
     $name: Enable group features
     $name:zh-CN: 启用本组功能
     $description: Master switch of this group. Turn it off to disable the whole group.
-    $description:zh-CN: 本组功能总开关，false后整组功能停用并还原已生效的修改。
+    $description:zh-CN: 本组功能总开关，关闭后整组功能停用并还原已生效的修改。
   - animationType: slide
     $name: Animation type (auto-hide)
     $name:zh-CN: 动画类型（秒显）
@@ -638,6 +689,23 @@ macOS 风格的图标悬停放大——三种动画曲线、相邻图标让位�
       - fade: 淡入淡出（透明度）
       - slideFade: 滑动+淡入淡出（最顺滑）
       - overshoot: 轻微过冲（小幅回落）
+  - NoAnimation: false
+    $name: No animation (auto-hide)
+    $name:zh-CN: 不使用动画（秒显）
+    $description: >-
+      Master switch that suppresses the show/hide animation entirely. The
+      taskbar snaps into place instantly, ignoring the animation type below.
+    $description:zh-CN: >-
+      关闭出现/隐藏动画的总开关。任务栏直接就位，忽略下方的「动画类型」设置。
+  - Overshoot: false
+    $name: Overshoot animation (auto-hide)
+    $name:zh-CN: 动画过冲（秒显）
+    $description: >-
+      Use the subtle spring overshoot animation: the taskbar slides slightly
+      past its target and settles back. Overrides the animation type below.
+    $description:zh-CN: >-
+      使用轻微过冲动画：任务栏滑过目标位置后小幅回落。
+      覆盖下方的「动画类型」设置。
   - showSpeedup: 400
     $name: Show speedup % (auto-hide, Slide mode only)
     $name:zh-CN: 显示加速 %（秒显，仅滑动模式）
@@ -6308,7 +6376,24 @@ struct {
     int hideDelay;
     bool oldTaskbarOnWin11;
     bool edgeDetection;
+    bool noAnimation;
+    bool overshoot;
 } g_settings;
+
+// HW-Beautify：独立的「不使用动画」「动画过冲」开关，叠加在上游
+// taskbar-autohide-instant-show 2.2 的 animationType 下拉项之上。
+// 优先级：NoAnimation > Overshoot > animationType 下拉项。
+// 两者分别复用上游已实现的 animType == -1（立即就位）与 animType == 5
+// （EaseOutBack/EaseInBack 过冲）两条代码路径，不改动上游动画算法本身。
+int ResolveAnimationType() {
+    if (g_settings.noAnimation) {
+        return -1;
+    }
+    if (g_settings.overshoot) {
+        return 5;
+    }
+    return g_settings.animationType;
+}
 
 enum class WinVersion {
     Unsupported,
@@ -6451,7 +6536,7 @@ void DoCustomAnimation(HWND hWnd,
                        const RECT* endRect,
                        bool show,
                        int myAnimGen) {
-    int animType = g_settings.animationType;
+    int animType = ResolveAnimationType();
     int duration = show ? g_settings.showDuration : g_settings.hideDuration;
 
     if (duration <= 0) {
@@ -6620,12 +6705,13 @@ void WINAPI TrayUI_SlideWindow_Hook(void* pThis,
                                     HMONITOR monitor,
                                     bool show,
                                     bool animate) {
-    Wh_Log(L"> show=%d animType=%d", show, g_settings.animationType);
+    const int animType = ResolveAnimationType();
+    Wh_Log(L"> show=%d animType=%d", show, animType);
 
-    if (g_settings.animationType == -1) {
+    if (animType == -1) {
         // No animation — snap to final position instantly.
         TrayUI_SlideWindow_Original(pThis, hWnd, rect, monitor, show, false);
-    } else if (g_settings.animationType == 0) {
+    } else if (animType == 0) {
         g_slideWindowSpeedup =
             show ? g_settings.showSpeedup : g_settings.hideSpeedup;
         g_slideWindowStartTime = TimerGetSeconds();
@@ -7034,6 +7120,12 @@ void LoadSettings() {
         g_settings.animationType = 0;
     }
     Wh_FreeStringSetting(animType);
+
+    // HW-Beautify：独立的「不使用动画」「动画过冲」开关，优先级高于上面的
+    // animationType 下拉项（见 ResolveAnimationType）。
+    g_settings.noAnimation =
+        Wh_GetIntSetting(L"autoHide.NoAnimation") != 0;
+    g_settings.overshoot = Wh_GetIntSetting(L"autoHide.Overshoot") != 0;
 
     g_settings.showSpeedup = Wh_GetIntSetting(L"autoHide.showSpeedup");
     g_settings.hideSpeedup = Wh_GetIntSetting(L"autoHide.hideSpeedup");
@@ -7723,14 +7815,8 @@ static DWORD WINAPI WorkerThread(LPVOID) {
 
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-    IUIAutomation* pAuto = nullptr;
-    if (FAILED(CoCreateInstance(__uuidof(CUIAutomation), nullptr,
-            CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void**)&pAuto)) || !pAuto) {
-        Wh_Log(L"Failed to create IUIAutomation");
-        CoUninitialize();
-        return 0;
-    }
-
+    // FIX: 不再常驻 IUIAutomation 对象。常驻 UIA 会干扰 Bandizip 现代右键菜单
+    // 的命令派发。改为仅在需查找溢出按钮时临时创建，用完立即释放。
     Settings s = GetSettingsSnapshot();
     int settingsGen = g_settingsGeneration;
 
@@ -7863,8 +7949,14 @@ static DWORD WINAPI WorkerThread(LPVOID) {
             lastWalkAt = now;
             bool didLog = false;
             bool didLogWeak = false;
-            pBtn = FindOverflowButton(pAuto, s, !loggedCandidates, &didLog,
-                                      loggedWeakMatch ? nullptr : &didLogWeak);
+            // FIX: 临时创建 UIA，用完立即释放，避免常驻对象干扰右键菜单。
+            IUIAutomation* pAuto = nullptr;
+            if (SUCCEEDED(CoCreateInstance(__uuidof(CUIAutomation), nullptr,
+                    CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void**)&pAuto)) && pAuto) {
+                pBtn = FindOverflowButton(pAuto, s, !loggedCandidates, &didLog,
+                                          loggedWeakMatch ? nullptr : &didLogWeak);
+                pAuto->Release();
+            }
             loggedCandidates = pBtn ? false : (loggedCandidates || didLog);
             loggedWeakMatch = loggedWeakMatch || didLogWeak;
             nextRectRefresh = 0;        // force a fresh rectangle below
@@ -8067,7 +8159,6 @@ static DWORD WINAPI WorkerThread(LPVOID) {
     }
 
     if (pBtn) pBtn->Release();
-    if (pAuto) pAuto->Release();
     CoUninitialize();
     return 0;
 }
@@ -8221,7 +8312,7 @@ using GetDpiForMonitor_Fn =
 namespace IconSize {
 
 // ============================================================================
-// 任务栏尺寸设置 — 直接读取用户设定的任务栏高度、图标大小与按钮宽度
+// 任务栏尺寸设置 — 直接读取用户设定的任务栏高度与图标大小
 //
 // 来自 local@hw-taskbar-icon-size 模组，保留任务栏尺寸设置功能，独立保留为
 // IconSize 命名空间：入口为 Init/AfterInit/BeforeUninit/Uninit/SettingsChanged，
@@ -8231,11 +8322,11 @@ namespace IconSize {
 using namespace winrt::Windows::UI::Xaml;
 
 struct {
+    bool pixelControlEnabled;
     int taskbarHeight;
     int iconSize;
-    int taskbarButtonWidth;
-    int trayIconSize;
-    int systemIconSize;
+    bool proportionalScalingEnabled;
+    int scaleRatio;
 } g_settings;
 
 // 运行时通过 GetProcAddress 加载，避免 Windhawk 链接器无法解析外部符号。
@@ -8256,9 +8347,9 @@ int g_originalTaskbarHeight;
 int g_taskbarHeight;
 std::atomic<DWORD> g_shellIconLoaderV2_LoadAsyncIcon__ResumeCoro_ThreadId;
 bool g_inSystemTrayController_UpdateFrameSize;
-bool g_taskbarButtonWidthCustomized;
 
 double* double_48_value_Original;
+
 
 
 size_t OffsetFromAssemblyRegex(void* func,
@@ -8395,90 +8486,6 @@ bool IsVerticalTaskbar() {
     return appBarData.uEdge == ABE_LEFT || appBarData.uEdge == ABE_RIGHT;
 }
 
-void OverrideResourceDirectoryLookup(
-    PCSTR sourceFunctionName,
-    const winrt::Windows::Foundation::IInspectable* key,
-    winrt::Windows::Foundation::IInspectable* value) {
-    if (g_unloading) {
-        return;
-    }
-
-    const auto keyString = key->try_as<winrt::hstring>();
-    if (!keyString) {
-        return;
-    }
-
-    double newValueDouble;
-    if (*keyString == L"MediumTaskbarButtonExtent") {
-        newValueDouble = g_settings.taskbarButtonWidth;
-    } else if (*keyString == L"SmallTaskbarButtonExtent") {
-        newValueDouble = g_settings.taskbarButtonWidth;
-    } else {
-        return;
-    }
-
-    const auto valueDouble = value->try_as<double>();
-    if (!valueDouble) {
-        return;
-    }
-
-    if (newValueDouble != *valueDouble) {
-        Wh_Log(L"[%S] Overriding value %s: %f->%f", sourceFunctionName,
-               keyString->c_str(), *valueDouble, newValueDouble);
-        *value = winrt::box_value(newValueDouble);
-    }
-}
-
-using ResourceDictionary_Lookup_TaskbarView_t =
-    winrt::Windows::Foundation::IInspectable*(
-        WINAPI*)(void* pThis,
-                 void** result,
-                 winrt::Windows::Foundation::IInspectable* key);
-ResourceDictionary_Lookup_TaskbarView_t
-    ResourceDictionary_Lookup_TaskbarView_Original;
-winrt::Windows::Foundation::IInspectable* WINAPI
-ResourceDictionary_Lookup_TaskbarView_Hook(
-    void* pThis,
-    void** result,
-    winrt::Windows::Foundation::IInspectable* key) {
-    // Wh_Log(L">");
-
-    auto ret =
-        ResourceDictionary_Lookup_TaskbarView_Original(pThis, result, key);
-    if (!*ret) {
-        return ret;
-    }
-
-    OverrideResourceDirectoryLookup(__FUNCTION__, key, ret);
-
-    return ret;
-}
-
-using ResourceDictionary_Lookup_SearchUxUi_t =
-    winrt::Windows::Foundation::IInspectable*(
-        WINAPI*)(void* pThis,
-                 void** result,
-                 winrt::Windows::Foundation::IInspectable* key);
-ResourceDictionary_Lookup_SearchUxUi_t
-    ResourceDictionary_Lookup_SearchUxUi_Original;
-winrt::Windows::Foundation::IInspectable* WINAPI
-ResourceDictionary_Lookup_SearchUxUi_Hook(
-    void* pThis,
-    void** result,
-    winrt::Windows::Foundation::IInspectable* key) {
-    // Wh_Log(L">");
-
-    auto ret =
-        ResourceDictionary_Lookup_SearchUxUi_Original(pThis, result, key);
-    if (!*ret) {
-        return ret;
-    }
-
-    OverrideResourceDirectoryLookup(__FUNCTION__, key, ret);
-
-    return ret;
-}
-
 using IconUtils_GetIconSize_t = void(WINAPI*)(bool isSmall,
                                               int type,
                                               SIZE* size);
@@ -8490,24 +8497,18 @@ void WINAPI IconUtils_GetIconSize_Hook(bool isSmall, int type, SIZE* size) {
         return true;
     }();
 
-    if (g_hasDynamicIconScaling) {
-        IconUtils_GetIconSize_Original(isSmall, type, size);
-        return;
-    }
+    // 不做动态图标缩放标志门控：图标位图始终按设定尺寸缩放，确保单项
+    // 图标大小设置真正生效（此前该 bail 会让图标尺寸被系统动态缩放覆盖）。
 
     IconUtils_GetIconSize_Original(isSmall, type, size);
 
-    if (!g_unloading && !isSmall) {
+    // 像素控制关闭时（iconSize 为 0）不覆盖系统尺寸，保持任务栏原样。
+    if (!g_unloading && !isSmall && g_settings.iconSize > 0) {
         // 根据 IconType 区分图标类型，各自使用独立的尺寸值。
         // type 0 = 任务栏图标，type 1 = 托盘图标（隐藏图标弹出面板），
         // type 2 = 系统托盘图标（WiFi、音量、电池、时间、日期），
         // 其余值回退为任务栏图标（保持原有行为）。
         int scaleSize = g_settings.iconSize;
-        if (type == 1) {
-            scaleSize = g_settings.trayIconSize;
-        } else if (type == 2) {
-            scaleSize = g_settings.systemIconSize;
-        }
         size->cx = MulDiv(size->cx, scaleSize, 24);
         size->cy = MulDiv(size->cy, scaleSize, 24);
     }
@@ -8576,7 +8577,9 @@ ULONG_PTR WINAPI CIconLoadingFunctions_GetClassLongPtrW_Hook(void* pThis,
                                                                nIndex);
     }
 
-    if (!g_unloading && nIndex == GCLP_HICON && g_settings.iconSize <= 16) {
+    // 像素控制关闭时（iconSize 为 0）不切换小图标，避免误判。
+    if (!g_unloading && nIndex == GCLP_HICON && g_settings.iconSize > 0 &&
+        g_settings.iconSize <= 16) {
         nIndex = GCLP_HICONSM;
     }
 
@@ -8612,8 +8615,9 @@ CIconLoadingFunctions_SendMessageCallbackW_Hook(void* pThis,
             pThis, hWnd, Msg, wParam, lParam, lpResultCallBack, dwData);
     }
 
+    // 像素控制关闭时（iconSize 为 0）不切换小图标，避免误判。
     if (!g_unloading && Msg == WM_GETICON && wParam == ICON_BIG &&
-        g_settings.iconSize <= 16) {
+        g_settings.iconSize > 0 && g_settings.iconSize <= 16) {
         wParam = ICON_SMALL2;
     }
 
@@ -8688,7 +8692,7 @@ int WINAPI TaskListItemViewModel_GetIconHeight_Hook(void* pThis,
     int ret =
         TaskListItemViewModel_GetIconHeight_Original(pThis, param1, iconHeight);
 
-    if (!g_unloading) {
+    if (!g_unloading && g_settings.iconSize > 0) {
         *iconHeight = g_settings.iconSize;
     }
 
@@ -8713,7 +8717,7 @@ int WINAPI TaskListGroupViewModel_GetIconHeight_Hook(void* pThis,
     int ret = TaskListGroupViewModel_GetIconHeight_Original(pThis, param1,
                                                             iconHeight);
 
-    if (!g_unloading) {
+    if (!g_unloading && g_settings.iconSize > 0) {
         *iconHeight = g_settings.iconSize;
     }
 
@@ -8737,7 +8741,9 @@ TaskbarConfiguration_GetIconHeightInViewPixels_taskbarSizeEnum_Hook(
         g_hasDynamicIconScaling = false;
     }
 
-    if (!g_unloading && (enumTaskbarSize == 1 || enumTaskbarSize == 2)) {
+    // 像素控制关闭时（iconSize 为 0）不覆盖，交回系统原实现。
+    if (!g_unloading && g_settings.iconSize > 0 &&
+        (enumTaskbarSize == 1 || enumTaskbarSize == 2)) {
         return g_settings.iconSize;
     }
 
@@ -8761,19 +8767,13 @@ TaskbarConfiguration_GetIconHeightInViewPixels_double_Hook(double baseHeight) {
         g_hasDynamicIconScaling = false;
     }
 
-    if (!g_unloading) {
+    if (!g_unloading && g_settings.iconSize > 0) {
         return g_settings.iconSize;
     }
 
     return TaskbarConfiguration_GetIconHeightInViewPixels_double_Original(
         baseHeight);
 }
-
-// TaskbarFrame::GetMetrics uses the icon height only to pick a posture button
-// extent, so it gets the stock height, which also tells the GetMetrics hook
-// which extent was picked.
-thread_local bool g_inTaskbarFrame_GetMetrics;
-thread_local std::optional<double> g_TaskbarFrame_GetMetrics_iconHeight;
 
 using TaskbarConfiguration_GetIconHeightInViewPixels_method_t =
     double(WINAPI*)(void* pThis);
@@ -8794,12 +8794,7 @@ TaskbarConfiguration_GetIconHeightInViewPixels_method_Hook(void* pThis) {
     // The customized heights can't, they may be equal.
     g_smallIconSize = iconSize <= 16;
 
-    if (g_inTaskbarFrame_GetMetrics) {
-        g_TaskbarFrame_GetMetrics_iconHeight = iconSize;
-        return iconSize;
-    }
-
-    if (!g_unloading) {
+    if (!g_unloading && g_settings.iconSize > 0) {
         return g_settings.iconSize;
     }
 
@@ -9634,52 +9629,6 @@ void WINAPI TaskbarFrame_UpdateIsSmallFrame_Hook(void* pThis,
     TaskbarFrame_UpdateIsSmallFrame_Original(pThis, isSmallFrame);
 }
 
-// TaskbarFrame looks the button extents up in the resource dictionary once, in
-// OnApplyTemplate, and keeps them. The overflow flyout looks them up again and
-// fail-fasts unless the metrics extent is one of them, crashing explorer if the
-// customized width changed in between, so the metrics get the current extent.
-using TaskbarFrame_GetMetrics_t = void*(WINAPI*)(void* pThis, void* metrics);
-TaskbarFrame_GetMetrics_t TaskbarFrame_GetMetrics_Original;
-void* WINAPI TaskbarFrame_GetMetrics_Hook(void* pThis, void* metrics) {
-    Wh_Log(L">");
-
-    g_inTaskbarFrame_GetMetrics = true;
-    g_TaskbarFrame_GetMetrics_iconHeight.reset();
-
-    void* ret = TaskbarFrame_GetMetrics_Original(pThis, metrics);
-
-    g_inTaskbarFrame_GetMetrics = false;
-    std::optional<double> iconHeight = g_TaskbarFrame_GetMetrics_iconHeight;
-
-    // Without dynamic icon scaling, the icon height isn't consulted and the
-    // extent can't be told. 32 is the tablet posture extent, which isn't
-    // customized.
-    if (!iconHeight || *iconHeight == 32) {
-        return ret;
-    }
-
-    double newValue;
-    if (*iconHeight == 16) {
-        // Either the small extent or the uncustomized small frame extent, but
-        // the small button width is a value the overflow flyout accepts, so it
-        // fits both.
-        newValue = g_unloading ? 44 : g_settings.taskbarButtonWidth;
-    } else {
-        newValue = g_unloading ? 44 : g_settings.taskbarButtonWidth;
-    }
-
-    // The button extent is the second member of TaskbarFrameMetrics.
-    double* buttonExtent = (double*)((BYTE*)metrics + sizeof(double));
-    if (*buttonExtent >= 1 && *buttonExtent < 10000 &&
-        *buttonExtent != newValue) {
-        Wh_Log(L"Updating button extent for TaskbarFrame metrics: %f->%f",
-               *buttonExtent, newValue);
-        *buttonExtent = newValue;
-    }
-
-    return ret;
-}
-
 using TaskListButton_UpdateButtonPadding_t = void(WINAPI*)(void* pThis);
 TaskListButton_UpdateButtonPadding_t
     TaskListButton_UpdateButtonPadding_Original;
@@ -9840,146 +9789,6 @@ void WINAPI TaskListButton_CreateMultiWindowClip_Hook(void* pThis) {
     }
 }
 
-void* TaskListButton_UpdateIconColumnDefinition_Original;
-
-LONG GetMediumTaskbarButtonExtentOffset() {
-    static LONG mediumTaskbarButtonExtentOffset = []() -> LONG {
-#if defined(_M_X64)
-        // Search for movsd followed by subsd. In newer builds with vertical
-        // taskbar support, there may be an additional movsd without a matching
-        // subsd above.
-        //
-        // f20f10b648030000 movsd   xmm6,mmword ptr [rsi+348h]
-        // f20f5cb680030000 subsd   xmm6,mmword ptr [rsi+380h]
-        // f20f5cb690030000 subsd   xmm6,mmword ptr [rsi+390h]
-
-        const BYTE* start =
-            (const BYTE*)TaskListButton_UpdateIconColumnDefinition_Original;
-        const BYTE* end = start + 0x200;
-        LONG offsetCandidate = 0;
-        LONG offset = 0;
-        for (const BYTE* p = start; p != end; p++) {
-            if (p[0] == 0xF2 && p[1] == 0x0F && p[2] == 0x10 &&
-                (p[3] & 0xC0) == 0x80) {
-                offsetCandidate = *(LONG*)(p + 4);
-            }
-
-            if (p[0] == 0xF2 && p[1] == 0x44 && p[2] == 0x0F && p[3] == 0x10 &&
-                (p[4] & 0xC0) == 0x80) {
-                offsetCandidate = *(LONG*)(p + 5);
-            }
-
-            if (p[0] == 0xF2 && p[1] == 0x0F && p[2] == 0x5C &&
-                (p[3] & 0xC0) == 0x80) {
-                offset = offsetCandidate;
-                break;
-            }
-
-            if (p[0] == 0xF2 && p[1] == 0x44 && p[2] == 0x0F && p[3] == 0x5C &&
-                (p[4] & 0xC0) == 0x80) {
-                offset = offsetCandidate;
-                break;
-            }
-        }
-
-        Wh_Log(L"mediumTaskbarButtonExtentOffset=0x%X", offset);
-        return (offset < 0 || offset > 0xFFFF) ? 0 : offset;
-#elif defined(_M_ARM64)
-        // ...
-        // fd41b670 ldr  d16,[x19,#0x368]
-        // fd419e71 ldr  d17,[x19,#0x338]
-        // 1e703a31 fsub d17,d17,d16
-        // fd41be70 ldr  d16,[x19,#0x378]
-        // 1e703a28 fsub d8,d17,d16
-        const DWORD* start =
-            (const DWORD*)TaskListButton_UpdateIconColumnDefinition_Original;
-        const DWORD* end = start + 0x80;
-        std::regex regexLdr(R"(ldr\s+(d\d+), \[(x\d+), #0x([0-9a-f]+)\])");
-        std::regex regexLdrOther(R"(ldr\s+(d\d+),.*)");
-        std::regex regexFsub(R"(fsub\s+d\d+, (d\d+), (d\d+))");
-        struct {
-            std::string reg;
-            std::string regSrc;
-            LONG offset;
-        } ldrs[32];
-        size_t ldrCount = 0;
-        for (const DWORD* p = start; p != end; p++) {
-            WH_DISASM_RESULT result;
-            if (!Wh_Disasm((void*)p, &result)) {
-                break;
-            }
-
-            std::string_view s = result.text;
-            if (s == "ret") {
-                break;
-            }
-
-            if (ldrCount == ARRAYSIZE(ldrs)) {
-                Wh_Log(L"Too many ldr instructions");
-                break;
-            }
-
-            std::match_results<std::string_view::const_iterator> matchLdr;
-            if (std::regex_match(s.begin(), s.end(), matchLdr, regexLdr)) {
-                // Wh_Log(L"%S", result.text);
-                std::string reg = matchLdr[1];
-                std::string regSrc = matchLdr[2];
-                LONG offset = std::stoull(matchLdr[3], nullptr, 16);
-                ldrs[ldrCount++] = {std::move(reg), std::move(regSrc), offset};
-                continue;
-            }
-
-            std::match_results<std::string_view::const_iterator> matchLdrOther;
-            if (std::regex_match(s.begin(), s.end(), matchLdrOther,
-                                 regexLdrOther)) {
-                // Wh_Log(L"%S", result.text);
-                std::string reg = matchLdrOther[1];
-                ldrs[ldrCount++] = {std::move(reg), std::string(), 0};
-                continue;
-            }
-
-            std::match_results<std::string_view::const_iterator> matchFsub;
-            if (std::regex_match(s.begin(), s.end(), matchFsub, regexFsub)) {
-                // Wh_Log(L"%S", result.text);
-                std::string regA = matchFsub[1];
-                std::string regB = matchFsub[2];
-
-                std::remove_reference_t<decltype(ldrs[0])>* ldrA = nullptr;
-                std::remove_reference_t<decltype(ldrs[0])>* ldrB = nullptr;
-
-                for (size_t i = 0; i < ldrCount; i++) {
-                    const auto& [ldrReg, ldrRegSrc, ldrOffset] =
-                        ldrs[ldrCount - 1 - i];
-                    if (!ldrA && ldrReg == regA) {
-                        ldrA = &ldrs[ldrCount - 1 - i];
-                    }
-                    if (!ldrB && ldrReg == regB) {
-                        ldrB = &ldrs[ldrCount - 1 - i];
-                    }
-                }
-
-                if (ldrA && ldrB && ldrA->regSrc == ldrB->regSrc) {
-                    LONG offset = ldrA->offset;
-                    Wh_Log(L"mediumTaskbarButtonExtentOffset=0x%X", offset);
-                    return (offset < 0 || offset > 0xFFFF) ? 0 : offset;
-                }
-            }
-        }
-#else
-#error "Unsupported architecture"
-#endif
-
-        Wh_Log(L"Error: mediumTaskbarButtonExtentOffset not found");
-        return 0;
-    }();
-
-    return mediumTaskbarButtonExtentOffset;
-}
-
-void TaskListButton_UpdateIconColumnDefinition_InitOffsets() {
-    GetMediumTaskbarButtonExtentOffset();
-}
-
 // UpdateVisualStates reads the icon height both as the posture marker and as
 // the progress indicator size. It gets the posture height, and the progress
 // indicator gets the customized height back.
@@ -9990,55 +9799,6 @@ using TaskListButton_UpdateVisualStates_t = void(WINAPI*)(void* pThis);
 TaskListButton_UpdateVisualStates_t TaskListButton_UpdateVisualStates_Original;
 void WINAPI TaskListButton_UpdateVisualStates_Hook(void* pThis) {
     Wh_Log(L">");
-
-    if (TaskListButton_UpdateIconColumnDefinition_Original &&
-        (g_applyingSettings || g_taskbarButtonWidthCustomized)) {
-        LONG mediumTaskbarButtonExtentOffset =
-            GetMediumTaskbarButtonExtentOffset();
-        if (mediumTaskbarButtonExtentOffset) {
-            bool updateButtonPadding = false;
-
-            double* mediumTaskbarButtonExtent =
-                (double*)((BYTE*)pThis + mediumTaskbarButtonExtentOffset);
-            if (*mediumTaskbarButtonExtent >= 1 &&
-                *mediumTaskbarButtonExtent < 10000) {
-                double newValue =
-                    g_unloading ? 44 : g_settings.taskbarButtonWidth;
-                if (newValue != *mediumTaskbarButtonExtent) {
-                    Wh_Log(
-                        L"Updating MediumTaskbarButtonExtent for "
-                        L"TaskListButton: %f->%f",
-                        *mediumTaskbarButtonExtent, newValue);
-                    *mediumTaskbarButtonExtent = newValue;
-                    updateButtonPadding = true;
-                }
-            }
-
-            double* smallTaskbarButtonExtent =
-                g_hasDynamicIconScaling ? mediumTaskbarButtonExtent - 1
-                                        : nullptr;
-            if (smallTaskbarButtonExtent && *smallTaskbarButtonExtent >= 1 &&
-                *smallTaskbarButtonExtent < 10000) {
-                double newValue =
-                    g_unloading ? 44 : g_settings.taskbarButtonWidth;
-                if (newValue != *smallTaskbarButtonExtent) {
-                    Wh_Log(
-                        L"Updating SmallTaskbarButtonExtent for "
-                        L"TaskListButton: %f->%f",
-                        *smallTaskbarButtonExtent, newValue);
-                    *smallTaskbarButtonExtent = newValue;
-                    updateButtonPadding = true;
-                }
-            }
-
-            if (updateButtonPadding) {
-                g_taskbarButtonWidthCustomized = true;
-                TaskListButton_UpdateButtonPadding_Hook(pThis);
-            }
-        } else {
-            Wh_Log(L"Error: mediumTaskbarButtonExtentOffset is invalid");
-        }
-    }
 
     double* iconHeight = nullptr;
     double prevIconHeight;
@@ -10177,6 +9937,11 @@ void UpdateAugmentedEntryPointContent(FrameworkElement panelElement) {
     FrameworkElement augmentedEntryPointContentGrid =
         FindChildByName(panelElement, L"AugmentedEntryPointContentGrid");
     if (!augmentedEntryPointContentGrid) {
+        return;
+    }
+
+    // 像素控制关闭时（iconSize 为 0）保持系统默认布局，不做自定义缩放。
+    if (g_settings.iconSize <= 0) {
         return;
     }
 
@@ -10379,50 +10144,12 @@ void WINAPI ExperienceToggleButton_UpdateButtonPadding_Hook(void* pThis) {
     if (g_hasDynamicIconScaling && g_unloading) {
         return;
     }
-
-    double defaultWidthExtra = -4;
-
-    if (className == L"Taskbar.ExperienceToggleButton") {
-        auto automationId = Automation::AutomationProperties::GetAutomationId(
-            toggleButtonElement);
-        if (automationId == L"StartButton") {
-            defaultWidthExtra = -3;
-        }
-    } else if (className == L"Taskbar.SearchBoxButton") {
-        // Only if search icon and not a search box.
-        if (panelElement.Margin() != Thickness{}) {
-            return;
-        }
-    } else {
-        return;
-    }
-
-    double buttonWidth = panelElement.Width();
-    if (!(buttonWidth > 0)) {
-        return;
-    }
-
-    // For the start button, the padding is different depending on the alignment
-    // of the taskbar (left/center).
-    auto buttonPadding = panelElement.Padding();
-
-    double defaultWidth = g_smallIconSize ? 32 : 44;
-    double overrideWidth =
-        g_unloading ? defaultWidth : g_settings.taskbarButtonWidth;
-
-    double newWidth = overrideWidth + buttonPadding.Left + buttonPadding.Right +
-                      defaultWidthExtra;
-    if (newWidth != buttonWidth) {
-        Wh_Log(L"Updating MediumTaskbarButtonExtent for %s: %f->%f",
-               className.c_str(), buttonWidth, newWidth);
-        panelElement.Width(newWidth);
-    }
 }
 
 // The search box sizes the icon next to its text with the same property, so
 // only the icon-only button gets the customized icon size. The template, which
-// the button width code tells the modes apart by, isn't applied when the
-// taskbar first hands the icon height over, so the class name is used here.
+// tells the modes apart, isn't applied when the taskbar first hands the icon
+// height over, so the class name is used here.
 bool IsSearchIconButton(void* pThis) {
     FrameworkElement buttonElement = nullptr;
     ((IUnknown**)pThis)[1]->QueryInterface(winrt::guid_of<FrameworkElement>(),
@@ -10455,7 +10182,8 @@ void SetSearchButtonIconHeight(void* pThis, double height) {
 void WINAPI SearchButtonBase_IconHeight_Hook(void* pThis, double height) {
     Wh_Log(L"> height=%f", height);
 
-    if (!g_unloading && IsSearchIconButton(pThis)) {
+    // 像素控制关闭时（iconSize 为 0）保持系统默认图标高度。
+    if (!g_unloading && g_settings.iconSize > 0 && IsSearchIconButton(pThis)) {
         double iconSize =
             g_settings.iconSize;
         if (height != iconSize) {
@@ -10465,70 +10193,6 @@ void WINAPI SearchButtonBase_IconHeight_Hook(void* pThis, double height) {
     }
 
     SearchButtonBase_IconHeight_Original(pThis, height);
-}
-
-Controls::Grid GetSearchButtonRootPanel(FrameworkElement buttonElement) {
-    auto panelElement =
-        FindChildByName(buttonElement, L"SearchBoxButtonRootPanel")
-            .try_as<Controls::Grid>();
-    if (!panelElement) {
-        return nullptr;
-    }
-
-    // Only if search icon and not a search box.
-    if (FindChildByName(panelElement, L"SearchBoxTextBlock")) {
-        return nullptr;
-    }
-
-    return panelElement;
-}
-
-void SetSearchButtonRootPanelWidth(Controls::Grid panelElement) {
-    double buttonWidth = panelElement.Width();
-    if (!(buttonWidth > 0)) {
-        return;
-    }
-
-    auto buttonPadding = panelElement.Padding();
-
-    double defaultWidth = g_smallIconSize ? 32 : 44;
-    double overrideWidth =
-        g_unloading ? defaultWidth : g_settings.taskbarButtonWidth;
-
-    double newWidth =
-        overrideWidth + buttonPadding.Left + buttonPadding.Right - 4;
-    if (newWidth != buttonWidth) {
-        Wh_Log(L"Updating MediumTaskbarButtonExtent: %f->%f", buttonWidth,
-               newWidth);
-        panelElement.Width(newWidth);
-    }
-}
-
-// The search button applies the button extent to its root panel on template
-// apply and on icon height changes, neither of which a settings change has to
-// go through, so the width is applied again in the measure pass.
-using SearchButtonBase_MeasureOverride_t =
-    int(WINAPI*)(void* pThis,
-                 winrt::Windows::Foundation::Size size,
-                 winrt::Windows::Foundation::Size* resultSize);
-SearchButtonBase_MeasureOverride_t SearchButtonBase_MeasureOverride_Original;
-int WINAPI SearchButtonBase_MeasureOverride_Hook(
-    void* pThis,
-    winrt::Windows::Foundation::Size size,
-    winrt::Windows::Foundation::Size* resultSize) {
-    Wh_Log(L">");
-
-    FrameworkElement buttonElement = nullptr;
-    ((IUnknown*)pThis)
-        ->QueryInterface(winrt::guid_of<FrameworkElement>(),
-                         winrt::put_abi(buttonElement));
-    if (buttonElement) {
-        if (auto panelElement = GetSearchButtonRootPanel(buttonElement)) {
-            SetSearchButtonRootPanelWidth(panelElement);
-        }
-    }
-
-    return SearchButtonBase_MeasureOverride_Original(pThis, size, resultSize);
 }
 
 using SearchButtonBase_UpdateButtonPadding_t = void(WINAPI*)(void* pThis);
@@ -10549,8 +10213,8 @@ void WINAPI SearchButtonBase_UpdateButtonPadding_Hook(void* pThis) {
     // which the property setter also applies to the icon element, so restore it
     // right after.
     std::optional<double> prevIconHeight;
-    if (!g_unloading && SearchButtonBase_IconHeight_Original &&
-        IsSearchIconButton(pThis)) {
+    if (!g_unloading && g_settings.iconSize > 0 &&
+        SearchButtonBase_IconHeight_Original && IsSearchIconButton(pThis)) {
         double postureIconHeight = g_smallIconSize ? 16 : 24;
         // Every write of the property goes through the hook above, so the
         // customized icon size is the height the button has.
@@ -10569,24 +10233,6 @@ void WINAPI SearchButtonBase_UpdateButtonPadding_Hook(void* pThis) {
     if (prevIconHeight) {
         SetSearchButtonIconHeight(pThis, *prevIconHeight);
     }
-
-    if (g_hasDynamicIconScaling && g_unloading) {
-        return;
-    }
-
-    FrameworkElement toggleButtonElement = nullptr;
-    ((IUnknown**)pThis)[1]->QueryInterface(winrt::guid_of<FrameworkElement>(),
-                                           winrt::put_abi(toggleButtonElement));
-    if (!toggleButtonElement) {
-        return;
-    }
-
-    auto panelElement = GetSearchButtonRootPanel(toggleButtonElement);
-    if (!panelElement) {
-        return;
-    }
-
-    SetSearchButtonRootPanelWidth(panelElement);
 }
 
 // The hooked setters are folded with the ones of other element types, and other
@@ -10673,11 +10319,11 @@ LRESULT WINAPI SendMessageTimeoutW_Hook(HWND hWnd,
                                         UINT fuFlags,
                                         UINT uTimeout,
                                         PDWORD_PTR lpdwResult) {
+    // 像素控制关闭时（iconSize 为 0）不切换小图标，避免误判。
     if (g_shellIconLoaderV2_LoadAsyncIcon__ResumeCoro_ThreadId ==
             GetCurrentThreadId() &&
         !g_unloading && Msg == WM_GETICON && wParam == ICON_BIG &&
-        g_settings.iconSize <=
-            16) {
+        g_settings.iconSize > 0 && g_settings.iconSize <= 16) {
         Wh_Log(L">");
         wParam = ICON_SMALL2;
     }
@@ -10689,45 +10335,49 @@ LRESULT WINAPI SendMessageTimeoutW_Hook(HWND hWnd,
 }
 
 void LoadSettings() {
-    // 直接使用包默认基线值（52/32/44/24/24），参与等比缩放换算。
-    // 单项尺寸设置已删除，仅保留等比缩放。
-    g_settings.taskbarHeight = 52;
-    g_settings.iconSize = 32;
-    g_settings.taskbarButtonWidth = 44;
-    g_settings.trayIconSize = 24;
-    g_settings.systemIconSize = 24;
+    // 任务栏尺寸设置：迁移自 Taskbar height and icon size 模组。
+    // 像素控制开关关闭时忽略两个像素数值，不修改任务栏尺寸；等比缩放开关
+    // 关闭时忽略缩放比例，两项均仅在各自开关启用时读取对应数值。
+    g_settings.pixelControlEnabled =
+        Wh_GetIntSetting(L"iconSize.PixelControlEnabled") != 0;
+    g_settings.proportionalScalingEnabled =
+        Wh_GetIntSetting(L"iconSize.ProportionalScalingEnabled") != 0;
 
-    // 等比缩放：把任务栏高度、图标大小、按钮宽度、托盘图标大小与系统图标
-    // 大小一起按百分比缩放。按 iconSize.ProportionalScale → size.ProportionalScale
-    // → look.ProportionalScale → ProportionalScale 的顺序回退读取，
-    // 兼容从 HW-任务栏样式美化迁移过来的旧保存值。
-    int scalePercent = Wh_GetIntSetting(L"iconSize.ProportionalScale");
-    if (!scalePercent) {
-        scalePercent = Wh_GetIntSetting(L"size.ProportionalScale");
+    // 等比缩放：以默认尺寸为基准，按比例整体缩放任务栏高度与图标大小。
+    // 仅在开关启用时读取缩放比例，否则比例保持默认 100（不缩放）。
+    g_settings.scaleRatio = 100;
+    if (g_settings.proportionalScalingEnabled) {
+        g_settings.scaleRatio = Wh_GetIntSetting(L"iconSize.ScaleRatio");
+        if (g_settings.scaleRatio <= 0) g_settings.scaleRatio = 100;
+        if (g_settings.scaleRatio < 50) g_settings.scaleRatio = 50;
+        if (g_settings.scaleRatio > 200) g_settings.scaleRatio = 200;
     }
-    if (!scalePercent) {
-        scalePercent = Wh_GetIntSetting(L"look.ProportionalScale");
+
+    // 等比缩放启用时直接由比例推导尺寸，忽略像素控制数值。
+    if (g_settings.proportionalScalingEnabled) {
+        int scaled = MulDiv(52, g_settings.scaleRatio, 100);
+        g_settings.taskbarHeight = std::max(24, std::min(96, scaled));
+        int icon = MulDiv(32, g_settings.scaleRatio, 100);
+        g_settings.iconSize = std::max(12, std::min(64, icon));
+        return;
     }
-    if (!scalePercent) {
-        scalePercent = Wh_GetIntSetting(L"ProportionalScale");
+
+    // 像素控制启用时才读取任务栏高度与图标大小两个数值。
+    if (!g_settings.pixelControlEnabled) {
+        g_settings.taskbarHeight = 0;
+        g_settings.iconSize = 0;
+        return;
     }
-    if (scalePercent != 0 && scalePercent != 100) {
-        if (scalePercent < 50) {
-            scalePercent = 50;
-        } else if (scalePercent > 300) {
-            scalePercent = 300;
-        }
-        g_settings.taskbarHeight =
-            MulDiv(g_settings.taskbarHeight, scalePercent, 100);
-        g_settings.iconSize =
-            MulDiv(g_settings.iconSize, scalePercent, 100);
-        g_settings.taskbarButtonWidth =
-            MulDiv(g_settings.taskbarButtonWidth, scalePercent, 100);
-        g_settings.trayIconSize =
-            MulDiv(g_settings.trayIconSize, scalePercent, 100);
-        g_settings.systemIconSize =
-            MulDiv(g_settings.systemIconSize, scalePercent, 100);
-    }
+
+    g_settings.taskbarHeight = Wh_GetIntSetting(L"iconSize.TaskbarHeight");
+    if (g_settings.taskbarHeight <= 0) g_settings.taskbarHeight = 52;
+    if (g_settings.taskbarHeight < 24) g_settings.taskbarHeight = 24;
+    if (g_settings.taskbarHeight > 96) g_settings.taskbarHeight = 96;
+
+    g_settings.iconSize = Wh_GetIntSetting(L"iconSize.IconSize");
+    if (g_settings.iconSize <= 0) g_settings.iconSize = 32;
+    if (g_settings.iconSize < 12) g_settings.iconSize = 12;
+    if (g_settings.iconSize > 64) g_settings.iconSize = 64;
 }
 
 HWND FindCurrentProcessTaskbarWnd() {
@@ -10763,6 +10413,13 @@ bool ProtectAndMemcpy(DWORD protect, void* dst, const void* src, size_t size) {
 }
 
 void ApplySettings(int taskbarHeight) {
+    // 无尺寸设置（像素控制关闭且未启用等比缩放，或像素控制关闭）时，恢复
+    // 原始任务栏高度并直接返回，不强制改动任务栏尺寸。
+    if (taskbarHeight <= 0) {
+        g_taskbarHeight = g_originalTaskbarHeight ? g_originalTaskbarHeight : 48;
+        return;
+    }
+
     if (taskbarHeight < 2) {
         taskbarHeight = 2;
     }
@@ -10977,16 +10634,6 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 true,
             },
             {
-                {
-                    LR"(public: __cdecl winrt::impl::consume_Windows_Foundation_Collections_IMap<struct winrt::Windows::UI::Xaml::ResourceDictionary,struct winrt::Windows::Foundation::IInspectable,struct winrt::Windows::Foundation::IInspectable>::Lookup(struct winrt::Windows::Foundation::IInspectable const &)const )",
-
-                    // Windows 11 version 21H2.
-                    LR"(public: struct winrt::Windows::Foundation::IInspectable __cdecl winrt::impl::consume_Windows_Foundation_Collections_IMap<struct winrt::Windows::UI::Xaml::ResourceDictionary,struct winrt::Windows::Foundation::IInspectable,struct winrt::Windows::Foundation::IInspectable>::Lookup(struct winrt::Windows::Foundation::IInspectable const &)const )",
-                },
-                &ResourceDictionary_Lookup_TaskbarView_Original,
-                ResourceDictionary_Lookup_TaskbarView_Hook,
-            },
-            {
                 // Pre-DynamicIconScaling.
                 {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskListItemViewModel,struct winrt::Taskbar::ITaskListItemViewModel>::GetIconHeight(void *,double *))"},
                 &TaskListItemViewModel_GetIconHeight_Original,
@@ -11005,6 +10652,7 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 {LR"(public: static double __cdecl winrt::Taskbar::implementation::TaskbarConfiguration::GetIconHeightInViewPixels(enum winrt::WindowsUdk::UI::Shell::TaskbarSize))"},
                 &TaskbarConfiguration_GetIconHeightInViewPixels_taskbarSizeEnum_Original,
                 TaskbarConfiguration_GetIconHeightInViewPixels_taskbarSizeEnum_Hook,
+                true,  // Pre-DynamicIconScaling; absent on 22H2+ builds with dynamic icon scaling.
             },
             {
                 // Pre-DynamicIconScaling.
@@ -11086,6 +10734,7 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskbarFrame,struct winrt::Windows::UI::Xaml::IFrameworkElementOverrides>::MeasureOverride(struct winrt::Windows::Foundation::Size,struct winrt::Windows::Foundation::Size *))"},
                 &TaskbarFrame_MeasureOverride_Original,
                 TaskbarFrame_MeasureOverride_Hook,
+                true,  // XAML override signature varies across builds.
             },
             {
                 {LR"(public: void __cdecl winrt::Taskbar::implementation::TaskbarFrame::UpdateIsSmallFrame(bool))"},
@@ -11094,25 +10743,22 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 true,  // Missing in older Windows 11 versions.
             },
             {
-                {LR"(public: struct winrt::Taskbar::implementation::TaskbarFrameMetrics __cdecl winrt::Taskbar::implementation::TaskbarFrame::GetMetrics(void)const )"},
-                &TaskbarFrame_GetMetrics_Original,
-                TaskbarFrame_GetMetrics_Hook,
-                true,  // Missing in older Windows 11 versions.
-            },
-            {
                 {LR"(private: void __cdecl winrt::Taskbar::implementation::TaskListButton::UpdateButtonPadding(void))"},
                 &TaskListButton_UpdateButtonPadding_Original,
                 TaskListButton_UpdateButtonPadding_Hook,
+                true,  // Signature varies across Taskbar.View.dll builds.
             },
             {
                 {LR"(public: void __cdecl winrt::Taskbar::implementation::TaskListButton::OverlayIcon(struct winrt::Windows::Storage::Streams::IRandomAccessStream const &))"},
                 &TaskListButton_OverlayIcon_Original,
                 TaskListButton_OverlayIcon_Hook,
+                true,  // Signature varies across Taskbar.View.dll builds.
             },
             {
                 {LR"(private: void __cdecl winrt::Taskbar::implementation::TaskListButton::UpdateBadge(void))"},
                 &TaskListButton_UpdateBadge_Original,
                 TaskListButton_UpdateBadge_Hook,
+                true,  // Signature varies across Taskbar.View.dll builds.
             },
             {
                 {LR"(private: void __cdecl winrt::Taskbar::implementation::TaskListButton::UpdateMultiWindowClip(void))"},
@@ -11127,15 +10773,10 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 true,  // Missing in older Windows 11 versions.
             },
             {
-                {LR"(private: void __cdecl winrt::Taskbar::implementation::TaskListButton::UpdateIconColumnDefinition(void))"},
-                &TaskListButton_UpdateIconColumnDefinition_Original,
-                nullptr,
-                true,  // Missing in older Windows 11 versions.
-            },
-            {
                 {LR"(private: void __cdecl winrt::Taskbar::implementation::TaskListButton::UpdateVisualStates(void))"},
                 &TaskListButton_UpdateVisualStates_Original,
                 TaskListButton_UpdateVisualStates_Hook,
+                true,  // Signature varies across Taskbar.View.dll builds.
             },
             {
                 {LR"(public: void __cdecl winrt::Microsoft::Windows::Taskbar::implementation::TaskbarComponentHost::IconHeight(double))"},
@@ -11165,6 +10806,7 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
                 {LR"(protected: virtual void __cdecl winrt::Taskbar::implementation::ExperienceToggleButton::UpdateButtonPadding(void))"},
                 &ExperienceToggleButton_UpdateButtonPadding_Original,
                 ExperienceToggleButton_UpdateButtonPadding_Hook,
+                true,  // Signature varies across Taskbar.View.dll builds.
             },
             {
                 // Sizes the progress indicator of a taskbar button.
@@ -11267,8 +10909,24 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
     }
 
     if (!HookSymbols(module, allHooks, index)) {
-        Wh_Log(L"HookSymbols failed");
-        return false;
+        Wh_Log(L"HookSymbols failed (continuing, resolved syms still apply)");
+        Wh_Log(L"[iconSize] null: tbtnPad=%d tbtnOv=%d tbtnBadge=%d tbtnVis=%d tframeM=%d expTog=%d | ih: enum=%d dbl=%d mth=%d tli=%d tlg=%d tbtnI=%d frm=%d",
+              (int)(TaskListButton_UpdateButtonPadding_Original == nullptr),
+              (int)(TaskListButton_OverlayIcon_Original == nullptr),
+              (int)(TaskListButton_UpdateBadge_Original == nullptr),
+              (int)(TaskListButton_UpdateVisualStates_Original == nullptr),
+              (int)(TaskbarFrame_MeasureOverride_Original == nullptr),
+              (int)(ExperienceToggleButton_UpdateButtonPadding_Original == nullptr),
+              (int)(TaskbarConfiguration_GetIconHeightInViewPixels_taskbarSizeEnum_Original == nullptr),
+              (int)(TaskbarConfiguration_GetIconHeightInViewPixels_double_Original == nullptr),
+              (int)(TaskbarConfiguration_GetIconHeightInViewPixels_method_Original == nullptr),
+              (int)(TaskListItemViewModel_GetIconHeight_Original == nullptr),
+              (int)(TaskListGroupViewModel_GetIconHeight_Original == nullptr),
+              (int)(TaskListButton_IconHeight_Original == nullptr),
+              (int)(TaskbarConfiguration_GetFrameSize_Original == nullptr));
+        // 不返回 false：本 build 上少数可选符号签名漂移使 HookSymbols 整体返回
+        // false，但绝大多数符号（含任务栏高度/帧尺寸关键钩子）已解析成功。继续
+        // 执行，让已解析的钩子生效，任务栏尺寸设置才能正常应用。
     }
 
     if (TaskListButton_IconHeight_Original) {
@@ -11301,10 +10959,6 @@ bool HookTaskbarViewDllSymbols(HMODULE module,
         TaskbarController_OnGroupingModeChanged_InitOffsets();
     }
 
-    if (TaskListButton_UpdateIconColumnDefinition_Original) {
-        TaskListButton_UpdateIconColumnDefinition_InitOffsets();
-    }
-
     constexpr UINT kDynamicIconScaling = 29785184;
     // 检测系统自带的动态图标缩放功能（feature ID 29785184）。若启用则
     // g_hasDynamicIconScaling = true，图标钩子会先跳过缩放；但
@@ -11324,11 +10978,6 @@ bool HookSearchUxUiDllSymbols(HMODULE module) {
     // SearchUx.UI.dll
     WindhawkUtils::SYMBOL_HOOK symbolHooks[] = {
         {
-            {LR"(public: __cdecl winrt::impl::consume_Windows_Foundation_Collections_IMap<struct winrt::Windows::UI::Xaml::ResourceDictionary,struct winrt::Windows::Foundation::IInspectable,struct winrt::Windows::Foundation::IInspectable>::Lookup(struct winrt::Windows::Foundation::IInspectable const &)const )"},
-            &ResourceDictionary_Lookup_SearchUxUi_Original,
-            ResourceDictionary_Lookup_SearchUxUi_Hook,
-        },
-        {
             {LR"(public: void __cdecl winrt::SearchUx::SearchUI::implementation::SearchButtonBase::IconHeight(double))"},
             &SearchButtonBase_IconHeight_Original,
             SearchButtonBase_IconHeight_Hook,
@@ -11338,12 +10987,6 @@ bool HookSearchUxUiDllSymbols(HMODULE module) {
             {LR"(protected: virtual void __cdecl winrt::SearchUx::SearchUI::implementation::SearchButtonBase::UpdateButtonPadding(void))"},
             &SearchButtonBase_UpdateButtonPadding_Original,
             SearchButtonBase_UpdateButtonPadding_Hook,
-        },
-        {
-            {LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::SearchUx::SearchUI::implementation::SearchButtonBase,struct winrt::Windows::UI::Xaml::IFrameworkElementOverrides>::MeasureOverride(struct winrt::Windows::Foundation::Size,struct winrt::Windows::Foundation::Size *))"},
-            &SearchButtonBase_MeasureOverride_Original,
-            SearchButtonBase_MeasureOverride_Hook,
-            true,  // Missing in older Windows 11 versions.
         },
     };
 
@@ -11773,6 +11416,7 @@ BOOL Wh_ModInit() {
 
 
     // ⑦ 托盘悬停展开（原 HW-Convenient Windows 的 trayHover 分组）。
+    // FIX: UIA 已改为按需创建，不再常驻，恢复初始化。
     if (g_modules.trayHover) {
         g_modules.trayHoverOk = TrayHover::Init() != FALSE;
         if (!g_modules.trayHoverOk) {

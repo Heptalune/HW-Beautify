@@ -4,7 +4,7 @@
 // @name:zh-CN      Windows 11 任务栏美化器
 // @description     Customize the taskbar with themes contributed by others or create your own
 // @description:zh-CN 使用他人贡献的主题或创建自己的主题来自定义任务栏
-// @version         1.11.1
+// @version         1.11.2
 // @author          m417z
 // @github          https://github.com/m417z
 // @twitter         https://twitter.com/m417z
@@ -368,7 +368,31 @@ Background:=<SolidColorBrush Color="{ThemeResource AutoAccent}" />
 mainColor=#fafad2
 ```
 
-然后可以在样式定义中通过前置 `$` 来使用该常量，例如：
+然后可以在样式定义中通过前置 `// ==WindhawkMod==
+// @id              windows-11-taskbar-styler
+// @name            Windows 11 Taskbar Styler
+// @name:zh-CN      Windows 11 任务栏美化器
+// @description     Customize the taskbar with themes contributed by others or create your own
+// @description:zh-CN 使用他人贡献的主题或创建自己的主题来自定义任务栏
+// @version         1.11.2
+// @author          m417z
+// @github          https://github.com/m417z
+// @twitter         https://twitter.com/m417z
+// @homepage        https://m417z.com/
+// @include         explorer.exe
+// @architecture    x86-64
+// @compilerOptions -lcomctl32 -lgdi32 -lole32 -loleaut32 -lruntimeobject -lshlwapi
+// ==/WindhawkMod==
+
+// Source code is published under The GNU General Public License v3.0.
+//
+// For bug reports and feature requests, please open an issue here:
+// https://github.com/ramensoftware/windhawk-mods/issues
+//
+// For pull requests, development takes place here:
+// https://github.com/m417z/my-windhawk-mods
+
+ 来使用该常量，例如：
 
 ```
 Fill=$mainColor
@@ -409,6 +433,65 @@ VisualTreeWatcher 的实现基于 **TranslucentTB** 项目中的
     in the mod details.
   $description:zh-CN: "主题是样式的集合。有关以下主题的详细信息，或有关提交自己主题的信息，请参阅模组详情中的相关部分。"
   $options:
+  - "": None
+  - TranslucentTaskbar: TranslucentTaskbar
+  - DockLike: DockLike
+  - SimplyTransparent: SimplyTransparent
+  - Squircle: Squircle
+  - Matter: Matter
+  - WinXP: WinXP
+  - WinXP_variant_Zune: WinXP (Zune)
+  - Bubbles: Bubbles
+  - RosePine: RosePine
+  - WinVista: WinVista
+  - CleanSlate: CleanSlate
+  - Lucent: Lucent (Accented Bar)
+  - Lucent_variant_Light: Lucent (Light Bar)
+  - SunValley: SunValley
+  - 21996Taskbar: SunValley (Legacy)
+  - BottomDensy: BottomDensy
+  - BottomDensy_variant_NoInd: BottomDensy (NoInd)
+  - TaskbarXII: TaskbarXII
+  - xdark: xdark
+  - Windows7: Windows7
+  - Aeris: Aeris
+  - Plasma: Plasma
+  - WindowGlass: WindowGlass
+  - WindowGlass_variant_Split: WindowGlass (Split)
+  - WindowGlass_variant_FullLength: WindowGlass (Full-Length)
+  - Surface: Surface
+  - Oversimplified&Accentuated: Oversimplified&Accentuated
+  - Luminosity_variant_Dock: Luminosity (Dock)
+  - Luminosity_variant_Classic: Luminosity (Classic)
+  - Luminosity_variant_Compact: Luminosity (Compact)
+  - LayerMicaUI: LayerMicaUI
+  - Fluid: Fluid
+  - TintedGlass: TintedGlass
+  - TaskbarToStatusbar: TaskbarToStatusbar
+  - UltraWideFriendly: UltraWideFriendly
+  - LiquidGlass2: LiquidGlass
+  - LiquidGlass: LiquidGlass (Legacy)
+  - LiquidGlass_variant_Alternate: LiquidGlass (Legacy - Alternate)
+  - Borderless: Borderless
+  - Command_Center: Command Center
+  - FluentGlass: FluentGlass
+  - OS26_Liquid_Glass_variant_ClearMacDock: OS26 Liquid Glass (Clear MacDock)
+  - OS26_Liquid_Glass_variant_ClearMacDockCompact: >-
+      OS26 Liquid Glass (Clear MacDock Compact)
+  - OS26_Liquid_Glass_variant_ClearTaskbar: OS26 Liquid Glass (Clear Taskbar)
+  - OS26_Liquid_Glass_variant_DarkMacDock: OS26 Liquid Glass (Dark MacDock)
+  - OS26_Liquid_Glass_variant_DarkMacDockCompact: >-
+      OS26 Liquid Glass (Dark MacDock Compact)
+  - OS26_Liquid_Glass_variant_DarkTaskbar: OS26 Liquid Glass (Dark Taskbar)
+  - FrostyGlass: FrostyGlass
+  - FrostedAcrylic: FrostedAcrylic
+  - Pills: Pills
+  - Blob: Blob
+  - Minecraft_Hotbar: Minecraft Hotbar
+  - One_UI_8_5_variant_Dock: One UI 8.5 (Dock)
+  - One_UI_8_5_variant_Taskbar: One UI 8.5 (Taskbar)
+  - OS26_Liquid_Glass_variant_ClearMacDockCompact: >-
+  $options:zh-CN:
   - "": 无
   - TranslucentTaskbar: 半透明任务栏（TranslucentTaskbar）
   - DockLike: 类似 Mac Dock（DockLike）
@@ -453,19 +536,19 @@ VisualTreeWatcher 的实现基于 **TranslucentTB** 项目中的
   - FluentGlass: Fluent 玻璃
   - OS26_Liquid_Glass_variant_ClearMacDock: OS26 液态玻璃-Clear MacDock
   - OS26_Liquid_Glass_variant_ClearMacDockCompact: >-
-      OS26 液态玻璃-Clear MacDock 紧凑版
-  - OS26_Liquid_Glass_variant_ClearTaskbar: OS26 液态玻璃-Clear Taskbar
-  - OS26_Liquid_Glass_variant_DarkMacDock: OS26 液态玻璃-Dark MacDock
+      OS26 Liquid Glass (Clear MacDock Compact)
+  - OS26_Liquid_Glass_variant_ClearTaskbar: OS26 Liquid Glass (Clear Taskbar)
+  - OS26_Liquid_Glass_variant_DarkMacDock: OS26 Liquid Glass (Dark MacDock)
   - OS26_Liquid_Glass_variant_DarkMacDockCompact: >-
-      OS26 液态玻璃-Dark MacDock 紧凑版
-  - OS26_Liquid_Glass_variant_DarkTaskbar: OS26 液态玻璃-Dark Taskbar
-  - FrostyGlass: 磨砂玻璃（FrostyGlass）
-  - FrostedAcrylic: FrostedAcrylic 风格
-  - Pills: Pills 风格
-  - Blob: Blob 风格
-  - Minecraft_Hotbar: Minecraft 热栏
-  - One_UI_8_5_variant_Dock: One UI 8.5 Dock 版
-  - One_UI_8_5_variant_Taskbar: One UI 8.5 任务栏版
+      OS26 Liquid Glass (Dark MacDock Compact)
+  - OS26_Liquid_Glass_variant_DarkTaskbar: OS26 Liquid Glass (Dark Taskbar)
+  - FrostyGlass: FrostyGlass
+  - FrostedAcrylic: FrostedAcrylic
+  - Pills: Pills
+  - Blob: Blob
+  - Minecraft_Hotbar: Minecraft Hotbar
+  - One_UI_8_5_variant_Dock: One UI 8.5 (Dock)
+  - One_UI_8_5_variant_Taskbar: One UI 8.5 (Taskbar)
 - styleConstants: [""]
   $name: Style constants
   $name:zh-CN: 样式常量
@@ -488,18 +571,14 @@ VisualTreeWatcher 的实现基于 **TranslucentTB** 项目中的
   $name:zh-CN: 资源变量
   $description: >-
     Use "Key=Value" to override an existing resource with a new value.
+  $description:zh-CN: >-
+    使用 "Key=Value" 以新值覆盖现有资源。
 
     Use "Key@Dark=Value" or "Key@Light=Value" to define theme-aware resources
     that can be referenced with {ThemeResource Key} in styles.
 
     The ":=" syntax can be used to set a XAML value. For details, refer to the
     mod description.
-  $description:zh-CN: >-
-    使用 "Key=Value" 以新值覆盖现有资源。
-
-    使用 "Key@Dark=Value" 或 "Key@Light=Value" 定义可在样式中通过 {ThemeResource Key} 引用的主题感知资源。
-
-    ":=" 语法可用于设置 XAML 值。有关详细信息，请参阅模组描述。
 - clickThroughTaskbar: false
   $name: Click-through taskbar
   $name:zh-CN: 点击穿透任务栏
@@ -518,10 +597,13 @@ VisualTreeWatcher 的实现基于 **TranslucentTB** 项目中的
     this mod.
   $description:zh-CN: "如何处理尝试使用 XAML 诊断的其他程序。一次只能有一个消费者。Block 将阻止其他程序使用它，这可能会破坏它们。Allow 将让它们使用，这可能会破坏本模组。"
   $options:
+  - alert: Alert (prompt before blocking)
+  - block: Block other consumers
+  - allow: Allow other consumers
+  $options:zh-CN:
   - alert: 警告（阻止前提示）
   - block: 阻止其他使用者
   - allow: 允许其他使用者
-
 */
 // ==/WindhawkModSettings==
 
@@ -590,13 +672,14 @@ const Theme g_themeDockLike = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"HorizontalAlignment={{taskbarDock==`vertical`?skip():DockNativeAlignment==`Left`?`Left`:`Center`}}",
-        L"Margin={{taskbarDock==`vertical`?skip():DockNativeAlignment==`Left`?0:250}},0,250,0",
+        L"HorizontalAlignment={{taskbarDock==`vertical`?skip():$TrayInFrame?`Left`:DockNativeAlignment==`Left`?`Left`:`Center`}}",
+        L"Margin={{taskbarDock==`vertical`?skip():$TrayInFrame?0:DockNativeAlignment==`Left`?0:250}},0,{{$TrayInFrame?0:250}},0",
+        L"MinWidth={{$TrayInFrame?(DockNativeAlignment==`Left`?0:$DockOffset+DockRepeaterWidth-TrayInFrameWidth+6):skip()}}",
         L"ActualWidth=>DockFrameWidth"}},
-    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
         L"ActualWidth=>DockContainerWidth"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin={{DockNativeAlignment==`Left`?-DockWidgetsWidth:skip()}},0,0,0",
+        L"Margin={{DockNativeAlignment==`Left`?-DockWidgetsWidth:$TrayInFrame?6+$DockOffset:skip()}},{{$TrayInFrame?$DockTopGap:0}},{{DockNativeAlignment==`Left`?0:$TrayInFrame?-(6+$DockOffset):skip()}},{{$TrayInFrame?$DockBottomGap:0}}",
         L"RenderTransform:=<TranslateTransform X=\"{{DockNativeAlignment==`Left`?DockContainerWidth-DockFrameWidth:skip()}}\" />"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"ActualWidth=>DockWidgetsWidth",
@@ -611,16 +694,28 @@ const Theme g_themeDockLike = {{
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
         L"ActualWidth=>DockStartInnerWidth"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Padding=6,0,6,0"}},
+        L"Padding={{$TrayInFrame?0:`6,0,6,0`}}",
+        L"Margin={{$TrayInFrame?0:`0,$DockTopGap,0,$DockBottomGap`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?0:skip()}},0,0,0",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?6+$DockOffset:skip()}},$DockTopGap,{{$TrayInFrame?-(6+$DockOffset):skip()}},$DockBottomGap"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=$DockBackground",
-        L"Margin=-6,0,-6,0",
+        L"Margin={{$TrayInFrame?$DockOffset:-6}},{{$TrayInFrame?$DockTopGap:0}},{{$TrayInFrame?max(TrayInFrameWidth-6-$DockOffset,0):-6}},{{$TrayInFrame?$DockBottomGap:0}}",
         L"CornerRadius={{DockNativeAlignment==`Left`?`0,8,0,0`:`8,8,0,0`}}",
         L"BorderBrush:=<SolidColorBrush Color=\"{ThemeResource SurfaceStrokeColorDefault}\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
         L"Visibility=Collapsed"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{taskbarDock==`vertical`?skip():6+$TrayGap}},0,{{taskbarDock==`vertical`?skip():-$TrayGap}},0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
+        L"Margin={{$TrayInFrame?6+$DockOffset:skip()}},0,{{$TrayInFrame?-(6+$DockOffset):skip()}},0"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Background:=$DockBackground",
         L"Margin=-4,-8,-4,-8",
@@ -647,7 +742,12 @@ const Theme g_themeDockLike = {{
         L"Width=Auto",
         L"MinWidth=24"}},
 }, {
+    L"DockTopGap=0",
+    L"DockBottomGap=0",
     L"DockBackground=<AcrylicBrush TintColor=\"{ThemeResource SystemChromeAltHighColor}\" TintOpacity=\"0.8\" FallbackColor=\"{ThemeResource SystemChromeLowColor}\" />",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=(DockNativeAlignment==`Left`?0:max(min((DockContainerWidth-DockRepeaterWidth-6+TrayInFrameWidth)/2,DockContainerWidth-DockRepeaterWidth-6),0))",
+    L"TrayGap=max(DockNativeAlignment==`Left`?DockContainerWidth-DockRepeaterWidth-6:(DockContainerWidth-DockRepeaterWidth-6-TrayInFrameWidth)/2,0)",
 }};
 
 const Theme g_themeSimplyTransparent = {{
@@ -951,17 +1051,25 @@ const Theme g_themeMatter = {{
 }};
 
 const Theme g_themeWinXP = {{
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
+        L"Tag=horizontal",
+        L"Tag@DockedTop=top",
+        L"Tag@DockedLeft=left",
+        L"Tag@DockedRight=right",
+        L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
-        L"Fill:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#3168d5\" Offset=\"0.0\" /> <GradientStop Color=\"#4993e6\" Offset=\"0.08\" /> <GradientStop Color=\"#245dd7\" Offset=\"0.18\" /> <GradientStop Color=\"#2561de\" Offset=\"0.9\" /> <GradientStop Color=\"#1941a5\" Offset=\"1.0\" /></LinearGradientBrush>",
+        L"Fill:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <LinearGradientBrush.RelativeTransform><RotateTransform CenterX=\"0.5\" CenterY=\"0.5\" Angle=\"$GradientAngle\" /></LinearGradientBrush.RelativeTransform> <GradientStop Color=\"#3168d5\" Offset=\"0.0\" /> <GradientStop Color=\"#4993e6\" Offset=\"0.08\" /> <GradientStop Color=\"#245dd7\" Offset=\"0.18\" /> <GradientStop Color=\"#2561de\" Offset=\"0.9\" /> <GradientStop Color=\"#1941a5\" Offset=\"1.0\" /></LinearGradientBrush>",
         L"VerticalAlignment=Stretch",
-        L"Height=Auto"}},
+        L"Height=Auto",
+        L"HorizontalAlignment=Stretch",
+        L"Width=Auto"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#HoverFlyoutBackgroundControl > Grid > Rectangle#BackgroundFill", {
         L"Fill:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#3168d5\" Offset=\"0.0\" /> <GradientStop Color=\"#4993E6\" Offset=\"0.1\" /> <GradientStop Color=\"#2157D7\" Offset=\"0.35\" /> <GradientStop Color=\"#2663E0\" Offset=\"0.8\" /> <GradientStop Color=\"#1941A5\" Offset=\"1.0\" /></LinearGradientBrush>"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton]", {
-        L"Margin=-9,0,10,0"}},
+        L"Margin={{$Vertical?0:`-9,0,10,0`}}"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel", {
         L"Padding=0",
-        L"Width=60",
+        L"Width={{$Vertical?skip():60}}",
         L"CornerRadius=9",
         L"Background:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#2D6B2D\" Offset=\"0.0\" /> <GradientStop Color=\"#7ED57E\" Offset=\"0.08\" /> <GradientStop Color=\"#3DB43D\" Offset=\"0.35\" /> <GradientStop Color=\"#2A752E\" Offset=\"0.85\" /> <GradientStop Color=\"#144818\" Offset=\"1.0\" /></LinearGradientBrush>",
         L"BorderThickness=0,0,2,0",
@@ -994,12 +1102,13 @@ const Theme g_themeWinXP = {{
     ThemeTargetStyles{L"Taskbar.TaskListButton", {
         L"Margin=-2"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
-        L"Background:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#16acf0\" Offset=\"0.0\" /> <GradientStop Color=\"#19b6f2\" Offset=\"0.08\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.18\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.9\" /> <GradientStop Color=\"#095bc9\" Offset=\"1.0\" /></LinearGradientBrush>",
-        L"BorderThickness=2,1,0,1",
+        L"Background:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <LinearGradientBrush.RelativeTransform><RotateTransform CenterX=\"0.5\" CenterY=\"0.5\" Angle=\"$GradientAngle\" /></LinearGradientBrush.RelativeTransform> <GradientStop Color=\"#16acf0\" Offset=\"0.0\" /> <GradientStop Color=\"#19b6f2\" Offset=\"0.08\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.18\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.9\" /> <GradientStop Color=\"#095bc9\" Offset=\"1.0\" /></LinearGradientBrush>",
+        L"BorderThickness={{$Vertical?`1,2,1,0`:`2,1,0,1`}}",
         L"BorderBrush=#095BC9",
-        L"Padding={{-ChevronIconWidth/2}},0,0,0"}},
+        L"Padding={{$Vertical?0:-ChevronIconWidth/2}},{{$Vertical?-ChevronIconHeight/2:0}},0,0"}},
     ThemeTargetStyles{L"SystemTray.Stack#NotifyIconStack", {
-        L"ActualWidth=>ChevronIconWidth"}},
+        L"ActualWidth=>ChevronIconWidth",
+        L"ActualHeight=>ChevronIconHeight"}},
     ThemeTargetStyles{L"Grid#OverflowRootGrid > Border", {
         L"Background:=<LinearGradientBrush StartPoint=\"0.5,0\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#16acf0\" Offset=\"0.0\" /> <GradientStop Color=\"#19b6f2\" Offset=\"0.08\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.18\" /> <GradientStop Color=\"#0c8eea\" Offset=\"0.9\" /> <GradientStop Color=\"#095bc9\" Offset=\"1.0\" /></LinearGradientBrush>"}},
     ThemeTargetStyles{L"SystemTray.ChevronIconView > Grid#ContainerGrid > Border#BackgroundBorder", {
@@ -1009,16 +1118,25 @@ const Theme g_themeWinXP = {{
         L"CornerRadius=10",
         L"BorderThickness=1",
         L"BorderBrush:=<LinearGradientBrush StartPoint=\"0,0\" EndPoint=\"1,1\"> <GradientStop Color=\"#000000\" Offset=\"0.0\" /><GradientStop Color=\"#FFFFFF\" Offset=\"1\" /></LinearGradientBrush>"}},
+}, {
+    L"GradientAngle={{taskbarDock==`left`?90:taskbarDock==`right`?-90:taskbarDock==`top`?180:0}}",
+    L"Vertical=(taskbarDock==`left`?1:taskbarDock==`right`)",
 }};
 
 const Theme g_themeWinXP_variant_Zune = {{
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
+        L"Tag=horizontal",
+        L"Tag@DockedTop=top",
+        L"Tag@DockedLeft=left",
+        L"Tag@DockedRight=right",
+        L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Rectangle#BackgroundFill", {
-        L"Fill:=<LinearGradientBrush StartPoint=\"0.5,0.5\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#656565\" Offset=\"0.0\" /> <GradientStop Color=\"#363636\" Offset=\"0.1\" /> <GradientStop Color=\"#363636\" Offset=\"0.35\" /> <GradientStop Color=\"#363636\" Offset=\"0.8\" /> <GradientStop Color=\"#363636\" Offset=\"1.0\" /></LinearGradientBrush>",
+        L"Fill:=<LinearGradientBrush StartPoint=\"0.5,0.5\" EndPoint=\"0.5,1\"> <LinearGradientBrush.RelativeTransform><RotateTransform CenterX=\"0.5\" CenterY=\"0.5\" Angle=\"$GradientAngle\" /></LinearGradientBrush.RelativeTransform> <GradientStop Color=\"#656565\" Offset=\"0.0\" /> <GradientStop Color=\"#363636\" Offset=\"0.1\" /> <GradientStop Color=\"#363636\" Offset=\"0.35\" /> <GradientStop Color=\"#363636\" Offset=\"0.8\" /> <GradientStop Color=\"#363636\" Offset=\"1.0\" /></LinearGradientBrush>",
         L"VerticalAlignment=Stretch",
         L"Height=Auto"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton]", {
         L"CornerRadius=0",
-        L"Margin=-4,0,4,0",
+        L"Margin={{$Vertical?0:`-4,0,4,0`}}",
         L"MaxWidth=48"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel", {
         L"Padding=0",
@@ -1054,19 +1172,22 @@ const Theme g_themeWinXP_variant_Zune = {{
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
         L"Fill=#858585"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
-        L"Background:=<LinearGradientBrush StartPoint=\"0.5,0.42\" EndPoint=\"0.5,0.75\"> <GradientStop Color=\"#454545\" Offset=\"0.0\" /> <GradientStop Color=\"#313131\" Offset=\"0.5\" /> <GradientStop Color=\"#363636\" Offset=\"0.35\" /> <GradientStop Color=\"#1D1D1D\" Offset=\"0.8\" /> <GradientStop Color=\"#1D1D1D\" Offset=\"1.0\" /></LinearGradientBrush>",
-        L"BorderThickness=1,0,0,0",
+        L"Background:=<LinearGradientBrush StartPoint=\"0.5,0.42\" EndPoint=\"0.5,0.75\"> <LinearGradientBrush.RelativeTransform><RotateTransform CenterX=\"0.5\" CenterY=\"0.5\" Angle=\"$GradientAngle\" /></LinearGradientBrush.RelativeTransform> <GradientStop Color=\"#454545\" Offset=\"0.0\" /> <GradientStop Color=\"#313131\" Offset=\"0.5\" /> <GradientStop Color=\"#363636\" Offset=\"0.35\" /> <GradientStop Color=\"#1D1D1D\" Offset=\"0.8\" /> <GradientStop Color=\"#1D1D1D\" Offset=\"1.0\" /></LinearGradientBrush>",
+        L"BorderThickness={{$Vertical?`0,1,0,0`:`1,0,0,0`}}",
         L"BorderBrush=#222222",
-        L"Padding=4,0,0,0"}},
+        L"Padding={{$Vertical?`0,4,0,0`:`4,0,0,0`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton#TaskListButton > Grid#IconPanel@RunningIndicatorStates > Windows.UI.Xaml.Controls.Image#Icon, Taskbar.TaskListButton#TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel@RunningIndicatorStates > Windows.UI.Xaml.Controls.Image#Icon", {
         L"Height@NoRunningIndicator=16"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton#TaskListButton > Grid#IconPanel@RunningIndicatorStates, Taskbar.TaskListButton#TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel@RunningIndicatorStates", {
-        L"Margin@NoRunningIndicator=-7,0,-7,0",
+        L"Margin@NoRunningIndicator={{$Vertical?`0,-7,0,-7`:`-7,0,-7,0`}}",
         L"Padding@NoRunningIndicator=0"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton", {
         L"Margin=-1.5"}},
     ThemeTargetStyles{L"Grid#OverflowRootGrid > Border", {
         L"Background:=<LinearGradientBrush StartPoint=\"0.5,0.5\" EndPoint=\"0.5,1\"> <GradientStop Color=\"#656565\" Offset=\"0.0\" /> <GradientStop Color=\"#363636\" Offset=\"0.1\" /> <GradientStop Color=\"#363636\" Offset=\"0.35\" /> <GradientStop Color=\"#363636\" Offset=\"0.8\" /> <GradientStop Color=\"#363636\" Offset=\"1.0\" /></LinearGradientBrush>"}},
+}, {
+    L"GradientAngle={{taskbarDock==`left`?90:taskbarDock==`right`?-90:taskbarDock==`top`?180:0}}",
+    L"Vertical=(taskbarDock==`left`?1:taskbarDock==`right`)",
 }};
 
 const Theme g_themeBubbles = {{
@@ -1219,8 +1340,6 @@ const Theme g_themeBubbles = {{
 const Theme g_themeRosePine = {{
     ThemeTargetStyles{L"Taskbar.TaskListButton", {
         L"CornerRadius=3"}},
-    ThemeTargetStyles{L"SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
-        L"FontSize=16"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
         L"MinWidth=25"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter[1] > SystemTray.IconView > Grid > Grid", {
@@ -2402,8 +2521,7 @@ const Theme g_themeBottomDensy = {{
         L"CornerRadius=0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid > Grid#ConfirmatorMainGrid", {
         L"BorderThickness=0",
-        L"CornerRadius=0",
-        L"MinHeight=32"}},
+        L"CornerRadius=0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid", {
         L"Padding=0,0,0,0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid > Grid#ConfirmatorMainGrid > Grid#VolumeConfirmator", {
@@ -2492,8 +2610,7 @@ const Theme g_themeBottomDensy_variant_NoInd = {{
         L"CornerRadius=0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid > Grid#ConfirmatorMainGrid", {
         L"BorderThickness=0",
-        L"CornerRadius=0",
-        L"MinHeight=32"}},
+        L"CornerRadius=0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid", {
         L"Padding=0,0,0,0"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > HWConfirmatorUI.ConfirmatorHostControl > Canvas#ConfirmatorFrameCanvas > Grid > Grid#ConfirmatorMainGrid > Grid#VolumeConfirmator", {
@@ -2528,8 +2645,7 @@ const Theme g_themeBottomDensy_variant_NoInd = {{
 const Theme g_themeTaskbarXII = {{
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid", {
         L"Background:=<AcrylicBrush TintColor=\"{ThemeResource SystemListLowColor}\" TintOpacity=\"0.1\" FallbackColor=\"{ThemeResource SystemChromeHighColor}\" />",
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"4\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"4\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
         L"Tag@DockedLeft=vertical",
@@ -2537,24 +2653,31 @@ const Theme g_themeTaskbarXII = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Grid.Column=1",
-        L"HorizontalAlignment=Right",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Right`}}",
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
         L"Height={{taskbarDock==`vertical`?skip():56}}",
-        L"MaxWidth={{taskbarDock==`vertical`?skip():(containerGridWidth>0?containerGridWidth:skip())}}"}},
+        L"MaxWidth={{taskbarDock==`vertical`?skip():$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:skip()}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth-1:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid", {
         L"Height=48",
-        L"CornerRadius=4"}},
+        L"CornerRadius={{$TrayInFrame?0:4}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl", {
         L"Transform3D:=<CompositeTransform3D TranslateX=\"{{$separateWidget?(widgetWidth==``?skip():widgetWidth+4.5):skip()}}\"/>",
         L"Opacity=0.7",
-        L"Height=48"}},
+        L"Height=48",
+        L"Margin={{$TrayInFrame?$DockOffset:skip()}},0,{{$TrayInFrame?max(TrayInFrameWidth+1-$DockOffset,0)+($separateWidget?(widgetWidth==``?0:widgetWidth+4.5):0):skip()}},0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground > Grid", {
         L"CornerRadius=4",
         L"Opacity=1"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
         L"Height=0"}},
     ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
-        L"Margin=3,0,3,0"}},
+        L"Margin={{$TrayInFrame?`0,-4,0,-4`:`3,0,3,0`}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-3:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?3+$DockOffset:skip()}},4,{{$TrayInFrame?-(3+$DockOffset):skip()}},4"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton > Taskbar.TaskListButtonPanel", {
         L"Background:={{$separateWidget?`<SolidColorBrush Color=\"{ThemeResource SystemChromeAltHighColor}\" Opacity=\"0.6\" />`:skip()}}",
         L"CornerRadius={{$separateWidget?4:skip()}}",
@@ -2594,8 +2717,16 @@ const Theme g_themeTaskbarXII = {{
     ThemeTargetStyles{L"TextBlock#DateInnerTextBlock", {
         L"FontSize=15",
         L"FontWeight=SemiBold"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?`7,-4,0,-4`:skip()}}"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth",
+        L"Background:={{TrayInFrameWidth==``?skip():`<AcrylicBrush TintColor=\"{ThemeResource SystemListLowColor}\" TintOpacity=\"0.1\" FallbackColor=\"{ThemeResource SystemChromeHighColor}\" />`}}"}},
 }, {
     L"separateWidget=1",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-3)/2,0)",
 }};
 
 const Theme g_themexdark = {{
@@ -2603,9 +2734,6 @@ const Theme g_themexdark = {{
         L"CornerRadius=13",
         L"Padding=6,0,6,0",
         L"HorizontalContentAlignment=Left"}},
-    ThemeTargetStyles{L"SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
-        L"FontSize=16",
-        L"Foreground=#facc15"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView#NotifyItemIcon", {
         L"MinWidth=25"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter[1] > SystemTray.IconView > Grid > Grid", {
@@ -2636,8 +2764,7 @@ const Theme g_themexdark = {{
     ThemeTargetStyles{L"SystemTray.ImageIconContent > Grid#ContainerGrid > Image", {
         L"Width=13"}},
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
-        L"FontSize=13",
-        L"Foreground=#facc15"}},
+        L"FontSize=13"}},
     ThemeTargetStyles{L"TextBlock#LabelControl", {
         L"FontFamily=Segoe UI Medium",
         L"Foreground=#facc15",
@@ -3050,9 +3177,14 @@ const Theme g_themeAeris = {{
         L"Transform3D:=<CompositeTransform3D TranslateX=\"2\" TranslateY=\"1\" />"}},
     ThemeTargetStyles{L"Grid#IconPanel > Rectangle#DefaultIcon, Taskbar.TaskListLabeledButtonPanel > Rectangle#DefaultIcon", {
         L"Visibility=Collapsed"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
+        L"Tag=horizontal",
+        L"Tag@DockedLeft=vertical",
+        L"Tag@DockedRight=vertical",
+        L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel", {
-        L"MinWidth=60",
-        L"Margin=0,0,$taskListMargin,0"}},
+        L"MinWidth={{taskbarDock==`vertical`?skip():60}}",
+        L"Margin={{taskbarDock==`vertical`?`$taskListMargin,0,$taskListMargin,0`:`0,0,$taskListMargin,0`}}"}},
     ThemeTargetStyles{L"Taskbar.SearchBoxButton > Taskbar.TaskListButtonPanel@CommonStates", {
         L"Padding=0",
         L"Margin=$taskListMargin,0,$taskListMargin,0",
@@ -3343,15 +3475,22 @@ const Theme g_themeWindowGlass = {{
         L"Tag@DockedRight=vertical",
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
-        L"MaxWidth={{containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+20+WGRepeaterWidth-TrayInFrameWidth-0:skip()}}",
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
         L"Grid.Column=1"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Margin=10,2,0,2",
-        L"BorderThickness=0.5,1,0,1",
-        L"CornerRadius=$CornerRadius,0,0,$CornerRadius",
-        L"Background:=$Background",
-        L"Padding=10,0,0,0"}},
+        L"Margin={{$TrayInFrame?0:10}},2,0,2",
+        L"BorderThickness={{$TrayInFrame?0:`0.5,1,0,1`}}",
+        L"CornerRadius={{$TrayInFrame?0:`$CornerRadius,0,0,$CornerRadius`}}",
+        L"Background:={{$TrayInFrame?skip():`$Background`}}",
+        L"Padding={{$TrayInFrame?0:`10,0,0,0`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`$Background`:skip()}}",
+        L"BorderThickness={{$TrayInFrame?`0.5,1,0,1`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?`$CornerRadius,0,0,$CornerRadius`:skip()}}",
+        L"Margin={{$TrayInFrame?10+$DockOffset:skip()}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):skip()}},0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
@@ -3368,7 +3507,7 @@ const Theme g_themeWindowGlass = {{
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0"}},
+        L"Margin={{$TrayInFrame?`0,-2,0,-2`:0}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,2,0,2",
         L"Padding=0,0,8,0",
@@ -3376,8 +3515,7 @@ const Theme g_themeWindowGlass = {{
         L"BorderThickness=0,1,0.5,1",
         L"CornerRadius=0,$CornerRadius,$CornerRadius,0"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SystemTray.ChevronIconView", {
         L"Padding=6,0,6,0",
         L"CornerRadius=8",
@@ -3473,8 +3611,6 @@ const Theme g_themeWindowGlass = {{
         L"BorderThickness=$ElementBorderThickness",
         L"MaxWidth:=100",
         L"Width=Auto"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
-        L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.ToolTip > Windows.UI.Xaml.Controls.ContentPresenter#LayoutRoot", {
@@ -3509,6 +3645,17 @@ const Theme g_themeWindowGlass = {{
         L"BorderBrush:=$BorderBrush",
         L"BorderThickness=$BorderThickness",
         L"CornerRadius=$CornerRadius"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-2,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?min($TaskbarFrameMaxWidth+TrayInFrameWidth,containerGridWidth)-20:skip()}}",
+        L"ActualWidth=>WGRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},2,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"Translucent=<WindhawkBlur BlurAmount=\"15\" TintColor=\"#10808080\"/>",
     L"Glass=<WindhawkBlur BlurAmount=\"5\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintOpacity=\"0.7\" />",
@@ -3530,6 +3677,8 @@ const Theme g_themeWindowGlass = {{
     L"TrayPadding=2,4,2,4",
     L"Height=70",
     L"TaskbarFrameMaxWidth=1895",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-20-WGRepeaterWidth)/2,0)",
 }};
 
 const Theme g_themeWindowGlass_variant_Split = {{
@@ -3540,14 +3689,21 @@ const Theme g_themeWindowGlass_variant_Split = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Grid.Column=1",
-        L"MaxWidth={{containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+20+WGRepeaterWidth-TrayInFrameWidth-3:skip()}}",
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Margin=10,2,3,2",
-        L"BorderThickness=$BorderThickness",
-        L"CornerRadius=25,5,5,25",
-        L"Background:=$Background",
-        L"Padding=10,0,0,0"}},
+        L"Margin={{$TrayInFrame?0:10}},2,{{$TrayInFrame?0:3}},2",
+        L"BorderThickness={{$TrayInFrame?0:`$BorderThickness`}}",
+        L"CornerRadius={{$TrayInFrame?0:`25,5,5,25`}}",
+        L"Background:={{$TrayInFrame?skip():`$Background`}}",
+        L"Padding={{$TrayInFrame?0:`10,0,0,0`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`$Background`:skip()}}",
+        L"BorderThickness={{$TrayInFrame?`$BorderThickness`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?`25,5,5,25`:skip()}}",
+        L"Margin={{$TrayInFrame?10+$DockOffset:skip()}},0,{{$TrayInFrame?max(TrayInFrameWidth+3-20-$DockOffset,0):skip()}},0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
@@ -3662,8 +3818,6 @@ const Theme g_themeWindowGlass_variant_Split = {{
         L"BorderThickness=$ElementBorderThickness",
         L"MaxWidth:=100",
         L"Width=Auto"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
-        L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.ToolTip > Windows.UI.Xaml.Controls.ContentPresenter#LayoutRoot", {
@@ -3701,7 +3855,18 @@ const Theme g_themeWindowGlass_variant_Split = {{
         L"BorderThickness=$BorderThickness",
         L"CornerRadius=$CornerRadius"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?`3,-2,0,-2`:skip()}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-2,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?min($TaskbarFrameMaxWidth+TrayInFrameWidth,containerGridWidth)-20:skip()}}",
+        L"ActualWidth=>WGRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},2,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
         L"ActualWidth=>containerGridWidth"}},
 }, {
     L"Translucent=<WindhawkBlur BlurAmount=\"15\" TintColor=\"#10808080\"/>",
@@ -3724,6 +3889,8 @@ const Theme g_themeWindowGlass_variant_Split = {{
     L"TrayPadding=2,4,2,4",
     L"Height=70",
     L"TaskbarFrameMaxWidth=1895",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-20-WGRepeaterWidth)/2,0)",
 }};
 
 const Theme g_themeWindowGlass_variant_FullLength = {{
@@ -3736,10 +3903,14 @@ const Theme g_themeWindowGlass_variant_FullLength = {{
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=10,2,10,2",
-        L"BorderThickness=$BorderThickness",
+        L"BorderThickness={{$TrayInFrame?0:`$BorderThickness`}}",
         L"CornerRadius=$CornerRadius",
         L"Background:=$Background",
         L"Padding=0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`-10,-2,10,2`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?`10,2,-10,-2`:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
@@ -3856,8 +4027,6 @@ const Theme g_themeWindowGlass_variant_FullLength = {{
         L"BorderThickness=$ElementBorderThickness",
         L"MaxWidth:=100",
         L"Width=Auto"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
-        L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.ToolTip > Windows.UI.Xaml.Controls.ContentPresenter#LayoutRoot", {
@@ -3869,7 +4038,7 @@ const Theme g_themeWindowGlass_variant_FullLength = {{
         L"MaxWidth:=300",
         L"MinWidth:=10",
         L"Width=Auto",
-        L"Margin=0"}},
+        L"Margin={{$TrayInFrame?`10,2,-10,-2`:0}}"}},
     ThemeTargetStyles{L"WindowsInternal.ComposableShell.Experiences.Switcher.VirtualDesktopBarElement > Windows.UI.Xaml.Controls.Grid#GridElement > Windows.UI.Xaml.Controls.Border#VirtualDesktopSwitcherBackground", {
         L"Background:=$Background",
         L"BorderBrush:=$BorderBrush",
@@ -3892,6 +4061,9 @@ const Theme g_themeWindowGlass_variant_FullLength = {{
         L"BorderBrush:=$BorderBrush",
         L"BorderThickness=$BorderThickness",
         L"CornerRadius=$CornerRadius"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?`10,0,-20,-4`:skip()}}"}},
 }, {
     L"Translucent=<WindhawkBlur BlurAmount=\"15\" TintColor=\"#10808080\"/>",
     L"Glass=<WindhawkBlur BlurAmount=\"5\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintOpacity=\"0.7\" />",
@@ -3912,11 +4084,12 @@ const Theme g_themeWindowGlass_variant_FullLength = {{
     L"CornerRadius=20",
     L"TrayPadding=2,4,2,4",
     L"Height=70",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }};
 
 const Theme g_themeSurface = {{
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(SurfaceRepeaterWidth-$DockOffset-(SurfaceRepeaterWidth-TrayInFrameWidth+20),0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"CornerRadius=20",
         L"BorderThickness=1",
@@ -3932,11 +4105,12 @@ const Theme g_themeSurface = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
         L"Height={{taskbarDock==`vertical`?skip():70}}",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+(SurfaceRepeaterWidth-TrayInFrameWidth+20):skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Visibility=Visible",
         L"Margin=0,0,0,10",
-        L"Padding=20,0,20,0"}},
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Height={{taskbarDock==`vertical`?skip():70}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
@@ -3965,11 +4139,24 @@ const Theme g_themeSurface = {{
         L"Margin=0,0,0,8"}},
     ThemeTargetStyles{L"Border#MultiWindowElement", {
         L"Height=0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?(containerGridWidth-$DockOffset-SurfaceRepeaterWidth):skip()}},0,{{$TrayInFrame?-((containerGridWidth-$DockOffset-SurfaceRepeaterWidth)-20):skip()}},-10"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-TrayInFrameWidth-20:skip()}}",
+        L"ActualWidth=>SurfaceRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},0,{{$TrayInFrame?-(20+$DockOffset):skip()}},0"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"TaskItemBackground=<AcrylicBrush TintColor=\"{ThemeResource SystemChromeAltHighColor}\" TintOpacity=\"0.9\" FallbackColor=\"{ThemeResource SystemChromeMediumColor}\" />",
     L"TaskItemBorder=<LinearGradientBrush StartPoint=\"0,0\" EndPoint=\"0.5,1\"><GradientStop Color=\"#00000000\" Offset=\"0\" /><GradientStop Color=\"#33000000\" Offset=\"1.5\" /></LinearGradientBrush>",
     L"SystemItemBackground=<AcrylicBrush TintColor=\"{ThemeResource SystemChromeAltHighColor}\" TintOpacity=\"0.8\" FallbackColor=\"{ThemeResource SystemChromeLowColor}\" />",
     L"SystemItemBorder=<LinearGradientBrush StartPoint=\"0,0\" EndPoint=\"0.5,1\"><GradientStop Color=\"#00000000\" Offset=\"0\" /><GradientStop Color=\"#33000000\" Offset=\"1.5\" /></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-SurfaceRepeaterWidth+TrayInFrameWidth-20)/2,0)",
 }};
 
 const Theme g_themeOversimplified_Accentuated = {{
@@ -4383,18 +4570,32 @@ const Theme g_themeLuminosity_variant_Dock = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
         L"HorizontalAlignment=Stretch",
-        L"Margin=$DockMargin,0,$DockMargin,0"}},
+        L"Margin={{$TrayInFrame?0:`$DockMargin,0,$DockMargin,0`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,$DockTopGap,0,$DockBottomGap"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Margin={{$TrayInFrame?$DockMargin:skip()}},0,{{$TrayInFrame?$DockMargin:skip()}},0",
         L"Background:=$lumiBackground",
         L"BorderThickness=$bt",
         L"BorderBrush=$bb",
         L"CornerRadius=$mcr"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?0:skip()}},{{-($DockTopGap)}},0,{{-($DockBottomGap)}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?0:skip()}},$DockTopGap,0,$DockBottomGap"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=0,0,$WidgetGap57,0"}},
+        L"Margin={{$TrayInFrame?($LeftAligned?0:$DockMargin):0}},{{$TrayInFrame?$DockTopGap:0}},$WidgetGap57,{{$TrayInFrame?$DockBottomGap:0}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton]", {
+        L"Margin={{$TrayInFrame?($LeftAligned?$DockMargin:0):skip()}},$DockTopGap,0,$DockBottomGap"}},
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
+        L"Width=>LumiStartWidth"}},
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+        L"ActualWidth=>LumiStartInnerWidth"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Margin=0,$DockTopGap,$DockMargin,$DockBottomGap"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"Margin=0,{{$TrayInFrame?$DockTopGap:0}},{{$TrayInFrame?$DockMargin:0}},{{$TrayInFrame?$DockBottomGap:0}}",
+        L"ActualWidth=>TrayInFrameWidth"}},
     ThemeTargetStyles{L"Grid#HoverFlyoutGrid", {
         L"Margin=0,0,0,$DockTopGap"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
@@ -4421,6 +4622,8 @@ const Theme g_themeLuminosity_variant_Dock = {{
     L"bn=Transparent",
     L"bh=<SolidColorBrush Color=\"{ThemeResource ControlFillColorSecondary}\" />",
     L"bp=<SolidColorBrush Color=\"{ThemeResource ControlFillColorTertiary}\" />",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"LeftAligned=(LumiStartWidth==``?0:LumiStartInnerWidth==``?0:LumiStartInnerWidth<=0?0:LumiStartWidth-LumiStartInnerWidth>8)",
 }, {
     L"LumiAccent@Dark={ThemeResource SystemAccentColorLight2}",
     L"LumiAccent@Light={ThemeResource SystemAccentColorDark1}",
@@ -5232,8 +5435,17 @@ const Theme g_themeLayerMicaUI = {{
         L"Margin=0,-1,0,-1",
         L"BorderBrush:=$ThemeControlBorder",
         L"BorderThickness=1"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton", {
+        L"Margin={{$TrayInFrame?`0,2,0,2`:`0,-1,0,-1`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl", {
-        L"Opacity=0"}},
+        L"Opacity={{$TrayInFrame?1:0}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`$ThemeLayer`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?$OuterRadius:skip()}}",
+        L"BorderThickness={{$TrayInFrame?1:skip()}}",
+        L"Margin={{$TrayInFrame?8:skip()}},0,{{$TrayInFrame?TrayInFrameWidth-4:skip()}},0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
+        L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#HoverFlyoutBackgroundControl > Grid > Rectangle#BackgroundFill", {
         L"CornerRadius=$OuterRadius"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#HoverFlyoutBackgroundControl", {
@@ -5246,11 +5458,11 @@ const Theme g_themeLayerMicaUI = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Margin=8,3,0,3",
-        L"CornerRadius=$OuterRadius",
-        L"Padding=-8,0,0,0",
-        L"Background:=$ThemeLayer",
-        L"BorderThickness=1",
+        L"Margin={{$TrayInFrame?0:8}},3,0,3",
+        L"CornerRadius={{$TrayInFrame?0:$OuterRadius}}",
+        L"Padding={{$TrayInFrame?0:-8}},0,0,0",
+        L"Background:={{$TrayInFrame?skip():`$ThemeLayer`}}",
+        L"BorderThickness={{$TrayInFrame?0:1}}",
         L"HorizontalAlignment=Left"}},
     ThemeTargetStyles{L"TextBlock#InnerTextBlock[Text=\uE971], TextBlock#InnerTextBlock[Text=\uE972]", {
         L"Text=\uF0E2"}},
@@ -5317,11 +5529,14 @@ const Theme g_themeLayerMicaUI = {{
         L"BorderThickness=1",
         L"BorderBrush:=$ThemeOutBorder"}},
     ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
-        L"Margin=0,0,2,0"}},
+        L"Margin={{$TrayInFrame?`0,-3,0,-3`:`0,0,2,0`}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-16:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
         L"Visibility=1"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"Background:=<WindhawkBlur BlurAmount=\"5\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintSaturation=\"2\" NoiseOpacity=\"0.19\" NoiseDensity=\"0.8\" TintOpacity=\"0.2\" TintLuminosityOpacity=\"0\" />"}},
+        L"Background:=$BaseBlur"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchBoxButton#SearchBox", {
         L"Margin=0,-1,0,0"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonRootGrid@CommonStates > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonRootGrid@CommonStates > Border#BackgroundElement", {
@@ -5347,8 +5562,17 @@ const Theme g_themeLayerMicaUI = {{
         L"BorderBrush:=$ThemeOutBorder"}},
     ThemeTargetStyles{L"WindowsInternal.ComposableShell.Experiences.Switcher.VirtualDesktopBarElement > Grid#GridElement > Border#VirtualDesktopSwitcherBackground", {
         L"Background:=$ThemeLayer"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?containerGridWidth-DockRepeaterWidth:skip()}},-4,{{$TrayInFrame?-(containerGridWidth-DockRepeaterWidth):skip()}},-4"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?`0,3,0,3`:skip()}}"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"Background:={{TrayInFrameWidth==``?skip():`$BaseBlur`}}",
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"ThemeBlur=<WindhawkBlur BlurAmount=\"12\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintSaturation=\"1.25\" NoiseOpacity=\"0.1\" NoiseDensity=\"0.8\" TintOpacity=\"0.2\" TintLuminosityOpacity=\"0.3\" />",
+    L"BaseBlur=<WindhawkBlur BlurAmount=\"5\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintSaturation=\"2\" NoiseOpacity=\"0.19\" NoiseDensity=\"0.8\" TintOpacity=\"0.2\" TintLuminosityOpacity=\"0\" />",
     L"ThemeLayer=<AcrylicBrush BackgroundSource=\"Backdrop\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintOpacity=\"{ThemeResource bgOpacity}\" TintLuminosityOpacity=\"{ThemeResource bgLuminosity}\" FallbackColor=\"{ThemeResource SystemChromeMediumColor}\" />",
     L"OuterRadius=10",
     L"InnerRadius=8",
@@ -5360,6 +5584,7 @@ const Theme g_themeLayerMicaUI = {{
     L"ThemeControlBorder=<SolidColorBrush Color=\"{ThemeResource ControlBorder}\" />",
     L"ThFntWt=Normal",
     L"ThemeFlyout=<AcrylicBrush BackgroundSource=\"Backdrop\" TintColor=\"{ThemeResource SystemChromeMediumColor}\" TintOpacity=\"0.1\" TintLuminosityOpacity=\"0.8\" FallbackColor=\"{ThemeResource SystemChromeMediumColor}\" />",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }, {
     L"Accent1@Dark={ThemeResource SystemAccentColorLight3}",
     L"Accent1@Light={ThemeResource SystemAccentColorDark2}",
@@ -5529,7 +5754,9 @@ const Theme g_themeTintedGlass = {{
 const Theme g_themeTaskbarToStatusbar = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
         L"Width=Auto",
-        L"HorizontalAlignment=Left"}},
+        L"HorizontalAlignment=Left",
+        L"MaxWidth={{TrayInFrameWidth==``?skip():(containerGridWidth+TrayInFrameWidth)/2}}",
+        L"ActualWidth=>StatusbarRepeaterWidth"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=TaskViewButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"Width=3840",
         L"Margin=0,0,-3840,0"}},
@@ -5539,7 +5766,7 @@ const Theme g_themeTaskbarToStatusbar = {{
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.SearchBoxButton#SearchBoxButton[AutomationProperties.AutomationId=SearchButton] > Taskbar.TaskListButtonPanel", {
         L"Visibility=Collapsed"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
         L"Visibility=Collapsed"}},
@@ -5579,14 +5806,20 @@ const Theme g_themeTaskbarToStatusbar = {{
         L"Fill:=<SolidColorBrush Color=\"{ThemeResource TextFillColorInverse}\"  Opacity=\"1.0\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background=Black"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"RenderTransform:=<TranslateTransform X=\"{{TrayInFrameWidth==``?skip():(containerGridWidth+TrayInFrameWidth)/2-StatusbarRepeaterWidth}}\" />"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
+        L"Margin={{TrayInFrameWidth==``?skip():0}}"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }};
 
 const Theme g_themeUltraWideFriendly = {{
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
         L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
         L"HorizontalAlignment=Stretch",
-        L"Background:=<SolidColorBrush Color=\"$GhostBarBackgroundColor\"/>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"Background:=<SolidColorBrush Color=\"$GhostBarBackgroundColor\"/>"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
         L"Tag@DockedLeft=vertical",
@@ -5595,34 +5828,54 @@ const Theme g_themeUltraWideFriendly = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Grid.Column=1",
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"HorizontalAlignment=Right",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Right`}}",
         L"Margin=0,0,$IslandHorizontalMargin,0",
-        L"MaxWidth={{containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}"}},
+        L"MaxWidth={{$TrayInFrame?`Infinity`:containerGridWidth>0?min($TaskbarFrameMaxWidth,containerGridWidth):$TaskbarFrameMaxWidth}}",
+        L"MinWidth={{$TrayInFrame?$IslandOffset+IslandRepeaterWidth-TrayInFrameWidth-2*$IslandHorizontalMargin+25:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid", {
-        L"Background:=<SolidColorBrush Color=\"$IslandBackgroundColor\"/>",
-        L"CornerRadius=10",
-        L"Padding=25,0,25,0",
-        L"Margin=0,$IslandVerticalMargin,0,$IslandVerticalMargin"}},
+        L"Background:={{$TrayInFrame?skip():`<SolidColorBrush Color=\"$IslandBackgroundColor\"/>`}}",
+        L"CornerRadius={{$TrayInFrame?0:10}}",
+        L"Padding={{$TrayInFrame?0:`25,0,25,0`}}",
+        L"Margin={{$TrayInFrame?0:`0,$IslandVerticalMargin,0,$IslandVerticalMargin`}}"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=$IslandHorizontalMargin,0,0,0"}},
+        L"Margin={{$TrayInFrame?25+2*$IslandHorizontalMargin:$IslandHorizontalMargin}},0,0,0"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Background:=<SolidColorBrush Color=\"$IslandBackgroundColor\"/>",
         L"CornerRadius=10",
         L"Padding=5,0,5,0",
         L"Margin=0,$IslandVerticalMargin,0,$IslandVerticalMargin"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl", {
-        L"Visibility=Collapsed"}},
+        L"Visibility={{$TrayInFrame?`Visible`:`Collapsed`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`<SolidColorBrush Color=\"$IslandBackgroundColor\"/>`:skip()}}",
+        L"CornerRadius=10",
+        L"Margin={{$TrayInFrame?$IslandOffset:skip()}},$IslandVerticalMargin,{{$TrayInFrame?max(TrayInFrameWidth+2*$IslandHorizontalMargin-25-$IslandOffset,0):skip()}},$IslandVerticalMargin"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Fill=Transparent"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundStroke", {
+        L"Visibility=Collapsed"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?min($TaskbarFrameMaxWidth-25+TrayInFrameWidth+2*$IslandHorizontalMargin,containerGridWidth-25):skip()}}",
+        L"ActualWidth=>IslandRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?25+$IslandOffset:skip()}},0,{{$TrayInFrame?-(25+$IslandOffset):skip()}},0"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth",
+        L"Background:={{TrayInFrameWidth==``?skip():`<SolidColorBrush Color=\"$GhostBarBackgroundColor\"/>`}}"}},
 }, {
     L"GhostBarBackgroundColor=#66000000",
     L"IslandBackgroundColor={ThemeResource ControlFillColorDefault}",
     L"IslandVerticalMargin=3",
     L"IslandHorizontalMargin=5",
     L"TaskbarFrameMaxWidth=8000",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"IslandOffset=max((containerGridWidth-IslandRepeaterWidth-25)/2,0)",
 }};
 
 const Theme g_themeLiquidGlass2 = {{
@@ -5653,8 +5906,6 @@ const Theme g_themeLiquidGlass2 = {{
         L"Fill@Inactive=#50ffffff"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
         L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth",
-        L"ActualHeight=>TaskHeight",
         L"HorizontalAlignment=Stretch"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
@@ -5663,17 +5914,18 @@ const Theme g_themeLiquidGlass2 = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"HorizontalAlignment=Center",
-        L"MaxWidth={{containerGridWidth>0?max(containerGridWidth-2*(trayWidth+50),100):`Infinity`}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?max(containerGridWidth-2*(trayWidth+50),100):`Infinity`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+82+(DockRepeaterWidth-TrayInFrameWidth-91):skip()}}",
         L"Grid.Column=1"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Padding=41,0,41,0",
+        L"Padding={{$TrayInFrame?0:`41,0,41,0`}}",
         L"Margin=0,0,0,4",
         L"Background:=Transparent",
-        L"HorizontalAlignment=Center",
+        L"HorizontalAlignment={{$TrayInFrame?`Stretch`:`Center`}}",
         L"Width=Auto"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-40,0,-40,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset+1:-40}},0,{{$TrayInFrame?max(TrayInFrameWidth+10-$DockOffset,0):-40}},0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Fill:=<WindhawkBlur BlurAmount=\"3\" TintColor=\"#14090909\" TintSaturation=\"1.2\"/>",
         L"RadiusX={{(TaskHeight/4.1)*2}}",
@@ -5704,7 +5956,7 @@ const Theme g_themeLiquidGlass2 = {{
         L"ActualWidth=>trayWidth"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"HorizontalAlignment=Left",
-        L"Margin=50,0,0,0",
+        L"Margin={{$TrayInFrame?`91,0,0,-4`:`50,0,0,0`}}",
         L"Grid.Column=2"}},
     ThemeTargetStyles{L"Taskbar.Gripper#GripperControl", {
         L"MinWidth=24"}},
@@ -5879,7 +6131,7 @@ const Theme g_themeLiquidGlass2 = {{
         L"Width=60"}},
     ThemeTargetStyles{L"Taskbar.OverflowToggleButton", {
         L"MinWidth=60",
-        L"Margin=5,0,5,0"}},
+        L"Margin={{$TrayInFrame?46+$DockOffset:5}},0,{{$TrayInFrame?-(36+$DockOffset):5}},0"}},
     ThemeTargetStyles{L"Grid#IconPanel@CommonStates > Border#BackgroundElement, Taskbar.TaskListLabeledButtonPanel@CommonStates > Border#BackgroundElement", {
         L"Background=Transparent",
         L"BorderBrush=Transparent"}},
@@ -5933,7 +6185,7 @@ const Theme g_themeLiquidGlass2 = {{
         L"RenderTransform@CheckedNormal:=<ScaleTransform ScaleX=\"1.37\" ScaleY=\"1.37\" />",
         L"RenderTransform@CheckedPointerOver:=<ScaleTransform ScaleX=\"1.37\" ScaleY=\"1.37\" />",
         L"RenderTransform@CheckedPressed:=<ScaleTransform ScaleX=\"1.1\" ScaleY=\"1.1\" />"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
+    ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
         L"Margin=2,0,3,0"}},
     ThemeTargetStyles{L"SystemTray.OmniButton#NotificationCenterButton@CommonStates > Grid > Border#BackgroundBorder", {
         L"Background:=Transparent",
@@ -6017,13 +6269,39 @@ const Theme g_themeLiquidGlass2 = {{
         L"BorderThickness=1"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#SearchPillBackgroundElement, SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#SearchPillBackgroundElement", {
         L"Visibility=1"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?max(containerGridWidth-2*(trayWidth+50),100)+TrayInFrameWidth+9:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement", {
+        L"Margin={{$TrayInFrame?41+$DockOffset:skip()}},0,{{$TrayInFrame?-(41+$DockOffset):skip()}},0"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton", {
+        L"Margin={{$TrayInFrame?41+$DockOffset-($LeftAligned?421:0):skip()}},0,{{$TrayInFrame?-(41+$DockOffset-($LeftAligned?421:0)):skip()}},0"}},
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
+        L"Width=>StartWidth"}},
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+        L"ActualWidth=>StartInnerWidth"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth",
+        L"ActualHeight=>TaskHeight"}},
+}, {
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"LeftAligned=(StartWidth==``?0:StartInnerWidth==``?0:StartInnerWidth<=0?0:StartWidth-StartInnerWidth>8)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth+TrayInFrameWidth+9)/2,0)",
 }};
 
 const Theme g_themeLiquidGlass = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"BorderThickness=$BorderThickness",
-        L"BorderBrush:=$BorderBrush",
+        L"BorderThickness={{$TrayInFrame?0:`$BorderThickness`}}",
+        L"BorderBrush:={{$TrayInFrame?skip():`$BorderBrush`}}",
         L"Background:=$Background"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"BorderThickness={{$TrayInFrame?`$BorderThickness`:skip()}}",
+        L"BorderBrush:={{$TrayInFrame?`$BorderBrush`:skip()}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
     ThemeTargetStyles{L"Rectangle#BackgroundFill", {
         L"Visibility=1"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
@@ -6192,6 +6470,7 @@ const Theme g_themeLiquidGlass = {{
     L"ElementBorderThickness=0.3,0.3,0.3,1",
     L"CornerRadius=12",
     L"ElementCornerRadius=8",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }};
 
 const Theme g_themeLiquidGlass_variant_Alternate = {{
@@ -6202,21 +6481,26 @@ const Theme g_themeLiquidGlass_variant_Alternate = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth:=1200",
-        L"HorizontalAlignment=Center"}},
+        L"MaxWidth={{$TrayInFrame?skip():1200}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+$DockWidth:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Margin=0,3,12,3",
-        L"BorderThickness=$BorderThickness",
-        L"BorderBrush:=$BorderBrush",
-        L"CornerRadius=$CornerRadius",
-        L"Background:=$Background",
-        L"Padding=1"}},
+        L"Margin=0,3,{{$TrayInFrame?0:12}},3",
+        L"BorderThickness={{$TrayInFrame?0:`$BorderThickness`}}",
+        L"BorderBrush:={{$TrayInFrame?skip():`$BorderBrush`}}",
+        L"CornerRadius={{$TrayInFrame?0:$CornerRadius}}",
+        L"Background:={{$TrayInFrame?skip():`$Background`}}",
+        L"Padding={{$TrayInFrame?0:1}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"BorderThickness={{$TrayInFrame?`$BorderThickness`:skip()}}",
+        L"BorderBrush:={{$TrayInFrame?`$BorderBrush`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?$CornerRadius:skip()}}",
+        L"Background:={{$TrayInFrame?`$Background`:skip()}}",
+        L"Margin={{$TrayInFrame?$DockOffset:skip()}},0,{{$TrayInFrame?max(DockRepeaterWidth-$DockOffset-$DockWidth,0):skip()}},0"}},
     ThemeTargetStyles{L"Rectangle#BackgroundFill", {
         L"Visibility=1"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
         L"Visibility=1"}},
-    ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
-        L"Margin=-3,0"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Background:=$ElementBackground",
         L"BorderBrush:=$ElementBorderBrush",
@@ -6375,6 +6659,18 @@ const Theme g_themeLiquidGlass_variant_Alternate = {{
         L"HorizontalAlignment=Right"}},
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"HorizontalAlignment=Left"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?(containerGridWidth-TrayInFrameWidth-(1.3+$DockOffset)-(DockRepeaterWidth-TrayInFrameWidth-13)):skip()}},-4,{{$TrayInFrame?-((containerGridWidth-TrayInFrameWidth-(1.3+$DockOffset)-(DockRepeaterWidth-TrayInFrameWidth-13))-13):skip()}},-4"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-3,0,-3`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?min(1200,containerGridWidth-2*TrayInFrameWidth)+TrayInFrameWidth-1.6:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?(1.3+$DockOffset):skip()}},3,{{$TrayInFrame?-(1.3+$DockOffset):skip()}},3"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"Background=<WindhawkBlur BlurAmount=\"15\" TintColor=\"{ThemeResource SystemAltLowColor}\" TintOpacity=\"0.2\" />",
     L"ElementBackground=<WindhawkBlur BlurAmount=\"20\" TintColor=\"{ThemeResource SystemAltLowColor}\" TintOpacity=\"0.4\" />",
@@ -6386,6 +6682,9 @@ const Theme g_themeLiquidGlass_variant_Alternate = {{
     L"ElementBorderThickness=0.3,0.3,0.3,1",
     L"CornerRadius=12",
     L"ElementCornerRadius=8",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockWidth=(DockRepeaterWidth-TrayInFrameWidth-13+2.6)",
+    L"DockOffset=max((containerGridWidth-$DockWidth-12)/2,0)",
 }};
 
 const Theme g_themeBorderless = {{
@@ -6393,19 +6692,21 @@ const Theme g_themeBorderless = {{
         L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
         L"HorizontalAlignment=Stretch",
         L"RowDefinitions:=<RowDefinitionCollection><RowDefinition Height=\"*\"/><RowDefinition Height=\"Auto\"/><RowDefinition Height=\"Auto\"/><RowDefinition Height=\"*\"/></RowDefinitionCollection>",
-        L"VerticalAlignment=Stretch",
-        L"ActualHeight=>containerGridHeight"}},
+        L"VerticalAlignment=Stretch"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
         L"Tag@DockedLeft=vertical",
         L"Tag@DockedRight=vertical",
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
-        L"Width={{taskbarDock==`vertical`?$TaskbarFrameHeight:$TaskbarFrameWidth}}",
-        L"MaxWidth={{taskbarDock==`vertical`?skip():$TaskbarFrameWidth}}",
-        L"Height={{taskbarDock==`vertical`?min($TaskbarFrameWidth,containerGridHeight):$TaskbarFrameHeight}}",
+        L"Width={{taskbarDock==`vertical`?$TaskbarFrameHeight:$TrayInFrame?`Auto`:$TaskbarFrameWidth}}",
+        L"MaxWidth={{taskbarDock==`vertical`?skip():$TrayInFrame?skip():$TaskbarFrameWidth}}",
+        L"MinWidth={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0)+$TaskbarFrameWidth:skip()}}",
+        L"Height={{taskbarDock==`vertical`?($VerticalTrayInFrame?min((containerGridHeight+$TaskbarFrameWidth)/2,containerGridHeight):min($TaskbarFrameWidth,containerGridHeight)):$TaskbarFrameHeight}}",
+        L"VerticalAlignment={{$VerticalTrayInFrame?`Top`:skip()}}",
         L"Grid.Column=1",
-        L"Grid.Row=1"}},
+        L"Grid.Row=1",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Height={{taskbarDock==`vertical`?skip():40}}",
         L"Width={{taskbarDock==`vertical`?50:skip()}}",
@@ -6415,11 +6716,17 @@ const Theme g_themeBorderless = {{
         L"Grid.Row=1"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Windows.UI.Xaml.Controls.Grid#RootGrid > Taskbar.TaskbarBackground#BackgroundControl", {
         L"CornerRadius=6",
-        L"Margin=2"}},
+        L"Margin={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0)+2:2}},{{$VerticalTrayInFrame?max((containerGridHeight-$TaskbarFrameWidth)/2,0)+2:2}},2,2"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
-        L"Margin=4"}},
+        L"Margin={{$TrayInFrame?0:$VerticalTrayInFrame?0:4}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"Width={{$TrayInFrame?$TaskbarFrameWidth-8:skip()}}",
+        L"VerticalAlignment={{$VerticalTrayInFrame?`Top`:skip()}}",
+        L"Height={{$VerticalTrayInFrame?min($TaskbarFrameWidth,containerGridHeight)-8:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?4+max((containerGridWidth-$TaskbarFrameWidth)/2,0):$VerticalTrayInFrame?4:skip()}},{{$VerticalTrayInFrame?4+max((containerGridHeight-$TaskbarFrameWidth)/2,0):4}},{{$TrayInFrame?-(4+max((containerGridWidth-$TaskbarFrameWidth)/2,0)):$VerticalTrayInFrame?4:skip()}},{{$VerticalTrayInFrame?-(4+max((containerGridHeight-$TaskbarFrameWidth)/2,0)):4}}"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.Border#OverflowFlyoutBackgroundBorder", {
         L"Shadow:=$Shadows",
         L"BorderThickness=0"}},
@@ -6451,10 +6758,17 @@ const Theme g_themeBorderless = {{
         L"BorderThickness=0"}},
     ThemeTargetStyles{L"WindowsInternal.ComposableShell.Experiences.Switcher.VirtualDesktopBarElement", {
         L"Margin=210,0,210,12"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth",
+        L"ActualHeight=>containerGridHeight"}},
 }, {
     L"TaskbarFrameWidth=800",
     L"TaskbarFrameHeight=56",
     L"Shadows=",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"VerticalTrayInFrame=(TrayInFrameWidth==``?0:taskbarDock==`vertical`)",
 }};
 
 const Theme g_themeCommand_Center = {{
@@ -6596,8 +6910,6 @@ const Theme g_themeCommand_Center = {{
         L"BorderBrush:=$BorderBrush",
         L"BorderThickness=$BorderThickness",
         L"CornerRadius=$R1"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
-        L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.Border#SnapBarBorder", {
         L"Background:=$Background",
         L"BorderBrush:=$BorderBrush",
@@ -6708,19 +7020,28 @@ const Theme g_themeFluentGlass = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Grid.Column=1",
-        L"Width={{taskbarDock==`vertical`?skip():$TaskbarFrameWidth}}",
+        L"Width={{taskbarDock==`vertical`?skip():$TrayInFrame?`Auto`:$TaskbarFrameWidth}}",
+        L"MinWidth={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0)+$TaskbarFrameWidth:skip()}}",
         L"Height={{taskbarDock==`vertical`?skip():($TaskbarHeight+$BottomGap)}}",
         L"MinHeight={{$TaskbarHeight+$BottomGap}}",
-        L"HorizontalAlignment=Center",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
         L"VerticalAlignment=Center",
         L"Padding=0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl", {
+        L"Visibility={{$TrayInFrame?`Visible`:`Collapsed`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`$LiquidBackground`:skip()}}",
+        L"BorderBrush:={{$TrayInFrame?`$LiquidBorder`:skip()}}",
+        L"BorderThickness={{$TrayInFrame?`0.5,1,0.5,1`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?$GlobalRadius:skip()}}",
+        L"Margin={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):skip()}},0,0,0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Grid#RootGrid", {
-        L"Background:=$LiquidBackground",
-        L"BorderBrush:=$LiquidBorder",
-        L"BorderThickness=0.5,1,0.5,1",
-        L"CornerRadius=$GlobalRadius",
+        L"Background:={{$TrayInFrame?skip():`$LiquidBackground`}}",
+        L"BorderBrush:={{$TrayInFrame?skip():`$LiquidBorder`}}",
+        L"BorderThickness={{$TrayInFrame?0:`0.5,1,0.5,1`}}",
+        L"CornerRadius={{$TrayInFrame?0:$GlobalRadius}}",
         L"Margin=0,0,0,$BottomGap",
         L"Padding=0"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
@@ -6729,7 +7050,7 @@ const Theme g_themeFluentGlass = {{
         L"VerticalAlignment=Center",
         L"Height=$TaskbarHeight",
         L"MinWidth=250",
-        L"Margin=0,0,0,$BottomGap"}},
+        L"Margin={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):0}},0,{{$TrayInFrame?-max((containerGridWidth-$TaskbarFrameWidth)/2,0):0}},{{$TrayInFrame?0:$BottomGap}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Background=Transparent",
         L"BorderThickness=0",
@@ -6744,11 +7065,24 @@ const Theme g_themeFluentGlass = {{
         L"BorderBrush:=$LiquidBorder",
         L"BorderThickness=0.5,1,0.5,1",
         L"CornerRadius=$GlobalRadius"}},
-    ThemeTargetStyles{L"Taskbar.TaskListButton, Taskbar.ExperienceToggleButton, Taskbar.AugmentedEntryPointButton, Taskbar.SearchBoxButton, SearchUx.SearchUI.SearchButtonControl", {
+    ThemeTargetStyles{L"Taskbar.SearchBoxButton, SearchUx.SearchUI.SearchButtonControl", {
         L"Margin=$ItemMargin",
         L"Padding=$ItemPadding",
         L"VerticalAlignment=Center",
         L"Height=$IconHeight"}},
+    ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton", {
+        L"Margin=$ItemMargin",
+        L"RenderTransform:=<TranslateTransform X=\"{{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):skip()}}\" />",
+        L"Padding=$ItemPadding",
+        L"VerticalAlignment=Center",
+        L"Height=$IconHeight"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton, Taskbar.ExperienceToggleButton", {
+        L"Margin={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):`$ItemMargin`}}{{$TrayInFrame?`,0,`:``}}{{$TrayInFrame?-max((containerGridWidth-$TaskbarFrameWidth)/2,0):``}}{{$TrayInFrame?`,0`:``}}",
+        L"Padding=$ItemPadding",
+        L"VerticalAlignment=Center",
+        L"Height=$IconHeight"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel, Taskbar.ExperienceToggleButton > Taskbar.TaskListButtonPanel", {
+        L"Margin={{$TrayInFrame?`$ItemMargin`:skip()}}"}},
     ThemeTargetStyles{L"Grid#IconPanel@CommonStates > Border#BackgroundElement, Taskbar.TaskListLabeledButtonPanel@CommonStates > Border#BackgroundElement, Taskbar.TaskListButtonPanel@CommonStates > Grid > Border#BackgroundElement, Taskbar.TaskListButtonPanel@CommonStates > Border#BackgroundElement, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel@CommonStates > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel@CommonStates > Border#BackgroundElement", {
         L"CornerRadius=$GlobalRadius",
         L"BorderThickness=0",
@@ -6771,10 +7105,20 @@ const Theme g_themeFluentGlass = {{
         L"RadiusY=2",
         L"VerticalAlignment=Bottom"}},
     ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
-        L"VerticalAlignment=Center"}},
+        L"VerticalAlignment=Center",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"Width={{$TrayInFrame?$TaskbarFrameWidth:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):skip()}},0,{{$TrayInFrame?-max((containerGridWidth-$TaskbarFrameWidth)/2,0):skip()}},0"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
+        L"RenderTransform:=<TranslateTransform X=\"{{$TrayInFrame?max((containerGridWidth-$TaskbarFrameWidth)/2,0):skip()}}\" />"}},
     ThemeTargetStyles{L"Grid#AugmentedEntryPointContentGrid", {
         L"Margin=5,0,0,0",
         L"VerticalAlignment=Center"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"TaskbarFrameWidth=1280",
     L"TaskbarHeight=50",
@@ -6785,6 +7129,7 @@ const Theme g_themeFluentGlass = {{
     L"ItemPadding=8,6,8,6",
     L"LiquidBackground=<WindhawkBlur BlurAmount=\"22\" TintColor=\"{ThemeResource SystemAltLowColor}\" TintOpacity=\"0.15\" />",
     L"LiquidBorder=<LinearGradientBrush StartPoint=\"0,0\" EndPoint=\"0,1\"><GradientStop Color=\"#50808080\" Offset=\"0.0\" /><GradientStop Color=\"#50404040\" Offset=\"1\" /></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }};
 
 const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
@@ -6795,12 +7140,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Grid.Column=1",
         L"Transitions:=<TransitionCollection><RepositionThemeTransition IsStaggeringEnabled=\"False\"/></TransitionCollection>",
         L"Height={{taskbarDock==`vertical`?skip():80}}",
         L"MaxHeight=80",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}"}},
     ThemeTargetStyles{L"Grid#IconPanel > Image#Icon, Taskbar.TaskListLabeledButtonPanel#IconPanel > Image#Icon", {
         L"Height=24",
         L"Width=24",
@@ -6811,15 +7157,17 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=55",
         L"Height=70"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=55",
         L"Height=70"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
-        L"Padding=20,0,20,0",
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}",
         L"BorderBrush=#40FFFFFF"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"CornerRadius=20,0,0,20",
@@ -6940,7 +7288,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{$TrayInFrame?`20,-10,0,0`:`0,-2,0.5,2`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,0,0.5,0",
         L"Height=70",
@@ -6983,8 +7331,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
         L"FontSize=30"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"Background:=Transparent",
         L"BorderThickness=0"}},
@@ -7094,7 +7441,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?8+$DockOffset:-12}},{{$TrayInFrame?8:0}},{{$TrayInFrame?-(20+$DockOffset):0}},{{$TrayInFrame?2:0}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=15",
@@ -7141,9 +7488,22 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDock = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},8,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"IconBackground=<ImageBrush ImageSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/OS26%20Liquid%20Glass/Assets/tahoeappbg.png\" Stretch=\"UniformtoFill\"/>",
     L"IconBorder= <LinearGradientBrush EndPoint=\"1,1\" StartPoint=\"0,0\"><GradientStop Color=\"#F5ffffff\" Offset=\"0.0\"/><GradientStop Color=\"#40ffffff\" Offset=\"0.4\"/><GradientStop Color=\"#20ffffff\" Offset=\"0.6\"/><GradientStop Color=\"#90ffffff\" Offset=\"1.0\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-20)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=55",
     L"SmallTaskbarButtonExtent=55",
@@ -7157,12 +7517,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Grid.Column=1",
         L"Transitions:=<TransitionCollection><RepositionThemeTransition IsStaggeringEnabled=\"False\"/></TransitionCollection>",
         L"Height={{taskbarDock==`vertical`?skip():70}}",
         L"MaxHeight=80",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}"}},
     ThemeTargetStyles{L"Grid#IconPanel > Image#Icon, Taskbar.TaskListLabeledButtonPanel#IconPanel > Image#Icon", {
         L"Height=24",
         L"Width=24"}},
@@ -7174,16 +7535,18 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
         L"Width=50",
         L"Height=65",
         L"Margin=0,-2,0,2"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=50",
         L"Height=65",
         L"Margin=0,-2,0,2"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
-        L"Padding=20,0,20,0",
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}",
         L"BorderBrush=#40FFFFFF"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"CornerRadius=20,0,0,20",
@@ -7305,7 +7668,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{$TrayInFrame?`20,-10,0,0`:`0,-2,0.5,2`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,0,0.5,0",
         L"Height=60",
@@ -7348,8 +7711,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
         L"FontSize=30"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"Background:=Transparent",
         L"BorderThickness=0"}},
@@ -7459,7 +7821,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?8+$DockOffset:-12}},{{$TrayInFrame?8:0}},{{$TrayInFrame?-(20+$DockOffset):0}},{{$TrayInFrame?2:0}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=13",
@@ -7506,9 +7868,22 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearMacDockCompact = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},8,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"IconBackground=<ImageBrush ImageSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/OS26%20Liquid%20Glass/Assets/tahoeappbg.png\" Stretch=\"UniformtoFill\"/>",
     L"IconBorder= <LinearGradientBrush EndPoint=\"1,1\" StartPoint=\"0,0\"><GradientStop Color=\"#F5ffffff\" Offset=\"0.0\"/><GradientStop Color=\"#40ffffff\" Offset=\"0.4\"/><GradientStop Color=\"#20ffffff\" Offset=\"0.6\"/><GradientStop Color=\"#90ffffff\" Offset=\"1.0\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-20)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=50",
     L"SmallTaskbarButtonExtent=50",
@@ -7531,6 +7906,8 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=55",
         L"Height=70"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=55",
         L"Height=70"}},
@@ -7548,6 +7925,12 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
         L"Visibility=Visible",
         L"Margin=0,8,0,2",
         L"Padding=20,0,20,0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`-20,-8,20,8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?`20,8,-20,-8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
+        L"Margin={{$TrayInFrame?`20,8,-20,-8`:skip()}}"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.FlyoutPresenter", {
         L"RequestedTheme=Dark",
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
@@ -7577,7 +7960,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
         L"BorderThickness=2",
         L"CornerRadius=25",
         L"BorderBrush:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#30ffffff\"/>"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid, ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid", {
+    ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid", {
         L"Height=35",
         L"CornerRadius=12",
         L"Background:=$IconBackground",
@@ -7657,12 +8040,6 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
         L"BorderBrush:=$IconBorder",
         L"Margin=2",
         L"BorderThickness=1.2"}},
-    ThemeTargetStyles{L"SystemTray.NotifyIconView@CommonStates > Grid#ContainerGrid > Border#BackgroundBorder", {
-        L"CornerRadius=12",
-        L"Background:=$IconBackground",
-        L"BorderBrush:=$IconBorder",
-        L"Margin=2",
-        L"BorderThickness=1.2"}},
     ThemeTargetStyles{L"Border#OverflowFlyoutBackgroundBorder", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"BorderBrush:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#60ffffff\"/>",
@@ -7715,7 +8092,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?`8,8,-20,-8`:`-12,0,0,0`}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=15",
@@ -7764,9 +8141,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_ClearTaskbar = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{TrayInFrameWidth==``?skip():$TrayInFrame?`20,0,-40,-10`:`0,-8,-20,-2`}}"}},
 }, {
     L"IconBackground=<ImageBrush ImageSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/OS26%20Liquid%20Glass/Assets/tahoeappbg.png\" Stretch=\"UniformtoFill\"/>",
     L"IconBorder= <LinearGradientBrush EndPoint=\"1,1\" StartPoint=\"0,0\"><GradientStop Color=\"#F5ffffff\" Offset=\"0.0\"/><GradientStop Color=\"#40ffffff\" Offset=\"0.4\"/><GradientStop Color=\"#20ffffff\" Offset=\"0.6\"/><GradientStop Color=\"#90ffffff\" Offset=\"1.0\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }, {
     L"MediumTaskbarButtonExtent=55",
     L"SmallTaskbarButtonExtent=55",
@@ -7780,12 +8161,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Grid.Column=1",
         L"Transitions:=<TransitionCollection><RepositionThemeTransition IsStaggeringEnabled=\"False\"/></TransitionCollection>",
         L"Height={{taskbarDock==`vertical`?skip():80}}",
         L"MaxHeight=80",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}"}},
     ThemeTargetStyles{L"Grid#IconPanel > Image#Icon, Taskbar.TaskListLabeledButtonPanel#IconPanel > Image#Icon", {
         L"Height=24",
         L"Width=24",
@@ -7796,15 +8178,17 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=55",
         L"Height=70"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=55",
         L"Height=70"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
-        L"Padding=20,0,20,0",
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}",
         L"BorderBrush=#40FFFFFF"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"CornerRadius=20,0,0,20",
@@ -7925,7 +8309,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{$TrayInFrame?`20,-10,0,0`:`0,-2,0.5,2`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,0,0.5,0",
         L"Height=70",
@@ -7968,8 +8352,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
         L"FontSize=30"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"Background:=Transparent",
         L"BorderThickness=0"}},
@@ -8079,7 +8462,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?8+$DockOffset:-12}},{{$TrayInFrame?8:0}},{{$TrayInFrame?-(20+$DockOffset):0}},{{$TrayInFrame?2:0}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=15",
@@ -8126,9 +8509,22 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDock = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},8,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"IconBackground=<LinearGradientBrush StartPoint=\"0.47,-0.29\" EndPoint=\"0.50,1.29\"><GradientStop Offset=\"0.18\" Color=\"#2F2F2F\"/><GradientStop Offset=\"0.3\" Color=\"#292929\"/><GradientStop Offset=\"0.5\" Color=\"#141414\"/><GradientStop Offset=\"0.68\" Color=\"#080808\"/><GradientStop Offset=\"0.81\" Color=\"#000000\"/></LinearGradientBrush>",
     L"IconBorder=<LinearGradientBrush StartPoint=\"0.04,-0.14\" EndPoint=\"1.22,1.10\"><GradientStop Offset=\"0.18\" Color=\"#4FFFFFFF\"/><GradientStop Offset=\"0.34\" Color=\"#661D1D1D\"/><GradientStop Offset=\"0.63\" Color=\"#00000000\"/><GradientStop Offset=\"0.72\" Color=\"#662D2D2D\"/><GradientStop Offset=\"0.84\" Color=\"#4FFFFFFF\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-20)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=55",
     L"SmallTaskbarButtonExtent=55",
@@ -8142,12 +8538,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Grid.Column=1",
         L"Transitions:=<TransitionCollection><RepositionThemeTransition IsStaggeringEnabled=\"False\"/></TransitionCollection>",
         L"Height={{taskbarDock==`vertical`?skip():70}}",
         L"MaxHeight=80",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}"}},
     ThemeTargetStyles{L"Grid#IconPanel > Image#Icon, Taskbar.TaskListLabeledButtonPanel#IconPanel > Image#Icon", {
         L"Height=24",
         L"Width=24"}},
@@ -8159,16 +8556,18 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
         L"Width=50",
         L"Height=65",
         L"Margin=0,-2,0,2"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=50",
         L"Height=65",
         L"Margin=0,-2,0,2"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
-        L"Padding=20,0,20,0",
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}",
         L"BorderBrush=#40FFFFFF"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"CornerRadius=20,0,0,20",
@@ -8290,7 +8689,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{$TrayInFrame?`20,-10,0,0`:`0,-2,0.5,2`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,0,0.5,0",
         L"Height=60",
@@ -8333,8 +8732,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.OmniButton#ControlCenterButton > Grid > ContentPresenter#ContentPresenter > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Grid#ContentGrid > SystemTray.TextIconContent > Grid#ContainerGrid > SystemTray.AdaptiveTextBlock#Base > TextBlock#InnerTextBlock", {
         L"FontSize=30"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"Background:=Transparent",
         L"BorderThickness=0"}},
@@ -8444,7 +8842,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?8+$DockOffset:-12}},{{$TrayInFrame?8:0}},{{$TrayInFrame?-(20+$DockOffset):0}},{{$TrayInFrame?2:0}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=13",
@@ -8491,9 +8889,22 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkMacDockCompact = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},8,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"IconBackground=<LinearGradientBrush StartPoint=\"0.47,-0.29\" EndPoint=\"0.50,1.29\"><GradientStop Offset=\"0.18\" Color=\"#2F2F2F\"/><GradientStop Offset=\"0.3\" Color=\"#292929\"/><GradientStop Offset=\"0.5\" Color=\"#141414\"/><GradientStop Offset=\"0.68\" Color=\"#080808\"/><GradientStop Offset=\"0.81\" Color=\"#000000\"/></LinearGradientBrush>",
     L"IconBorder=<LinearGradientBrush StartPoint=\"0.04,-0.14\" EndPoint=\"1.22,1.10\"><GradientStop Offset=\"0.18\" Color=\"#4FFFFFFF\"/><GradientStop Offset=\"0.34\" Color=\"#661D1D1D\"/><GradientStop Offset=\"0.63\" Color=\"#00000000\"/><GradientStop Offset=\"0.72\" Color=\"#662D2D2D\"/><GradientStop Offset=\"0.84\" Color=\"#4FFFFFFF\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-20)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=50",
     L"SmallTaskbarButtonExtent=50",
@@ -8516,6 +8927,8 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=55",
         L"Height=70"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=55",
         L"Height=70"}},
@@ -8533,6 +8946,12 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
         L"Visibility=Visible",
         L"Margin=0,8,0,2",
         L"Padding=20,0,20,0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`-20,-8,20,8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?`20,8,-20,-8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
+        L"Margin={{$TrayInFrame?`20,8,-20,-8`:skip()}}"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.FlyoutPresenter", {
         L"RequestedTheme=Dark",
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
@@ -8562,7 +8981,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
         L"BorderThickness=2",
         L"CornerRadius=25",
         L"BorderBrush:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#30ffffff\"/>"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid, ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid", {
+    ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NotifyIconStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.ChevronIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid", {
         L"Height=35",
         L"CornerRadius=12",
         L"Background:=$IconBackground",
@@ -8642,12 +9061,6 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
         L"BorderBrush:=$IconBorder",
         L"Margin=2",
         L"BorderThickness=1.2"}},
-    ThemeTargetStyles{L"SystemTray.NotifyIconView@CommonStates > Grid#ContainerGrid > Border#BackgroundBorder", {
-        L"CornerRadius=12",
-        L"Background:=$IconBackground",
-        L"BorderBrush:=$IconBorder",
-        L"Margin=2",
-        L"BorderThickness=1.2"}},
     ThemeTargetStyles{L"Border#OverflowFlyoutBackgroundBorder", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"BorderBrush:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#60ffffff\"/>",
@@ -8700,7 +9113,7 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
     ThemeTargetStyles{L"SystemTray.TextIconContent > Grid > SystemTray.AdaptiveTextBlock#Base > TextBlock", {
         L"Foreground=White"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton", {
-        L"Margin=-12,0,0,0"}},
+        L"Margin={{$TrayInFrame?`8,8,-20,-8`:`-12,0,0,0`}}"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Border#BackgroundElement, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"CornerRadius=15",
@@ -8749,9 +9162,13 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{TrayInFrameWidth==``?skip():$TrayInFrame?`20,0,-40,-10`:`0,-8,-20,-2`}}"}},
 }, {
     L"IconBackground=<LinearGradientBrush StartPoint=\"0.47,-0.29\" EndPoint=\"0.50,1.29\"><GradientStop Offset=\"0.18\" Color=\"#2F2F2F\"/><GradientStop Offset=\"0.3\" Color=\"#292929\"/><GradientStop Offset=\"0.5\" Color=\"#141414\"/><GradientStop Offset=\"0.68\" Color=\"#080808\"/><GradientStop Offset=\"0.81\" Color=\"#000000\"/></LinearGradientBrush>",
     L"IconBorder=<LinearGradientBrush StartPoint=\"0.25,-0.20\" EndPoint=\"0.99,1.39\"><GradientStop Offset=\"0.11\" Color=\"#50FFFFFF\"/><GradientStop Offset=\"0.3\" Color=\"#631C1C1C\"/><GradientStop Offset=\"0.62\" Color=\"#591C1C1C\"/><GradientStop Offset=\"0.77\" Color=\"#50FFFFFF\"/></LinearGradientBrush>",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }, {
     L"MediumTaskbarButtonExtent=55",
     L"SmallTaskbarButtonExtent=55",
@@ -8760,11 +9177,11 @@ const Theme g_themeOS26_Liquid_Glass_variant_DarkTaskbar = {{
 const Theme g_themeFrostyGlass = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,0,0,4",
-        L"BorderThickness=$BorderThickness",
-        L"BorderBrush:=$BorderBrush",
-        L"CornerRadius=$CornerRadius",
-        L"Background:=$Background",
-        L"Padding=2,0,1.5,0"}},
+        L"BorderThickness={{$TrayInFrame?0:$BorderThickness}}",
+        L"BorderBrush:={{$TrayInFrame?skip():`$BorderBrush`}}",
+        L"CornerRadius={{$TrayInFrame?0:$CornerRadius}}",
+        L"Background:={{$TrayInFrame?skip():`$Background`}}",
+        L"Padding={{$TrayInFrame?0:`2,0,1.5,0`}}"}},
     ThemeTargetStyles{L"Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"Margin=3.5",
         L"Background:=$Background",
@@ -8865,8 +9282,6 @@ const Theme g_themeFrostyGlass = {{
         L"CornerRadius=$ElementCornerRadius",
         L"BorderThickness=$ElementBorderThickness",
         L"Margin=0"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
-        L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"RenderTransform:=<TranslateTransform X=\"0\" Y=\"0\" />",
         L"Padding=1.5,4,1.5,4"}},
@@ -8922,9 +9337,10 @@ const Theme g_themeFrostyGlass = {{
         L"Tag@DockedRight=vertical",
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
-        L"HorizontalAlignment=Center",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"Padding=1,0,1,0"}},
+        L"Padding={{$TrayInFrame?0:`1,0,1,0`}}",
+        L"MinWidth={{$TrayInFrame?$DockOffset+$DockWidth:skip()}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Visibility=0"}},
     ThemeTargetStyles{L"Grid#IconPanel > Border#BackgroundElement, Taskbar.TaskListLabeledButtonPanel > Border#BackgroundElement", {
@@ -8968,11 +9384,12 @@ const Theme g_themeFrostyGlass = {{
         L"BorderThickness:=$BorderThickness",
         L"BorderBrush:=$BorderBrush",
         L"CornerRadius:=$CornerRadius"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
-        L"Background:=$Background",
-        L"BorderBrush:=$BorderBrush",
-        L"BorderThickness:=$BorderThickness",
-        L"CornerRadius:=10"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"Background:={{$TrayInFrame?`$Background`:skip()}}",
+        L"BorderBrush:={{$TrayInFrame?`$BorderBrush`:skip()}}",
+        L"BorderThickness={{$TrayInFrame?$BorderThickness:skip()}}",
+        L"CornerRadius={{$TrayInFrame?10:skip()}}",
+        L"Margin={{$TrayInFrame?$DockOffset:skip()}},0,{{$TrayInFrame?max(FrostyRepeaterWidth-$DockOffset-$DockWidth,0):skip()}},0"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid > Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
@@ -9001,6 +9418,17 @@ const Theme g_themeFrostyGlass = {{
         L"BorderBrush:=$BorderBrush"}},
     ThemeTargetStyles{L"SystemTray.NotifyIconView > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"CornerRadius=7"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?(containerGridWidth-$DockOffset-3-FrostyRepeaterWidth):skip()}},0,{{$TrayInFrame?-(containerGridWidth-$DockOffset-3-FrostyRepeaterWidth):skip()}},-4"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-TrayInFrameWidth-5.5:skip()}}",
+        L"ActualWidth=>FrostyRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?3+$DockOffset:skip()}},0,{{$TrayInFrame?-(3+$DockOffset):skip()}},0"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"Background=<WindhawkBlur BlurAmount=\"20\" TintColor=\"{ThemeResource SystemChromeDarkColor}\" TintOpacity=\"0.15\" />",
     L"BorderBrush2=<LinearGradientBrush StartPoint=\"0,0\" EndPoint=\"0,1\"><GradientStop Color=\"{ThemeResource SystemChromeHighColor}\" Offset=\"0.0\" /><GradientStop Color=\"{ThemeResource SystemChromeLowColor}\" Offset=\"0.25\" /><GradientStop Color=\"{ThemeResource SystemChromeHighColor}\" Offset=\"1\" /></LinearGradientBrush>",
@@ -9015,10 +9443,13 @@ const Theme g_themeFrostyGlass = {{
     L"ElementCornerRadius=10",
     L"Background3=Transparent",
     L"BorderBrush3=Transparent",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockWidth=(FrostyRepeaterWidth-TrayInFrameWidth+5.5)",
+    L"DockOffset=max((containerGridWidth-$DockWidth)/2,0)",
 }};
 
 const Theme g_themeFrostedAcrylic = {{
-    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
         L"ActualWidth=>containerGridWidth"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
@@ -9036,11 +9467,15 @@ const Theme g_themeFrostedAcrylic = {{
         L"Width=Auto",
         L"HorizontalAlignment=Stretch",
         L"Margin=$SideMargin,2,$SideMargin,3",
-        L"BorderThickness=$BorderThickness",
-        L"BorderBrush:=$BorderBrush",
+        L"BorderThickness={{$TrayInFrame?0:`$BorderThickness`}}",
+        L"BorderBrush:={{$TrayInFrame?skip():`$BorderBrush`}}",
         L"CornerRadius=$CornerRadius",
         L"Background:=$Background",
         L"Padding=0"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
+        L"BorderThickness={{$TrayInFrame?`$BorderThickness`:skip()}}",
+        L"BorderBrush:={{$TrayInFrame?`$BorderBrush`:skip()}}",
+        L"CornerRadius={{$TrayInFrame?`$CornerRadius`:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundFill", {
         L"Visibility=Collapsed"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Windows.UI.Xaml.Controls.Grid > Windows.UI.Xaml.Shapes.Rectangle#BackgroundStroke", {
@@ -9052,6 +9487,9 @@ const Theme g_themeFrostedAcrylic = {{
         L"VerticalAlignment=Center",
         L"Margin=0,0,$TrayRightMargin,0",
         L"Background:=$Background"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth",
+        L"Margin={{$TrayInFrame?2*$SideMargin-$TrayRightMargin:0}},{{$TrayInFrame?2:0}},{{$TrayInFrame?$TrayRightMargin-2*$SideMargin:0}},{{$TrayInFrame?-2:0}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Background:=Transparent",
         L"CornerRadius=6"}},
@@ -9061,38 +9499,34 @@ const Theme g_themeFrostedAcrylic = {{
         L"MaxWidth=48",
         L"Margin=0"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton", {
-        L"Width=48",
-        L"MinWidth=48",
-        L"MaxWidth=48",
         L"Height=60",
         L"MinHeight=60",
         L"MaxHeight=60",
         L"Padding=0",
         L"Margin=0",
-        L"HorizontalAlignment=Center",
         L"VerticalAlignment=Center"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?-($SideMargin):skip()}},-2,{{$SideMargin}},2"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?$SideMargin:skip()}},2,{{-($SideMargin)}},-2"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
+        L"Margin={{$TrayInFrame?$SideMargin:skip()}},2,{{-($SideMargin)}},-2"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel", {
         L"Height=60",
         L"MinHeight=60",
         L"MaxHeight=60",
         L"Padding=2,4,2,4",
         L"Margin=0",
-        L"HorizontalAlignment=Center",
         L"VerticalAlignment=Center"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"44\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"44\"/><ColumnDefinition Width=\"Auto\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel > Border#BackgroundElement, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel > Border#BackgroundElement", {
         L"Margin=2,0,2,0"}},
-    ThemeTargetStyles{L"Grid#IconPanel > TextBlock, Taskbar.TaskListLabeledButtonPanel > TextBlock, Taskbar.TaskListButtonPanel > Grid > TextBlock, Taskbar.TaskListButtonPanel > TextBlock, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid > Grid > TextBlock, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid > TextBlock", {
+    ThemeTargetStyles{L"Taskbar.TaskListButtonPanel > Grid > TextBlock, Taskbar.TaskListButtonPanel > TextBlock, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid > Grid > TextBlock, SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid > TextBlock", {
         L"Visibility=Collapsed",
         L"Margin=0"}},
-    ThemeTargetStyles{L"Taskbar.TaskListButtonPanel > Grid > TextBlock", {
-        L"Visibility=Collapsed",
-        L"Margin=0"}},
-    ThemeTargetStyles{L"Taskbar.TaskListButtonPanel > Grid > StackPanel > TextBlock", {
-        L"Visibility=Collapsed",
-        L"Opacity=0",
-        L"Width=0",
-        L"MinWidth=0",
-        L"MaxWidth=0"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel > Grid > Grid > TextBlock", {
         L"Visibility=Collapsed",
         L"Opacity=0",
@@ -9222,12 +9656,14 @@ const Theme g_themeFrostedAcrylic = {{
     L"ElementBorderThickness=0.3,0.3,0.3,1",
     L"ElementCornerRadius=12",
     L"TrayPadding=2,4,2,4",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }, {
     L"MediumTaskbarButtonExtent=48",
+    L"SmallTaskbarButtonExtent=48",
 }};
 
 const Theme g_themePills = {{
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground#BackgroundControl > Grid", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground#BackgroundControl > Grid", {
         L"Margin := $taskbarMargin",
         L"CornerRadius := $taskbarRadius",
         L"Opacity := $taskbarOpacity"}},
@@ -9237,7 +9673,7 @@ const Theme g_themePills = {{
         L"Fill := $taskbarFill"}},
     ThemeTargetStyles{L"Taskbar.TaskbarBackground#BackgroundControl > Grid > Rectangle#BackgroundStroke", {
         L"Fill := $taskbarStrokeColor"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Height => TaskbarHeight"}},
     ThemeTargetStyles{L"Grid#IconPanel@RunningIndicatorStates > Border#BackgroundElement, Taskbar.TaskListLabeledButtonPanel#IconPanel@RunningIndicatorStates > Border#BackgroundElement", {
         L"Height := {{TaskbarHeight-($taskbarBottomOffset+$taskbarTopOffset)-2*($highlightOffset)}}",
@@ -9335,7 +9771,7 @@ const Theme g_themePills = {{
         L"HorizontalAlignment = 0",
         L"Margin = 4,0,0,0",
         L"Canvas.ZIndex = 4"}},
-    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement", {
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
         L"Visibility = 1"}},
     ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel", {
         L"Width = 1",
@@ -9408,13 +9844,13 @@ const Theme g_themePills = {{
     ThemeTargetStyles{L"SystemTray.AdaptiveTextBlock#LanguageInnerTextBlock > TextBlock#InnerTextBlock", {
         L"Margin = 0,0,0,1",
         L"MaxLines = 1"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker1, ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker1", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker1, Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker1", {
         L"ActualWidth => WeatherIconWidth",
         L"RenderTransform := <TranslateTransform X=\"0\" Y=\"1\" />"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[1], ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[1]", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[1], Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[1]", {
         L"ActualWidth => WeatherTempWidth",
         L"RenderTransform := <TranslateTransform X=\"0\" Y=\"8\" />"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[2], ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[2]", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[2], Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid > Border#LargeTicker2 > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > TextBlock[2]", {
         L"ActualWidth => WeatherCondWidth",
         L"RenderTransform := <TranslateTransform X=\"{{(WeatherTempWidth + 8)}}\" Y=\"-8\" />"}},
     ThemeTargetStyles{L"Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid, Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid", {
@@ -9434,20 +9870,20 @@ const Theme g_themePills = {{
         L"BorderThickness := $borderThickness",
         L"Background := $buttonFill",
         L"BorderBrush := $buttonBorderColor"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel, ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel, Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel", {
         L"VerticalAlignment = 1"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid, ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid, Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid", {
         L"VerticalAlignment = 1"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid[1], ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid[1]", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid[1], Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid[1]", {
         L"HorizontalAlignment = 0",
         L"RenderTransform := <TranslateTransform X=\"8\" Y=\"-2\" />"}},
     ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#BadgeAnchorLargeTicker, Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#BadgeAnchorSmallTicker", {
         L"MaxWidth = 20"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid[2], ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid[2]", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid[2], Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid[2]", {
         L"HorizontalAlignment = 0",
         L"RenderTransformOrigin = 0.5,0.5",
         L"RenderTransform := <TransformGroup><TranslateTransform X=\"20\" Y=\"-4\" /><ScaleTransform ScaleX = \"0.75\" ScaleY = \"0.75\" /></TransformGroup>"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid, ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid, Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton#AugmentedEntryPointButton > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid#AugmentedEntryPointContentGrid > Grid > Grid > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Border > AdaptiveCards.Rendering.Uwp.WholeItemsPanel > Grid", {
         L"Background = Transparent"}},
     ThemeTargetStyles{L"Grid#ContainerGrid@ > Rectangle#ShowDesktopPipe", {
         L"Opacity = 1",
@@ -9834,11 +10270,7 @@ const Theme g_themeBlob = {{
 
 const Theme g_themeMinecraft_Hotbar = {{
     ThemeTargetStyles{L"Grid#IconPanel@CommonStates > Image#Icon, Taskbar.TaskListLabeledButtonPanel#IconPanel@CommonStates > Image#Icon", {
-        L"Margin=0",
-        L"Margin@ActiveNormal=3.5,0,-4.5,0",
-        L"Margin@ActivePointerOver=3.5,0,-4.5,0",
-        L"Margin@InactivePointerOver=1.5,0,-1.5,0",
-        L"Margin@ActivePressed=3.5,0,-4.5,0"}},
+        L"Margin=0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=transparent"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
@@ -9852,11 +10284,10 @@ const Theme g_themeMinecraft_Hotbar = {{
         L"MinWidth=55"}},
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"MinWidth=55"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"MinWidth=55"}},
-    ThemeTargetStyles{L"Taskbar.TaskListButtonPanel@CommonStates > Grid > Border#BackgroundElement, Taskbar.TaskListButtonPanel@CommonStates > Border#BackgroundElement", {
-        L"CornerRadius=0",
-        L"Margin=0,5.5,0,5.5"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid@DockingStates", {
         L"Tag=horizontal",
         L"Tag@DockedLeft=vertical",
@@ -9864,14 +10295,16 @@ const Theme g_themeMinecraft_Hotbar = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Height={{taskbarDock==`vertical`?skip():70}}",
         L"Grid.Column=1",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}",
+        L"MinWidth={{$TrayInFrame?$HotbarOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Transitions:=<TransitionCollection><EntranceThemeTransition HorizontalOffset=\"0\" VerticalOffset=\"0\" /></TransitionCollection>",
-        L"Margin=0,4,0,-4",
-        L"Padding=20,0,20,0"}},
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Taskbar.TaskbarBackground", {
+        L"Margin={{$TrayInFrame?20+$HotbarOffset:skip()}},0,{{$TrayInFrame?max(TrayInFrameWidth-$HotbarOffset,0):skip()}},0"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Height=70",
         L"CornerRadius=0",
@@ -9888,8 +10321,7 @@ const Theme g_themeMinecraft_Hotbar = {{
         L"CornerRadius=0",
         L"Visibility=Visible"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
-        L"ActualWidth=>containerGridWidth"}},
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"Grid#IconPanel@RunningIndicatorStates > Rectangle#RunningIndicator, Taskbar.TaskListLabeledButtonPanel@RunningIndicatorStates > Rectangle#RunningIndicator", {
         L"Fill:=#90ffffff",
         L"RadiusX=0",
@@ -10104,15 +10536,27 @@ const Theme g_themeMinecraft_Hotbar = {{
         L"Visibility=1"}},
     ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > SystemTray.NotificationAreaOverflow > Grid#OverflowRootGrid > ItemsControl > ItemsPresenter > WrapGrid > ContentPresenter > SystemTray.NotifyIconView > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid", {
         L"Background:=$IconBackground"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid, ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid", {
+    ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid", {
         L"Width=55",
         L"Height=55",
         L"Background:=$IconBackground"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton#TaskListButton > Grid#IconPanel > TextBlock#LabelControl, ScrollViewer > ScrollContentPresenter > Border > Grid > Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton#TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel > TextBlock#LabelControl", {
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton#TaskListButton > Grid#IconPanel > TextBlock#LabelControl, Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton#TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel > TextBlock#LabelControl", {
         L"Visibility=1"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$HotbarOffset:skip()}},0,{{$TrayInFrame?-(20+$HotbarOffset):skip()}},0"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
+        L"ActualWidth=>containerGridWidth"}},
 }, {
     L"IconBackground= <ImageBrush Stretch=\"UniformtoFill\" ImageSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/Minecraft%20Hotbar/Assets/hotbar.png\" />",
     L"ActiveBackground= <ImageBrush Stretch=\"UniformtoFill\" ImageSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/Minecraft%20Hotbar/Assets/hotbaractive.png\" />",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"HotbarOffset=max((containerGridWidth-DockRepeaterWidth-40)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=55",
     L"SmallTaskbarButtonExtent=55",
@@ -10349,6 +10793,8 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=45",
         L"Height=60"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=45",
         L"Height=60"}},
@@ -10365,12 +10811,12 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
         L"BorderBrush:=$IconBorder"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#Icon, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#Icon", {
         L"Visibility=1"}},
-    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[3] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[3] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=TaskViewButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=TaskViewButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"Background:=<ImageBrush Stretch=\"Uniform\"><ImageBrush.ImageSource><BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/darkbg.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\"/></ImageBrush.ImageSource></ImageBrush>",
         L"BorderThickness=0",
         L"CornerRadius=0"}},
-    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[1] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[1] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"Background:=<ImageBrush Stretch=\"Uniform\"><ImageBrush.ImageSource><BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/Start.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\"/></ImageBrush.ImageSource></ImageBrush>",
         L"BorderThickness=0"}},
@@ -10385,18 +10831,19 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
         L"Tag=>taskbarDock"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame", {
         L"Width={{taskbarDock==`vertical`?skip():`Auto`}}",
-        L"MaxWidth={{containerGridWidth>0?containerGridWidth:`Infinity`}}",
+        L"MaxWidth={{$TrayInFrame?skip():containerGridWidth>0?containerGridWidth:`Infinity`}}",
         L"Grid.Column=1",
+        L"MinWidth={{$TrayInFrame?$DockOffset+DockRepeaterWidth-TrayInFrameWidth+20:skip()}}",
         L"Transitions:=<TransitionCollection><RepositionThemeTransition IsStaggeringEnabled=\"False\"/></TransitionCollection>",
         L"Height={{taskbarDock==`vertical`?skip():70}}",
         L"MaxHeight=70",
-        L"HorizontalAlignment=Center"}},
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:`Center`}}"}},
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
-        L"Padding=20,0,20,0",
+        L"Padding={{$TrayInFrame?0:`20,0,20,0`}}",
         L"BorderBrush=#40FFFFFF"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
-        L"Margin=-20,0,-20,0"}},
+        L"Margin={{$TrayInFrame?$DockOffset:-20}},0,{{$TrayInFrame?max(TrayInFrameWidth-20-$DockOffset,0):-20}},0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
         L"Background:=<WindhawkBlur BlurAmount=\"8\" TintColor=\"#2D101010\"/>",
         L"CornerRadius=25,0,0,25",
@@ -10409,11 +10856,11 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
     ThemeTargetStyles{L"Rectangle#BackgroundStroke", {
         L"Fill=Transparent"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
-        L"Height=70",
+        L"Height={{$TrayInFrame?60:70}}",
         L"Grid.Column=2",
         L"Width=Auto",
         L"HorizontalAlignment=Left",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{$TrayInFrame?`20,0,0,0`:`0,-2,0.5,2`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"Margin=0,0,0.5,0",
         L"Height=60",
@@ -10425,8 +10872,18 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
         L"CornerRadius=0,25,25,0",
         L"Visibility=Visible",
         L"BorderBrush=#40FFFFFF"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,-2`:skip()}}",
+        L"HorizontalAlignment={{$TrayInFrame?`Left`:skip()}}",
+        L"MaxWidth={{$TrayInFrame?containerGridWidth-20:skip()}}",
+        L"ActualWidth=>DockRepeaterWidth"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?20+$DockOffset:skip()}},8,{{$TrayInFrame?-(20+$DockOffset):skip()}},2"}},
     ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border > Grid", {
-        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>",
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"Auto\"/><ColumnDefinition Width=\"*\"/></ColumnDefinitionCollection>"}},
+    ThemeTargetStyles{L":root > ScrollViewer > ScrollContentPresenter > Border", {
         L"ActualWidth=>containerGridWidth"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.Stack#NonActivatableStack > Grid#Content > SystemTray.StackListView#IconStack > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.IconView#SystemTrayIcon > Grid#ContainerGrid > Border#BackgroundBorder", {
         L"Background:=Transparent",
@@ -10495,7 +10952,7 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
         L"Background:=<ImageBrush Stretch=\"Uniform\"> <ImageBrush.ImageSource> <BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/darkbg.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\" /> </ImageBrush.ImageSource> </ImageBrush>",
         L"Width=35",
         L"Height=35"}},
-    ThemeTargetStyles{L"ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid, ScrollViewer > ScrollContentPresenter > Border > Grid > SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid", {
+    ThemeTargetStyles{L"SystemTray.SystemTrayFrame > StackPanel#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid, SystemTray.SystemTrayFrame > Grid#SystemTrayFrameGrid > SystemTray.NotificationAreaIcons#NotificationAreaIcons > ItemsPresenter > StackPanel > ContentPresenter > SystemTray.NotifyIconView#NotifyItemIcon > Grid#ContainerGrid > ContentPresenter#ContentPresenter > Grid#ContentGrid > SystemTray.ImageIconContent > Grid#ContainerGrid", {
         L"Background:=$IconBackground",
         L"Height=40",
         L"Width=40",
@@ -10640,6 +11097,8 @@ const Theme g_themeOne_UI_8_5_variant_Dock = {{
 }, {
     L"IconBackground=<ImageBrush Stretch=\"Uniform\"> <ImageBrush.ImageSource> <BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/template.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\" /> </ImageBrush.ImageSource> </ImageBrush>",
     L"IconBorder=transparent",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
+    L"DockOffset=max((containerGridWidth-DockRepeaterWidth-20)/2,0)",
 }, {
     L"MediumTaskbarButtonExtent=45",
 }};
@@ -10871,6 +11330,8 @@ const Theme g_themeOne_UI_8_5_variant_Taskbar = {{
     ThemeTargetStyles{L"Grid#IconPanel, Taskbar.TaskListLabeledButtonPanel", {
         L"Width=45",
         L"Height=60"}},
+    ThemeTargetStyles{L"Taskbar.TaskListButton > Grid#IconPanel, Taskbar.TaskListButton > Taskbar.TaskListLabeledButtonPanel#IconPanel", {
+        L"ColumnDefinitions:=<ColumnDefinitionCollection><ColumnDefinition Width=\"*\"/><ColumnDefinition Width=\"0\"/></ColumnDefinitionCollection>"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel", {
         L"Width=45",
         L"Height=60"}},
@@ -10887,12 +11348,12 @@ const Theme g_themeOne_UI_8_5_variant_Taskbar = {{
         L"BorderBrush:=$IconBorder"}},
     ThemeTargetStyles{L"SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Grid > Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#Icon, SearchUx.SearchUI.SearchButtonControl > Grid > SearchUx.SearchUI.SearchIconButton > SearchUx.SearchUI.SearchButtonRootGrid#SearchBoxButtonRootPanel > Microsoft.UI.Xaml.Controls.AnimatedVisualPlayer#Icon", {
         L"Visibility=1"}},
-    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[3] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[3] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=TaskViewButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=TaskViewButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"Background:=<ImageBrush Stretch=\"Uniform\"><ImageBrush.ImageSource><BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/darkbg.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\"/></ImageBrush.ImageSource></ImageBrush>",
         L"BorderThickness=0",
         L"CornerRadius=0"}},
-    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[1] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[1] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
+    ThemeTargetStyles{L"Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Grid > Border#BackgroundElement, Taskbar.ExperienceToggleButton#LaunchListButton[AutomationProperties.AutomationId=StartButton] > Taskbar.TaskListButtonPanel#ExperienceToggleButtonRootPanel > Border#BackgroundElement", {
         L"Margin=0,5.5,0,5.5",
         L"Background:=<ImageBrush Stretch=\"Uniform\"><ImageBrush.ImageSource><BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/Start.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\"/></ImageBrush.ImageSource></ImageBrush>",
         L"BorderThickness=0"}},
@@ -10906,6 +11367,12 @@ const Theme g_themeOne_UI_8_5_variant_Taskbar = {{
     ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid", {
         L"Margin=0,8,0,2",
         L"BorderBrush=#40FFFFFF"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarFrame > Grid#RootGrid > Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater", {
+        L"Margin={{$TrayInFrame?`0,-8,0,8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.ExperienceToggleButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskListButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.AugmentedEntryPointButton, Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.OverflowToggleButton", {
+        L"Margin={{$TrayInFrame?`0,8,0,-8`:skip()}}"}},
+    ThemeTargetStyles{L"Microsoft.UI.Xaml.Controls.ItemsRepeater#TaskbarFrameRepeater > Taskbar.TaskbarExtensionElement > ContentPresenter > SearchUx.SearchUI.SearchButtonControl", {
+        L"Margin={{$TrayInFrame?`0,8,0,-8`:skip()}}"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground", {
         L"Margin=5,0,5,0"}},
     ThemeTargetStyles{L"Grid#RootGrid > Taskbar.TaskbarBackground > Grid", {
@@ -10920,7 +11387,7 @@ const Theme g_themeOne_UI_8_5_variant_Taskbar = {{
         L"Fill=Transparent"}},
     ThemeTargetStyles{L"SystemTray.SystemTrayFrame", {
         L"Height=70",
-        L"Margin=0,-2,0.5,2"}},
+        L"Margin={{TrayInFrameWidth==``?`0,-2,0.5,2`:$TrayInFrame?`0,-2,0.5,-8`:`0,-10,0.5,0`}}"}},
     ThemeTargetStyles{L"StackPanel#SystemTrayFrameGrid, Grid#SystemTrayFrameGrid", {
         L"VerticalAlignment=bottom",
         L"Height=60",
@@ -11037,9 +11504,12 @@ const Theme g_themeOne_UI_8_5_variant_Taskbar = {{
         L"Padding=8,0,8,0"}},
     ThemeTargetStyles{L"Windows.UI.Xaml.Controls.TextBlock#volumeLevelText", {
         L"Foreground=White"}},
+    ThemeTargetStyles{L"Taskbar.TaskbarExtensionElement > ContentPresenter > SystemTray.SystemTrayFrame", {
+        L"ActualWidth=>TrayInFrameWidth"}},
 }, {
     L"IconBackground=<ImageBrush Stretch=\"Uniform\"> <ImageBrush.ImageSource> <BitmapImage UriSource=\"https://raw.githubusercontent.com/ramensoftware/windows-11-taskbar-styling-guide/refs/heads/main/Themes/One%20UI%208.5/Assets/template.png\" DecodePixelType=\"Logical\" DecodePixelWidth=\"64\" DecodePixelHeight=\"64\" /> </ImageBrush.ImageSource> </ImageBrush>",
     L"IconBorder=transparent",
+    L"TrayInFrame=(TrayInFrameWidth==``?0:taskbarDock!=`vertical`)",
 }, {
     L"MediumTaskbarButtonExtent=45",
 }};
@@ -18809,9 +19279,79 @@ bool IsTaskbarTopLevelWindow(HWND hWnd) {
            _wcsicmp(className, L"Shell_SecondaryTrayWnd") == 0;
 }
 
-// Click-through taskbar: clip the top-level taskbar window to the union of the
-// TaskbarFrame and SystemTrayFrame rects so the empty areas become both
-// invisible and click-through.
+// The repeater item that holds the system tray. On some builds, the tray is an
+// item of a repeater inside the taskbar frame. Null when the tray isn't inside
+// the frame.
+FrameworkElement SystemTrayItemInTaskbarFrame(
+    FrameworkElement const& systemTrayFrame,
+    FrameworkElement const& taskbarFrame) {
+    try {
+        FrameworkElement item{nullptr};
+        DependencyObject child = systemTrayFrame;
+        while (true) {
+            auto parent = Media::VisualTreeHelper::GetParent(child);
+            if (!parent) {
+                return nullptr;
+            }
+
+            if (!item && parent.try_as<muxc::ItemsRepeater>()) {
+                item = child.try_as<FrameworkElement>();
+            }
+
+            if (parent == taskbarFrame) {
+                return item;
+            }
+
+            child = std::move(parent);
+        }
+    } catch (winrt::hresult_error const& ex) {
+        Wh_Log(L"Error %08X: %s", ex.code(), ex.message().c_str());
+        return nullptr;
+    }
+}
+
+// The element that draws the background of the taskbar frame: the content of
+// the root grid's BackgroundControl, which a style can move or resize apart
+// from the frame.
+FrameworkElement FindTaskbarFrameBackground(
+    FrameworkElement const& taskbarFrame) {
+    try {
+        int count = Media::VisualTreeHelper::GetChildrenCount(taskbarFrame);
+        for (int i = 0; i < count; i++) {
+            auto rootGrid = Media::VisualTreeHelper::GetChild(taskbarFrame, i);
+            int rootGridCount =
+                Media::VisualTreeHelper::GetChildrenCount(rootGrid);
+            for (int j = 0; j < rootGridCount; j++) {
+                auto child = Media::VisualTreeHelper::GetChild(rootGrid, j)
+                                 .try_as<FrameworkElement>();
+                if (!child ||
+                    winrt::get_class_name(child) !=
+                        L"Taskbar.TaskbarBackground" ||
+                    child.Name() != L"BackgroundControl") {
+                    continue;
+                }
+
+                if (Media::VisualTreeHelper::GetChildrenCount(child) > 0) {
+                    if (auto content = Media::VisualTreeHelper::GetChild(child, 0)
+                                           .try_as<FrameworkElement>()) {
+                        return content;
+                    }
+                }
+
+                return child;
+            }
+        }
+    } catch (winrt::hresult_error const& ex) {
+        Wh_Log(L"Error %08X: %s", ex.code(), ex.message().c_str());
+    }
+
+    return nullptr;
+}
+
+// Click-through taskbar: clip the top-level taskbar window to the TaskbarFrame
+// and SystemTrayFrame rects so the empty areas become both invisible and
+// click-through. When the tray is an item inside the frame, the frame's
+// background and items take the place of the frame's rect, see below.
 void UpdateClickThroughRegion(ClickThroughTaskbarState& state) {
     auto taskbarFrame = state.taskbarFrame.get();
     if (!taskbarFrame) {
@@ -18891,7 +19431,45 @@ void UpdateClickThroughRegion(ClickThroughTaskbarState& state) {
         return;
     }
 
-    auto systemTrayFrameRect = frameRect(state.systemTrayFrame.get());
+    auto systemTrayFrame = state.systemTrayFrame.get();
+    auto systemTrayFrameRect = frameRect(systemTrayFrame);
+
+    // With the tray inside the frame, the frame stays at the left edge and a
+    // style moves a dock by its background and items, so those make up the
+    // region. The tray item is left out, since the tray can be moved away from
+    // it, and the tray's own rect is added below.
+    std::vector<winrt::Windows::Foundation::Rect> contentRects;
+    FrameworkElement systemTrayItem{nullptr};
+    if (systemTrayFrame) {
+        systemTrayItem =
+            SystemTrayItemInTaskbarFrame(systemTrayFrame, taskbarFrame);
+    }
+    if (systemTrayItem) {
+        try {
+            if (auto rect =
+                    frameRect(FindTaskbarFrameBackground(taskbarFrame))) {
+                contentRects.push_back(*rect);
+            }
+
+            auto repeater = Media::VisualTreeHelper::GetParent(systemTrayItem);
+            int count = Media::VisualTreeHelper::GetChildrenCount(repeater);
+            for (int i = 0; i < count; i++) {
+                auto item = Media::VisualTreeHelper::GetChild(repeater, i)
+                                .try_as<FrameworkElement>();
+                if (!item || item == systemTrayItem ||
+                    item.Visibility() != Visibility::Visible) {
+                    continue;
+                }
+
+                if (auto rect = frameRect(item)) {
+                    contentRects.push_back(*rect);
+                }
+            }
+        } catch (winrt::hresult_error const& ex) {
+            Wh_Log(L"Error %08X: %s", ex.code(), ex.message().c_str());
+            contentRects.clear();
+        }
+    }
 
     // LayoutUpdated is frequent; only re-apply when the result actually
     // changes.
@@ -18913,6 +19491,9 @@ void UpdateClickThroughRegion(ClickThroughTaskbarState& state) {
     signature.push_back(QuantizeLayoutSize(scale * 100));
     appendRect(signature, taskbarFrameRect);
     appendRect(signature, systemTrayFrameRect);
+    for (auto const& rect : contentRects) {
+        appendRect(signature, rect);
+    }
 
     RECT tlRect;
     if (!GetWindowRect(topLevelWnd, &tlRect)) {
@@ -18975,23 +19556,37 @@ void UpdateClickThroughRegion(ClickThroughTaskbarState& state) {
                     std::clamp(bottom, 0, tlHeight)};
     };
 
-    RECT tf = toWindowRect(*taskbarFrameRect);
-    HRGN rgn = CreateRectRgn(tf.left, tf.top, tf.right, tf.bottom);
+    HRGN rgn = CreateRectRgn(0, 0, 0, 0);
     if (!rgn) {
         Wh_Log(L"CreateRectRgn failed");
         return;
     }
 
-    RECT rgnBox = tf;
-
-    if (systemTrayFrameRect) {
-        RECT st = toWindowRect(*systemTrayFrameRect);
-        if (HRGN trayRgn =
-                CreateRectRgn(st.left, st.top, st.right, st.bottom)) {
-            CombineRgn(rgn, rgn, trayRgn, RGN_OR);
-            DeleteObject(trayRgn);
-            UnionRect(&rgnBox, &rgnBox, &st);
+    auto addRect = [&](winrt::Windows::Foundation::Rect const& dip) {
+        RECT rect = toWindowRect(dip);
+        if (HRGN rectRgn =
+                CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom)) {
+            CombineRgn(rgn, rgn, rectRgn, RGN_OR);
+            DeleteObject(rectRgn);
         }
+    };
+
+    if (contentRects.empty()) {
+        addRect(*taskbarFrameRect);
+    }
+    for (auto const& rect : contentRects) {
+        addRect(rect);
+    }
+    if (systemTrayFrameRect) {
+        addRect(*systemTrayFrameRect);
+    }
+
+    RECT rgnBox;
+    if (GetRgnBox(rgn, &rgnBox) == NULLREGION) {
+        // An empty region would hide the whole taskbar. Retry on the next pass.
+        Wh_Log(L"Empty click-through region");
+        DeleteObject(rgn);
+        return;
     }
 
     Wh_Log(L"Applying region to %08X, dpi=%u, rasterization scale=%f",

@@ -2,8 +2,8 @@
 // @id              hw-close-remove-unwanted
 // @name            HW-关闭/移除一些无用设置
 // @name:zh-CN      HW-关闭/移除一些无用设置
-// @description     Suppress the file extension rename warning and remove the Microsoft Store item from the Open With menu, merged into one mod with two collapsible groups, each with its own master switch.
-// @description:zh-CN 关闭扩展名修改警告与移除「打开方式」中的 Microsoft Store 项，二合一模组，两个可收起分组、每组带总开关。
+// @description     Suppress the file extension rename warning and remove the Microsoft Store item from the Open With menu, merged into one mod with both functions shown directly (no groups), each with its own switch.
+// @description:zh-CN 关闭扩展名修改警告与移除「打开方式」中的 Microsoft Store 项，二合一模组，取消分组、两项功能直接平铺展示，各自独立开关。
 // @version 1.0.0
 // @author Heptalune & m417z, aubymori
 // @github          https://github.com/m417z
@@ -16,15 +16,15 @@
 //
 // HW-Beautify 整合说明：本模组由两个功能合并而成，两段代码按前缀隔离、各自
 // 独立初始化与卸载，一处失败不影响另一处：
-//   1.「弹窗警告」段（ExtWarn*）：原 HW-文件操作优化模组中的「扩展名警告」
-//      分组，组名与功能名调整为「弹窗警告」/「关闭扩展名修改警告」。来源：
-//      m417z Turn off change file extension warning 1.0.1（GPL-3.0，
-//      https://windhawk.net/mods/extension-change-no-warning）。
-//   2.「打开方式」段（MsStore*）：原 HW-移除打开方式商店项模组整体迁入，
-//      功能名「移除 Microsoft Store」。来源：aubymori Open With - Remove
-//      Microsoft Store Menu Item 1.0.0（GPL-3.0，
-//      https://windhawk.net/mods/-remove-ms-store-open-with）。
-// 设置键沿用原前缀（extWarn.* 与 openWith.*），与旧版保存值兼容。
+//   1.「关闭扩展名修改警告」段（ExtWarn*）：原 HW-文件操作优化模组中的「扩展名
+//      警告」功能。来源：m417z Turn off change file extension warning 1.0.1
+//      （GPL-3.0，https://windhawk.net/mods/extension-change-no-warning）。
+//   2.「移除 Microsoft Store」段（MsStore*）：原 HW-移除打开方式商店项模组整体
+//      迁入。来源：aubymori Open With - Remove Microsoft Store Menu Item 1.0.0
+//      （GPL-3.0，https://windhawk.net/mods/-remove-ms-store-open-with）。
+// 取消分组：两项功能直接平铺展示，各为顶层独立开关（closeWarn 与
+// removeMsStore），不设任何分组层级。旧版键（extWarn.enable / openWith.enable、
+// extWarn.closeWarn / openWith.removeMsStore）均不再读取，需重新在设置页切换。
 // 仅注入 explorer.exe：两段都只在 explorer.exe 中启用，其余进程完全不初始化。
 
 // ==WindhawkModReadme==
@@ -36,14 +36,14 @@
 
 # HW-关闭/移除一些无用设置
 
-HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修改警告」与「移除打开方式中的 Microsoft Store 项」两项系统行为调整，由 Windhawk 直接注入 explorer.exe 运行。设置页共两个可收起分组（弹窗警告、打开方式），每组组首都有「启用本组功能」总开关，默认关闭（均为屏蔽系统行为的改动，请显式开启）。
+HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修改警告」与「移除打开方式中的 Microsoft Store 项」两项系统行为调整，由 Windhawk 直接注入 explorer.exe 运行。已取消分组，两项功能在设置页直接平铺展示，各自独立开关，默认关闭（均为屏蔽系统行为的改动，请显式开启）。
 
-| 分组 | 功能 | 设置键前缀 |
-| --- | --- | --- |
-| 弹窗警告 | 关闭扩展名修改警告 | extWarn.* |
-| 打开方式 | 移除 Microsoft Store | openWith.* |
+| 功能 | 设置键 |
+| --- | --- |
+| 关闭扩展名修改警告 | closeWarn |
+| 移除 Microsoft Store | removeMsStore |
 
-## 功能一：弹窗警告（extWarn 分组）
+## 功能一：关闭扩展名修改警告
 
 重命名文件并修改扩展名时，Windows 默认会弹出「如果改变文件扩展名，可能会导致文件不可用」的确认警告。开启本功能后不再弹出该警告，重命名一步生效。
 
@@ -53,7 +53,7 @@ HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修�
 
 > 来源：**m417z** [Turn off change file extension warning](https://windhawk.net/mods/extension-change-no-warning) 1.0.1，**GPL-3.0**。
 
-## 功能二：打开方式（openWith 分组）
+## 功能二：移除 Microsoft Store
 
 从文件资源管理器「打开方式」子菜单中移除「用 Microsoft Store 搜索」项。该项无法通过常规方式（MUI / 注册表编辑）移除。
 
@@ -66,8 +66,8 @@ HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修�
 
 ## 设置说明
 
-- 各分组第一项「启用本组功能」为该分组总开关，均默认关闭。
-- 两个分组的钩子始终安装（代价极低），由各钩子内的总开关判断短路——关闭时完全直通原函数，系统默认行为照常；开启时命中特征即执行对应拦截。设置变更即时生效。
+- 两项功能各自为独立开关，均默认关闭。
+- 两个功能的钩子始终安装（代价极低），由各钩子内的开关判断短路——关闭时完全直通原函数，系统默认行为照常；开启时命中特征即执行对应拦截。设置变更即时生效。
 
 ## 兼容性
 
@@ -77,9 +77,9 @@ HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修�
 
 ## 修改说明
 
-- 将「关闭扩展名修改警告」与「移除打开方式中的 Microsoft Store 项」两个独立功能整合进一个模组，代码按前缀（extWarn.* / openWith.*）隔离、各自独立初始化与卸载，一处失败不影响另一处。
-- 仅注入 explorer.exe；两段钩子始终安装，由总开关短路，设置变更即时生效。
-- 各分组新增组首「启用本组功能」总开关，默认关闭（系统安全提醒类改动，需显式开启）。
+- 将「关闭扩展名修改警告」与「移除打开方式中的 Microsoft Store 项」两个独立功能整合进一个模组，代码按前缀（ExtWarn* / MsStore*）隔离、各自独立初始化与卸载，一处失败不影响另一处。
+- 仅注入 explorer.exe；两段钩子始终安装，由各功能开关短路，设置变更即时生效。
+- 取消分组：移除组级「启用本组功能」总开关，两项功能直接平铺展示，各为顶层独立开关（closeWarn / removeMsStore），默认关闭（系统安全提醒类改动，需显式开启）。
 - 全中文本地化与整合维护由 HW-Beautify 完成；版本号统一为 1.0.0。
 
 ## 致谢与许可
@@ -92,56 +92,33 @@ HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修�
 
 // ==WindhawkModSettings==
 /*
-- extWarn:
-  - enable: false
-    $name: Enable this feature group
-    $name:zh-CN: 启用本组功能
-    $description: >-
-      Master switch for the file extension warning. Off by default: turning
-      this on suppresses a system safety prompt, so opt in explicitly. When
-      enabled, renaming a file with a changed extension no longer shows the
-      confirmation warning and applies directly; turning it off restores the
-      system behavior at once.
-    $description:zh-CN: >-
-      「弹窗警告」分组总开关。默认关闭——开启即屏蔽系统确认弹窗：重命名
-      文件并修改扩展名时不再弹出「如果改变文件扩展名，可能会导致文件不可用」
-      的警告，直接按「是」处理。该弹窗是防止误改扩展名的安全提醒，请确认知情
-      后再开启；关闭后立即恢复系统默认行为（该开关随设置变更即时生效）。
-  $name: Popup warning
-  $name:zh-CN: 弹窗警告
+- closeWarn: false
+  $name: Close file extension rename warning
+  $name:zh-CN: 关闭扩展名修改警告
   $description: >-
-    Turn off the confirmation warning shown when a file is renamed with a
-    changed extension. Merged from the standalone mod "Turn off change file
-    extension warning" by m417z (GPL-3.0). Off by default: enabling it
+    Suppress the confirmation warning shown when a file is renamed with a
+    changed extension. When enabled, renaming a file with a changed
+    extension no longer shows the "if you change a file extension, the file
+    may become unusable" warning and applies directly; turning it off
+    restores the system behavior at once. Off by default: enabling it
     suppresses a system safety prompt, so opt in explicitly.
   $description:zh-CN: >-
-    重命名文件并修改扩展名时不再弹出确认警告。由独立模组「关闭扩展名修改
-    警告」（原作者 m417z，GPL-3.0）并入。默认关闭：开启即屏蔽系统安全提醒，
-    请显式选择开启。
+    重命名文件并修改扩展名时不再弹出「如果改变文件扩展名，可能会导致文件不可用」
+    的确认警告，重命名一步生效。默认关闭：开启即屏蔽系统安全提醒，请知悉风险后
+    显式开启；关闭后立即恢复系统默认行为（开关随设置变更即时生效）。
 
-- openWith:
-  - enable: false
-    $name: Enable this feature group
-    $name:zh-CN: 启用本组功能
-    $description: >-
-      Master switch for removing the Microsoft Store item from the Open With
-      menu. Off by default: enabling it removes a system menu item, so opt in
-      explicitly. When enabled, the "Search with Microsoft Store" item no
-      longer appears in the Open With submenu; turning it off restores the
-      system behavior at once.
-    $description:zh-CN: >-
-      「打开方式」分组总开关。默认关闭——开启即移除系统内置菜单项：文件
-      资源管理器「打开方式」子菜单中的「用 Microsoft Store 搜索」项不再出现。
-      请显式选择开启；关闭后立即恢复系统默认行为（该开关随设置变更即时生效）。
-  $name: Open with
-  $name:zh-CN: 打开方式
+- removeMsStore: false
+  $name: Remove Microsoft Store from Open With menu
+  $name:zh-CN: 移除 Microsoft Store
   $description: >-
     Remove the "Search with Microsoft Store" menu item from the "Open with"
-    submenu. Merged from the standalone mod "Open With - Remove Microsoft
-    Store Menu Item" by aubymori (GPL-3.0).
+    submenu. When enabled, the item no longer appears in the Open With
+    submenu; turning it off restores the system behavior at once. Off by
+    default: enabling it removes a system menu item, so opt in explicitly.
   $description:zh-CN: >-
-    从「打开方式」子菜单中移除「用 Microsoft Store 搜索」项。由独立模组
-    「移除打开方式商店项」（原作者 aubymori，GPL-3.0）并入。
+    从文件资源管理器「打开方式」子菜单中移除「用 Microsoft Store 搜索」项，
+    该项无法通过常规方式移除。默认关闭：开启即移除系统内置菜单项，请显式开启；
+      关闭后立即恢复系统默认行为（开关随设置变更即时生效）。
 */
 // ==/WindhawkModSettings==
 
@@ -152,24 +129,23 @@ HW-Beautify 整合包的二合一功能模组，整合了「关闭扩展名修�
 #include <processthreadsapi.h>
 #include <psapi.h>
 #include <windhawk_utils.h>
-// 功能五：扩展名警告（ExtWarn*）
+// 功能一：关闭扩展名修改警告（ExtWarn*）
 // 来源：m417z Turn off change file extension warning 1.0.1（GPL-3.0），
 // 原版链接：https://windhawk.net/mods/extension-change-no-warning。
 // 逻辑与上游一致，全局符号与函数统一加 ExtWarn 前缀以与其他功能隔离；设置键
-// 迁移为 extWarn.enable（分组总开关，默认关闭——开启即屏蔽系统确认弹窗，
-// 让用户显式选择）。
+// 为 closeWarn（顶层开关，默认关闭——开启即屏蔽系统确认弹窗，让用户显式选择）。
 // 实现方式：ShellMessageBoxW / ShellMessageBoxInternal 钩子
-// 始终安装（代价极低），由各钩子内的总开关判断短路——关闭时完全直通原函数，
+// 始终安装（代价极低），由各钩子内的开关判断短路——关闭时完全直通原函数，
 // 系统默认警告照常弹出；开启时命中重命名警告特征即代答 IDYES。
 // 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
 // ─────────────────────────────────────────────────────────────────────────────
 
 static struct {
-    bool enable;      // 分组总开关（extWarn.enable，默认 false）
+    bool closeWarn;   // 功能开关（closeWarn，默认 false）
 } ExtWarnSettings;
 
 static void ExtWarnLoadSettings() {
-    ExtWarnSettings.enable = Wh_GetIntSetting(L"extWarn.enable") != 0;
+    ExtWarnSettings.closeWarn = Wh_GetIntSetting(L"closeWarn") != 0;
 }
 
 static bool ExtWarnIsRenameMessageBoxParams(HINSTANCE hAppInst,
@@ -202,9 +178,9 @@ int __cdecl ExtWarnShellMessageBoxW_Hook(HINSTANCE hAppInst,
                                          UINT fuStyle) {
     Wh_Log(L">");
 
-    // 分组总开关关闭：完全直通原函数，系统默认确认警告照常弹出（运行时
+    // 开关关闭：完全直通原函数，系统默认确认警告照常弹出（运行时
     // 短路，设置变更经 ExtWarnLoadSettings 即时生效）。
-    if (ExtWarnSettings.enable &&
+    if (ExtWarnSettings.closeWarn &&
         ExtWarnIsRenameMessageBoxParams(hAppInst, lpcText, lpcTitle, fuStyle)) {
         return IDYES;
     }
@@ -228,7 +204,7 @@ int __cdecl ExtWarnShellMessageBoxInternal_Hook(HINSTANCE hAppInst,
                                                 UINT fuStyle) {
     Wh_Log(L">");
 
-    if (ExtWarnSettings.enable &&
+    if (ExtWarnSettings.closeWarn &&
         ExtWarnIsRenameMessageBoxParams(hAppInst, lpcText, lpcTitle, fuStyle)) {
         return IDYES;
     }
@@ -274,13 +250,13 @@ static void ExtWarnNotifySettingsChanged() {
     ExtWarnLoadSettings();
 }
 // ─────────────────────────────────────────────────────────────────────────────
-// 功能二：打开方式（MsStore*）
+// 功能二：移除 Microsoft Store（MsStore*）
 // 来源：aubymori Open With - Remove Microsoft Store Menu Item 1.0.0（GPL-3.0），
 // 原版链接：https://windhawk.net/mods/-remove-ms-store-open-with。
-// 逻辑与上游一致，全局符号与函数统一加 MsStore 前缀隔离；设置键迁移为
-// openWith.enable（分组总开关，默认关闭——该功能会移除系统内置菜单项，让用户
+// 逻辑与上游一致，全局符号与函数统一加 MsStore 前缀隔离；设置键为
+// removeMsStore（顶层开关，默认关闭——该功能会移除系统内置菜单项，让用户
 // 显式选择）。
-// 实现方式：InsertMenuItemW 钩子段加开关短路——总开关关闭时完全直通原函数
+// 实现方式：InsertMenuItemW 钩子段加开关短路——开关关闭时完全直通原函数
 //（菜单行为与系统完全一致），开启时仅当调用方来自 shell32 且菜单项字符串
 // 匹配系统「用 Microsoft Store 搜索」资源时跳过插入，其余调用完全直通。
 // 仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
@@ -295,11 +271,11 @@ static ULONGLONG MsStore_g_shell32Size = 0;
 static WCHAR MsStore_g_szMsStore[80] = { 0 };
 
 static struct {
-    bool enable;      // 分组总开关（openWith.enable，默认 false）
+    bool removeMsStore;  // 功能开关（removeMsStore，默认 false）
 } MsStoreSettings;
 
 static void MsStoreLoadSettings() {
-    MsStoreSettings.enable = Wh_GetIntSetting(L"openWith.enable") != 0;
+    MsStoreSettings.removeMsStore = Wh_GetIntSetting(L"removeMsStore") != 0;
 }
 
 BOOL WINAPI MsStoreInsertMenuItemW_hook(
@@ -309,9 +285,9 @@ BOOL WINAPI MsStoreInsertMenuItemW_hook(
     LPCMENUITEMINFOW lpmi
 )
 {
-    // 分组总开关关闭：完全直通原函数，菜单行为与系统完全一致（运行时短路，
+    // 开关关闭：完全直通原函数，菜单行为与系统完全一致（运行时短路，
     // 设置变更经 MsStoreLoadSettings 即时生效）。
-    if (!MsStoreSettings.enable) {
+    if (!MsStoreSettings.removeMsStore) {
         return MsStoreInsertMenuItemW_orig(hmenu, item, fByPosition, lpmi);
     }
 
@@ -387,8 +363,8 @@ static void MsStoreNotifySettingsChanged() {
 }
 
 // -----------------------------------------------------------------------------
-// 模组入口：本模组仅注入 explorer.exe，整合两个功能分组——「弹窗警告」
-// （扩展名修改警告）与「打开方式」（移除 Microsoft Store）。
+// 模组入口：本模组仅注入 explorer.exe，整合两个功能——「关闭扩展名修改警告」
+// 与「移除 Microsoft Store」，取消分组、直接平铺展示，各自独立开关。
 // 自 HW-文件操作优化拆出（桌面图标隐藏、拖拽删除、双击返回上级已迁出）。
 // -----------------------------------------------------------------------------
 BOOL Wh_ModInit() {

@@ -2,7 +2,7 @@
 // @id              file-hover-info
 // @name            文件悬停信息
 // @description     在桌面或文件资源管理器中悬停文件时，显示包含大小、日期等信息的可主题化信息卡片
-// @version         1.1.2
+// @version         1.2.0
 // @author          HaVeN80
 // @github          https://github.com/haven80
 // @include         explorer.exe
@@ -43,114 +43,196 @@ Windows 设置本身不会被更改，关闭该选项或模组后弹出窗口即
 // ==WindhawkModSettings==
 /*
 - delay: 450
+  $name: Hover delay (ms)
   $name:zh-CN: 悬停延迟 (毫秒)
+  $description: How long the cursor must rest on an item before the card appears
   $description:zh-CN: 光标需在项目上停留多长时间，卡片才会显示
 - showOnDesktop: true
+  $name: Show on the desktop
   $name:zh-CN: 在桌面显示
 - showInExplorer: true
+  $name: Show in File Explorer windows
   $name:zh-CN: 在文件资源管理器窗口中显示
+- extensions: show
+  $name: File extensions in the name
+  $name:zh-CN: 名称中的文件扩展名
+  $description: Whether the file name on the card includes its extension (.jpg, .pdf...). Shortcuts (.lnk, .url) never show it, as in File Explorer.
+  $description:zh-CN: 卡片上的文件名是否包含扩展名（.jpg、.pdf 等）。快捷方式（.lnk、.url）始终不显示扩展名，与文件资源管理器一致。
+  $options:
+  - show: Always show
+  - hide: Always hide
+  - explorer: Same as File Explorer ("File name extensions" setting)
+  $options:zh-CN:
+  - show: 始终显示
+  - hide: 始终隐藏
+  - explorer: 与文件资源管理器一致（"文件扩展名"设置）
 - hideNativeTooltip: true
+  $name: Hide Windows' own hover popup
   $name:zh-CN: 隐藏 Windows 自带的悬停弹出窗口
+  $description: Hides the built-in popup so only this card appears. The Windows setting is not changed.
   $description:zh-CN: 隐藏内置弹出窗口，仅显示此卡片。Windows 设置不会被更改。
 - language: auto
+  $name: Card language
   $name:zh-CN: 卡片语言
+  $options:
+  - auto: Same as Windows (English if not available)
+  - en: English
+  - it: Italiano
+  - es: Español
+  - fr: Français
+  - de: Deutsch
+  - pt: Português
+  - zh: 简体中文 (Simplified Chinese)
   $options:zh-CN:
-  - auto: 与 Windows 相同（不可用时为英语）
-  - en: 英语
-  - it: 意大利语
-  - es: 西班牙语
-  - fr: 法语
-  - de: 德语
-  - pt: 葡萄牙语
-  - zh: 简体中文
+  - auto: Same as Windows (English if not available)
+  - en: English
+  - it: Italiano
+  - es: Español
+  - fr: Français
+  - de: Deutsch
+  - pt: Português
+  - zh: 简体中文 (Simplified Chinese)
 - folderSizeLimit: 10
+  $name: Folder size - maximum calculation time (seconds)
   $name:zh-CN: 文件夹大小 - 最大计算时间 (秒)
+  $description: Large folders are summed in the background. When the limit is hit the card shows a partial total.
   $description:zh-CN: 大文件夹在后台汇总。达到上限后，卡片显示部分总数。
 - dateStyle: shortRelative
+  $name: Date format
   $name:zh-CN: 日期格式
+  $options:
+  - long: Long date and time
+  - short: Short date and time
+  - relative: Relative (e.g. "2 hours ago")
+  - shortRelative: Short date + relative
   $options:zh-CN:
-  - long: 完整日期和时间
-  - short: 简短日期和时间
-  - relative: 相对（例如"2 小时前"）
-  - shortRelative: 简短日期 + 相对
+  - long: Long date and time
+  - short: Short date and time
+  - relative: Relative (e.g. "2 hours ago")
+  - shortRelative: Short date + relative
 - fields:
   - type: true
+    $name: Type
     $name:zh-CN: 类型
   - size: true
+    $name: Size
     $name:zh-CN: 大小
   - exactBytes: false
+    $name: Exact size in bytes
     $name:zh-CN: 精确字节大小
   - created: true
+    $name: Created
     $name:zh-CN: 创建时间
   - modified: true
+    $name: Modified
     $name:zh-CN: 修改时间
   - accessed: false
+    $name: Last accessed
     $name:zh-CN: 上次访问
   - attributes: true
+    $name: Attributes (hidden, read-only, online-only...)
     $name:zh-CN: 属性（隐藏、只读、仅联机等）
   - dimensions: true
+    $name: Image dimensions
     $name:zh-CN: 图像尺寸
   - duration: true
+    $name: Audio/video duration
     $name:zh-CN: 音频/视频时长
   - version: true
+    $name: File version (exe, dll)
     $name:zh-CN: 文件版本 (exe, dll)
   - target: true
+    $name: Shortcut target
     $name:zh-CN: 快捷方式目标
   - folderSize: true
+    $name: Folder size (calculated in the background)
     $name:zh-CN: 文件夹大小（后台计算）
   - contents: true
+    $name: Folder contents (number of items)
     $name:zh-CN: 文件夹内容（项目数量）
   - folderPreview: true
+    $name: Folder preview (names of the first subfolders and files)
     $name:zh-CN: 文件夹预览（前几个子文件夹和文件的名称）
   - location: false
+    $name: Location (parent folder)
     $name:zh-CN: 位置（父文件夹）
-  $name:zh-CN: 要显示的信息
+  $name: Information to show
+  $name:zh-CN: 显示的信息
 - appearance:
   - theme: auto
+    $name: Theme
     $name:zh-CN: 主题
+    $options:
+    - auto: Follow Windows
+    - dark: Dark
+    - light: Light
+    - custom: Custom colors
     $options:zh-CN:
-    - auto: 跟随 Windows
-    - dark: 深色
-    - light: 浅色
-    - custom: 自定义颜色
+    - auto: Follow Windows
+    - dark: Dark
+    - light: Light
+    - custom: Custom colors
   - background: solid
+    $name: Background
     $name:zh-CN: 背景
+    $options:
+    - solid: Solid
+    - acrylic: Acrylic
+    - blur: Blur
     $options:zh-CN:
-    - solid: 纯色
-    - acrylic: 亚克力
-    - blur: 模糊
+    - solid: Solid
+    - acrylic: Acrylic
+    - blur: Blur
   - opacity: 94
+    $name: Background opacity (%)
     $name:zh-CN: 背景不透明度 (%)
   - accentColor: ""
+    $name: Accent color
     $name:zh-CN: 强调色
+    $description: "#RRGGBB. Leave empty to use the Windows accent color"
     $description:zh-CN: "#RRGGBB。留空则使用 Windows 强调色"
   - accentBar: true
+    $name: Accent bar on the left
     $name:zh-CN: 左侧强调条
   - shadow: true
+    $name: Drop shadow (solid background)
     $name:zh-CN: 投影（纯色背景）
   - animation: true
+    $name: Fade-in (solid background)
     $name:zh-CN: 淡入（纯色背景）
   - cornerRadius: 8
+    $name: Corner radius (solid background)
     $name:zh-CN: 圆角半径（纯色背景）
   - fontFamily: Segoe UI Variable Text
+    $name: Font
     $name:zh-CN: 字体
   - fontSize: 13
+    $name: Font size
     $name:zh-CN: 字号
   - maxWidth: 380
+    $name: Maximum width
     $name:zh-CN: 最大宽度
   - icon: true
+    $name: Show icon
     $name:zh-CN: 显示图标
   - thumbnail: true
+    $name: Use thumbnails for images and videos
     $name:zh-CN: 为图像和视频使用缩略图
   - iconSize: 40
+    $name: Icon size
     $name:zh-CN: 图标大小
   - customBackground: "#1E1E2E"
+    $name: Custom background color
     $name:zh-CN: 自定义背景颜色
+    $description: Used when the theme is "Custom colors"
     $description:zh-CN: 当主题为"自定义颜色"时使用
   - customText: "#CDD6F4"
+    $name: Custom text color
     $name:zh-CN: 自定义文字颜色
   - customLabel: "#9399B2"
+    $name: Custom label color
     $name:zh-CN: 自定义标签颜色
+  $name: Appearance
   $name:zh-CN: 外观
 */
 // ==/WindhawkModSettings==
@@ -262,11 +344,13 @@ static const wchar_t kCardClass[] = L"WhFileHoverInfoCard";
 // ---------------------------------------------------------------------------
 enum Theme { ThemeAuto, ThemeDark, ThemeLight, ThemeCustom };
 enum Background { BgSolid, BgAcrylic, BgBlur };
+enum Extensions { ExtShow, ExtHide, ExtExplorer };
 enum DateStyle { DateLong, DateShort, DateRelative, DateShortRelative };
 
 struct Settings {
     int delay;
     bool onDesktop, inExplorer;
+    int extensions;
     int lang;
     int folderSizeLimit;
     int dateStyle;
@@ -422,6 +506,12 @@ static void LoadSettings() {
     g_set.delay = std::clamp(Wh_GetIntSetting(L"delay"), 0, 5000);
     g_set.onDesktop = GetBool(L"showOnDesktop");
     g_set.inExplorer = GetBool(L"showInExplorer");
+    {
+        std::wstring ext = GetStr(L"extensions");
+        g_set.extensions = ext == L"hide"       ? ExtHide
+                           : ext == L"explorer" ? ExtExplorer
+                                                : ExtShow;
+    }
     {
         static const wchar_t* codes[] = {L"en", L"it", L"es", L"fr", L"de", L"pt", L"zh"};
         std::wstring lang = GetStr(L"language");
@@ -1128,6 +1218,34 @@ static void AddRow(const wchar_t* label, const std::wstring& value) {
 
 static void LayoutCard();
 
+// True for types whose extension File Explorer never shows (shortcuts and
+// the like), marked with the NeverShowExt registry value.
+static bool IsNeverShowExt(PCWSTR ext) {
+    if (!ext || !*ext)
+        return false;
+    if (RegGetValueW(HKEY_CLASSES_ROOT, ext, L"NeverShowExt", RRF_RT_ANY,
+                     nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+        return true;
+    wchar_t progId[256];
+    DWORD sz = sizeof(progId);
+    if (RegGetValueW(HKEY_CLASSES_ROOT, ext, nullptr, RRF_RT_REG_SZ, nullptr,
+                     progId, &sz) != ERROR_SUCCESS ||
+        !*progId)
+        return false;
+    return RegGetValueW(HKEY_CLASSES_ROOT, progId, L"NeverShowExt", RRF_RT_ANY,
+                        nullptr, nullptr, nullptr) == ERROR_SUCCESS;
+}
+
+// The file name without its extension. Names that are only an extension
+// (".gitignore") are kept whole.
+static std::wstring StripExtension(const std::wstring& name) {
+    PCWSTR ext = PathFindExtensionW(name.c_str());
+    size_t pos = (size_t)(ext - name.c_str());
+    if (!*ext || pos == 0)
+        return name;
+    return name.substr(0, pos);
+}
+
 static bool BuildCard(IShellItem2* item, UINT dpi) {
     *g_card = Card();
     Card& c = *g_card;
@@ -1140,7 +1258,17 @@ static bool BuildCard(IShellItem2* item, UINT dpi) {
         CoTaskMemFree(raw);
     }
     raw = nullptr;
-    if (!path.empty() && !PathIsRootW(path.c_str())) {
+    bool isFile = false;
+    if (!path.empty()) {
+        DWORD a = GetFileAttributesW(path.c_str());
+        isFile = a != INVALID_FILE_ATTRIBUTES && !(a & FILE_ATTRIBUTE_DIRECTORY);
+    }
+    if (isFile && g_set.extensions != ExtExplorer) {
+        c.name = PathFindFileNameW(path.c_str());
+        if (g_set.extensions == ExtHide ||
+            IsNeverShowExt(PathFindExtensionW(c.name.c_str())))
+            c.name = StripExtension(c.name);
+    } else if (!path.empty() && !isFile && !PathIsRootW(path.c_str())) {
         c.name = PathFindFileNameW(path.c_str());
     } else if (SUCCEEDED(item->GetDisplayName(SIGDN_NORMALDISPLAY, &raw)) &&
                raw) {

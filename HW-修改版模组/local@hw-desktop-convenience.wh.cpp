@@ -1098,12 +1098,10 @@ static void ToggleIconsUninit()
 //     0x7402（TOGGLEICONS_TOGGLE_COMMAND），由系统真正隐藏并持久化。
 //     淡出期间的输入恢复/再次双击由 ToggleIcons 调
 //     SmoothIconsCancelHideTransition 取消（alpha 平滑升回 255，不发命令）。
-//   • 显示方向（SmoothIconsBeginShowTransition）：「先登记待淡入、后放行系统
-//     命令、再动画」。先把 alpha 定格为 0 并登记 showFadePending（此刻
-//     SysListView32 仍隐藏、甚至已被系统销毁），调用方随即发出系统显示命令；
-//     系统重建/显示 ListView 触发刷新处理时，直接在重建出的 ListView 上从
-//     alpha=0 平滑升回 255（若 ListView 当时已就绪则立即淡入），与隐藏方向
-//     对称的平滑动画同样覆盖显示图标。
+//   • 显示方向（SmoothIconsBeginShowTransition）：「先放行系统命令、后动画」。
+//     先把 alpha 定格为 0（此刻 SysListView32 仍隐藏、无绘制发生），调用方
+//     随即发出系统显示命令，系统显示 ListView 后首帧即以 alpha=0 绘制（不
+//     闪现完整图标），alpha 再平滑升回 255。
 // 设置键：toggleIcons.animationDuration（ToggleIcons 分组内的「动画时长」），
 // 本段无独立设置分组、无独立隐藏开关。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1137,11 +1135,6 @@ struct SmoothIconsDesktopState {
 
     // 隐藏方向过渡：淡出进行中，系统切换命令（0x7402）在动画结束后补发。
     bool hideCommandPending = false;
-
-    // 显示方向过渡：已登记「待淡入」但 ListView 尚未就绪（图标隐藏时系统可能
-    // 已销毁/隐藏 SysListView32，显示命令才会重建/显示它）。刷新处理在
-    // ListView 重新接管后据此从透明平滑淡入，而非把 alpha 重置为 255。
-    bool showFadePending = false;
 };
 
 // All SmoothIconsDesktopState entries are created, changed and read on the desktop
@@ -1295,23 +1288,17 @@ bool SmoothIconsBeginHideTransition(HWND hwndShell) {
 }
 
 bool SmoothIconsBeginShowTransition(HWND hwndShell) {
-    SmoothIconsDesktopState* state = SmoothIconsFindStateByShell(hwndShell);
+    SmoothIconsDesktopState* state = SmoothIconsTransitionState(hwndShell);
     if (!state)
         return false;
 
     // 显示方向覆盖任何挂起的隐藏过渡（其系统命令不再补发）。
     state->hideCommandPending = false;
 
-    // 登记「待淡入」并先把 alpha 定格为 0。此刻 SysListView32 可能仍隐藏
-    // （甚至已被系统销毁），所以这里直接改状态里的 alpha，而不是经
-    // SmoothIconsSetAlpha（它会因 list 不存在而提前返回）。调用方随即发出
-    // 系统显示命令；若 ListView 已就绪则立即淡入，若命令重建/显示 ListView
-    // 则由刷新处理在 ListView 接管后从透明平滑淡入。
-    state->showFadePending = true;
-    state->alpha = 0;
-
-    if (state->list && IsWindow(state->list))
-        SmoothIconsAnimateTo(state, 255);
+    // 先把 alpha 定格为 0：此刻 SysListView32 仍隐藏、无绘制发生；系统显示
+    // 命令发出后 ListView 的首帧即按 alpha=0 绘制（不闪现完整图标）。
+    SmoothIconsSetAlpha(state, 0);
+    SmoothIconsAnimateTo(state, 255);
     return true;
 }
 
@@ -1322,7 +1309,6 @@ void SmoothIconsCancelHideTransition(HWND hwndShell) {
 
     // 取消挂起的隐藏：不再补发系统命令，绘制 alpha 平滑升回 255。
     state->hideCommandPending = false;
-    state->showFadePending = false;
     if (state->alpha != 255)
         SmoothIconsAnimateTo(state, 255);
 }
@@ -2007,21 +1993,12 @@ LRESULT CALLBACK SmoothIconsDesktopShellSubclassProc(
                     exStyle & ~static_cast<LONG_PTR>(WS_EX_LAYERED));
             }
 
-            if (state->showFadePending) {
-                // 显示方向过渡：ListView 重新接管，从透明（alpha=0）平滑淡入
-                // 到 255，而非重置为满不透明度——这样「待淡入」挂起的平滑动画
-                // 在重建/显示后立即续上，而不是瞬现完整图标。
-                state->hideCommandPending = false;
-                state->alpha = 0;
-                SmoothIconsAnimateTo(state, 255);
-            } else {
-                // 初始 alpha=255：桌面图标的显示/隐藏完全由系统 HideIcons 状态
-                // 决定，本绘制器只在 ToggleIcons 触发切换时叠加过渡动画。
-                state->alpha = 255;
-                state->animating = false;
-                state->hideCommandPending = false;
-                SmoothIconsRepaintList(state);
-            }
+            // 初始 alpha=255：桌面图标的显示/隐藏完全由系统 HideIcons 状态
+            // 决定，本绘制器只在 ToggleIcons 触发切换时叠加过渡动画。
+            state->alpha = 255;
+            state->animating = false;
+            state->hideCommandPending = false;
+            SmoothIconsRepaintList(state);
         }
 
         return 0;
@@ -2033,7 +2010,6 @@ LRESULT CALLBACK SmoothIconsDesktopShellSubclassProc(
         KillTimer(hWnd, kSmoothIconsTimerAnimation);
         SmoothIconsEndTimerPrecision(state);
         state->hideCommandPending = false;
-        state->showFadePending = false;
         state->alpha = 255;
 
         if (state->list && IsWindow(state->list)) {
@@ -2064,7 +2040,6 @@ LRESULT CALLBACK SmoothIconsDesktopShellSubclassProc(
         KillTimer(hWnd, kSmoothIconsTimerAnimation);
         SmoothIconsEndTimerPrecision(state);
         state->hideCommandPending = false;
-        state->showFadePending = false;
         state->shell = nullptr;
         state->list = nullptr;
         break;

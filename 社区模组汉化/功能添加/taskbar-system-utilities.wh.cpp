@@ -2,7 +2,7 @@
 // @id              taskbar-system-utilities
 // @name            任务栏系统工具
 // @description     原生 XAML 任务栏工具：重启资源管理器、清理临时文件、释放内存、重置显卡驱动、获取 IP、重建缓存和清理 DNS 缓存。
-// @version         1.2
+// @version         1.3
 // @author          Marco Petrucci
 // @github          https://github.com/marco00petrucci
 // @donateUrl       https://www.paypal.me/marco00petrucci
@@ -39,107 +39,261 @@
 /*
 - submenu:
   - enabled: true
+    $name: Group into submenu
     $name:zh-CN: 归入子菜单
+    $description: Group the selected utilities inside a cascading submenu.
     $description:zh-CN: 将所选工具归入一个层叠子菜单中。
-  - label: 系统工具
+  - label: System Utilities
+    $name: Submenu label
     $name:zh-CN: 子菜单标签
   - glyph: E712
+    $name: Submenu icon glyph (Segoe Fluent Icons)
     $name:zh-CN: 子菜单图标字形（Segoe Fluent Icons）
+    $description: "Hex code (E712, 0xE712, \\uE712) or a single character/emoji."
     $description:zh-CN: 十六进制代码（E712、0xE712、\uE712）或字形本身。
+  - placement: top
+    $name: Utilities placement
+    $name:zh-CN: 实用工具位置
+    $description: Where the system utilities appear in the taskbar context menu.
+    $description:zh-CN: >-
+      系统实用工具在任务栏右键菜单中的显示位置。
+    $options:
+    - top: Above built-in items
+    - bottom: Below built-in items
+    $options:zh-CN:
+    - top: 在内置项上方
+    - bottom: 在内置项下方
+  $name: Submenu
   $name:zh-CN: 子菜单
+  $description: Configure the cascading submenu and placement for system utilities.
   $description:zh-CN: 配置层叠子菜单。
 - restartExplorer:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重启资源管理器
+  - label: Restart Explorer
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
+  $name: Restart Explorer
   $name:zh-CN: 重启资源管理器
+  $description: Configure the Restart Explorer shortcut.
   $description:zh-CN: 配置重启资源管理器快捷方式。
 - cleanTemp:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 清理临时文件
+  - label: Clean Temp
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
   - cleanRecycleBin: false
+    $name: Empty Recycle Bin
     $name:zh-CN: 清空回收站
+    $description: Permanently empty Recycle Bin on all drives.
     $description:zh-CN: 永久清空所有驱动器上的回收站。
   - showCard: true
+    $name: Show summary card
     $name:zh-CN: 显示摘要卡片
+    $description: Display XAML card with cleanup statistics.
     $description:zh-CN: 显示包含清理统计信息的 XAML 卡片。
+  $name: Clean Temp
   $name:zh-CN: 清理临时文件
+  $description: Configure the temporary files cleaner.
   $description:zh-CN: 配置临时文件清理工具。
 - reduceMemory:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 释放内存
+  - label: Reduce Memory
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
   - showCard: true
+    $name: Show summary card
     $name:zh-CN: 显示摘要卡片
+    $description: Display XAML card with freed RAM statistics.
     $description:zh-CN: 显示包含已释放内存统计信息的 XAML 卡片。
+  $name: Reduce Memory
   $name:zh-CN: 释放内存
+  $description: Trim working sets of running processes to free up RAM.
   $description:zh-CN: 修剪正在运行进程的工作集以释放内存。
 - restartGpu:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重启显卡驱动
+  - label: Restart Graphics Driver
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
+  $name: Restart Graphics Driver
   $name:zh-CN: 重启显卡驱动
+  $description: Configure the graphics subsystem reset shortcut.
   $description:zh-CN: 配置图形子系统重置快捷方式。
 - getIp:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 获取 IP 地址
+  - label: Get IP Address
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
   - queryPublicIp: false
+    $name: Query Public IP (External)
     $name:zh-CN: 查询公网 IP（外部）
+    $description: Contacts api.ipify.org via HTTPS. Off by default.
     $description:zh-CN: 通过 HTTPS 访问 api.ipify.org。默认关闭。
   - copyToClipboard: false
+    $name: Auto-copy to clipboard
     $name:zh-CN: 自动复制到剪贴板
+    $description: Automatically copy detected IPs to clipboard.
     $description:zh-CN: 自动将检测到的 IP 复制到剪贴板。
+  $name: Get IP Address
   $name:zh-CN: 获取 IP 地址
+  $description: Configure local and public IP detection.
   $description:zh-CN: 配置本地和公网 IP 检测。
 - rebuildCache:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重建图标和缩略图缓存
+  - label: Rebuild Icon & Thumbnail Cache
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
   - showCard: true
+    $name: Show summary card
     $name:zh-CN: 显示摘要卡片
+    $description: Display XAML card with cache rebuild statistics.
     $description:zh-CN: 显示包含缓存重建统计信息的 XAML 卡片。
+  $name: Rebuild Icon & Thumbnail Cache
   $name:zh-CN: 重建图标和缩略图缓存
+  $description: Delete thumbnail cache and rebuild Windows icon cache.
   $description:zh-CN: 删除缩略图缓存并重建 Windows 图标缓存。
 - flushDns:
   - enabled: true
+    $name: Enable in taskbar menu
     $name:zh-CN: 在任务栏菜单中启用
   - inSubmenu: true
+    $name: Place inside submenu
     $name:zh-CN: 放入子菜单
+    $description: Show this item in the submenu (when grouping is on).
     $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 清理 DNS 缓存
+  - label: Clean DNS Cache
+    $name: Menu item label
     $name:zh-CN: 菜单项标签
   - showCard: true
+    $name: Show confirmation card
     $name:zh-CN: 显示确认卡片
+    $description: Display XAML card when DNS cache is flushed.
     $description:zh-CN: 清理 DNS 缓存时显示 XAML 卡片。
+  $name: Clean DNS Cache
   $name:zh-CN: 清理 DNS 缓存
+  $description: Configure the DNS resolver cache cleaner.
   $description:zh-CN: 配置 DNS 解析缓存清理工具。
-
+- items:
+  - - name: Terminal
+      $name: Label
+      $name:zh-CN: 标签
+      $description: "Text shown in the menu. Use a single dash (-) to add a separator line. Leave command empty for a disabled section heading."
+      $description:zh-CN: >-
+        菜单中显示的文字。填入单个短横线 (-) 可添加一条分隔线；命令留空则作为不可点击的分组标题。
+    - command: wt.exe
+      $name: Command
+      $name:zh-CN: 命令
+      $description: "Program, file, folder, URL, ms-settings page or shell location to open, without arguments. Environment variables such as %USERPROFILE% are expanded."
+      $description:zh-CN: >-
+        要打开的程序、文件、文件夹、URL、ms-settings 设置页或 shell 位置，不带参数。支持展开 %USERPROFILE% 等环境变量。
+    - arguments: ""
+      $name: Arguments
+      $name:zh-CN: 参数
+      $description: Optional command-line arguments for the command.
+      $description:zh-CN: >-
+        命令的可选命令行参数。
+    - icon: E756
+      $name: Icon
+      $name:zh-CN: 图标
+      $description: "Optional hex code of a Segoe Fluent Icons glyph (e.g. E756) or a single character such as an emoji."
+      $description:zh-CN: >-
+        可选的 Segoe Fluent Icons 字形十六进制代码（例如 E756），也可以是单个字符（如 emoji）。
+    - runAsAdmin: false
+      $name: Run as administrator
+      $name:zh-CN: 以管理员身份运行
+      $description: Start the command elevated with administrative privileges (triggers UAC).
+      $description:zh-CN: >-
+        以管理员权限启动该命令（会触发 UAC 提示）。
+    - hideWindow: false
+      $name: Hide window
+      $name:zh-CN: 隐藏窗口
+      $description: Start the command without a visible window, useful for background scripts and console commands.
+      $description:zh-CN: >-
+        启动命令时不显示窗口，适合后台脚本和控制台命令。
+  - - name: Control Panel
+    - command: control.exe
+    - arguments: ""
+    - icon: E770
+    - runAsAdmin: false
+    - hideWindow: false
+  $name: Custom Menu Items
+  $name:zh-CN: 自定义菜单项
+  $description: "Add your own custom items to the taskbar right-click menu: programs, folders, scripts, URLs and settings pages."
+  $description:zh-CN: >-
+    在任务栏右键菜单中添加你自己的项目：程序、文件夹、脚本、URL 和设置页。
+- customPlacement: bottom
+  $name: Custom items placement
+  $name:zh-CN: 自定义项位置
+  $description: Where the custom items appear in the taskbar context menu.
+  $description:zh-CN: >-
+    自定义项目在任务栏右键菜单中的显示位置。
+  $options:
+  - bottom: Below built-in items
+  - top: Above built-in items
+  - submenu: Inside System Utilities submenu
+  $options:zh-CN:
+  - bottom: 在内置项下方
+  - top: 在内置项上方
+  - submenu: 在系统实用工具子菜单内
+- customSeparator: true
+  $name: Custom items separator line
+  $name:zh-CN: 自定义项分隔线
+  $description: Draw a separator line between the custom items and adjacent menu items.
+  $description:zh-CN: >-
+    在自定义项与相邻菜单项之间绘制一条分隔线。
+- customSubmenuName: ""
+  $name: Custom items submenu name
+  $name:zh-CN: 自定义项子菜单名称
+  $description: If set, custom items are grouped into a dedicated submenu with this name instead of being listed directly in the menu.
+  $description:zh-CN: >-
+    填写后，自定义项会以该名称归入一个独立的子菜单，而不是直接列在菜单中。
+- customSubmenuIcon: E71D
+  $name: Custom items submenu icon
+  $name:zh-CN: 自定义项子菜单图标
+  $description: "Optional hex code of a Segoe Fluent Icons glyph (e.g. E71D) or a single character/emoji for the custom items submenu."
+  $description:zh-CN: >-
+    可选的 Segoe Fluent Icons 字形十六进制代码（例如 E71D），也可以是单个字符/emoji，用于自定义项子菜单。
 */
 // ==/WindhawkModSettings==
 
@@ -171,7 +325,6 @@
 #include <atomic>
 #include <cctype>
 #include <cwchar>
-#include <cwctype>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -181,6 +334,7 @@
 #include <vector>
 
 namespace wf = winrt::Windows::Foundation;
+namespace wfc = winrt::Windows::Foundation::Collections;
 namespace wu = winrt::Windows::UI;
 namespace wut = winrt::Windows::UI::Text;
 namespace wux = winrt::Windows::UI::Xaml;
@@ -189,78 +343,135 @@ namespace wuxcp = winrt::Windows::UI::Xaml::Controls::Primitives;
 namespace wuxi = winrt::Windows::UI::Xaml::Input;
 namespace wuxm = winrt::Windows::UI::Xaml::Media;
 
+using MenuItemsVector = wfc::IVector<wuxc::MenuFlyoutItemBase>;
+
+// ============================================================================
+// Settings & Configuration Structures
+// ============================================================================
+
+enum class UtilitiesPlacement {
+    Top,
+    Bottom,
+};
+
+enum class CustomPlacement {
+    Bottom,
+    Top,
+    Submenu,
+};
+
+struct CustomMenuItemSettings {
+    std::wstring name;
+    std::wstring command;
+    std::wstring arguments;
+    std::wstring icon;
+    bool runAsAdmin = false;
+    bool hideWindow = false;
+
+    // Returns the text displayed in the menu and log messages.
+    // An item without an explicit label displays its command string.
+    const std::wstring& DisplayName() const {
+        return name.empty() ? command : name;
+    }
+};
+
+struct ModSettings {
+    // System Utilities Submenu & Placement
+    bool enableSubmenu = true;
+    std::wstring textSubmenu = L"System Utilities";
+    std::wstring glyphSubmenu = L"\xE712";
+    UtilitiesPlacement utilitiesPlacement = UtilitiesPlacement::Top;
+
+    // 1. Restart Explorer
+    bool showRestartExplorer = true;
+    bool inSubmenuRestartExplorer = true;
+    std::wstring textRestartExplorer = L"Restart Explorer";
+
+    // 2. Clean Temp
+    bool showCleanTemp = true;
+    bool inSubmenuCleanTemp = true;
+    std::wstring textCleanTemp = L"Clean Temp";
+    bool cleanRecycleBin = false;
+    bool notifyCleanTemp = true;
+
+    // 3. Reduce Memory
+    bool showReduceMemory = true;
+    bool inSubmenuReduceMemory = true;
+    std::wstring textReduceMemory = L"Reduce Memory";
+    bool notifyReduceMemory = true;
+
+    // 4. Restart Graphics Driver
+    bool showRestartGpu = true;
+    bool inSubmenuRestartGpu = true;
+    std::wstring textRestartGpu = L"Restart Graphics Driver";
+
+    // 5. Get IP Address
+    bool showGetIp = true;
+    bool inSubmenuGetIp = true;
+    std::wstring textGetIp = L"Get IP Address";
+    bool queryPublicIp = false;
+    bool copyIpToClipboard = false;
+
+    // 6. Rebuild Icon & Thumbnail Cache
+    bool showRebuildCache = true;
+    bool inSubmenuRebuildCache = true;
+    std::wstring textRebuildCache = L"Rebuild Icon & Thumbnail Cache";
+    bool notifyRebuildCache = true;
+
+    // 7. Clean DNS Cache
+    bool showFlushDns = true;
+    bool inSubmenuFlushDns = true;
+    std::wstring textFlushDns = L"Clean DNS Cache";
+    bool notifyFlushDns = true;
+
+    // Custom Menu Items
+    std::vector<CustomMenuItemSettings> customItems;
+    CustomPlacement customPlacement = CustomPlacement::Bottom;
+    bool customSeparator = true;
+    std::wstring customSubmenuName;
+    std::wstring customSubmenuIcon = L"E71D";
+};
+
+// Settings are loaded on a Windhawk thread and read on the taskbar UI thread,
+// so they are published as an immutable shared_ptr snapshot.
+std::mutex g_settingsMutex;
+std::shared_ptr<const ModSettings> g_settings;
+
+std::shared_ptr<const ModSettings> GetSettingsSnapshot() {
+    std::lock_guard<std::mutex> lock(g_settingsMutex);
+    return g_settings;
+}
+
 // ============================================================================
 // Global State & Thread / Window Synchronization
 // ============================================================================
 
-struct ModSettings {
-    bool enableSubmenu = true;
-    std::wstring textSubmenu = L"系统工具";
-    std::wstring glyphSubmenu = L"\xE712";
-
-    bool showRestartExplorer = true;
-    bool inSubmenuRestartExplorer = true;
-    std::wstring textRestartExplorer = L"重启资源管理器";
-
-    bool showCleanTemp = true;
-    bool inSubmenuCleanTemp = true;
-    std::wstring textCleanTemp = L"清理临时文件";
-    bool cleanRecycleBin = false;
-    bool notifyCleanTemp = true;
-
-    bool showReduceMemory = true;
-    bool inSubmenuReduceMemory = true;
-    std::wstring textReduceMemory = L"释放内存";
-    bool notifyReduceMemory = true;
-
-    bool showRestartGpu = true;
-    bool inSubmenuRestartGpu = true;
-    std::wstring textRestartGpu = L"重启显卡驱动";
-
-    bool showGetIp = true;
-    bool inSubmenuGetIp = true;
-    std::wstring textGetIp = L"获取 IP 地址";
-    bool queryPublicIp = false;
-    bool copyIpToClipboard = false;
-
-    bool showRebuildCache = true;
-    bool inSubmenuRebuildCache = true;
-    std::wstring textRebuildCache = L"重建图标和缩略图缓存";
-    bool notifyRebuildCache = true;
-
-    bool showFlushDns = true;
-    bool inSubmenuFlushDns = true;
-    std::wstring textFlushDns = L"清理 DNS 缓存";
-    bool notifyFlushDns = true;
-};
-
-std::mutex g_settingsMutex;
-ModSettings g_settings;
-
-static constexpr wchar_t kGuardItemName[] = L"WindhawkSystemUtilitiesGuardItem";
+// Identifier assigned to every element injected by the mod.
+static constexpr wchar_t kInjectedElementName[] =
+    L"WindhawkCustomTaskbarMenuItem";
 
 std::atomic<bool> g_taskbarViewModuleHooked{false};
 std::atomic<bool> g_restartStarted{false};
 std::atomic<bool> g_unloading{false};
 
-thread_local int g_taskbarSettingsMenuDepth = 0;
-thread_local bool g_currentMenuInjected = false;
-
-// Accessed only on the taskbar UI thread
+// Weak references to XAML UI objects, accessed exclusively on the taskbar UI
+// thread.
 winrt::weak_ref<wux::FrameworkElement> g_lastTargetWeak;
 winrt::weak_ref<wuxc::Flyout> g_activeFlyoutWeak;
 winrt::weak_ref<wuxc::Button> g_activeOkButtonWeak;
 winrt::event_token g_activeOkClickToken{};
 
+// Background task handles for built-in system utilities.
 std::mutex g_threadsMutex;
 std::vector<HANDLE> g_threads;
 std::mutex g_dispatchMutex;
 
-ModSettings GetSettingsSnapshot() {
-    std::lock_guard<std::mutex> lock(g_settingsMutex);
-    return g_settings;
-}
+// Background thread handles for custom item command execution.
+std::mutex g_launchThreadsMutex;
+std::vector<HANDLE> g_launchThreads;
 
+// Finds the primary taskbar window (Shell_TrayWnd) belonging to the current
+// process.
 HWND FindCurrentProcessTaskbarWnd() {
     HWND hTaskbarWnd = nullptr;
     EnumWindows(
@@ -281,6 +492,7 @@ HWND FindCurrentProcessTaskbarWnd() {
     return hTaskbarWnd;
 }
 
+// Executes a callback synchronously on the thread owning the specified window.
 bool RunFromWindowThread(HWND hWnd, std::function<void()> proc) {
     DWORD dwThreadId = GetWindowThreadProcessId(hWnd, nullptr);
     if (!dwThreadId) {
@@ -324,6 +536,8 @@ bool RunFromWindowThread(HWND hWnd, std::function<void()> proc) {
     return true;
 }
 
+// Runs a background task on a tracked worker thread so Wh_ModUninit can wait
+// for completion before unloading the mod DLL.
 template <typename F>
 void RunAsyncTracked(F&& fn) {
     std::lock_guard<std::mutex> lock(g_threadsMutex);
@@ -341,24 +555,353 @@ void RunAsyncTracked(F&& fn) {
     }
 
     auto task = std::make_unique<std::function<void()>>(std::forward<F>(fn));
+    auto* rawTask = task.release();
+
     HANDLE thread = CreateThread(
         nullptr, 0,
         [](void* p) -> DWORD {
-            std::unique_ptr<std::function<void()>> task(
+            std::unique_ptr<std::function<void()>> taskPtr(
                 static_cast<std::function<void()>*>(p));
             try {
-                (*task)();
+                (*taskPtr)();
             } catch (...) {
                 Wh_Log(L"Background task threw an exception");
             }
             return 0;
         },
-        task.get(), 0, nullptr);
+        rawTask, 0, nullptr);
 
     if (thread) {
-        task.release();
         g_threads.push_back(thread);
+    } else {
+        delete rawTask;
     }
+}
+
+// ============================================================================
+// Icon & Glyph Helpers
+// ============================================================================
+
+bool IsHexDigit(wchar_t ch) {
+    return (ch >= L'0' && ch <= L'9') || (ch >= L'a' && ch <= L'f') ||
+           (ch >= L'A' && ch <= L'F');
+}
+
+// Converts an icon configuration string into a UTF-16 glyph string.
+// Accepts hex code points ("E756", "0xE756", "U+E756", "\uE756", "\xE756")
+// as well as literal characters or emojis.
+std::wstring GlyphFromIconSetting(const std::wstring& icon, bool* isCodePoint) {
+    // Treat a single Private Use Area character (U+E000..U+F8FF) pasted directly
+    // as a Segoe Fluent Icons / MDL2 glyph.
+    if (icon.size() == 1 && icon[0] >= 0xE000 && icon[0] <= 0xF8FF) {
+        *isCodePoint = true;
+        return icon;
+    }
+
+    *isCodePoint = false;
+
+    std::wstring_view hex = icon;
+    if (hex.size() > 2 &&
+        (hex.starts_with(L"0x") || hex.starts_with(L"0X") ||
+         hex.starts_with(L"U+") || hex.starts_with(L"u+") ||
+         hex.starts_with(L"\\u") || hex.starts_with(L"\\U") ||
+         hex.starts_with(L"\\x") || hex.starts_with(L"\\X"))) {
+        hex.remove_prefix(2);
+    }
+
+    if (hex.size() < 4 || hex.size() > 6) {
+        return icon;
+    }
+
+    for (wchar_t ch : hex) {
+        if (!IsHexDigit(ch)) {
+            return icon;
+        }
+    }
+
+    unsigned long codePoint = wcstoul(std::wstring(hex).c_str(), nullptr, 16);
+    if (codePoint == 0 || codePoint > 0x10FFFF ||
+        (codePoint >= 0xD800 && codePoint <= 0xDFFF)) {
+        return icon;
+    }
+
+    *isCodePoint = true;
+
+    std::wstring glyph;
+    if (codePoint < 0x10000) {
+        glyph.push_back(static_cast<wchar_t>(codePoint));
+    } else {
+        codePoint -= 0x10000;
+        glyph.push_back(static_cast<wchar_t>(0xD800 + (codePoint >> 10)));
+        glyph.push_back(static_cast<wchar_t>(0xDC00 + (codePoint & 0x3FF)));
+    }
+
+    return glyph;
+}
+
+wuxc::FontIcon CreateFluentIcon(const wchar_t* glyph, double size = 16.0) {
+    wuxc::FontIcon icon;
+    icon.FontFamily(wuxm::FontFamily(L"Segoe Fluent Icons,Segoe MDL2 Assets"));
+    icon.Glyph(glyph);
+    icon.FontSize(size);
+    return icon;
+}
+
+wuxc::FontIcon CreateIconFromSetting(const std::wstring& iconSetting,
+                                     double size = 16.0) {
+    bool isCodePoint = false;
+    std::wstring glyph = GlyphFromIconSetting(iconSetting, &isCodePoint);
+
+    wuxc::FontIcon icon;
+    if (isCodePoint) {
+        icon.FontFamily(
+            wuxm::FontFamily(L"Segoe Fluent Icons,Segoe MDL2 Assets"));
+    } else {
+        icon.FontFamily(wuxm::FontFamily(L"Segoe UI Emoji,Segoe UI"));
+    }
+    icon.FontSize(size);
+    icon.Glyph(glyph);
+    return icon;
+}
+
+// ============================================================================
+// Custom Items Process Launcher
+// ============================================================================
+
+struct LaunchRequest {
+    std::wstring name;
+    std::wstring command;
+    std::wstring arguments;
+    bool runAsAdmin = false;
+    bool hideWindow = false;
+};
+
+// Expands environment variable references such as %USERPROFILE% or %WINDIR%.
+std::wstring ExpandEnvironment(const std::wstring& value) {
+    if (value.empty()) {
+        return value;
+    }
+
+    DWORD size = ExpandEnvironmentStringsW(value.c_str(), nullptr, 0);
+    if (!size) {
+        return value;
+    }
+
+    std::wstring expanded(size, L'\0');
+    DWORD written =
+        ExpandEnvironmentStringsW(value.c_str(), expanded.data(), size);
+    if (!written || written > size) {
+        return value;
+    }
+
+    expanded.resize(written - 1);
+    return expanded;
+}
+
+// Removes surrounding quotes from paths copied via File Explorer's "Copy as
+// path".
+std::wstring StripSurroundingQuotes(const std::wstring& value) {
+    if (value.size() >= 2 && value.front() == L'"' && value.back() == L'"' &&
+        value.find(L'"', 1) == value.size() - 1) {
+        return value.substr(1, value.size() - 2);
+    }
+
+    return value;
+}
+
+DWORD WINAPI LaunchThread(LPVOID param) {
+    std::unique_ptr<LaunchRequest> request(static_cast<LaunchRequest*>(param));
+
+    HRESULT hrCoInit = CoInitializeEx(
+        nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+    std::wstring command =
+        StripSurroundingQuotes(ExpandEnvironment(request->command));
+    std::wstring arguments = ExpandEnvironment(request->arguments);
+
+    // Use the user's profile directory as the working directory rather than
+    // System32.
+    std::wstring directory = ExpandEnvironment(L"%USERPROFILE%");
+
+    SHELLEXECUTEINFOW sei = {};
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_NOASYNC;
+    sei.lpVerb = request->runAsAdmin ? L"runas" : nullptr;
+    sei.lpFile = command.c_str();
+    sei.lpParameters = arguments.empty() ? nullptr : arguments.c_str();
+    sei.lpDirectory = directory.empty() ? nullptr : directory.c_str();
+    sei.nShow = request->hideWindow ? SW_HIDE : SW_SHOWNORMAL;
+
+    if (ShellExecuteExW(&sei)) {
+        Wh_Log(L"Started \"%s\"", request->name.c_str());
+    } else {
+        DWORD error = GetLastError();
+        if (error == ERROR_CANCELLED) {
+            Wh_Log(L"Starting \"%s\" was cancelled by the user",
+                   request->name.c_str());
+        } else {
+            Wh_Log(L"Failed to start \"%s\" (%s), error %lu",
+                   request->name.c_str(), command.c_str(), error);
+        }
+    }
+
+    if (SUCCEEDED(hrCoInit)) {
+        CoUninitialize();
+    }
+
+    return 0;
+}
+
+// Launches a custom item command on a separate thread so slow startups or UAC
+// prompts do not block the taskbar UI thread.
+void Launch(const CustomMenuItemSettings& item) {
+    auto request = std::make_unique<LaunchRequest>();
+    request->name = item.DisplayName();
+    request->command = item.command;
+    request->arguments = item.arguments;
+    request->runAsAdmin = item.runAsAdmin;
+    request->hideWindow = item.hideWindow;
+
+    std::lock_guard<std::mutex> lock(g_launchThreadsMutex);
+    if (g_unloading.load()) {
+        return;
+    }
+
+    std::erase_if(g_launchThreads, [](HANDLE thread) {
+        if (WaitForSingleObject(thread, 0) != WAIT_OBJECT_0) {
+            return false;
+        }
+
+        CloseHandle(thread);
+        return true;
+    });
+
+    auto* rawRequest = request.release();
+    HANDLE thread =
+        CreateThread(nullptr, 0, LaunchThread, rawRequest, 0, nullptr);
+    if (!thread) {
+        delete rawRequest;
+        Wh_Log(L"CreateThread failed, error %lu", GetLastError());
+        return;
+    }
+
+    g_launchThreads.push_back(thread);
+}
+
+void WaitForLaunchThreads() {
+    std::vector<HANDLE> threads;
+    {
+        std::lock_guard<std::mutex> lock(g_launchThreadsMutex);
+        threads.swap(g_launchThreads);
+    }
+
+    for (HANDLE thread : threads) {
+        WaitForSingleObject(thread, INFINITE);
+        CloseHandle(thread);
+    }
+}
+
+// ============================================================================
+// Injected Menu Elements Lifetime & Unload Detachment
+// ============================================================================
+
+// Tracks menu elements injected by the mod using weak references so that closed
+// menus can be garbage-collected normally while remaining detachable on unload.
+struct InjectedElement {
+    winrt::weak_ref<wuxc::MenuFlyoutItemBase> element;
+    winrt::event_token clickToken{};
+    bool hasClickHandler = false;
+};
+
+std::mutex g_injectedElementsMutex;
+std::vector<InjectedElement> g_injectedElements;
+
+void TrackInjectedElement(InjectedElement&& element) {
+    std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+    g_injectedElements.push_back(std::move(element));
+}
+
+void PruneInjectedElements() {
+    std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+    std::erase_if(g_injectedElements, [](const InjectedElement& entry) {
+        return !entry.element.get();
+    });
+}
+
+// Removes click handlers and collapses injected elements on the taskbar UI
+// thread when the mod is being unloaded.
+void ReleaseInjectedElements() {
+    std::vector<InjectedElement> elements;
+    {
+        std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+        elements.swap(g_injectedElements);
+    }
+
+    int released = 0;
+    for (const auto& entry : elements) {
+        try {
+            auto element = entry.element.get();
+            if (!element) {
+                continue;
+            }
+
+            if (entry.hasClickHandler) {
+                if (auto item = element.try_as<wuxc::MenuFlyoutItem>()) {
+                    item.Click(entry.clickToken);
+                }
+            }
+
+            element.Visibility(wux::Visibility::Collapsed);
+            released++;
+        } catch (...) {
+        }
+    }
+
+    Wh_Log(L"Released %d menu element(s)", released);
+}
+
+wuxc::MenuFlyoutSeparator CreateSeparator() {
+    wuxc::MenuFlyoutSeparator separator;
+    separator.Name(kInjectedElementName);
+
+    InjectedElement tracked;
+    tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(separator);
+    TrackInjectedElement(std::move(tracked));
+
+    return separator;
+}
+
+wuxc::MenuFlyoutItemBase CreateCustomMenuItem(
+    const CustomMenuItemSettings& settings) {
+    if (settings.name == L"-") {
+        return CreateSeparator();
+    }
+
+    wuxc::MenuFlyoutItem item;
+    item.Name(kInjectedElementName);
+    item.Text(settings.DisplayName());
+
+    if (!settings.icon.empty()) {
+        item.Icon(CreateIconFromSetting(settings.icon, 16.0));
+    }
+
+    InjectedElement tracked;
+    tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(item);
+
+    if (settings.command.empty()) {
+        // An item with a label and an empty command acts as a disabled heading.
+        item.IsEnabled(false);
+    } else {
+        tracked.clickToken = item.Click(
+            [settings](wf::IInspectable const&, wux::RoutedEventArgs const&) {
+                Wh_Log(L"Clicked \"%s\"", settings.DisplayName().c_str());
+                Launch(settings);
+            });
+        tracked.hasClickHandler = true;
+    }
+
+    TrackInjectedElement(std::move(tracked));
+    return item;
 }
 
 // ============================================================================
@@ -369,14 +912,6 @@ using DialogRow = std::pair<std::wstring, std::wstring>;
 
 wuxm::SolidColorBrush MakeBrush(uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
     return wuxm::SolidColorBrush(wu::ColorHelper::FromArgb(a, r, g, b));
-}
-
-wuxc::FontIcon CreateFluentIcon(const wchar_t* glyph, double size = 16.0) {
-    wuxc::FontIcon icon;
-    icon.FontFamily(wuxm::FontFamily(L"Segoe Fluent Icons"));
-    icon.Glyph(glyph);
-    icon.FontSize(size);
-    return icon;
 }
 
 void CloseActiveFlyoutOnUIThread() {
@@ -424,7 +959,8 @@ void ShowModernXAMLCardOnUIThread(const std::wstring& titleText,
         flyout.Placement(wuxcp::FlyoutPlacementMode::Top);
         flyout.XamlRoot(target.XamlRoot());
 
-        // Strip default FlyoutPresenter padding/border so our card is seamless
+        // Remove default FlyoutPresenter padding and borders for a clean card
+        // layout.
         wux::Interop::TypeName presenterType{
             winrt::hstring{winrt::name_of<wuxc::FlyoutPresenter>()},
             wux::Interop::TypeKind::Metadata};
@@ -452,7 +988,7 @@ void ShowModernXAMLCardOnUIThread(const std::wstring& titleText,
         wuxc::StackPanel mainStack;
         mainStack.Spacing(14);
 
-        // 1. Header Row (Accent Icon + Bold Title)
+        // 1. Header Row (Accent Icon Badge + Title)
         wuxc::StackPanel headerStack;
         headerStack.Orientation(wuxc::Orientation::Horizontal);
         headerStack.Spacing(12);
@@ -483,7 +1019,7 @@ void ShowModernXAMLCardOnUIThread(const std::wstring& titleText,
 
         mainStack.Children().Append(headerStack);
 
-        // 2. Inner Content Box for structured Key-Value metrics
+        // 2. Metrics Box (Key-Value Rows)
         wuxc::Border metricsBox;
         metricsBox.Background(isLight ? MakeBrush(255, 240, 240, 240)
                                       : MakeBrush(255, 43, 43, 43));
@@ -535,7 +1071,7 @@ void ShowModernXAMLCardOnUIThread(const std::wstring& titleText,
         metricsBox.Child(rowsStack);
         mainStack.Children().Append(metricsBox);
 
-        // 3. Footer Bar (Optional status badge + Pill Button)
+        // 3. Footer Bar (Status Note + OK Button)
         wuxc::Grid footerGrid;
 
         if (!footerNote.empty()) {
@@ -560,7 +1096,7 @@ void ShowModernXAMLCardOnUIThread(const std::wstring& titleText,
         }
 
         wuxc::Button okButton;
-        okButton.Content(winrt::box_value(L"确定"));
+        okButton.Content(winrt::box_value(L"OK"));
         okButton.Width(76);
         okButton.Height(30);
         okButton.CornerRadius({6, 6, 6, 6});
@@ -653,7 +1189,7 @@ bool CopyTextToClipboard(const std::wstring& text) {
 }
 
 // ============================================================================
-// Native Action Implementations
+// Native Action Implementations (System Utilities)
 // ============================================================================
 
 // 1. Restart Explorer
@@ -797,30 +1333,30 @@ void OnCleanTempClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             CleanDirectoryRecursive(ToExtendedPath(sysTemp), false, stats);
         }
 
-        if (cfg.cleanRecycleBin && !g_unloading.load()) {
+        if (cfg->cleanRecycleBin && !g_unloading.load()) {
             SHEmptyRecycleBinW(
                 nullptr, nullptr,
                 SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
         }
 
-        if (cfg.notifyCleanTemp && !g_unloading.load()) {
+        if (cfg->notifyCleanTemp && !g_unloading.load()) {
             double mbFreed =
                 static_cast<double>(stats.bytesFreed) / (1024.0 * 1024.0);
             wchar_t mbBuf[64] = {};
             swprintf_s(mbBuf, L"%.2f MB", mbFreed);
 
             std::vector<DialogRow> rows = {
-                {L"已删除文件", std::to_wstring(stats.filesDeleted)},
-                {L"已锁定/已跳过", std::to_wstring(stats.filesSkipped)},
-                {L"已释放空间", mbBuf},
+                {L"Deleted files", std::to_wstring(stats.filesDeleted)},
+                {L"Locked / skipped", std::to_wstring(stats.filesSkipped)},
+                {L"Space recovered", mbBuf},
             };
 
             std::wstring footer =
                 (stats.filesDeleted == 0 && stats.filesSkipped == 0)
-                    ? L"未找到可清理的临时文件"
-                    : L"清理完成";
+                    ? L"No removable temp files found"
+                    : L"Cleanup completed";
 
-            DispatchXAMLCardSync(L"临时文件已清理", L"\xE74D", rows,
+            DispatchXAMLCardSync(L"Temporary Files Cleaned", L"\xE74D", rows,
                                  footer);
         }
     });
@@ -870,7 +1406,7 @@ void OnReduceMemoryClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             }
         }
 
-        if (cfg.notifyReduceMemory && !g_unloading.load()) {
+        if (cfg->notifyReduceMemory && !g_unloading.load()) {
             MEMORYSTATUSEX memAfter = {sizeof(memAfter)};
             GlobalMemoryStatusEx(&memAfter);
 
@@ -887,18 +1423,18 @@ void OnReduceMemoryClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             swprintf_s(freedBuf, L"%.1f MB", freedMb);
 
             wchar_t availBuf[64] = {};
-            swprintf_s(availBuf, L"%.2f GB（已用 %lu%%）", availGb,
+            swprintf_s(availBuf, L"%.2f GB (%lu%% used)", availGb,
                        memAfter.dwMemoryLoad);
 
             std::vector<DialogRow> rows = {
-                {L"已优化进程", std::to_wstring(trimmedCount)},
-                {L"已跳过进程", std::to_wstring(skippedCount)},
-                {L"已回收内存", freedBuf},
-                {L"可用内存", availBuf},
+                {L"Processes optimized", std::to_wstring(trimmedCount)},
+                {L"Processes skipped", std::to_wstring(skippedCount)},
+                {L"RAM recovered", freedBuf},
+                {L"Available RAM", availBuf},
             };
 
-            DispatchXAMLCardSync(L"内存已优化", L"\xE950", rows,
-                                 L"已清理工作集");
+            DispatchXAMLCardSync(L"Memory Optimized", L"\xE950", rows,
+                                 L"Working sets trimmed");
         }
     });
 }
@@ -951,7 +1487,7 @@ std::vector<DialogRow> GetLocalAdapterIPs(std::wstring& clipboardText) {
     }
 
     if (dwRetVal != NO_ERROR) {
-        rows.emplace_back(L"状态", L"查询适配器失败");
+        rows.emplace_back(L"Status", L"Failed to query adapters");
         return rows;
     }
 
@@ -981,7 +1517,7 @@ std::vector<DialogRow> GetLocalAdapterIPs(std::wstring& clipboardText) {
                 auto* sa4 = reinterpret_cast<sockaddr_in*>(addr);
                 const auto* bytes =
                     reinterpret_cast<const uint8_t*>(&sa4->sin_addr);
-                // Skip addresses APIPA 169.254.0.0/16
+                // Ignore link-local APIPA addresses (169.254.0.0/16).
                 if (bytes[0] == 169 && bytes[1] == 254) {
                     continue;
                 }
@@ -991,7 +1527,7 @@ std::vector<DialogRow> GetLocalAdapterIPs(std::wstring& clipboardText) {
                 }
             } else if (addr->sa_family == AF_INET6 && !hasIpv6) {
                 auto* sa6 = reinterpret_cast<sockaddr_in6*>(addr);
-                // Skip link-local addresses (fe80::/10)
+                // Ignore link-local IPv6 addresses (fe80::/10).
                 if (IN6_IS_ADDR_LINKLOCAL(&sa6->sin6_addr)) {
                     continue;
                 }
@@ -1003,9 +1539,9 @@ std::vector<DialogRow> GetLocalAdapterIPs(std::wstring& clipboardText) {
 
             if (ipStr[0] != L'\0') {
                 std::wstring label =
-                    adapter->FriendlyName ? adapter->FriendlyName : L"适配器";
+                    adapter->FriendlyName ? adapter->FriendlyName : L"Adapter";
                 if (addr->sa_family == AF_INET6) {
-                    label += L"（IPv6）";
+                    label += L" (IPv6)";
                 }
                 rows.emplace_back(label, ipStr);
                 if (!clipboardText.empty()) {
@@ -1017,7 +1553,7 @@ std::vector<DialogRow> GetLocalAdapterIPs(std::wstring& clipboardText) {
     }
 
     if (rows.empty()) {
-        rows.emplace_back(L"网络", L"已断开连接");
+        rows.emplace_back(L"Network", L"Disconnected");
     }
 
     return rows;
@@ -1035,7 +1571,7 @@ void CancelActivePublicIpRequest() {
 }
 
 std::wstring GetPublicIP() {
-    std::wstring result = L"不可用";
+    std::wstring result = L"Unavailable";
     HINTERNET hInternet =
         InternetOpenW(L"WindhawkSystemUtilities/" WH_MOD_VERSION,
                       INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0);
@@ -1106,14 +1642,14 @@ void OnGetIpClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
         std::wstring clipboardText;
         std::vector<DialogRow> rows = GetLocalAdapterIPs(clipboardText);
 
-        if (cfg.queryPublicIp && !g_unloading.load()) {
+        if (cfg->queryPublicIp && !g_unloading.load()) {
             std::wstring publicIp = GetPublicIP();
-            rows.insert(rows.begin(), {L"公网 IP", publicIp});
+            rows.insert(rows.begin(), {L"Public IP", publicIp});
             if (!clipboardText.empty()) {
                 clipboardText =
-                    L"公网 IP：" + publicIp + L"\r\n" + clipboardText;
+                    L"Public IP: " + publicIp + L"\r\n" + clipboardText;
             } else {
-                clipboardText = L"公网 IP：" + publicIp;
+                clipboardText = L"Public IP: " + publicIp;
             }
         }
 
@@ -1122,13 +1658,13 @@ void OnGetIpClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
         }
 
         std::wstring footer;
-        if (cfg.copyIpToClipboard && !clipboardText.empty()) {
+        if (cfg->copyIpToClipboard && !clipboardText.empty()) {
             if (CopyTextToClipboard(clipboardText)) {
-                footer = L"已复制到剪贴板";
+                footer = L"Copied to clipboard";
             }
         }
 
-        DispatchXAMLCardSync(L"网络 IP 地址", L"\xE968", rows, footer);
+        DispatchXAMLCardSync(L"Network IP Addresses", L"\xE968", rows, footer);
     });
 }
 
@@ -1141,7 +1677,6 @@ void OnRebuildCacheClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
         DWORD thumbsSkipped = 0;
         ULONGLONG bytesFreed = 0;
 
-        // Best-effort delete of thumbnail cache files.
         wchar_t localAppData[MAX_PATH] = {};
         DWORD localLen =
             GetEnvironmentVariableW(L"LOCALAPPDATA", localAppData, MAX_PATH);
@@ -1208,29 +1743,29 @@ void OnRebuildCacheClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             }
         }
 
-        if (cfg.notifyRebuildCache && !g_unloading.load()) {
+        if (cfg->notifyRebuildCache && !g_unloading.load()) {
             double mbFreed =
                 static_cast<double>(bytesFreed) / (1024.0 * 1024.0);
             wchar_t mbBuf[64] = {};
             swprintf_s(mbBuf, L"%.2f MB", mbFreed);
 
             std::vector<DialogRow> rows = {
-                {L"已删除缩略图文件", std::to_wstring(thumbsDeleted)},
-                {L"已锁定/已跳过", std::to_wstring(thumbsSkipped)},
-                {L"已释放空间", mbBuf},
-                {L"图标缓存", iconsRebuilt ? L"已重建" : L"失败"},
+                {L"Thumbnail files deleted", std::to_wstring(thumbsDeleted)},
+                {L"Locked / skipped", std::to_wstring(thumbsSkipped)},
+                {L"Space recovered", mbBuf},
+                {L"Icon cache", iconsRebuilt ? L"Rebuilt" : L"Failed"},
             };
 
             std::wstring footer;
             if (!iconsRebuilt) {
-                footer = L"图标重建失败";
+                footer = L"Icon rebuild failed";
             } else if (thumbsSkipped > 0) {
-                footer = L"部分缩略图被资源管理器占用";
+                footer = L"Some thumbnails locked by Explorer";
             } else {
-                footer = L"缓存重建成功";
+                footer = L"Cache rebuilt successfully";
             }
 
-            DispatchXAMLCardSync(L"缓存已重建", L"\xE8B9", rows, footer);
+            DispatchXAMLCardSync(L"Cache Rebuilt", L"\xE8B9", rows, footer);
         }
     });
 }
@@ -1245,54 +1780,28 @@ void OnFlushDnsClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
                                              LOAD_LIBRARY_SEARCH_SYSTEM32)) {
             auto pFlush = reinterpret_cast<DnsFlushResolverCache_t>(
                 GetProcAddress(hDnsApi, "DnsFlushResolverCache"));
-            if (pFlush)
+            if (pFlush) {
                 flushed = pFlush();
+            }
             FreeLibrary(hDnsApi);
         }
 
         auto cfg = GetSettingsSnapshot();
-        if (cfg.notifyFlushDns && !g_unloading.load()) {
+        if (cfg->notifyFlushDns && !g_unloading.load()) {
             std::vector<DialogRow> rows = {
-                {L"解析缓存", flushed ? L"已刷新" : L"失败"},
-                {L"方式", L"dnsapi.dll（内存中）"},
+                {L"Resolver Cache", flushed ? L"Flushed" : L"Failed"},
+                {L"Method", L"dnsapi.dll (In-Memory)"},
             };
-            DispatchXAMLCardSync(L"DNS 缓存", L"\xE774", rows,
-                                 flushed ? L"缓存清理成功"
-                                         : L"刷新缓存时出错");
+            DispatchXAMLCardSync(L"DNS Cache", L"\xE774", rows,
+                                 flushed ? L"Cache cleared successfully"
+                                         : L"Error flushing cache");
         }
     });
 }
 
 // ============================================================================
-// Taskbar Context Menu Injection Hooks
+// Taskbar Context Menu Injection Engine
 // ============================================================================
-
-bool HStringEquals(winrt::hstring const& value, const wchar_t* text) {
-    return std::wstring_view(value.c_str(), value.size()) == text;
-}
-
-bool IsNamedItem(wuxc::MenuFlyoutItemBase const& baseItem,
-                 const wchar_t* name) {
-    try {
-        if (auto frameworkElement = baseItem.try_as<wux::FrameworkElement>()) {
-            return HStringEquals(frameworkElement.Name(), name);
-        }
-    } catch (...) {
-    }
-    return false;
-}
-
-bool IsSeparator(wuxc::MenuFlyoutItemBase const& baseItem) {
-    try {
-        return !!baseItem.try_as<wuxc::MenuFlyoutSeparator>();
-    } catch (...) {
-    }
-    return false;
-}
-
-using MenuFlyoutItemBaseVector_Append_t =
-    void(__cdecl*)(void* pThis, wuxc::MenuFlyoutItemBase const& item);
-MenuFlyoutItemBaseVector_Append_t MenuFlyoutItemBaseVector_Append_Original;
 
 struct MenuItemSpec {
     bool enabled;
@@ -1302,8 +1811,83 @@ struct MenuItemSpec {
     void (*handler)(wf::IInspectable const&, wux::RoutedEventArgs const&);
 };
 
-void AppendInjectedItems(void* vectorThis) {
-    auto cfg = GetSettingsSnapshot();
+struct MenuBuildState {
+    std::shared_ptr<const ModSettings> settings;
+    // ABI identity of the taskbar menu's IVector<MenuFlyoutItemBase>.
+    void* itemsIdentity = nullptr;
+    // Elements appended to the bottom of the menu, kept in display order.
+    std::vector<wuxc::MenuFlyoutItemBase> bottomInjected;
+    // Re-entrancy guard while the mod modifies the item collection.
+    bool modifying = false;
+};
+
+thread_local MenuBuildState* g_menuBuildState = nullptr;
+
+void* GetIdentity(MenuItemsVector const& items) {
+    return winrt::get_abi(items.as<wf::IUnknown>());
+}
+
+// Creates custom menu elements, either listed directly or grouped into a
+// dedicated cascading submenu with an optional icon.
+std::vector<wuxc::MenuFlyoutItemBase> CreateCustomElements(
+    const std::vector<CustomMenuItemSettings>& items,
+    const std::wstring& submenuName,
+    const std::wstring& submenuIcon) {
+    std::vector<wuxc::MenuFlyoutItemBase> elements;
+    if (items.empty()) {
+        return elements;
+    }
+
+    if (!submenuName.empty()) {
+        wuxc::MenuFlyoutSubItem subItem;
+        subItem.Name(kInjectedElementName);
+        subItem.Text(submenuName);
+
+        if (!submenuIcon.empty()) {
+            subItem.Icon(CreateIconFromSetting(submenuIcon, 16.0));
+        }
+
+        InjectedElement tracked;
+        tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(subItem);
+        TrackInjectedElement(std::move(tracked));
+
+        auto subItems = subItem.Items();
+        for (const auto& item : items) {
+            subItems.Append(CreateCustomMenuItem(item));
+        }
+
+        elements.push_back(subItem);
+    } else {
+        for (const auto& item : items) {
+            elements.push_back(CreateCustomMenuItem(item));
+        }
+    }
+
+    return elements;
+}
+
+// Builds the system utilities items (and any custom items configured to appear
+// inside the System Utilities submenu).
+std::vector<wuxc::MenuFlyoutItemBase> CreateUtilityElements(
+    const ModSettings& cfg) {
+    std::vector<wuxc::MenuFlyoutItemBase> utilityElements;
+    wuxc::MenuFlyoutSubItem subItem{nullptr};
+
+    auto ensureSubmenu = [&]() {
+        if (!subItem) {
+            subItem = wuxc::MenuFlyoutSubItem();
+            subItem.Name(kInjectedElementName);
+            subItem.Text(cfg.textSubmenu);
+            if (!cfg.glyphSubmenu.empty()) {
+                subItem.Icon(CreateIconFromSetting(cfg.glyphSubmenu, 16.0));
+            }
+
+            InjectedElement trackedSub;
+            trackedSub.element =
+                winrt::make_weak<wuxc::MenuFlyoutItemBase>(subItem);
+            TrackInjectedElement(std::move(trackedSub));
+        }
+    };
 
     const MenuItemSpec specs[] = {
         {cfg.showRestartExplorer, cfg.inSubmenuRestartExplorer,
@@ -1322,78 +1906,185 @@ void AppendInjectedItems(void* vectorThis) {
          &OnFlushDnsClick},
     };
 
-    wuxc::MenuFlyoutSubItem subItem{nullptr};
-    bool anyRootInjected = false;
-
     for (const auto& spec : specs) {
         if (!spec.enabled) {
             continue;
         }
 
         wuxc::MenuFlyoutItem menuItem;
+        menuItem.Name(kInjectedElementName);
         menuItem.Text(spec.text);
         menuItem.Icon(CreateFluentIcon(spec.glyph));
-        menuItem.Click(wux::RoutedEventHandler{spec.handler});
+
+        InjectedElement tracked;
+        tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(menuItem);
+        tracked.clickToken =
+            menuItem.Click(wux::RoutedEventHandler{spec.handler});
+        tracked.hasClickHandler = true;
+        TrackInjectedElement(std::move(tracked));
 
         if (cfg.enableSubmenu && spec.inSubmenu) {
-            if (!subItem) {
-                subItem = wuxc::MenuFlyoutSubItem();
-                subItem.Text(cfg.textSubmenu);
-                subItem.Icon(CreateFluentIcon(cfg.glyphSubmenu.c_str()));
-            }
+            ensureSubmenu();
             subItem.Items().Append(menuItem);
         } else {
-            if (!anyRootInjected) {
-                menuItem.Name(kGuardItemName);
+            utilityElements.push_back(menuItem);
+        }
+    }
+
+    // If custom items are configured to appear inside the System Utilities group:
+    if (cfg.customPlacement == CustomPlacement::Submenu &&
+        !cfg.customItems.empty()) {
+        auto customElements = CreateCustomElements(
+            cfg.customItems, cfg.customSubmenuName, cfg.customSubmenuIcon);
+
+        if (cfg.enableSubmenu) {
+            ensureSubmenu();
+
+            if (subItem.Items().Size() > 0 && cfg.customSeparator) {
+                subItem.Items().Append(CreateSeparator());
             }
-            MenuFlyoutItemBaseVector_Append_Original(vectorThis, menuItem);
-            anyRootInjected = true;
+
+            for (const auto& el : customElements) {
+                subItem.Items().Append(el);
+            }
+        } else {
+            if (!utilityElements.empty() && cfg.customSeparator) {
+                utilityElements.push_back(CreateSeparator());
+            }
+            for (const auto& el : customElements) {
+                utilityElements.push_back(el);
+            }
         }
     }
 
-    if (subItem) {
-        if (!anyRootInjected) {
-            subItem.Name(kGuardItemName);
-        }
-        MenuFlyoutItemBaseVector_Append_Original(vectorThis, subItem);
-        anyRootInjected = true;
+    if (subItem && subItem.Items().Size() > 0) {
+        utilityElements.push_back(subItem);
     }
 
-    if (anyRootInjected) {
-        wuxc::MenuFlyoutSeparator separator;
-        MenuFlyoutItemBaseVector_Append_Original(vectorThis, separator);
-        g_currentMenuInjected = true;
+    return utilityElements;
+}
+
+void InjectElements(MenuItemsVector const& items, MenuBuildState& state) {
+    PruneInjectedElements();
+
+    const auto& cfg = *state.settings;
+
+    std::vector<wuxc::MenuFlyoutItemBase> topElements;
+    std::vector<wuxc::MenuFlyoutItemBase> bottomElements;
+
+    // 1. Place System Utilities (Top or Bottom)
+    auto utilityElements = CreateUtilityElements(cfg);
+    if (!utilityElements.empty()) {
+        if (cfg.utilitiesPlacement == UtilitiesPlacement::Top) {
+            for (const auto& el : utilityElements) {
+                topElements.push_back(el);
+            }
+            topElements.push_back(CreateSeparator());
+        } else {
+            bottomElements.push_back(CreateSeparator());
+            for (const auto& el : utilityElements) {
+                bottomElements.push_back(el);
+            }
+        }
+    }
+
+    // 2. Place Custom Items when configured at Top or Bottom
+    if (!cfg.customItems.empty() &&
+        cfg.customPlacement != CustomPlacement::Submenu) {
+        auto customElements = CreateCustomElements(
+            cfg.customItems, cfg.customSubmenuName, cfg.customSubmenuIcon);
+
+        if (cfg.customPlacement == CustomPlacement::Top) {
+            for (const auto& el : customElements) {
+                topElements.push_back(el);
+            }
+            if (cfg.customSeparator) {
+                topElements.push_back(CreateSeparator());
+            }
+        } else if (cfg.customPlacement == CustomPlacement::Bottom) {
+            if (cfg.customSeparator) {
+                bottomElements.push_back(CreateSeparator());
+            }
+            for (const auto& el : customElements) {
+                bottomElements.push_back(el);
+            }
+        }
+    }
+
+    // Insert top elements before the built-in taskbar menu items
+    if (!topElements.empty()) {
+        uint32_t index = 0;
+        for (const auto& element : topElements) {
+            items.InsertAt(index++, element);
+        }
+    }
+
+    // Append bottom elements after the built-in taskbar menu items
+    if (!bottomElements.empty()) {
+        for (const auto& element : bottomElements) {
+            items.Append(element);
+        }
+        state.bottomInjected = std::move(bottomElements);
     }
 }
+
+void MoveBottomElementsToEnd(MenuItemsVector const& items,
+                             MenuBuildState& state) {
+    for (const auto& element : state.bottomInjected) {
+        uint32_t index;
+        if (items.IndexOf(element, index)) {
+            items.RemoveAt(index);
+        }
+    }
+
+    for (const auto& element : state.bottomInjected) {
+        items.Append(element);
+    }
+}
+
+using MenuFlyoutItemBaseVector_Append_t =
+    void(__cdecl*)(void* pThis, wuxc::MenuFlyoutItemBase const& item);
+MenuFlyoutItemBaseVector_Append_t MenuFlyoutItemBaseVector_Append_Original;
 
 void __cdecl MenuFlyoutItemBaseVector_Append_Hook(
     void* pThis,
     wuxc::MenuFlyoutItemBase const& item) {
-    if (g_taskbarSettingsMenuDepth > 0 && !g_currentMenuInjected) {
-        try {
-            if (!IsSeparator(item) && !IsNamedItem(item, kGuardItemName)) {
-                AppendInjectedItems(pThis);
-            }
-        } catch (...) {
-            Wh_Log(L"Taskbar menu append inspection failed");
-        }
-    }
-
     MenuFlyoutItemBaseVector_Append_Original(pThis, item);
-}
 
-struct ScopedTaskbarSettingsMenuBuild {
-    bool outer = false;
-
-    ScopedTaskbarSettingsMenuBuild() {
-        outer = g_taskbarSettingsMenuDepth++ == 0;
-        if (outer) {
-            g_currentMenuInjected = false;
-        }
+    MenuBuildState* state = g_menuBuildState;
+    if (!state || state->modifying || g_unloading.load()) {
+        return;
     }
 
-    ~ScopedTaskbarSettingsMenuBuild() { g_taskbarSettingsMenuDepth--; }
-};
+    state->modifying = true;
+
+    try {
+        auto const& items = *reinterpret_cast<MenuItemsVector const*>(pThis);
+        void* identity = GetIdentity(items);
+
+        if (!state->itemsIdentity) {
+            if (!items.try_as<MenuItemsVector>()) {
+                state->modifying = false;
+                return;
+            }
+
+            state->itemsIdentity = identity;
+            InjectElements(items, *state);
+        } else if (state->itemsIdentity == identity &&
+                   !state->bottomInjected.empty()) {
+            // Keep bottom-placed items at the end of the menu when Explorer
+            // appends additional built-in items.
+            MoveBottomElementsToEnd(items, *state);
+        }
+    } catch (winrt::hresult_error const& e) {
+        Wh_Log(L"Failed to update taskbar menu: %08X %s",
+               static_cast<unsigned>(e.code()), e.message().c_str());
+    } catch (...) {
+        Wh_Log(L"Failed to update taskbar menu");
+    }
+
+    state->modifying = false;
+}
 
 using ContextMenus_ShowTaskbarSettingsContextMenu_t =
     void(__cdecl*)(wux::FrameworkElement const& target,
@@ -1408,6 +2099,12 @@ void __cdecl ContextMenus_ShowTaskbarSettingsContextMenu_Hook(
     void* taskbarSettings,
     wuxi::ContextRequestedEventArgs const& args,
     unsigned long long options) {
+    if (g_menuBuildState) {
+        ContextMenus_ShowTaskbarSettingsContextMenu_Original(
+            target, taskbarSettings, args, options);
+        return;
+    }
+
     try {
         if (target && target.XamlRoot()) {
             g_lastTargetWeak = target;
@@ -1415,7 +2112,15 @@ void __cdecl ContextMenus_ShowTaskbarSettingsContextMenu_Hook(
     } catch (...) {
     }
 
-    ScopedTaskbarSettingsMenuBuild scopedBuild;
+    MenuBuildState state;
+    state.settings = GetSettingsSnapshot();
+
+    struct ScopedMenuBuild {
+        explicit ScopedMenuBuild(MenuBuildState* state) {
+            g_menuBuildState = state;
+        }
+        ~ScopedMenuBuild() { g_menuBuildState = nullptr; }
+    } scopedMenuBuild(&state);
 
     ContextMenus_ShowTaskbarSettingsContextMenu_Original(
         target, taskbarSettings, args, options);
@@ -1473,7 +2178,16 @@ bool HookTaskbarViewDllSymbols(HMODULE module) {
         },
     };
 
-    return HookSymbols(module, symbolHooks, ARRAYSIZE(symbolHooks));
+    if (!WindhawkUtils::HookSymbols(module, symbolHooks,
+                                    ARRAYSIZE(symbolHooks))) {
+        Wh_Log(
+            L"Failed to hook Taskbar.View symbols, required symbols are "
+            L"missing");
+        return false;
+    }
+
+    Wh_Log(L"Hooked the taskbar menu");
+    return true;
 }
 
 void HandleLoadedModuleIfTaskbarView(HMODULE module, bool applyHookOperations) {
@@ -1511,110 +2225,138 @@ HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpLibFileName,
     return module;
 }
 
-std::wstring LoadStringSetting(const wchar_t* name,
-                               const wchar_t* defaultValue) {
-    auto val = WindhawkUtils::StringSetting::make(name);
-    return val.get()[0] != L'\0' ? val.get() : defaultValue;
+std::wstring Trim(std::wstring_view value) {
+    const wchar_t* whitespace = L" \t\r\n";
+    size_t first = value.find_first_not_of(whitespace);
+    if (first == std::wstring_view::npos) {
+        return {};
+    }
+
+    size_t last = value.find_last_not_of(whitespace);
+    return std::wstring(value.substr(first, last - first + 1));
 }
 
-// Accepts "E712", "0xE712", "\xE712", "\uE712", "U+E712" or a literal glyph.
-std::wstring ParseGlyphString(const std::wstring& raw,
-                              const wchar_t* fallback) {
-    size_t begin = raw.find_first_not_of(L" \t");
-    if (begin == std::wstring::npos) {
-        return fallback;
-    }
-    size_t end = raw.find_last_not_of(L" \t");
-    std::wstring s = raw.substr(begin, end - begin + 1);
+template <typename... Args>
+std::wstring GetStringSetting(PCWSTR valueName, Args... args) {
+    auto value = WindhawkUtils::StringSetting::make(valueName, args...);
+    return Trim(value.get());
+}
 
-    std::wstring_view hex = s;
-    auto startsWithI = [&](const wchar_t* prefix) {
-        size_t n = wcslen(prefix);
-        return hex.size() >= n && _wcsnicmp(hex.data(), prefix, n) == 0;
-    };
-    bool hadPrefix = false;
-    if (startsWithI(L"\\u") || startsWithI(L"\\x") || startsWithI(L"0x") ||
-        startsWithI(L"U+")) {
-        hex.remove_prefix(2);
-        hadPrefix = true;
-    }
-
-    bool allHex = !hex.empty() && hex.size() <= 4;
-    for (wchar_t c : hex) {
-        if (!iswxdigit(c)) {
-            allHex = false;
-            break;
-        }
-    }
-
-    // Without a prefix, treat only 4-digit hex strings as code points so a
-    // literal glyph character (or short text) is used as-is.
-    if (allHex && (hadPrefix || hex.size() == 4)) {
-        unsigned long cp = wcstoul(std::wstring(hex).c_str(), nullptr, 16);
-        if (cp != 0) {
-            return std::wstring(1, static_cast<wchar_t>(cp));
-        }
-        return fallback;
-    }
-
-    return hadPrefix ? std::wstring(fallback) : s;
+std::wstring LoadStringSetting(const wchar_t* name,
+                               const wchar_t* defaultValue) {
+    std::wstring trimmed = GetStringSetting(name);
+    return !trimmed.empty() ? trimmed : defaultValue;
 }
 
 void LoadSettings() {
-    ModSettings fresh;
-    fresh.enableSubmenu = Wh_GetIntSetting(L"submenu.enabled");
-    fresh.textSubmenu =
-        LoadStringSetting(L"submenu.label", L"系统工具");
-    fresh.glyphSubmenu = ParseGlyphString(
-        LoadStringSetting(L"submenu.glyph", L"E712"), L"\xE712");
+    auto fresh = std::make_shared<ModSettings>();
 
-    fresh.inSubmenuRestartExplorer =
-        Wh_GetIntSetting(L"restartExplorer.inSubmenu");
-    fresh.inSubmenuCleanTemp = Wh_GetIntSetting(L"cleanTemp.inSubmenu");
-    fresh.inSubmenuReduceMemory = Wh_GetIntSetting(L"reduceMemory.inSubmenu");
-    fresh.inSubmenuRestartGpu = Wh_GetIntSetting(L"restartGpu.inSubmenu");
-    fresh.inSubmenuGetIp = Wh_GetIntSetting(L"getIp.inSubmenu");
-    fresh.inSubmenuRebuildCache = Wh_GetIntSetting(L"rebuildCache.inSubmenu");
-    fresh.inSubmenuFlushDns = Wh_GetIntSetting(L"flushDns.inSubmenu");
+    // 1. System Utilities Submenu & Placement
+    fresh->enableSubmenu = Wh_GetIntSetting(L"submenu.enabled") != 0;
+    fresh->textSubmenu =
+        LoadStringSetting(L"submenu.label", L"System Utilities");
+    fresh->glyphSubmenu = LoadStringSetting(L"submenu.glyph", L"E712");
 
-    fresh.showRestartExplorer = Wh_GetIntSetting(L"restartExplorer.enabled");
-    fresh.textRestartExplorer =
-        LoadStringSetting(L"restartExplorer.label", L"重启资源管理器");
+    std::wstring utilPlacementStr = GetStringSetting(L"submenu.placement");
+    fresh->utilitiesPlacement = (utilPlacementStr == L"bottom")
+                                    ? UtilitiesPlacement::Bottom
+                                    : UtilitiesPlacement::Top;
 
-    fresh.showCleanTemp = Wh_GetIntSetting(L"cleanTemp.enabled");
-    fresh.textCleanTemp = LoadStringSetting(L"cleanTemp.label", L"清理临时文件");
-    fresh.cleanRecycleBin = Wh_GetIntSetting(L"cleanTemp.cleanRecycleBin");
-    fresh.notifyCleanTemp = Wh_GetIntSetting(L"cleanTemp.showCard");
+    // 2. Restart Explorer
+    fresh->showRestartExplorer =
+        Wh_GetIntSetting(L"restartExplorer.enabled") != 0;
+    fresh->inSubmenuRestartExplorer =
+        Wh_GetIntSetting(L"restartExplorer.inSubmenu") != 0;
+    fresh->textRestartExplorer =
+        LoadStringSetting(L"restartExplorer.label", L"Restart Explorer");
 
-    fresh.showReduceMemory = Wh_GetIntSetting(L"reduceMemory.enabled");
-    fresh.textReduceMemory =
-        LoadStringSetting(L"reduceMemory.label", L"释放内存");
-    fresh.notifyReduceMemory = Wh_GetIntSetting(L"reduceMemory.showCard");
+    // 3. Clean Temp
+    fresh->showCleanTemp = Wh_GetIntSetting(L"cleanTemp.enabled") != 0;
+    fresh->inSubmenuCleanTemp = Wh_GetIntSetting(L"cleanTemp.inSubmenu") != 0;
+    fresh->textCleanTemp = LoadStringSetting(L"cleanTemp.label", L"Clean Temp");
+    fresh->cleanRecycleBin =
+        Wh_GetIntSetting(L"cleanTemp.cleanRecycleBin") != 0;
+    fresh->notifyCleanTemp = Wh_GetIntSetting(L"cleanTemp.showCard") != 0;
 
-    fresh.showRestartGpu = Wh_GetIntSetting(L"restartGpu.enabled");
-    fresh.textRestartGpu =
-        LoadStringSetting(L"restartGpu.label", L"重启显卡驱动");
+    // 4. Reduce Memory
+    fresh->showReduceMemory = Wh_GetIntSetting(L"reduceMemory.enabled") != 0;
+    fresh->inSubmenuReduceMemory =
+        Wh_GetIntSetting(L"reduceMemory.inSubmenu") != 0;
+    fresh->textReduceMemory =
+        LoadStringSetting(L"reduceMemory.label", L"Reduce Memory");
+    fresh->notifyReduceMemory = Wh_GetIntSetting(L"reduceMemory.showCard") != 0;
 
-    fresh.showGetIp = Wh_GetIntSetting(L"getIp.enabled");
-    fresh.textGetIp = LoadStringSetting(L"getIp.label", L"获取 IP 地址");
-    fresh.queryPublicIp = Wh_GetIntSetting(L"getIp.queryPublicIp");
-    fresh.copyIpToClipboard = Wh_GetIntSetting(L"getIp.copyToClipboard");
+    // 5. Restart Graphics Driver
+    fresh->showRestartGpu = Wh_GetIntSetting(L"restartGpu.enabled") != 0;
+    fresh->inSubmenuRestartGpu = Wh_GetIntSetting(L"restartGpu.inSubmenu") != 0;
+    fresh->textRestartGpu =
+        LoadStringSetting(L"restartGpu.label", L"Restart Graphics Driver");
 
-    fresh.showRebuildCache = Wh_GetIntSetting(L"rebuildCache.enabled");
-    fresh.textRebuildCache = LoadStringSetting(
-        L"rebuildCache.label", L"重建图标和缩略图缓存");
-    fresh.notifyRebuildCache = Wh_GetIntSetting(L"rebuildCache.showCard");
+    // 6. Get IP Address
+    fresh->showGetIp = Wh_GetIntSetting(L"getIp.enabled") != 0;
+    fresh->inSubmenuGetIp = Wh_GetIntSetting(L"getIp.inSubmenu") != 0;
+    fresh->textGetIp = LoadStringSetting(L"getIp.label", L"Get IP Address");
+    fresh->queryPublicIp = Wh_GetIntSetting(L"getIp.queryPublicIp") != 0;
+    fresh->copyIpToClipboard = Wh_GetIntSetting(L"getIp.copyToClipboard") != 0;
 
-    fresh.showFlushDns = Wh_GetIntSetting(L"flushDns.enabled");
-    fresh.textFlushDns =
-        LoadStringSetting(L"flushDns.label", L"清理 DNS 缓存");
-    fresh.notifyFlushDns = Wh_GetIntSetting(L"flushDns.showCard");
+    // 7. Rebuild Icon & Thumbnail Cache
+    fresh->showRebuildCache = Wh_GetIntSetting(L"rebuildCache.enabled") != 0;
+    fresh->inSubmenuRebuildCache =
+        Wh_GetIntSetting(L"rebuildCache.inSubmenu") != 0;
+    fresh->textRebuildCache = LoadStringSetting(
+        L"rebuildCache.label", L"Rebuild Icon & Thumbnail Cache");
+    fresh->notifyRebuildCache = Wh_GetIntSetting(L"rebuildCache.showCard") != 0;
+
+    // 8. Clean DNS Cache
+    fresh->showFlushDns = Wh_GetIntSetting(L"flushDns.enabled") != 0;
+    fresh->inSubmenuFlushDns = Wh_GetIntSetting(L"flushDns.inSubmenu") != 0;
+    fresh->textFlushDns =
+        LoadStringSetting(L"flushDns.label", L"Clean DNS Cache");
+    fresh->notifyFlushDns = Wh_GetIntSetting(L"flushDns.showCard") != 0;
+
+    // 9. Custom Menu Items
+    for (int i = 0;; i++) {
+        CustomMenuItemSettings item;
+        item.name = GetStringSetting(L"items[%d].name", i);
+        item.command = GetStringSetting(L"items[%d].command", i);
+
+        // Stop reading at the first entry that has neither a label nor a
+        // command.
+        if (item.name.empty() && item.command.empty()) {
+            break;
+        }
+
+        item.arguments = GetStringSetting(L"items[%d].arguments", i);
+        item.icon = GetStringSetting(L"items[%d].icon", i);
+        item.runAsAdmin = Wh_GetIntSetting(L"items[%d].runAsAdmin", i) != 0;
+        item.hideWindow = Wh_GetIntSetting(L"items[%d].hideWindow", i) != 0;
+
+        fresh->customItems.push_back(std::move(item));
+    }
+
+    // 10. Custom items placement, separator, and submenu settings
+    std::wstring placementStr = GetStringSetting(L"customPlacement");
+    if (placementStr == L"top") {
+        fresh->customPlacement = CustomPlacement::Top;
+    } else if (placementStr == L"submenu") {
+        fresh->customPlacement = CustomPlacement::Submenu;
+    } else {
+        fresh->customPlacement = CustomPlacement::Bottom;
+    }
+
+    fresh->customSeparator = Wh_GetIntSetting(L"customSeparator") != 0;
+    fresh->customSubmenuName = GetStringSetting(L"customSubmenuName");
+    fresh->customSubmenuIcon = GetStringSetting(L"customSubmenuIcon");
+
+    Wh_Log(L"Loaded settings: %zu custom item(s)", fresh->customItems.size());
 
     std::lock_guard<std::mutex> lock(g_settingsMutex);
     g_settings = std::move(fresh);
 }
 
 BOOL Wh_ModInit() {
+    Wh_Log(L">");
+
     g_unloading.store(false);
     LoadSettings();
 
@@ -1629,6 +2371,8 @@ BOOL Wh_ModInit() {
         if (!HookTaskbarViewDllSymbols(taskbarViewModule)) {
             Wh_Log(L"Failed to hook Taskbar.View symbols during init");
         }
+    } else {
+        Wh_Log(L"Taskbar view module not loaded yet");
     }
 
     HMODULE kernelBase = GetModuleHandleW(L"kernelbase.dll");
@@ -1639,12 +2383,16 @@ BOOL Wh_ModInit() {
     if (loadLibraryExW) {
         WindhawkUtils::SetFunctionHook(loadLibraryExW, LoadLibraryExW_Hook,
                                        &LoadLibraryExW_Original);
+    } else {
+        Wh_Log(L"LoadLibraryExW not found in kernelbase.dll");
     }
 
     return TRUE;
 }
 
 void Wh_ModAfterInit() {
+    Wh_Log(L">");
+
     if (!g_taskbarViewModuleHooked.load()) {
         if (HMODULE taskbarViewModule = GetTaskbarViewModuleHandle()) {
             HandleLoadedModuleIfTaskbarView(taskbarViewModule, true);
@@ -1653,26 +2401,49 @@ void Wh_ModAfterInit() {
 }
 
 void Wh_ModSettingsChanged() {
+    Wh_Log(L">");
+
     LoadSettings();
 }
 
+void Wh_ModBeforeUninit() {
+    Wh_Log(L">");
+
+    g_unloading.store(true);
+}
+
 void Wh_ModUninit() {
+    Wh_Log(L">");
+
+    g_unloading.store(true);
+
+    CancelActivePublicIpRequest();
+
+    bool hasInjectedElements;
+    {
+        std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+        hasInjectedElements = !g_injectedElements.empty();
+    }
+
+    if (HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd()) {
+        RunFromWindowThread(hTaskbarWnd, [hasInjectedElements]() {
+            CloseActiveFlyoutOnUIThread();
+            if (hasInjectedElements) {
+                ReleaseInjectedElements();
+            }
+        });
+    }
+
     std::vector<HANDLE> threads;
     {
         std::lock_guard<std::mutex> lock(g_threadsMutex);
-        g_unloading.store(true);
         threads.swap(g_threads);
     }
-
-    CancelActivePublicIpRequest();
 
     for (HANDLE thread : threads) {
         WaitForSingleObject(thread, INFINITE);
         CloseHandle(thread);
     }
 
-    if (HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd()) {
-        RunFromWindowThread(hTaskbarWnd,
-                            []() { CloseActiveFlyoutOnUIThread(); });
-    }
+    WaitForLaunchThreads();
 }

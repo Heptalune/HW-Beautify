@@ -26,14 +26,24 @@
 //                   （m417z Better file sizes in Explorer details，GPL-3.0；
 //                     含 CW 创新的后台文件夹大小计算引擎与 Everything 集成通道）。
 // 2. HoverInfo      段 ← local@hw-file-hover-info.wh.cpp 1.1.3
-//                   （HaVeN80 File Hover Info）。
+//                   （HaVeN80 File Hover Info）；已跟进上游 file-hover-info 1.2.0
+//                   的「名称中的文件扩展名」选项（show / hide / explorer）。
 // 3. InfoBar        段 ← local@hw-explorer-info-bar-plus.wh.cpp 1.2.1
 //                   （digART Explorer Info Bar+，GPL-3.0-only）。
 // 4. DragDel        段 ← HW-文件操作优化「拖拽删除」分组（iMAboud Drag to
-//                   Delete 1.0.0，MIT，https://windhawk.net/mods/drag-to-delete）。
+//                   Delete，MIT，https://windhawk.net/mods/drag-to-delete）；
+//                   已跟进上游 drag-to-delete 1.1.0：放置模式、回收站系统
+//                   图标、可选阴影、图标大小、顶部边距、桌面/文件夹距离、
+//                   远离自动隐藏、桌面 Shell 项（CFSTR_SHELLIDLIST）拖放、
+//                   虚拟项过滤、搜索结果拖放、Ctrl+Z 原生撤销、动态 DPI 与
+//                   全屏置顶修复。
 // 5. DblUp          段 ← HW-文件操作优化「双击返回上级」分组（wrldspawn
 //                   Explorer Double Click Up 1.0.1，GPL-3.0，
 //                   https://windhawk.net/mods/explorer-double-click-up）。
+//
+// 上游跟进记录：本次跟进了 file-hover-info 1.2.0 与 drag-to-delete 1.1.0
+// 两个上游版本的新特性，均以本地代码结构为基准移植，未整段替换上游代码；
+// 本地改造（Bandizip 兼容修复、整合层结构、中文本地化等）全部保留。
 
 // ==WindhawkModReadme==
 /*
@@ -62,9 +72,10 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
 
 - 文件夹大小在后台线程累加，不阻塞资源管理器；卡片先显示「正在计算……」，算好后自动更新；驱动器直接显示剩余空间。
 - 卡片文字内置简体中文等 7 种语言，可跟随 Windows 显示语言或手动指定。
+- **名称中的文件扩展名**（`hoverInfo.extensions`）：可选择始终显示、始终隐藏，或与文件资源管理器的「文件扩展名」设置保持一致；快捷方式（.lnk、.url）始终不显示扩展名，与资源管理器一致。
 - 主题外观可调：深色/浅色/跟随 Windows/自定义颜色；背景可选纯色、亚克力或模糊；强调色、左侧强调条、圆角、投影、淡入动画、字体与字号均可配置；可隐藏 Windows 自带的悬停弹出提示。
 
-> 来源：**HaVeN80** [File Hover Info](https://windhawk.net/mods/file-hover-info) 1.1.2 汉化版 1.1.3（原版文件头未标注许可）。
+> 来源：**HaVeN80** [File Hover Info](https://windhawk.net/mods/file-hover-info) 1.1.2 汉化版 1.1.3（原版文件头未标注许可）；本版跟进了上游 1.2.0 的「名称中的文件扩展名」选项。
 ## 功能三：信息栏增强（InfoBar）
 
 增强 Windows 11 文件资源管理器底部信息栏：显示磁盘剩余空间、当前文件夹内容统计（文件夹/文件数量与直接文件大小合计）、选中项信息（数量与大小合计），以及单个选中文件的详情（真实扩展名、照片/RAW 尺寸与相机/镜头元数据、视频/音频时长与分辨率等，分「标准」与「扩展」两档）。三种显示样式（简约 / 平面板块 / 软卡片）、纯色或四向渐变面板填充、可配置分段顺序、字体字号与自定义颜色；可选隐藏资源管理器右下角原生视图按钮。
@@ -75,14 +86,18 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
 
 ## 功能四：拖拽删除（DragDel 分组）
 
-开启后，在文件资源管理器或桌面拖动文件时，屏幕顶部会浮现一个悬浮的垃圾桶目标；把文件拖到目标圆形判定范围内松手，文件即被移入回收站，支持一次拖放多个文件。拖动结束后悬浮目标自动隐藏。
+开启后，在文件资源管理器或桌面拖动文件时，屏幕上会浮现一个悬浮的垃圾桶目标；把文件拖到目标圆形判定范围内松手，文件即被移入回收站，支持一次拖放多个文件。拖动结束后悬浮目标自动隐藏。
 
 - **误入不误删**：只有松手位置落在垃圾桶判定范围（圆形区域加边缘余量）内才生效，拖到其他任何位置松手都是正常取消。
-- **误删防护**：删除走系统回收站通道（FOF_ALLOWUNDO），误删后可随时从回收站还原；删除为静默执行（不弹确认框、不显示进度窗口），若文件过大无法进回收站，系统仍会弹出「将彻底删除」的警告，不会无声永久删除。
-- **DPI 适配**：按显示器实际缩放比例渲染图标与窗口，多显示器环境下跟随拖动所在的显示器；带弹性缩放动画，不获取焦点、无任务栏按钮。
+- **误删防护**：删除走系统回收站通道（IFileOperation + FOFX_RECYCLEONDELETE），误删后可在资源管理器里 **Ctrl+Z 原生撤销**，也可随时从回收站还原；删除为静默执行（不弹确认框、不显示进度窗口），若文件过大无法进回收站，系统仍会弹出「将彻底删除」的警告，不会无声永久删除。
+- **放置模式**（`dragDel.placement`）：「跟随光标」「拖拽起点附近」「屏幕顶部」三种，**默认「屏幕顶部」**（与整合版升级前的位置一致，升级后观感不变；想用上游默认的跟随光标可自行切换）；跟随模式下带缓动跟随，光标靠近目标时不会把目标推开；桌面拖动与文件夹内拖动可分别设置距离（`dragDel.desktopDistance` / `dragDel.folderDistance`）。
+- **目标图标**（`dragDel.iconSource` / `dragDel.iconSize`）：可用模组自绘的垃圾桶图标，也可用 Windows 原生的锐利回收站图标（随系统主题变化）；图标直径 24 - 72 像素可调；投影可开关（`dragDel.showShadow`）。
+- **屏幕顶部模式**的顶部边距可调（`dragDel.topMargin`）；拖得太远时悬浮目标会淡出（`dragDel.autoHideDistance`，0 表示不启用）。
+- **DPI 适配**：按显示器实际缩放比例渲染图标与窗口，多显示器环境下跟随拖动所在的显示器（跨屏时动态换算）；带弹性缩放动画，不获取焦点、无任务栏按钮；全屏窗口下也会保持在最前。
+- **桌面与搜索结果**：支持桌面 Shell 项（CFSTR_SHELLIDLIST）拖放，并自动忽略没有文件系统属性的虚拟项（如「回收站」本身）；支持 Everything / Power Tools 等搜索结果窗口的拖放。
 - **默认关闭的原因**：该功能会把拖放直接变成删除动作，为避免误删请显式开启。
 
-> 来源：**iMAboud** [Drag to Delete](https://windhawk.net/mods/drag-to-delete) 1.0.0，**MIT**。原属 HW-文件操作优化模组，按用户要求迁入本模组。
+> 来源：**iMAboud** [Drag to Delete](https://windhawk.net/mods/drag-to-delete) 1.1.0，**MIT**（原属 HW-文件操作优化模组，按用户要求迁入本模组；本地整合版跟进上游 1.1.0 新特性，保留本地改造）。
 
 ## 功能五：双击返回上级（DblUp 分组）
 
@@ -100,6 +115,7 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
 
 ## 兼容性与已知问题
 
+- **Bandizip 现代右键菜单兼容性（已修复）**：早期版本中「拖拽删除」分组会在资源管理器进程内**常驻调用 `RegisterDragDrop`**，把一个 OLE 拖放目标注册到悬浮垃圾桶窗口上。该常驻注册改变了 explorer 进程的 OLE/COM 状态，导致 Bandizip 的 shell 扩展在 Windows 11 现代右键菜单（XAML/UIA 派发）中的「压缩/解压」命令点击无反应——菜单项可见但点击不执行，而「显示更多选项」的经典菜单走 Win32 `WM_COMMAND`、不受影响，WinRAR 等其它压缩软件的菜单也不受影响。修复方式：**取消常驻注册**，改为仅在文件拖放进行中临时 `RegisterDragDrop`、拖放结束立即 `RevokeDragDrop`（注册/撤销都在覆盖窗口的 UI 线程上执行，由 `DoDragDrop` 钩子投递消息触发），平时 explorer 进程不再持有注册的 OLE 拖放目标；Bandizip 右键菜单恢复正常，拖拽删除功能与稳定性不受影响。另，「双击返回上级」分组的 UIA 对象同样由常驻改为每次鼠标回调内临时创建、用完即释放，以规避长期占用 UIA 对现代菜单派发的潜在干扰。
 - 注入进程：仅 explorer.exe；本模组声明 `@architecture x86-64`（64 位）。
 - 信息栏增强请勿与 Classic Explorer Status Bar、PreVista Explorer Status Bar 或 Explorer Status Bar Metadata 同时启用（同一底部区域互相冲突/覆盖）。
 - 文件悬停信息不支持「主页」「图库」等非经典文件夹视图；亚克力/模糊背景使用未公开 API，个别系统版本上模糊背景可能不跟随圆角。
@@ -126,6 +142,10 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
 - 各分组新增组首「启用本组功能」总开关；任一分组开关或文件大小列设置变化会触发整模组重载，其余设置走免重载即时生效路径。
 - 文件大小列增强新增不依赖 Everything 的后台文件夹大小计算引擎（\sizes.computed.*\）与 Everything 集成通道；信息栏增强在汉化基础上进一步汉化了运行时文案。
 - 全中文本地化、运行时文案汉化与整合维护由 HW-Beautify 完成；版本号统一为 1.0.0。
+- **跟进上游 file-hover-info 1.2.0**：文件悬停信息新增「名称中的文件扩展名」选项（始终显示 / 始终隐藏 / 与资源管理器一致），快捷方式始终不显示扩展名。
+- **跟进上游 drag-to-delete 1.1.0**：拖拽删除新增放置模式（跟随光标 / 拖拽起点附近 / 屏幕顶部）、回收站系统图标与图标大小、可选投影、顶部边距、桌面与文件夹的跟随距离、远离自动隐藏、桌面 Shell 项（CFSTR_SHELLIDLIST）拖放与虚拟项过滤、搜索结果窗口拖放、Ctrl+Z 原生撤销（IFileOperation）、跨屏动态 DPI 与全屏置顶修复；上游的常驻 `RegisterDragDrop` 未引入，保留本地「拖放期间临时注册、结束立即撤销」的写法。
+- **修复 Bandizip 现代右键菜单失效**：DragDel 的 `RegisterDragDrop` 从常驻注册改为「拖放期间临时注册、结束立即撤销」；DblUp 的 UI Automation 对象从常驻改为按需临时创建、用完即释放。详见「兼容性与已知问题」。
+- **修正拖放目标的注册线程**：`RegisterDragDrop` / `RevokeDragDrop` 必须在其窗口所属线程调用（MSDN），否则注册失败、拖拽删除静默失效。改为 DoDragDrop 钩子只 `PostMessage` 通知覆盖窗口的 UI 线程，由 UI 线程在窗口过程里自行注册/撤销，仍保持「仅拖放期间注册」的语义。
 */
 // ==/WindhawkModReadme==
 
@@ -316,6 +336,23 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
     $name:zh-CN: 隐藏 Windows 自带的悬停弹出提示
     $description: Hides the built-in popup so only this card appears. The Windows setting is not changed.
     $description:zh-CN: 隐藏系统内置的弹出提示，只显示本卡片。不会更改 Windows 设置本身。
+  - extensions: show
+    $name: File extensions in the name
+    $name:zh-CN: 名称中的文件扩展名
+    $description: >-
+      Whether the file name on the card includes its extension (.jpg, .pdf...).
+      Shortcuts (.lnk, .url) never show it, as in File Explorer.
+    $description:zh-CN: >-
+      卡片上的文件名是否包含扩展名（.jpg、.pdf 等）。快捷方式（.lnk、.url）始终
+      不显示扩展名，与文件资源管理器一致。
+    $options:
+    - show: Always show
+    - hide: Always hide
+    - explorer: Same as File Explorer ("File name extensions" setting)
+    $options:zh-CN:
+    - show: 始终显示
+    - hide: 始终隐藏
+    - explorer: 与文件资源管理器一致（"文件扩展名"设置）
   - language: auto
     $name: Card language
     $name:zh-CN: 卡片语言
@@ -683,16 +720,90 @@ HW-Beautify 整合包的文件管理器五合一模组，整合了「文件大�
     $name:zh-CN: 启用本组功能
     $description: >-
       Master switch for drag to delete. When turned on, a floating trash
-      target appears at the top of the screen while files are being dragged;
-      dropping files onto it moves them to the Recycle Bin (silent, restore
-      from the Recycle Bin if needed). Off by default: this feature turns a
-      drag into a delete action, so opt in explicitly.
+      target appears while files are being dragged; dropping files onto it
+      moves them to the Recycle Bin (silent, undo with Ctrl+Z or restore from
+      the Recycle Bin if needed). Off by default: this feature turns a drag
+      into a delete action, so opt in explicitly.
     $description:zh-CN: >-
-      「拖拽删除」分组总开关。开启后，拖动文件时屏幕顶部会浮现悬浮垃圾桶
-      目标，把文件拖到目标上松手即移入回收站（静默执行，误删可从回收站还原；
-      拖到其他任何位置松手都是正常取消）。默认关闭——该功能会把拖放直接变成
-      删除动作，请显式选择开启；关闭后拖动文件不再出现悬浮目标，
+      「拖拽删除」分组总开关。开启后，拖动文件时屏幕上会浮现悬浮垃圾桶目标，
+      把文件拖到目标上松手即移入回收站（静默执行，误删可用 Ctrl+Z 或从回收站
+      还原；拖到其他任何位置松手都是正常取消）。默认关闭——该功能会把拖放直接
+      变成删除动作，请显式选择开启；关闭后拖动文件不再出现悬浮目标，
       开关切换即时生效。
+  - placement: top
+    $name: Target placement
+    $name:zh-CN: 目标位置
+    $description: >-
+      Where the floating target appears while dragging: following the cursor,
+      near the point where the drag started, or fixed at the top of the screen.
+    $description:zh-CN: >-
+      拖动时悬浮目标出现的位置：跟随光标、停在拖拽起点附近，或固定在屏幕顶部。
+    $options:
+    - follow: Follow cursor
+    - nearby: Nearby the drag start
+    - top: Top of the screen
+    $options:zh-CN:
+    - follow: 跟随光标
+    - nearby: 拖拽起点附近
+    - top: 屏幕顶部
+  - iconSource: drawn
+    $name: Target icon
+    $name:zh-CN: 目标图标
+    $description: >-
+      Use the drawn in-app trash icon, or the sharp native Windows Recycle Bin
+      icon. The native icon follows the theme of Windows.
+    $description:zh-CN: >-
+      使用模组自绘的垃圾桶图标，或使用 Windows 原生的锐利回收站图标。
+      原生图标会跟随 Windows 主题变化。
+    $options:
+    - drawn: Drawn icon
+    - system: Native Recycle Bin icon
+    $options:zh-CN:
+    - drawn: 自绘图标
+    - system: 原生回收站图标
+  - iconSize: 68
+    $name: Target icon size (px)
+    $name:zh-CN: 目标图标大小（像素）
+    $description: Diameter of the target icon, in pixels (24 - 72).
+    $description:zh-CN: 目标图标的直径，单位为像素（24 - 72）。
+  - showShadow: true
+    $name: Show shadow
+    $name:zh-CN: 显示阴影
+    $description: Draw a soft shadow under the floating target.
+    $description:zh-CN: 在悬浮目标下方绘制柔和的阴影。
+  - desktopDistance: 72
+    $name: Distance from the cursor - desktop (px)
+    $name:zh-CN: 与光标的距离 - 桌面（像素）
+    $description: >-
+      How far the target stays from the cursor when files are dragged on the
+      desktop (48 - 220).
+    $description:zh-CN: >-
+      在桌面上拖动文件时，悬浮目标与光标的距离（48 - 220）。
+  - folderDistance: 100
+    $name: Distance from the cursor - folder (px)
+    $name:zh-CN: 与光标的距离 - 文件夹（像素）
+    $description: >-
+      How far the target stays from the cursor when files are dragged inside a
+      folder (48 - 220).
+    $description:zh-CN: >-
+      在文件夹内拖动文件时，悬浮目标与光标的距离（48 - 220）。
+  - autoHideDistance: 280
+    $name: Auto-hide distance (px)
+    $name:zh-CN: 远离自动隐藏的距离（像素）
+    $description: >-
+      The target fades out when the cursor is dragged farther away than this
+      distance (0 - 600). 0 disables auto-hide.
+    $description:zh-CN: >-
+      当光标被拖到比该距离更远的地方时，悬浮目标淡出（0 - 600）。0 表示不启用
+      自动隐藏。
+  - topMargin: 8
+    $name: Top margin (px)
+    $name:zh-CN: 顶部边距（像素）
+    $description: >-
+      Distance from the top of the screen when the placement is "Top of the
+      screen" (0 - 100).
+    $description:zh-CN: >-
+      放置方式为「屏幕顶部」时，悬浮目标与屏幕顶部的距离（0 - 100）。
   $name: Drag to delete
   $name:zh-CN: 拖拽删除
   $description: >-
@@ -4792,6 +4903,8 @@ static const wchar_t kCardClass[] = L"WhFileHoverInfoCard";
 enum Theme { ThemeAuto, ThemeDark, ThemeLight, ThemeCustom };
 enum Background { BgSolid, BgAcrylic, BgBlur };
 enum DateStyle { DateLong, DateShort, DateRelative, DateShortRelative };
+// 上游 file-hover-info 1.2.0：卡片文件名是否带扩展名。
+enum Extensions { ExtShow, ExtHide, ExtExplorer };
 
 struct Settings {
     int delay;
@@ -4799,6 +4912,7 @@ struct Settings {
     int lang;
     int folderSizeLimit;
     int dateStyle;
+    int extensions;
     struct {
         bool type, size, folderSize, folderPreview, exactBytes, created, modified, accessed, attributes,
             dimensions, duration, version, target, contents, location;
@@ -4987,6 +5101,12 @@ static void LoadSettings() {
                       : ds == L"short"    ? DateShort
                       : ds == L"relative" ? DateRelative
                                           : DateShortRelative;
+
+    // 上游 file-hover-info 1.2.0：名称中的文件扩展名。
+    std::wstring ext = GetStr(L"hoverInfo.extensions");
+    g_set.extensions = ext == L"hide"     ? ExtHide
+                       : ext == L"explorer" ? ExtExplorer
+                                            : ExtShow;
 
     g_set.f.type = GetBool(L"hoverInfo.fields.type");
     g_set.f.size = GetBool(L"hoverInfo.fields.size");
@@ -5657,6 +5777,56 @@ static void AddRow(const wchar_t* label, const std::wstring& value) {
 
 static void LayoutCard();
 
+// ---------------------------------------------------------------------------
+// File extension handling (upstream file-hover-info 1.2.0)
+// ---------------------------------------------------------------------------
+
+// Explorer never shows the extension of a type whose extension key or its
+// default ProgID carries the "NeverShowExt" value (.lnk, .url, ...).
+static bool IsNeverShowExt(PCWSTR ext) {
+    if (!ext || !*ext)
+        return false;
+
+    if (RegGetValueW(HKEY_CLASSES_ROOT, ext, L"NeverShowExt", RRF_RT_ANY,
+                     nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+        return true;
+
+    wchar_t progId[256] = {};
+    DWORD size = sizeof(progId);
+    if (RegGetValueW(HKEY_CLASSES_ROOT, ext, nullptr, RRF_RT_REG_SZ, nullptr,
+                     progId, &size) != ERROR_SUCCESS ||
+        !progId[0])
+        return false;
+
+    return RegGetValueW(HKEY_CLASSES_ROOT, progId, L"NeverShowExt", RRF_RT_ANY,
+                        nullptr, nullptr, nullptr) == ERROR_SUCCESS;
+}
+
+// Removes the extension of a file name. Names that consist of an extension
+// only (".gitignore") are kept as they are.
+static std::wstring StripExtension(const std::wstring& name) {
+    PCWSTR ext = PathFindExtensionW(name.c_str());
+    if (!ext || !*ext)
+        return name;
+    size_t pos = (size_t)(ext - name.c_str());
+    if (pos == 0)
+        return name;
+    return name.substr(0, pos);
+}
+
+// Explorer's own "File name extensions" option (1 = hidden).
+static bool ExplorerHidesFileExtensions() {
+    DWORD value = 0;
+    DWORD size = sizeof(value);
+    if (RegGetValueW(HKEY_CURRENT_USER,
+                     L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer"
+                     L"\\Advanced",
+                     L"HideFileExt", RRF_RT_REG_DWORD, nullptr, &value,
+                     &size) == ERROR_SUCCESS)
+        return value != 0;
+    return false;
+}
+
 static bool BuildCard(IShellItem2* item, UINT dpi) {
     *g_card = Card();
     Card& c = *g_card;
@@ -5669,7 +5839,27 @@ static bool BuildCard(IShellItem2* item, UINT dpi) {
         CoTaskMemFree(raw);
     }
     raw = nullptr;
-    if (!path.empty() && !PathIsRootW(path.c_str())) {
+
+    DWORD attrs = path.empty() ? INVALID_FILE_ATTRIBUTES
+                               : GetFileAttributesW(path.c_str());
+    bool isFile = attrs != INVALID_FILE_ATTRIBUTES &&
+                  !(attrs & FILE_ATTRIBUTE_DIRECTORY);
+    bool isDir = attrs != INVALID_FILE_ATTRIBUTES &&
+                 (attrs & FILE_ATTRIBUTE_DIRECTORY);
+
+    if (isFile) {
+        // Upstream 1.2.0: the card name may carry the extension or not, and
+        // shortcuts (.lnk, .url) never show it, as in File Explorer.
+        c.name = PathFindFileNameW(path.c_str());
+        bool strip = g_set.extensions == ExtHide;
+        if (!strip && g_set.extensions == ExtExplorer)
+            strip = ExplorerHidesFileExtensions();
+        if (!strip &&
+            IsNeverShowExt(PathFindExtensionW(c.name.c_str())))
+            strip = true;
+        if (strip)
+            c.name = StripExtension(c.name);
+    } else if (!path.empty() && !PathIsRootW(path.c_str())) {
         c.name = PathFindFileNameW(path.c_str());
     } else if (SUCCEEDED(item->GetDisplayName(SIGDN_NORMALDISPLAY, &raw)) &&
                raw) {
@@ -5707,10 +5897,7 @@ static bool BuildCard(IShellItem2* item, UINT dpi) {
         }
     }
 
-    DWORD attrs = path.empty() ? INVALID_FILE_ATTRIBUTES
-                               : GetFileAttributesW(path.c_str());
-    bool isDir = attrs != INVALID_FILE_ATTRIBUTES &&
-                 (attrs & FILE_ATTRIBUTE_DIRECTORY);
+    // attrs / isDir were already determined above (before the name).
 
     if (g_set.f.size && !isDir) {
         ULONGLONG size = 0;
@@ -13551,15 +13738,27 @@ void Uninit()
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 功能七：拖拽删除（DragDel*）
-// 来源：iMAboud Drag to Delete 1.0.0（MIT），
+// 来源：iMAboud Drag to Delete 1.1.0（MIT），
 // 原版链接：https://windhawk.net/mods/drag-to-delete。
+// 本地整合版在 1.0.0 的本地改造基础上并入上游 1.1.0 的新特性：
+//   • 放置模式：跟随光标 / 起始点附近 / 屏幕顶部（dragDel.placement）；
+//   • 回收站系统图标（dragDel.iconSource = system）与图标大小（dragDel.iconSize）；
+//   • 可选投影（dragDel.showShadow）、顶部边距（dragDel.topMargin）、
+//     桌面/文件夹距离、远离自动隐藏（dragDel.autoHideDistance）；
+//   • 桌面 Shell 项（CFSTR_SHELLIDLIST）拖放与虚拟项过滤；
+//   • Everything / Power Tools 搜索结果拖放；
+//   • Ctrl+Z 原生撤销（IFileOperation + FOFX_ADDUNDORECORD）；
+//   • 跟随模式下的动态 DPI 与全屏置顶修复。
 // 逻辑与上游一致，全局符号与函数统一加 DragDel 前缀以与其他功能隔离；设置键
-// 迁移为 dragDel.enable（分组总开关，默认关闭——该功能会把拖放直接变成删除
+// 迁移为 dragDel.*（分组总开关 dragDel.enable，默认关闭——该功能会把拖放直接变成删除
 // 动作，让用户显式选择）。
 // 实现方式：DoDragDrop 钩子段加开关短路——总开关关闭时不显示悬浮目标（拖放
 // 行为与系统完全一致），但拖放计数保持对称，避免开关切换瞬间残留状态；覆盖
 // 窗口线程与删除工作线程常驻（空闲零轮询、资源占用极低），总开关切换即时
 // 生效。仅在 explorer.exe 中启用（合并入口按进程判定，见文件末尾）。
+// FIX（Bandizip 现代右键菜单兼容）：拖放目标**只在文件拖放进行中临时注册**，
+// 拖放结束立即 RevokeDragDrop，explorer 进程平时不持有任何已注册的 OLE 拖放
+// 目标；**不得**改回上游 1.1.0 的常驻 RegisterDragDrop。
 // 上游全部线程/窗口回调均为显式 WINAPI/CALLBACK 函数或成员函数，无无捕获
 // lambda 直传 WINAPI/stdcall 回调的情况，x86 兼容。
 // ─────────────────────────────────────────────────────────────────────────────
@@ -13573,6 +13772,8 @@ static const float DRAGDEL_BASE_CENTER_X   = 100.0f;
 static const float DRAGDEL_BASE_CENTER_Y   = 50.0f;
 static const float DRAGDEL_BASE_RADIUS     = 34.0f;
 static const float DRAGDEL_BASE_HIT_MARGIN = 16.0f;
+// 上游 1.1.0：默认图标尺寸（圆形半径 = 图标尺寸 / 2，与本地原半径一致）。
+static const int DRAGDEL_DEFAULT_ICON_SIZE = (int)(DRAGDEL_BASE_RADIUS * 2);
 
 constexpr WCHAR kDragDelClassName[] = L"WindhawkDragToDeleteOverlay";
 
@@ -13592,22 +13793,91 @@ static CRITICAL_SECTION g_DragDelDeleteCs;
 static std::vector<std::vector<wchar_t>> g_DragDelDeleteQueue;
 
 static RECT g_DragDelTargetWorkArea = {};
+static POINT g_DragDelOverlayOrigin = {};  // 悬浮窗口左上角（屏幕坐标）
 static float g_DragDelCurrentDpiScale = 1.0f;
 static DragDelAnimState g_DragDelAnimState = DragDelAnimState::HIDDEN;
 static float g_DragDelCurrentScale = 0.0f;
 static float g_DragDelTargetScale = 0.0f;
 static float g_DragDelLastRenderedScale = -1.0f;
 
-// 分组总开关（dragDel.enable，默认 false）。
+// 上游 1.1.0 新增状态。
+static LONG g_DragDelDragFromDesktop = 0;
+static LONG g_DragDelDragFromSearch = 0;
+static LONG g_DragDelHovering = 0;
+static bool g_DragDelLastRenderedHover = false;
+static POINT g_DragDelLastCursor = {};
+static bool g_DragDelHaveLastCursor = false;
+static POINT g_DragDelAutoHideDragStart = {};
+static float g_DragDelAutoHideInitialDistance = 0.0f;
+static bool g_DragDelAutoHideConcealed = false;
+static bool g_DragDelAutoHideWindowHidden = false;
+static ULONGLONG g_DragDelAutoHideDistantSince = 0;
+static ULONGLONG g_DragDelAutoHideFadeStarted = 0;
+static float g_DragDelAutoHideOpacity = 1.0f;
+static float g_DragDelAutoHideFadeStart = 1.0f;
+static float g_DragDelAutoHideFadeTarget = 1.0f;
+static HICON g_DragDelSystemIcon = nullptr;
+
+// 分组总开关（dragDel.enable，默认 false）+ 上游 1.1.0 新增设置。
 static struct {
     bool enable;
+    std::wstring placement;   // follow / nearby / top
+    std::wstring iconSource;  // drawn / system
+    bool showShadow;
+    int iconSize;
+    int desktopDistance;
+    int folderDistance;
+    int autoHideDistance;
+    int topMargin;
 } DragDelSettings;
+
+static std::wstring DragDelReadString(PCWSTR name) {
+    std::wstring result;
+    PCWSTR value = Wh_GetStringSetting(name);
+    if (value) {
+        result = value;
+        Wh_FreeStringSetting(value);
+    }
+    return result;
+}
 
 static void DragDelLoadSettings() {
     DragDelSettings.enable = Wh_GetIntSetting(L"dragDel.enable") != 0;
+
+    std::wstring placement = DragDelReadString(L"dragDel.placement");
+    if (placement == L"nearby")
+        DragDelSettings.placement = L"nearby";
+    else if (placement == L"top")
+        DragDelSettings.placement = L"top";
+    else
+        DragDelSettings.placement = L"follow";
+
+    std::wstring iconSource = DragDelReadString(L"dragDel.iconSource");
+    DragDelSettings.iconSource =
+        (iconSource == L"system") ? L"system" : L"drawn";
+
+    DragDelSettings.showShadow = Wh_GetIntSetting(L"dragDel.showShadow") != 0;
+    DragDelSettings.iconSize =
+        std::clamp(Wh_GetIntSetting(L"dragDel.iconSize"), 24, 72);
+    DragDelSettings.desktopDistance =
+        std::clamp(Wh_GetIntSetting(L"dragDel.desktopDistance"), 48, 220);
+    DragDelSettings.folderDistance =
+        std::clamp(Wh_GetIntSetting(L"dragDel.folderDistance"), 48, 220);
+    DragDelSettings.autoHideDistance =
+        std::clamp(Wh_GetIntSetting(L"dragDel.autoHideDistance"), 0, 600);
+    DragDelSettings.topMargin =
+        std::clamp(Wh_GetIntSetting(L"dragDel.topMargin"), 0, 100);
 }
 
 #define DRAGDEL_WM_UPDATE_DRAG_STATE (WM_USER + 101)
+// FIX（Bandizip 兼容）/ 正确性修复：拖放目标的注册与撤销必须在覆盖窗口的
+// 所属线程（即 DragDelOverlayUIThread，创建 g_DragDelOverlayWnd 的那个线程）
+// 上执行。MSDN：RegisterDragDrop 的 hwnd 必须属于调用线程，否则返回
+// E_INVALIDARG / DRAGDROP_E_INVALIDHWND，表现为拖拽删除静默失效。
+// 因此 DoDragDrop 钩子只用 PostMessage 通知 UI 线程自行注册/撤销，钩子里
+// 不直接调用这两个 API。注册仍然只在拖放期间存在，不回到常驻注册。
+#define DRAGDEL_WM_REGISTER_DROP_TARGET   (WM_USER + 102)
+#define DRAGDEL_WM_REVOKE_DROP_TARGET     (WM_USER + 103)
 #define DRAGDEL_TIMER_ANIM 1
 
 HMODULE DragDelGetCurrentModuleHandle() {
@@ -13640,6 +13910,228 @@ static UINT DragDelGetMonitorDpi(HMONITOR hMon) {
         }
     }
     return 96;
+}
+
+// 上游 1.1.0：窗口几何（本地仍用 200x160 的窗口与 (100, 50) 的圆形中心，
+// 只是位置不再固定，而是由放置模式决定）。
+static int DragDelWindowWidth(float dpiScale) {
+    return (int)(DRAGDEL_BASE_WND_WIDTH * dpiScale);
+}
+
+static int DragDelWindowHeight(float dpiScale) {
+    return (int)(DRAGDEL_BASE_WND_HEIGHT * dpiScale);
+}
+
+static float DragDelCircleCenterX(float dpiScale) {
+    return DRAGDEL_BASE_CENTER_X * dpiScale;
+}
+
+static float DragDelCircleCenterY(float dpiScale) {
+    return DRAGDEL_BASE_CENTER_Y * dpiScale;
+}
+
+static float DragDelCircleRadius(float dpiScale) {
+    return (DragDelSettings.iconSize / 2.0f) * dpiScale;
+}
+
+// 上游 1.1.0：是否从桌面（Progman/WorkerW）发起拖放。
+static bool DragDelIsDesktopDragStart() {
+    POINT pt = {};
+    if (!GetCursorPos(&pt)) return false;
+    HWND wnd = WindowFromPoint(pt);
+    wchar_t klass[80] = {};
+    for (HWND parent = wnd; parent; parent = GetParent(parent)) {
+        klass[0] = 0;
+        GetClassNameW(parent, klass, ARRAYSIZE(klass));
+        if (lstrcmpiW(klass, L"CabinetWClass") == 0) return false;
+        if (lstrcmpiW(klass, L"Progman") == 0 || lstrcmpiW(klass, L"WorkerW") == 0)
+            return true;
+    }
+    return false;
+}
+
+// 上游 1.1.0：Everything / Power Tools 搜索结果窗口发起的拖放。
+static bool DragDelIsSearchDragStart() {
+    POINT cursor = {};
+    if (!GetCursorPos(&cursor)) return false;
+    HWND cursorWindow = WindowFromPoint(cursor);
+    HWND windows[] = { cursorWindow, GetForegroundWindow() };
+    for (HWND window : windows) {
+        for (int depth = 0; window && depth < 16; ++depth) {
+            wchar_t className[128] = {};
+            if (GetClassNameW(window, className, ARRAYSIZE(className)) &&
+                wcscmp(className, L"StartEverything_SearchWindowPrototype") == 0) {
+                return true;
+            }
+            window = GetParent(window);
+        }
+    }
+    return false;
+}
+
+// 上游 1.1.0：回收站系统图标（原生 Windows 回收站图标，比自绘图标更锐利）。
+static HICON DragDelGetSystemRecycleBinIcon(int desiredPx) {
+    HICON hIcon = nullptr;
+    PIDLIST_ABSOLUTE pidl = nullptr;
+    // FOLDERID_RecycleBinFolder（knownfolders.h 未包含，直接给出 GUID 常量，
+    // 避免额外的链接依赖）。
+    static const GUID kDragDelRecycleBinFolder = {
+        0xB7534046, 0x3ECB, 0x4C18,
+        {0xBE, 0x4E, 0x64, 0xCD, 0x4C, 0xB7, 0xD6, 0xAC}};
+    if (SUCCEEDED(SHGetKnownFolderIDList(kDragDelRecycleBinFolder,
+                                         KF_FLAG_DEFAULT, nullptr, &pidl)) &&
+        pidl) {
+        IShellItem* pItem = nullptr;
+        if (SUCCEEDED(SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&pItem))) &&
+            pItem) {
+            IShellItemImageFactory* pFactory = nullptr;
+            if (SUCCEEDED(pItem->QueryInterface(IID_PPV_ARGS(&pFactory))) &&
+                pFactory) {
+                SIZE size = { desiredPx, desiredPx };
+                HBITMAP hBmp = nullptr;
+                if (SUCCEEDED(pFactory->GetImage(size, SIIGBF_ICONONLY, &hBmp)) &&
+                    hBmp) {
+                    HBITMAP hMask =
+                        CreateBitmap(desiredPx, desiredPx, 1, 1, nullptr);
+                    if (hMask) {
+                        ICONINFO ii = {};
+                        ii.fIcon = TRUE;
+                        ii.hbmColor = hBmp;
+                        ii.hbmMask = hMask;
+                        hIcon = CreateIconIndirect(&ii);
+                        DeleteObject(hMask);
+                    }
+                    DeleteObject(hBmp);
+                }
+                pFactory->Release();
+            }
+            pItem->Release();
+        }
+        ILFree(pidl);
+    }
+    if (!hIcon) {
+        SHSTOCKICONINFO stock = { sizeof(stock) };
+        if (SUCCEEDED(SHGetStockIconInfo(SIID_RECYCLER,
+                                         SHGSI_ICON | SHGSI_LARGEICON,
+                                         &stock))) {
+            hIcon = stock.hIcon;
+        }
+    }
+    return hIcon;
+}
+
+// 上游 1.1.0：同时支持 CF_HDROP 与桌面 Shell 项（CFSTR_SHELLIDLIST），
+// 并过滤掉没有文件系统属性的虚拟项。
+static bool DragDelHasFileDragFormat(IDataObject* source) {
+    if (!source) return false;
+    FORMATETC hdrop = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+    if (source->QueryGetData(&hdrop) == S_OK) return true;
+    CLIPFORMAT shellFormat =
+        static_cast<CLIPFORMAT>(RegisterClipboardFormatW(CFSTR_SHELLIDLIST));
+    if (!shellFormat) return false;
+    FORMATETC shell = { shellFormat, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+    if (source->QueryGetData(&shell) != S_OK) return false;
+
+    IShellItemArray* items = nullptr;
+    if (SUCCEEDED(SHCreateShellItemArrayFromDataObject(source,
+                                                        IID_PPV_ARGS(&items))) &&
+        items) {
+        SFGAOF attribs = 0;
+        HRESULT hr = items->GetAttributes(SIATTRIBFLAGS_AND, SFGAO_FILESYSTEM,
+                                          &attribs);
+        items->Release();
+        if (SUCCEEDED(hr) && (attribs & SFGAO_FILESYSTEM)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// 上游 1.1.0：取出待回收的路径（双零结尾的缓冲区）。
+static bool DragDelExtractDragPaths(IDataObject* source,
+                                     std::vector<wchar_t>& output) {
+    if (!source) return false;
+    FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+    if (source->QueryGetData(&fmt) == S_OK) {
+        STGMEDIUM medium = {};
+        if (FAILED(source->GetData(&fmt, &medium))) return false;
+        bool ok = false;
+        HDROP files = reinterpret_cast<HDROP>(GlobalLock(medium.hGlobal));
+        if (files) {
+            UINT count = DragQueryFileW(files, 0xFFFFFFFF, nullptr, 0);
+            if (count && count <= 10000) {
+                ok = true;
+                for (UINT n = 0; n < count; ++n) {
+                    UINT len = DragQueryFileW(files, n, nullptr, 0);
+                    if (!len || len >= 32760) {
+                        ok = false;
+                        break;
+                    }
+                    size_t start = output.size();
+                    output.resize(start + len + 1, 0);
+                    if (DragQueryFileW(files, n, output.data() + start, len + 1) != len) {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+            GlobalUnlock(medium.hGlobal);
+        }
+        ReleaseStgMedium(&medium);
+        if (!ok)
+            output.clear();
+        else
+            output.push_back(L'\0');
+        return ok;
+    }
+
+    IShellItemArray* items = nullptr;
+    HRESULT hr =
+        SHCreateShellItemArrayFromDataObject(source, IID_PPV_ARGS(&items));
+    if (FAILED(hr) || !items) return false;
+    DWORD count = 0;
+    bool ok = SUCCEEDED(items->GetCount(&count)) && count > 0 && count <= 10000;
+    if (ok) {
+        for (DWORD n = 0; n < count; ++n) {
+            IShellItem* item = nullptr;
+            PWSTR path = nullptr;
+            if (FAILED(items->GetItemAt(n, &item)) || !item) {
+                ok = false;
+                break;
+            }
+            HRESULT pathHr = item->GetDisplayName(SIGDN_FILESYSPATH, &path);
+            item->Release();
+            if (FAILED(pathHr) || !path || !*path) {
+                if (path) CoTaskMemFree(path);
+                ok = false;
+                break;
+            }
+            size_t len = wcslen(path);
+            if (len >= 32760) {
+                CoTaskMemFree(path);
+                ok = false;
+                break;
+            }
+            output.insert(output.end(), path, path + len + 1);
+            CoTaskMemFree(path);
+        }
+    }
+    items->Release();
+    if (!ok)
+        output.clear();
+    else
+        output.push_back(L'\0');
+    return ok;
+}
+
+// 上游 1.1.0：允许的回收站放置效果（搜索结果需要允许复制语义）。
+static DWORD DragDelAllowedRecycleEffect(DWORD offered) {
+    if (offered & DROPEFFECT_MOVE) return DROPEFFECT_MOVE;
+    if ((offered & DROPEFFECT_COPY) &&
+        InterlockedCompareExchange(&g_DragDelDragFromSearch, 0, 0)) {
+        return DROPEFFECT_COPY;
+    }
+    return DROPEFFECT_NONE;
 }
 
 void DragDelRenderFrame(HWND hWnd);
@@ -13687,12 +14179,12 @@ void DragDelRenderFrame(HWND hWnd) {
     if (g_DragDelAnimState == DragDelAnimState::HIDDEN || g_DragDelCurrentScale < 0.05f) return;
 
     float dpiScale = g_DragDelCurrentDpiScale;
-    int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * dpiScale);
-    int wndHeight = (int)(DRAGDEL_BASE_WND_HEIGHT * dpiScale);
-    int topY = (int)(DRAGDEL_BASE_TOP_Y * dpiScale);
-    float cx = DRAGDEL_BASE_CENTER_X * dpiScale;
-    float cy = DRAGDEL_BASE_CENTER_Y * dpiScale;
-    float baseRadius = DRAGDEL_BASE_RADIUS * dpiScale;
+    int wndWidth = DragDelWindowWidth(dpiScale);
+    int wndHeight = DragDelWindowHeight(dpiScale);
+    float cx = DragDelCircleCenterX(dpiScale);
+    float cy = DragDelCircleCenterY(dpiScale);
+    float baseRadius = DragDelCircleRadius(dpiScale);
+    bool systemIcon = DragDelSettings.iconSource == L"system";
 
     HDC hdcScreen = GetDC(nullptr);
     HDC hdcMem = CreateCompatibleDC(hdcScreen);
@@ -13715,34 +14207,61 @@ void DragDelRenderFrame(HWND hWnd) {
         g.SetSmoothingMode(SmoothingModeAntiAlias);
 
         float r = baseRadius * g_DragDelCurrentScale;
+        float iconScale = (DragDelSettings.iconSize / 68.0f) * g_DragDelCurrentScale * dpiScale;
 
-        SolidBrush shadowBrush(Color(25, 0, 0, 0));
-        g.FillEllipse(&shadowBrush, cx - r - 4.0f * dpiScale, cy - r - 1.0f * dpiScale, (r + 4.0f * dpiScale) * 2, (r + 4.0f * dpiScale) * 2 + 5.0f * dpiScale);
+        if (systemIcon) {
+            if (DragDelSettings.showShadow) {
+                SolidBrush shadowBrush(Color(25, 0, 0, 0));
+                g.FillEllipse(&shadowBrush, cx - r - 3.0f * dpiScale, cy - r + 1.0f * dpiScale,
+                              (r + 3.0f * dpiScale) * 2, (r + 3.0f * dpiScale) * 2 + 4.0f * dpiScale);
+            }
 
-        RectF glassRect(cx - r, cy - r, r * 2, r * 2);
-        LinearGradientBrush glassBrush(
-            PointF(cx, cy - r),
-            PointF(cx, cy + r),
-            Color(215, 38, 40, 46),
-            Color(190, 20, 21, 25)
-        );
-        g.FillEllipse(&glassBrush, glassRect);
+            if (g_DragDelTargetScale > 1.02f) {
+                SolidBrush hoverBrush(Color(40, 255, 255, 255));
+                g.FillEllipse(&hoverBrush, cx - r - 2.0f * dpiScale, cy - r - 2.0f * dpiScale,
+                              (r + 2.0f * dpiScale) * 2, (r + 2.0f * dpiScale) * 2);
+            }
 
-        Pen innerEdgePen(Color(35, 255, 255, 255), 1.0f * dpiScale);
-        g.DrawEllipse(&innerEdgePen, cx - r + 0.5f, cy - r + 0.5f, (r - 0.5f) * 2, (r - 0.5f) * 2);
+            if (!g_DragDelSystemIcon) {
+                DragDelDrawModernTrashIcon(g, cx, cy, iconScale, Color(245, 248, 250));
+            }
+        } else {
+            if (DragDelSettings.showShadow) {
+                SolidBrush shadowBrush(Color(25, 0, 0, 0));
+                g.FillEllipse(&shadowBrush, cx - r - 4.0f * dpiScale, cy - r - 1.0f * dpiScale,
+                              (r + 4.0f * dpiScale) * 2, (r + 4.0f * dpiScale) * 2 + 5.0f * dpiScale);
+            }
 
-        DragDelDrawModernTrashIcon(g, cx, cy, g_DragDelCurrentScale * dpiScale, Color(245, 248, 250));
+            RectF glassRect(cx - r, cy - r, r * 2, r * 2);
+            LinearGradientBrush glassBrush(
+                PointF(cx, cy - r),
+                PointF(cx, cy + r),
+                Color(215, 38, 40, 46),
+                Color(190, 20, 21, 25)
+            );
+            g.FillEllipse(&glassBrush, glassRect);
+
+            Pen innerEdgePen(Color(35, 255, 255, 255), 1.0f * dpiScale);
+            g.DrawEllipse(&innerEdgePen, cx - r + 0.5f, cy - r + 0.5f, (r - 0.5f) * 2, (r - 0.5f) * 2);
+
+            DragDelDrawModernTrashIcon(g, cx, cy, iconScale, Color(245, 248, 250));
+        }
     }
 
-    int monLeft = g_DragDelTargetWorkArea.left;
-    int monWidth = g_DragDelTargetWorkArea.right - g_DragDelTargetWorkArea.left;
-    int wndLeft = monLeft + (monWidth - wndWidth) / 2;
-    int wndTop = g_DragDelTargetWorkArea.top + topY;
+    if (systemIcon && g_DragDelSystemIcon) {
+        int iside = (int)(DragDelSettings.iconSize * dpiScale * g_DragDelCurrentScale + 0.5f);
+        DrawIconEx(hdcMem, (int)(cx - iside / 2.0f), (int)(cy - iside / 2.0f),
+                   g_DragDelSystemIcon, iside, iside, 0, nullptr, DI_NORMAL);
+    }
+
+    int wndLeft = g_DragDelOverlayOrigin.x;
+    int wndTop = g_DragDelOverlayOrigin.y;
 
     POINT ptDst = { wndLeft, wndTop };
     POINT ptSrc = { 0, 0 };
     SIZE wndSize = { wndWidth, wndHeight };
-    BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+    BYTE alpha = static_cast<BYTE>(std::clamp(g_DragDelAutoHideOpacity, 0.0f, 1.0f) * 255.0f);
+    BLENDFUNCTION blend = { AC_SRC_OVER, 0, alpha, AC_SRC_ALPHA };
 
     UpdateLayeredWindow(hWnd, hdcScreen, &ptDst, &wndSize, hdcMem, &ptSrc, 0, &blend, ULW_ALPHA);
 
@@ -13754,23 +14273,19 @@ void DragDelRenderFrame(HWND hWnd) {
 
 class DragDelRecycleDropTarget final : public IDropTarget {
     LONG m_refCount = 1;
-    bool m_hasHDrop = false;
+    bool m_hasFileFormat = false;
 
     bool IsOverTrash(POINTL pt) {
         if (!g_DragDelOverlayWnd) return false;
 
         float dpiScale = g_DragDelCurrentDpiScale;
-        int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * dpiScale);
-        int topY = (int)(DRAGDEL_BASE_TOP_Y * dpiScale);
-        float centerX = DRAGDEL_BASE_CENTER_X * dpiScale;
-        float centerY = DRAGDEL_BASE_CENTER_Y * dpiScale;
-        float baseRadius = DRAGDEL_BASE_RADIUS * dpiScale;
+        float centerX = DragDelCircleCenterX(dpiScale);
+        float centerY = DragDelCircleCenterY(dpiScale);
+        float baseRadius = DragDelCircleRadius(dpiScale);
         float hitMargin = DRAGDEL_BASE_HIT_MARGIN * dpiScale;
 
-        int monLeft = g_DragDelTargetWorkArea.left;
-        int monWidth = g_DragDelTargetWorkArea.right - g_DragDelTargetWorkArea.left;
-        int wndLeft = monLeft + (monWidth - wndWidth) / 2;
-        int wndTop = g_DragDelTargetWorkArea.top + topY;
+        int wndLeft = g_DragDelOverlayOrigin.x;
+        int wndTop = g_DragDelOverlayOrigin.y;
 
         float dx = (float)(pt.x - wndLeft) - centerX;
         float dy = (float)(pt.y - wndTop) - centerY;
@@ -13798,96 +14313,155 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE DragEnter(IDataObject* pDataObj, DWORD, POINTL pt, DWORD* pdwEffect) override {
-        FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-        m_hasHDrop = (pDataObj && pDataObj->QueryGetData(&fmt) == S_OK);
+        m_hasFileFormat = DragDelHasFileDragFormat(pDataObj);
 
-        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
-        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
-            *pdwEffect = DROPEFFECT_MOVE;
+        DWORD recycleEffect =
+            pdwEffect ? DragDelAllowedRecycleEffect(*pdwEffect) : DROPEFFECT_NONE;
+        if (m_hasFileFormat && recycleEffect && IsOverTrash(pt)) {
+            *pdwEffect = recycleEffect;
             g_DragDelTargetScale = 1.2f;
+            InterlockedExchange(&g_DragDelHovering, 1);
         } else {
             if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
             g_DragDelTargetScale = 1.0f;
+            InterlockedExchange(&g_DragDelHovering, 0);
         }
         return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL pt, DWORD* pdwEffect) override {
-        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
-        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
-            *pdwEffect = DROPEFFECT_MOVE;
+        DWORD recycleEffect =
+            pdwEffect ? DragDelAllowedRecycleEffect(*pdwEffect) : DROPEFFECT_NONE;
+        if (m_hasFileFormat && recycleEffect && IsOverTrash(pt)) {
+            *pdwEffect = recycleEffect;
             g_DragDelTargetScale = 1.2f;
+            InterlockedExchange(&g_DragDelHovering, 1);
         } else {
             if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
             g_DragDelTargetScale = 1.0f;
+            InterlockedExchange(&g_DragDelHovering, 0);
         }
         return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE DragLeave() override {
-        m_hasHDrop = false;
+        m_hasFileFormat = false;
         g_DragDelTargetScale = 1.0f;
+        InterlockedExchange(&g_DragDelHovering, 0);
         return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE Drop(IDataObject* pDataObj, DWORD, POINTL pt, DWORD* pdwEffect) override {
-        bool canMove = pdwEffect && (*pdwEffect & DROPEFFECT_MOVE);
-        if (m_hasHDrop && canMove && IsOverTrash(pt)) {
-            *pdwEffect = DROPEFFECT_MOVE;
-
-            FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-            STGMEDIUM stg;
-            if (SUCCEEDED(pDataObj->GetData(&fmt, &stg))) {
-                HDROP hDrop = (HDROP)GlobalLock(stg.hGlobal);
-                if (hDrop) {
-                    UINT fileCount = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
-                    if (fileCount > 0) {
-                        std::vector<wchar_t> buffer;
-                        for (UINT i = 0; i < fileCount; i++) {
-                            UINT len = DragQueryFileW(hDrop, i, nullptr, 0);
-                            size_t prevSize = buffer.size();
-                            buffer.resize(prevSize + len + 1);
-                            DragQueryFileW(hDrop, i, buffer.data() + prevSize, len + 1);
-                        }
-                        buffer.push_back(L'\0');
-
-                        EnterCriticalSection(&g_DragDelDeleteCs);
-                        g_DragDelDeleteQueue.push_back(std::move(buffer));
-                        LeaveCriticalSection(&g_DragDelDeleteCs);
-                        SetEvent(g_DragDelDeleteQueueEvent);
-                    }
-                    GlobalUnlock(stg.hGlobal);
-                }
-                ReleaseStgMedium(&stg);
+        DWORD recycleEffect =
+            pdwEffect ? DragDelAllowedRecycleEffect(*pdwEffect) : DROPEFFECT_NONE;
+        bool accepted = false;
+        if (m_hasFileFormat && recycleEffect && IsOverTrash(pt)) {
+            std::vector<wchar_t> buffer;
+            if (DragDelExtractDragPaths(pDataObj, buffer) && buffer.size() > 2) {
+                EnterCriticalSection(&g_DragDelDeleteCs);
+                g_DragDelDeleteQueue.push_back(std::move(buffer));
+                LeaveCriticalSection(&g_DragDelDeleteCs);
+                SetEvent(g_DragDelDeleteQueueEvent);
+                accepted = true;
+                g_DragDelCurrentScale = 1.25f;
+                g_DragDelTargetScale = 0.0f;
+                g_DragDelAnimState = DragDelAnimState::DROPPED;
+            } else {
+                Wh_Log(L"Drag did not contain a complete recyclable file selection");
             }
-
-            g_DragDelCurrentScale = 1.25f;
-            g_DragDelTargetScale = 0.0f;
-            g_DragDelAnimState = DragDelAnimState::DROPPED;
-        } else {
-            if (pdwEffect) *pdwEffect = DROPEFFECT_NONE;
         }
-        m_hasHDrop = false;
+        if (pdwEffect) *pdwEffect = accepted ? recycleEffect : DROPEFFECT_NONE;
+        m_hasFileFormat = false;
+        InterlockedExchange(&g_DragDelHovering, 0);
         return S_OK;
     }
 };
 
 static DragDelRecycleDropTarget* g_DragDelDropTarget = nullptr;
 
+// 上游 1.1.0：用 IFileOperation 走 Shell 原生撤销栈（Ctrl+Z 可撤销），
+// FOFX_RECYCLEONDELETE 保证进入回收站而不是直接删除。
 void DragDelMoveFilesToRecycleBin(const std::vector<wchar_t>& buffer) {
     if (buffer.empty()) return;
 
-    SHFILEOPSTRUCTW fileOp = {};
-    fileOp.wFunc = FO_DELETE;
-    fileOp.pFrom = buffer.data();
-    fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_WANTNUKEWARNING | FOF_SILENT;
-    SHFileOperationW(&fileOp);
+    std::vector<PIDLIST_ABSOLUTE> ids;
+    std::vector<PCIDLIST_ABSOLUTE> pidls;
+    bool valid = true;
+    size_t index = 0;
+    while (index < buffer.size() && buffer[index] != L'\0') {
+        PCWSTR path = buffer.data() + index;
+        size_t len = wcslen(path);
+        if (!len || len >= 32760) {
+            valid = false;
+            break;
+        }
+        PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path);
+        if (!pidl) {
+            Wh_Log(L"Failed to resolve Shell path: 0x%08X", GetLastError());
+            valid = false;
+            break;
+        }
+        ids.push_back(pidl);
+        pidls.push_back(pidl);
+        index += len + 1;
+    }
+
+    if (!valid || pidls.empty()) {
+        for (auto pidl : ids) ILFree(pidl);
+        Wh_Log(L"Recycle batch aborted: one or more paths could not be resolved");
+        return;
+    }
+
+    IShellItemArray* group = nullptr;
+    HRESULT hr = SHCreateShellItemArrayFromIDLists((UINT)pidls.size(),
+                                                    pidls.data(), &group);
+    for (auto pidl : ids) ILFree(pidl);
+
+    if (FAILED(hr) || !group) {
+        Wh_Log(L"Unable to build grouped Shell selection: 0x%08X", hr);
+        return;
+    }
+
+    IFileOperation* operation = nullptr;
+    hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_INPROC_SERVER,
+                          IID_PPV_ARGS(&operation));
+    if (SUCCEEDED(hr) && operation) {
+        // 与上游 1.1.0 一致：不加 FOF_NOCONFIRMATION，这样「无法进回收站」的
+        // 警告（FOF_WANTNUKEWARNING）仍然有效，不会被「全部确认」吞掉。
+        const DWORD flags = FOF_ALLOWUNDO | FOF_SILENT | FOF_WANTNUKEWARNING |
+                            FOFX_RECYCLEONDELETE | FOFX_ADDUNDORECORD;
+        hr = operation->SetOperationFlags(flags);
+        if (SUCCEEDED(hr)) hr = operation->DeleteItems(group);
+        if (SUCCEEDED(hr)) hr = operation->PerformOperations();
+        operation->Release();
+    } else {
+        Wh_Log(L"IFileOperation unavailable: 0x%08X", hr);
+    }
+    group->Release();
 }
 
+// 上游 1.1.0：删除线程需要 STA（IFileOperation），因此初始化 COM 并泵消息。
 DWORD WINAPI DragDelDeleteWorkerThread(LPVOID) {
+    HRESULT comResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    if (FAILED(comResult)) {
+        Wh_Log(L"Cannot initialize COM apartment: 0x%08X", comResult);
+        return 0;
+    }
     HANDLE handles[2] = { g_DragDelDeleteStopEvent, g_DragDelDeleteQueueEvent };
     while (true) {
-        DWORD wait = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+        DWORD wait = MsgWaitForMultipleObjectsEx(2, handles, INFINITE,
+                                                 QS_ALLINPUT,
+                                                 MWMO_INPUTAVAILABLE);
+        if (wait == WAIT_OBJECT_0 + 2) {
+            MSG msg = {};
+            while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+                if (msg.message != WM_QUIT) {
+                    TranslateMessage(&msg);
+                    DispatchMessageW(&msg);
+                }
+            }
+            continue;
+        }
         if (wait == WAIT_OBJECT_0) {
             EnterCriticalSection(&g_DragDelDeleteCs);
             auto queueCopy = std::move(g_DragDelDeleteQueue);
@@ -13914,15 +14488,323 @@ DWORD WINAPI DragDelDeleteWorkerThread(LPVOID) {
             break;
         }
     }
+    CoUninitialize();
     return 0;
+}
+
+// 上游 1.1.0：全屏窗口置顶修复——悬浮目标被全屏窗口盖住时重新置顶。
+static void DragDelRestoreZOrder(HWND hWnd, bool force) {
+    if (!IsWindowVisible(hWnd)) return;
+    bool mustRaise =
+        force || !(GetWindowLongPtrW(hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST);
+    if (!mustRaise) {
+        RECT overlayBounds = {};
+        if (GetWindowRect(hWnd, &overlayBounds)) {
+            for (HWND above = GetWindow(hWnd, GW_HWNDPREV); above;
+                 above = GetWindow(above, GW_HWNDPREV)) {
+                if (above == hWnd) continue;
+                if (!IsWindowVisible(above) || IsIconic(above)) continue;
+                wchar_t className[64] = {};
+                GetClassNameW(above, className, ARRAYSIZE(className));
+                if (wcscmp(className, L"SysDragImage") == 0 ||
+                    wcscmp(className, L"tooltips_class32") == 0) {
+                    continue;
+                }
+                RECT otherBounds = {}, intersection = {};
+                if (GetWindowRect(above, &otherBounds) &&
+                    IntersectRect(&intersection, &overlayBounds, &otherBounds)) {
+                    mustRaise = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (mustRaise) {
+        SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+    }
+}
+
+// 上游 1.1.0：按圆形中心反推窗口原点，并限制在工作区内。
+static void DragDelSetOriginForCenter(POINT center) {
+    float scale = g_DragDelCurrentDpiScale;
+    int wndWidth = DragDelWindowWidth(scale);
+    int wndHeight = DragDelWindowHeight(scale);
+    int margin = (int)(8 * scale);
+    int minX = g_DragDelTargetWorkArea.left + margin;
+    int minY = g_DragDelTargetWorkArea.top + margin;
+    int maxX = std::max(minX,
+                         (int)(g_DragDelTargetWorkArea.right - margin - wndWidth));
+    int maxY = std::max(
+        minY, (int)(g_DragDelTargetWorkArea.bottom - margin - wndHeight));
+    g_DragDelOverlayOrigin.x = std::clamp(
+        (int)center.x - (int)DragDelCircleCenterX(scale), minX, maxX);
+    g_DragDelOverlayOrigin.y = std::clamp(
+        (int)center.y - (int)DragDelCircleCenterY(scale), minY, maxY);
+}
+
+// 上游 1.1.0：三种放置模式（跟随光标 / 起始点附近 / 屏幕顶部）。
+static void DragDelComputeInitialPlacement(POINT ptCursor) {
+    float scale = g_DragDelCurrentDpiScale;
+    int wndWidth = DragDelWindowWidth(scale);
+    int wndHeight = DragDelWindowHeight(scale);
+    int margin = (int)(8 * scale);
+
+    if (DragDelSettings.placement == L"top") {
+        // 屏幕顶部居中（本地原有行为，顶部边距可调）。
+        g_DragDelOverlayOrigin.x =
+            g_DragDelTargetWorkArea.left +
+            (g_DragDelTargetWorkArea.right - g_DragDelTargetWorkArea.left -
+             wndWidth) /
+                2;
+        g_DragDelOverlayOrigin.y =
+            g_DragDelTargetWorkArea.top +
+            (int)(DragDelSettings.topMargin * scale);
+        return;
+    }
+
+    bool desktop =
+        InterlockedCompareExchange(&g_DragDelDragFromDesktop, 0, 0) != 0;
+    int distance =
+        desktop ? DragDelSettings.desktopDistance : DragDelSettings.folderDistance;
+    int offsetX = (int)(distance * scale);
+    int offsetY = (int)(distance * scale * (desktop ? 1.0f : 0.94f));
+
+    int centerX = ptCursor.x + offsetX;
+    int centerY = ptCursor.y - offsetY;
+    if (centerX + wndWidth / 2 > g_DragDelTargetWorkArea.right - margin)
+        centerX = ptCursor.x - offsetX;
+    if (centerY - wndHeight / 2 < g_DragDelTargetWorkArea.top + margin)
+        centerY = ptCursor.y + offsetY;
+
+    DragDelSetOriginForCenter(POINT{centerX, centerY});
+}
+
+// 上游 1.1.0：跟随模式下自动隐藏后重新定位。
+static void DragDelRepositionFollowTarget(POINT pt) {
+    HMONITOR monitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = { sizeof(mi) };
+    if (GetMonitorInfoW(monitor, &mi)) g_DragDelTargetWorkArea = mi.rcWork;
+    g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(monitor) / 96.0f;
+
+    const float scale = g_DragDelCurrentDpiScale;
+    const bool desktop =
+        InterlockedCompareExchange(&g_DragDelDragFromDesktop, 0, 0) != 0;
+    const int offset =
+        desktop ? DragDelSettings.desktopDistance : DragDelSettings.folderDistance;
+    const int ox = (int)(offset * scale);
+    const int oy = (int)(offset * (desktop ? 1.0f : 0.94f) * scale);
+    const int margin = (int)(8 * scale);
+    int centerX = pt.x + ox;
+    int centerY = pt.y - oy;
+    if (centerX + DragDelWindowWidth(scale) / 2 >
+        g_DragDelTargetWorkArea.right - margin)
+        centerX = pt.x - ox;
+    if (centerY - DragDelWindowHeight(scale) / 2 <
+        g_DragDelTargetWorkArea.top + margin)
+        centerY = pt.y + oy;
+    DragDelSetOriginForCenter(POINT{centerX, centerY});
+    g_DragDelLastCursor = pt;
+    g_DragDelHaveLastCursor = true;
+}
+
+// 上游 1.1.0：跟随光标（带缓动与“捕获”保护，避免目标把光标推开）。
+static bool DragDelFollowCursor() {
+    if (DragDelSettings.placement != L"follow" ||
+        g_DragDelAnimState != DragDelAnimState::VISIBLE ||
+        !g_DragDelHaveLastCursor || g_DragDelCurrentScale < 0.5f ||
+        g_DragDelTargetScale > 1.02f) {
+        return false;
+    }
+
+    POINT pt = {};
+    if (!GetCursorPos(&pt)) return false;
+    int deltaX = pt.x - g_DragDelLastCursor.x;
+    int deltaY = pt.y - g_DragDelLastCursor.y;
+    g_DragDelLastCursor = pt;
+    if (!deltaX && !deltaY) return false;
+
+    // 动态 DPI：跨显示器时按目标显示器的缩放重新计算。
+    HMONITOR mon = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = { sizeof(mi) };
+    if (GetMonitorInfoW(mon, &mi)) g_DragDelTargetWorkArea = mi.rcWork;
+    g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(mon) / 96.0f;
+
+    float scale = g_DragDelCurrentDpiScale;
+    int wndWidth = DragDelWindowWidth(scale);
+    int wndHeight = DragDelWindowHeight(scale);
+    int centerX = g_DragDelOverlayOrigin.x + (int)DragDelCircleCenterX(scale);
+    int centerY = g_DragDelOverlayOrigin.y + (int)DragDelCircleCenterY(scale);
+    int toCenterX = centerX - pt.x;
+    int toCenterY = centerY - pt.y;
+    float capture = (DragDelSettings.iconSize / 2.0f + 22.0f) * scale;
+    if (toCenterX * toCenterX + toCenterY * toCenterY < capture * capture)
+        return false;
+    if (deltaX * toCenterX + deltaY * toCenterY > 0) return false;
+
+    bool desktop =
+        InterlockedCompareExchange(&g_DragDelDragFromDesktop, 0, 0) != 0;
+    int distance =
+        desktop ? DragDelSettings.desktopDistance : DragDelSettings.folderDistance;
+    int offsetX = (int)(distance * scale);
+    int offsetY = (int)(distance * scale * (desktop ? 1.0f : 0.94f));
+    int idealX = pt.x + offsetX;
+    int idealY = pt.y - offsetY;
+    int margin = (int)(8 * scale);
+    if (idealX + wndWidth / 2 > g_DragDelTargetWorkArea.right - margin)
+        idealX = pt.x - offsetX;
+    if (idealY - wndHeight / 2 < g_DragDelTargetWorkArea.top + margin)
+        idealY = pt.y + offsetY;
+
+    int minX = g_DragDelTargetWorkArea.left + margin;
+    int minY = g_DragDelTargetWorkArea.top + margin;
+    int maxX = std::max(minX,
+                         (int)(g_DragDelTargetWorkArea.right - margin - wndWidth));
+    int maxY = std::max(
+        minY, (int)(g_DragDelTargetWorkArea.bottom - margin - wndHeight));
+    int goalX = std::clamp(idealX - (int)DragDelCircleCenterX(scale), minX, maxX);
+    int goalY = std::clamp(idealY - (int)DragDelCircleCenterY(scale), minY, maxY);
+    int diffX = goalX - g_DragDelOverlayOrigin.x;
+    int diffY = goalY - g_DragDelOverlayOrigin.y;
+    if (abs(diffX) + abs(diffY) < 3) return false;
+    int stepX = (int)(diffX * 0.38f);
+    int stepY = (int)(diffY * 0.38f);
+    if (!stepX && diffX) stepX = diffX > 0 ? 1 : -1;
+    if (!stepY && diffY) stepY = diffY > 0 ? 1 : -1;
+    g_DragDelOverlayOrigin.x += stepX;
+    g_DragDelOverlayOrigin.y += stepY;
+    return true;
+}
+
+// 上游 1.1.0：拖得太远时悬浮目标淡出。
+static bool DragDelUpdateAutoHide(HWND hWnd) {
+    if (g_DragDelAnimState != DragDelAnimState::VISIBLE ||
+        DragDelSettings.placement == L"top" ||
+        DragDelSettings.autoHideDistance == 0 || g_DragDelTargetScale == 0.0f) {
+        return false;
+    }
+
+    POINT cursor = {};
+    if (!GetCursorPos(&cursor)) return false;
+    const float scale = g_DragDelCurrentDpiScale;
+    // 与上游 1.1.0 的一处偏差：上游在「跟随光标」模式下以“拖拽起点”为锚点，
+    // 结果是拖动超过 autoHideDistance 后目标淡出且再也回不来（跟随模式下目标
+    // 始终跟着光标，本就不该淡出）。这里统一以目标自身中心为锚点：
+    // 「起始点附近」模式下即拖远了就淡出、靠近又回来；「跟随光标」模式下
+    // 光标始终贴着目标，因此不会误淡出。
+    const POINT anchor = POINT{
+        g_DragDelOverlayOrigin.x + (int)DragDelCircleCenterX(scale),
+        g_DragDelOverlayOrigin.y + (int)DragDelCircleCenterY(scale)};
+
+    const LONGLONG dx = (LONGLONG)cursor.x - anchor.x;
+    const LONGLONG dy = (LONGLONG)cursor.y - anchor.y;
+    const LONGLONG distanceSquared = dx * dx + dy * dy;
+
+    const float configuredHide = DragDelSettings.autoHideDistance * scale;
+    const float hideRadius =
+        (DragDelSettings.placement == L"nearby")
+            ? std::max(configuredHide,
+                       g_DragDelAutoHideInitialDistance +
+                           (DRAGDEL_BASE_HIT_MARGIN + 32.0f) * scale)
+            : configuredHide;
+    const float restoreRadius =
+        std::max(32.0f * scale,
+                 hideRadius - std::min(90.0f * scale, hideRadius * 0.35f));
+    const bool isFar = (float)distanceSquared > hideRadius * hideRadius;
+    const bool isNear = (float)distanceSquared < restoreRadius * restoreRadius;
+    const ULONGLONG now = GetTickCount64();
+    bool repositioned = false;
+    const bool hovering =
+        InterlockedCompareExchange(&g_DragDelHovering, 0, 0) != 0;
+
+    if (!g_DragDelAutoHideConcealed) {
+        if (isFar && !hovering) {
+            if (!g_DragDelAutoHideDistantSince)
+                g_DragDelAutoHideDistantSince = now;
+            if (now - g_DragDelAutoHideDistantSince >= 150) {
+                g_DragDelAutoHideConcealed = true;
+                g_DragDelAutoHideFadeStart = g_DragDelAutoHideOpacity;
+                g_DragDelAutoHideFadeTarget = 0.0f;
+                g_DragDelAutoHideFadeStarted = now;
+            }
+        } else {
+            g_DragDelAutoHideDistantSince = 0;
+        }
+    } else if (isNear || hovering) {
+        g_DragDelAutoHideConcealed = false;
+        g_DragDelAutoHideDistantSince = 0;
+        g_DragDelAutoHideFadeStart = g_DragDelAutoHideOpacity;
+        g_DragDelAutoHideFadeTarget = 1.0f;
+        g_DragDelAutoHideFadeStarted = now;
+        if (DragDelSettings.placement == L"follow") {
+            DragDelRepositionFollowTarget(cursor);
+            repositioned = true;
+        }
+    }
+
+    const float previousOpacity = g_DragDelAutoHideOpacity;
+    if (g_DragDelAutoHideOpacity != g_DragDelAutoHideFadeTarget) {
+        const float progress = std::min(
+            1.0f, (float)(now - g_DragDelAutoHideFadeStarted) / 120.0f);
+        g_DragDelAutoHideOpacity =
+            g_DragDelAutoHideFadeStart +
+            (g_DragDelAutoHideFadeTarget - g_DragDelAutoHideFadeStart) * progress;
+        if (progress >= 1.0f) g_DragDelAutoHideOpacity = g_DragDelAutoHideFadeTarget;
+    }
+
+    if (g_DragDelAutoHideOpacity <= 0.0f && !g_DragDelAutoHideWindowHidden) {
+        g_DragDelAutoHideOpacity = 0.0f;
+        ShowWindow(hWnd, SW_HIDE);
+        g_DragDelAutoHideWindowHidden = true;
+    } else if (g_DragDelAutoHideOpacity > 0.0f && g_DragDelAutoHideWindowHidden) {
+        g_DragDelAutoHideWindowHidden = false;
+        ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+        DragDelRestoreZOrder(hWnd, true);
+    }
+    return repositioned || previousOpacity != g_DragDelAutoHideOpacity;
 }
 
 LRESULT CALLBACK DragDelOverlayWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
+        // FIX（Bandizip 兼容）：拖放目标由本线程（窗口所属线程）注册/撤销。
+        // 注册只持续一次拖放，拖放结束后钩子会再发 REVOKE，不常驻。
+        case DRAGDEL_WM_REGISTER_DROP_TARGET: {
+            if (!g_DragDelDropTarget) {
+                g_DragDelDropTarget = new DragDelRecycleDropTarget();
+            }
+            if (g_DragDelDropTarget) {
+                // 同一次拖放里重复注册时先撤销再注册，保证返回值可判定。
+                RevokeDragDrop(hWnd);
+                if (FAILED(RegisterDragDrop(hWnd, g_DragDelDropTarget))) {
+                    Wh_Log(L"RegisterDragDrop failed: %08X (thread %u)",
+                           (unsigned)GetLastError(), (unsigned)GetCurrentThreadId());
+                }
+            }
+            return 0;
+        }
+
+        case DRAGDEL_WM_REVOKE_DROP_TARGET: {
+            RevokeDragDrop(hWnd);
+            return 0;
+        }
+
         case DRAGDEL_WM_UPDATE_DRAG_STATE: {
             if (wParam != 0) {
+                // wParam 位标志：1 = 开始拖放，2 = 来自桌面，4 = 来自搜索结果。
+                InterlockedExchange(&g_DragDelDragFromDesktop, (wParam & 2) ? 1 : 0);
+                InterlockedExchange(&g_DragDelDragFromSearch, (wParam & 4) ? 1 : 0);
+
                 POINT ptCursor;
                 GetCursorPos(&ptCursor);
+                g_DragDelAutoHideDragStart = ptCursor;
+                g_DragDelAutoHideConcealed = false;
+                g_DragDelAutoHideWindowHidden = false;
+                g_DragDelAutoHideDistantSince = 0;
+                g_DragDelAutoHideFadeStarted = GetTickCount64();
+                g_DragDelAutoHideFadeStart = 1.0f;
+                g_DragDelAutoHideFadeTarget = 1.0f;
+                g_DragDelAutoHideOpacity = 1.0f;
+
                 HMONITOR hMon = MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST);
                 MONITORINFO mi = { sizeof(mi) };
                 if (GetMonitorInfoW(hMon, &mi)) {
@@ -13932,22 +14814,65 @@ LRESULT CALLBACK DragDelOverlayWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 }
 
                 g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(hMon) / 96.0f;
+
+                DragDelComputeInitialPlacement(ptCursor);
+
+                float initDx = (float)ptCursor.x -
+                               ((float)g_DragDelOverlayOrigin.x +
+                                DragDelCircleCenterX(g_DragDelCurrentDpiScale));
+                float initDy = (float)ptCursor.y -
+                               ((float)g_DragDelOverlayOrigin.y +
+                                DragDelCircleCenterY(g_DragDelCurrentDpiScale));
+                g_DragDelAutoHideInitialDistance =
+                    sqrtf(initDx * initDx + initDy * initDy);
+
+                g_DragDelLastCursor = ptCursor;
+                g_DragDelHaveLastCursor = true;
+                InterlockedExchange(&g_DragDelHovering, 0);
+                g_DragDelLastRenderedHover = false;
+
+                // 上游 1.1.0：系统回收站图标按当前 DPI 重新生成。
+                int desiredPx =
+                    (int)(DragDelSettings.iconSize * g_DragDelCurrentDpiScale + 0.5f);
+                if (DragDelSettings.iconSource == L"system") {
+                    if (g_DragDelSystemIcon) DestroyIcon(g_DragDelSystemIcon);
+                    g_DragDelSystemIcon =
+                        DragDelGetSystemRecycleBinIcon(desiredPx);
+                }
+
                 g_DragDelAnimState = DragDelAnimState::VISIBLE;
                 g_DragDelCurrentScale = 0.3f;
                 g_DragDelTargetScale = 1.0f;
                 g_DragDelLastRenderedScale = -1.0f;
-                ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+
+                DragDelRenderFrame(hWnd);
+                g_DragDelLastRenderedScale = g_DragDelCurrentScale;
+
+                SetWindowPos(hWnd, HWND_TOPMOST, g_DragDelOverlayOrigin.x,
+                             g_DragDelOverlayOrigin.y,
+                             DragDelWindowWidth(g_DragDelCurrentDpiScale),
+                             DragDelWindowHeight(g_DragDelCurrentDpiScale),
+                             SWP_NOACTIVATE | SWP_SHOWWINDOW);
+                DragDelRestoreZOrder(hWnd, true);
                 SetTimer(hWnd, DRAGDEL_TIMER_ANIM, 16, nullptr);
             } else {
                 if (g_DragDelAnimState != DragDelAnimState::DROPPED) {
                     g_DragDelTargetScale = 0.0f;
                 }
+                InterlockedExchange(&g_DragDelDragFromDesktop, 0);
+                InterlockedExchange(&g_DragDelDragFromSearch, 0);
             }
             return 0;
         }
 
         case WM_TIMER: {
             if (wParam == DRAGDEL_TIMER_ANIM) {
+                static unsigned zOrderCheck = 0;
+                if (g_DragDelAnimState == DragDelAnimState::VISIBLE &&
+                    ++zOrderCheck % 6 == 0) {
+                    DragDelRestoreZOrder(hWnd, false);
+                }
+
                 if (abs((int)((g_DragDelTargetScale - g_DragDelCurrentScale) * 1000.0f)) < 5) {
                     g_DragDelCurrentScale = g_DragDelTargetScale;
                 } else {
@@ -13958,11 +14883,25 @@ LRESULT CALLBACK DragDelOverlayWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                     g_DragDelAnimState = DragDelAnimState::HIDDEN;
                     KillTimer(hWnd, DRAGDEL_TIMER_ANIM);
                     ShowWindow(hWnd, SW_HIDE);
+                    if (g_DragDelSystemIcon) {
+                        DestroyIcon(g_DragDelSystemIcon);
+                        g_DragDelSystemIcon = nullptr;
+                    }
+                    InterlockedExchange(&g_DragDelHovering, 0);
                     return 0;
                 }
 
-                if (g_DragDelCurrentScale != g_DragDelLastRenderedScale) {
+                bool opacityChanged = DragDelUpdateAutoHide(hWnd);
+                bool moved = !g_DragDelAutoHideConcealed && DragDelFollowCursor();
+                bool hoverChanged =
+                    (InterlockedCompareExchange(&g_DragDelHovering, 0, 0) != 0) !=
+                    g_DragDelLastRenderedHover;
+
+                if (opacityChanged || moved || hoverChanged ||
+                    g_DragDelCurrentScale != g_DragDelLastRenderedScale) {
                     g_DragDelLastRenderedScale = g_DragDelCurrentScale;
+                    g_DragDelLastRenderedHover =
+                        InterlockedCompareExchange(&g_DragDelHovering, 0, 0) != 0;
                     DragDelRenderFrame(hWnd);
                 }
             }
@@ -13971,6 +14910,7 @@ LRESULT CALLBACK DragDelOverlayWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
         case WM_DESTROY: {
             KillTimer(hWnd, DRAGDEL_TIMER_ANIM);
+            // 无条件的 RevokeDragDrop 是安全的：未注册时它只返回错误，不改变状态。
             RevokeDragDrop(hWnd);
             return 0;
         }
@@ -14004,8 +14944,8 @@ DWORD WINAPI DragDelOverlayUIThread(LPVOID) {
     HMONITOR hPrimary = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
     g_DragDelCurrentDpiScale = (float)DragDelGetMonitorDpi(hPrimary) / 96.0f;
 
-    int wndWidth = (int)(DRAGDEL_BASE_WND_WIDTH * g_DragDelCurrentDpiScale);
-    int wndHeight = (int)(DRAGDEL_BASE_WND_HEIGHT * g_DragDelCurrentDpiScale);
+    int wndWidth = DragDelWindowWidth(g_DragDelCurrentDpiScale);
+    int wndHeight = DragDelWindowHeight(g_DragDelCurrentDpiScale);
     int topY = (int)(DRAGDEL_BASE_TOP_Y * g_DragDelCurrentDpiScale);
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 
@@ -14025,11 +14965,11 @@ DWORD WINAPI DragDelOverlayUIThread(LPVOID) {
         return 0;
     }
 
+    // FIX: 不在窗口创建时常驻 RegisterDragDrop（会改变 explorer 的 OLE 状态、
+    // 干扰 Bandizip 现代右键菜单）。DropTarget 对象与注册都推迟到每次拖放开始
+    // 时由 DRAGDEL_WM_REGISTER_DROP_TARGET 在本线程内建立，拖放结束再撤销。
+    // 上游 1.1.0 在这里常驻注册，本地整合版**不要**照抄。
     g_DragDelDropTarget = new DragDelRecycleDropTarget();
-    HRESULT hrDrop = RegisterDragDrop(g_DragDelOverlayWnd, g_DragDelDropTarget);
-    if (FAILED(hrDrop)) {
-        Wh_Log(L"RegisterDragDrop failed with HRESULT 0x%08X", hrDrop);
-    }
 
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         TranslateMessage(&msg);
@@ -14048,6 +14988,11 @@ DWORD WINAPI DragDelOverlayUIThread(LPVOID) {
         g_DragDelDropTarget = nullptr;
     }
 
+    if (g_DragDelSystemIcon) {
+        DestroyIcon(g_DragDelSystemIcon);
+        g_DragDelSystemIcon = nullptr;
+    }
+
     GdiplusShutdown(g_DragDelGdiplusToken);
     OleUninitialize();
     return 0;
@@ -14057,24 +15002,38 @@ using DragDelDoDragDrop_t = decltype(&DoDragDrop);
 static DragDelDoDragDrop_t g_DragDelOriginalDoDragDrop = nullptr;
 
 HRESULT WINAPI DragDelHookedDoDragDrop(IDataObject* pDataObj, IDropSource* pDropSource, DWORD dwOKEffects, LPDWORD pdwEffect) {
-    bool bIsFileDrag = false;
-    if (pDataObj) {
-        FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-        bIsFileDrag = (pDataObj->QueryGetData(&fmt) == S_OK);
-    }
+    // 上游 1.1.0：同时识别 CF_HDROP 与桌面 Shell 项（CFSTR_SHELLIDLIST），
+    // 并过滤没有文件系统属性的虚拟项。
+    bool bIsFileDrag = DragDelHasFileDragFormat(pDataObj);
 
     // 计数严格对称（wasCounted 配对增减），总开关只控制悬浮目标的显示：
     // 关闭时拖放行为与系统完全一致，开关切换即时生效且无残留状态。
     bool wasCounted = false;
+    bool requestedRegistration = false;
     if (bIsFileDrag) {
         wasCounted = InterlockedIncrement(&g_DragDelActiveDrags) == 1;
+        // FIX: 仅在文件拖放期间临时注册拖放目标，避免常驻注册干扰右键菜单。
+        // FIX: 注册只能在其窗口所属线程（覆盖窗口的 UI 线程）上做，这里只投递
+        // 消息，由 UI 线程在该消息里调用 RegisterDragDrop；本线程不直接调用。
+        if (wasCounted && g_DragDelOverlayWnd) {
+            requestedRegistration =
+                PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_REGISTER_DROP_TARGET, 0, 0) != 0;
+        }
         if (wasCounted && DragDelSettings.enable && g_DragDelOverlayWnd) {
-            PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_UPDATE_DRAG_STATE, 1, 0);
+            // 上游 1.1.0：识别桌面拖放与搜索结果拖放（影响放置距离与效果）。
+            bool fromSearch = DragDelIsSearchDragStart() && (dwOKEffects & DROPEFFECT_COPY);
+            bool fromDesktop = !fromSearch && DragDelIsDesktopDragStart();
+            PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_UPDATE_DRAG_STATE,
+                         1 | (fromDesktop ? 2 : 0) | (fromSearch ? 4 : 0), 0);
         }
     }
 
     HRESULT hr = g_DragDelOriginalDoDragDrop(pDataObj, pDropSource, dwOKEffects, pdwEffect);
 
+    if (requestedRegistration && g_DragDelOverlayWnd) {
+        // 撤销同样交回 UI 线程；拖放已结束，OLE 不会再向目标投递事件。
+        PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_REVOKE_DROP_TARGET, 0, 0);
+    }
     if (bIsFileDrag && wasCounted && InterlockedDecrement(&g_DragDelActiveDrags) == 0 && g_DragDelOverlayWnd) {
         PostMessageW(g_DragDelOverlayWnd, DRAGDEL_WM_UPDATE_DRAG_STATE, 0, 0);
     }
@@ -14117,10 +15076,18 @@ static BOOL DragDelInit() {
         return FALSE;
     }
 
-    if (!WindhawkUtils::SetFunctionHook(DoDragDrop, DragDelHookedDoDragDrop, &g_DragDelOriginalDoDragDrop)) {
-        Wh_Log(L"Failed to hook DoDragDrop");
-        DragDelUninit();
-        return FALSE;
+    // DoDragDrop 是全局 shell API，会拦截所有进程的拖放入口。仅在
+    // 拖放删除功能开启时安装该钩子，避免功能关闭时仍常驻一个全局
+    // shell 钩子——多个模组同时运行时，常驻全局钩子叠加是新右键
+    // 菜单命令派发被干扰的可疑入口。关闭时保持系统原生 DoDragDrop。
+    if (DragDelSettings.enable) {
+        if (!WindhawkUtils::SetFunctionHook(DoDragDrop, DragDelHookedDoDragDrop, &g_DragDelOriginalDoDragDrop)) {
+            Wh_Log(L"Failed to hook DoDragDrop");
+            DragDelUninit();
+            return FALSE;
+        }
+    } else {
+        Wh_Log(L"dragDel disabled, DoDragDrop hook not installed");
     }
 
     return TRUE;
@@ -14238,7 +15205,7 @@ protected:
 } g_DblUpComInitializer;
 
 std::vector<DblUpExplorerWrapper> g_DblUpWrappers;
-static winrt::com_ptr<IUIAutomation> g_DblUpUIAutomation;
+// FIX: 已移除常驻 g_DblUpUIAutomation；UIA 改为回调内按需创建。
 
 // 双击判定设置：intervalMs 为两次单击的最大间隔（0 表示跟随系统设置），
 // modifier 为必须按住的辅助键（0 不需要，1 Ctrl，2 Alt，3 Shift）。
@@ -14383,7 +15350,12 @@ LRESULT CALLBACK DblUpDUISubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
         GetCursorPos(&mousePos);
 
         winrt::com_ptr<IUIAutomationElement> pElement = NULL;
-        if (SUCCEEDED(g_DblUpUIAutomation->ElementFromPoint(mousePos, pElement.put())) && pElement) {
+        winrt::com_ptr<IUIAutomation> tempAutomation;
+        if (FAILED(CoCreateInstance(CLSID_CUIAutomation, NULL, CLSCTX_INPROC_SERVER,
+                                    __uuidof(IUIAutomation), tempAutomation.put_void()))) {
+            return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        }
+        if (SUCCEEDED(tempAutomation->ElementFromPoint(mousePos, pElement.put())) && pElement) {
             _bstr_t _className;
             if (SUCCEEDED(pElement->get_CurrentClassName(_className.GetAddress()))) {
                 wchar_t* className = _className.GetBSTR();
@@ -14663,13 +15635,9 @@ static BOOL Init() {
         Wh_Log(L"COM initialization failed");
         return FALSE;
     }
-    if (
-        FAILED(CoCreateInstance(CLSID_CUIAutomation, NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), g_DblUpUIAutomation.put_void())) ||
-        !g_DblUpUIAutomation
-    ) {
-        Wh_Log(L"Failed to create UIAutomation COM instance");
-        return FALSE;
-    }
+    // FIX: 不再在初始化时创建常驻 UIAutomation 对象。常驻 UIA 会干扰 Bandizip
+    // 现代右键菜单的命令派发；现改为每次鼠标回调内临时创建、用完立即释放。
+
 
     LoadSettings();
     // 激活（枚举挂接现有窗口）放在合并层 Wh_ModAfterInit 的 AfterInit 中进行，
@@ -14863,32 +15831,39 @@ BOOL Wh_ModInit() {
             Wh_Log(L"InfoBar group disabled by infoBar.enable");
         }
 
-        // ── DragDel（拖拽删除）：仅 explorer.exe，始终初始化（总开关运行时短路）──
-        bool dragDelOk = DragDelInit() != FALSE;
-        if (!dragDelOk) {
-            Wh_Log(L"DragDel (drag to delete) init failed, continuing without it");
+        // ── DragDel（拖拽删除）：仅 explorer.exe，总开关开启时才初始化 ──
+        // DoDragDrop 全局钩子与常驻置顶覆盖窗口均在 DragDelInit 内建立；
+        // OLE 拖放目标**不在**这里注册——只在文件拖放期间临时注册、结束立即
+        // 撤销（见 DragDelHookedDoDragDrop）。仅在 dragDel.enable 开启时初始化，
+        // 避免功能关闭时仍常驻全局 shell 钩子与置顶窗口，干扰右键菜单等无关窗口。
+        if (Wh_GetIntSetting(L"dragDel.enable")) {
+            bool dragDelOk = DragDelInit() != FALSE;
+            if (!dragDelOk) {
+                Wh_Log(L"DragDel (drag to delete) init failed, continuing without it");
+            } else {
+                g_dragDelInited = true;
+                anyOk = true;
+            }
         } else {
-            g_dragDelInited = true;
-            anyOk = true;
+            Wh_Log(L"DragDel group disabled by dragDel.enable");
         }
 
         // ── DblUp（双击返回上级）：仅 explorer.exe，需 CreateWindowExW 钩子 ──
-        bool dblUpHookOk = DblUpInstallCreateWindowExWHook() != FALSE;
-        if (!dblUpHookOk) Wh_Log(L"DblUp CreateWindowExW hook failed");
-
-        bool dblUpOk = dblUpHookOk && Wh_GetIntSetting(L"dblUp.enable") &&
-                       DblUp::Init() != FALSE;
-        if (!dblUpOk) {
+        // CreateWindowExW 是全局窗口创建 API，对 explorer 内所有新建窗口（含
+        // 新右键菜单的命令派发窗口）都会经过此钩子。仅在 dblUp.enable 开启时
+        // 安装，避免功能关闭时仍常驻一个全局钩子，干扰右键菜单等无关窗口。
+        if (Wh_GetIntSetting(L"dblUp.enable")) {
+            bool dblUpHookOk = DblUpInstallCreateWindowExWHook() != FALSE;
             if (!dblUpHookOk) {
-                Wh_Log(L"DblUp group disabled by shared hook failure");
-            } else if (!Wh_GetIntSetting(L"dblUp.enable")) {
-                Wh_Log(L"DblUp group disabled by dblUp.enable");
+                Wh_Log(L"DblUp CreateWindowExW hook failed");
+            } else if (DblUp::Init() != FALSE) {
+                g_dblUpInited = true;
+                anyOk = true;
             } else {
                 Wh_Log(L"DblUp (double-click up) init failed, continuing without it");
             }
         } else {
-            g_dblUpInited = true;
-            anyOk = true;
+            Wh_Log(L"DblUp group disabled by dblUp.enable");
         }
 
     } else {

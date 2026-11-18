@@ -1,4 +1,4 @@
-﻿// ==WindhawkMod==
+// ==WindhawkMod==
 // @id              hw-shake-find-cursor
 // @name            HW-晃动找指针（注入版）
 // @name:zh-CN      HW-晃动找指针（注入版）

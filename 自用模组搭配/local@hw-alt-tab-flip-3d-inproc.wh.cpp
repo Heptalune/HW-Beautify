@@ -1,4 +1,4 @@
-﻿// ==WindhawkMod==
+// ==WindhawkMod==
 // @id              hw-alt-tab-flip-3d-inproc
 // @name            HW-窗口切换动画（Vista 风格）（注入版）
 // @name:zh-CN      HW-窗口切换动画（Vista 风格）（注入版）

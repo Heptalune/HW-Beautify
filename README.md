@@ -15,13 +15,15 @@
 | `社区模组汉化\功能添加\`          | 从社区搜集并汉化的功能增强类模组（29 个），附 `功能添加 模组介绍.md`                                                    |
 | `ZenDesktop\`           | 收录的 [ZenDesktop](https://github.com/Liset999/ZenDesktop) 项目模组（11 个），附 `ZenDesktop 模组介绍.md` |
 | `自用模组搭配\`               | 本人电脑上实际搭配使用的一组模组源码（18 个）                                                                   |
-| `HW-修改版模组\`             | 经过本人修改、整合或兼容性修复的模组（11 个），附 `HW-修改版模组 模组介绍.md`                                              |
+| `HW-修改版模组\`             | 经过本人修改、整合或兼容性修复的模组（12 个），附 `HW-修改版模组 模组介绍.md`                                              |
 | `README.md`             | 本文件                                                                                        |
 | `restart_explorer.bat`  | 重启 Windows 资源管理器，用于刷新界面样式                                                                  |
 
+> 各目录内的模组介绍文档列出了每个模组的名称、ID、版本、作者、功能与来源，可直接查阅。
+
 ## 如何使用
 
-下面是一套完整的上手流程。本仓库第一版只提供模组源码，不含安装器或卸载器程序，因此从源码装入 Windhawk 需要用到 Windhawk 自带的命令行工具 `windhawk-cli.exe`。
+下面是一套完整的上手流程。本仓库只提供模组源码，不含安装器或卸载器程序，需要把 `.wh.cpp` 源码交给 Windhawk 编译安装。**Windhawk 2.0 测试版与 1.7.3 稳定版的安装方式差别很大**，请按自己实际安装的版本选择合适的方法，不要混用。
 
 ### 1. 安装 Windhawk
 
@@ -29,8 +31,24 @@
    - 在线版安装程序（运行需联网下载组件）：[`windhawk_setup.exe`](https://github.com/ramensoftware/windhawk/releases/latest/download/windhawk_setup.exe)
    - 离线版安装程序（已包含完整依赖，无需联网）：[`windhawk_setup_offline.exe`](https://github.com/ramensoftware/windhawk/releases/latest/download/windhawk_setup_offline.exe)
 2. 安装完成后确认 Windhawk 能正常启动。模组以 DLL 注入系统进程工作，需要 Windhawk 的服务与编译器组件处于可用状态。
+3. 确认版本号：打开 Windhawk → 右上角「关于」，或查看安装目录下的 `windhawk.ini`。版本决定后续用 CLI 还是 GUI，见下表。
 
-### 2. 挑选模组
+### 2. 两个版本的差异（重要）
+
+| 对比项 | 2.0 测试版 | 1.7.3 稳定版 |
+| --- | --- | --- |
+| 命令行工具 `windhawk-cli.exe` | **有**，安装目录下独立提供，支持 `mod install / list / enable / config` 等全部子命令 | **没有**，只有 `windhawk.exe` 主程序，命令行仅支持 `-tray-only`、`-exit`、`-restart` 等少量启动参数 |
+| 批量安装 | **支持**：CLI 循环调用 `mod install --file` 一次装入全部 | 不支持批量命令；把多个源码放进 `ModsSource` 后，需在 GUI 中逐个启用以触发编译 |
+| 源码目录 | 安装目录 `AppData\ModsSource\`，CLI 安装时会自动写入该目录 | 同样是 `AppData\ModsSource\`，但需要手动把源码复制进去 |
+| 装入/编译方式 | CLI 的 `mod install --file` 一步完成登记并编译，也可用 `--disabled` 先装后启用 | 只有 GUI：复制源码 → 重启 Windhawk 识别 → 在模组卡片上打开开关触发首次编译；或把 `.wh.cpp` 拖进 Windhawk 窗口安装 |
+| 启用/禁用/卸载 | CLI 命令 `mod enable/disable/remove`，可脚本化 | 只能在 GUI 的模组卡片上操作开关和「移除」按钮 |
+| 设置项的读取与修改 | CLI 的 `mod settings get/set`、`mod config get/set`，便于备份与核对 | 只能在 GUI 的模组详情页中调整 |
+| 模组列表查看 | CLI `mod list` 一行列出 ID、版本、启用状态 | GUI「已安装的 Mod」列表逐条查看 |
+| 与源码同步 | CLI 重新安装即用最新源码覆盖编译结果 | 修改源码后需回到 GUI 重新打开开关 / 重新编译，不会自动跟随文件变化 |
+
+> 判断依据很简单：**安装目录里有 `windhawk-cli.exe` 就是 2.0，没有就是 1.7.3**。本仓库源码本身同时兼容两个版本，`ModsSource` 目录结构也一致，只是安装操作的入口不同。
+
+### 3. 挑选模组
 
 1. 先翻阅各目录下的模组介绍文档，了解每个模组的功能、注入进程与来源：
    - `社区模组汉化\` 三个分类文件夹：按动画效果、外观美化、功能添加分类的社区汉化模组；
@@ -40,11 +58,9 @@
 2. 按需挑选，注意「同类模组不要同时开启」：接管任务栏、开始菜单、通知中心、Alt+Tab、右键菜单的模组，同一类只启用一个；注入版模组与对应的独立进程原版也不可同时开启。
 3. 记下要用的源码文件（`.wh.cpp`）。文件名带 `local@` 前缀表示装入后会以本地模组形式存在，这正是本仓库源码的默认形式。
 
-### 3. 把源码装入 Windhawk 并编译
+### 4. 把源码装入 Windhawk 并编译
 
-下面两种方式任选其一，效果相同：把 `.wh.cpp` 源码交给 Windhawk 登记为本地模组，并在首次启用时编译。
-
-#### 方式一：命令行（windhawk-cli.exe）
+#### 方式 A：Windhawk 2.0 测试版（推荐用 CLI，可批量）
 
 `windhawk-cli.exe` 位于 Windhawk 安装目录（例如 `C:\Program Files\Windhawk\`），打开命令行后执行：
 
@@ -52,38 +68,57 @@
 windhawk-cli.exe mod install --file "源码文件的完整路径" --disabled
 ```
 
-- `--file` 指向某个 `.wh.cpp` 源码，Windhawk 会对它进行本地编译；
+- `--file` 指向某个 `.wh.cpp` 源码，Windhawk 会本地编译并登记为本地模组；
 - `--disabled` 表示以**禁用**状态装入，不会立刻改动界面，便于逐个确认；
-- 需要一次装入多个时，对每个源码各执行一次该命令。
+- 需要一次装入多个时，对每个源码各执行一次该命令，例如批量装入 `自用模组搭配\` 目录：
 
-#### 方式二：手动复制到 ModsSource 目录
+```
+for %f in ("D:\GitHub Repositories\HW-Beautify\自用模组搭配\*.wh.cpp") do windhawk-cli.exe mod install --file "%f" --disabled
+```
 
-1. 找到 Windhawk 的 **ModsSource** 目录：默认在 Windhawk 安装目录下的 `AppData\ModsSource\`（例如 `C:\Program Files\Windhawk\AppData\ModsSource\`；若装在别处，就在对应安装目录里找 `AppData\ModsSource\`）。也可在 Windhawk 界面中打开模组源码存放位置来确认。
+- 首次装入即会编译；后续源码有更新时，重新执行一次 `mod install --file` 即可用新源码覆盖编译结果。
+
+#### 方式 B：Windhawk 1.7.3 稳定版（只有 GUI）
+
+1. 找到 Windhawk 安装目录下的 `AppData\ModsSource\`（例如 `D:\Beautify\Windhawk\AppData\ModsSource\`；若安装程序装在别处，就在对应目录里找）。
 2. 把挑选好的 `.wh.cpp` 源码**直接复制**进这个目录，保持原文件名（如 `local@hw-taskbar-plus.wh.cpp`），不要放进子目录、不要改名。
-3. 重启 Windhawk（或重启资源管理器），界面「已安装的 Mod」/「本地模组」列表中就会出现这些模组，源码即登记完成。
+3. **重启 Windhawk**（退出托盘图标再启动，或执行 `windhawk.exe -exit` 后重新打开）。重启后，界面「已安装的 Mod」列表中就会出现这些模组。
+4. 在每一个模组卡片上**打开开关**（首次打开时 Windhawk 才会编译该模组）。若只想登记不启用，可暂时保持关闭；关闭状态下不会编译、也不会改动界面。也可把 `.wh.cpp` 文件直接拖进 Windhawk 窗口，按提示安装。
+5. 逐个打开开关后，观察每个模组卡片是否出现编译错误提示；全部编译成功再继续使用。
 
-> 手动复制只是把源码放进 Windhawk 的模组源目录，同样不会自动启用；两种方式的后续启用步骤见下一节。带 `local@` 前缀的文件名表示本地模组，直接照原样复制即可。
+> 注意：1.7.3 中把源码放进 `ModsSource` **只是登记**，不会自动编译、也不会自动启用。模组卡片右上角若显示「斜杠眼睛」图标、开关呈灰色，表示尚未编译/未启用。修改源码后不会自动反映到已编译的 DLL，需重新触发编译（关闭再打开开关，或重新安装）。
 
-首次装入或首次启用时 Windhawk 会编译源码，请等待编译完成并确认没有报错。若提示编译失败，先检查网络与 Windhawk 符号服务；Windows 更新后建议重新编译一次。
+#### 编译失败的排查
 
-### 4. 启用模组
+- 确认网络通畅：Windhawk 编译时需要从符号服务器下载系统组件的符号，首次编译或 Windows 更新后尤其明显；
+- 确认 Windhawk 服务与编译器组件正常（在线版安装程序会下载编译器，离线版已自带）；
+- Windows 大版本更新后，建议把相关模组**全部重新编译一次**；
+- 若某个模组持续编译失败，先单独编译它看报错内容，多数情况是源码头部 `@compilerOptions` 引用的库缺失或系统版本不匹配。
 
-装入后的模组默认是关闭的，用以下任一方式启用：
+### 5. 启用模组
 
-- 命令行：`windhawk-cli.exe mod enable <模组 ID>`（模组 ID 即源码头部 `@id`，带 `local@` 前缀，例如 `local@hw-taskbar-plus`）；
-- 图形界面：打开 Windhawk →「已安装的 Mod」→ 找到对应模组 → 打开开关。
+- **2.0 测试版**：命令行 `windhawk-cli.exe mod enable <模组 ID>`（模组 ID 即源码头部 `@id`，带 `local@` 前缀，例如 `local@hw-taskbar-plus`）；也可在 GUI 中打开模组卡片开关。
+- **1.7.3 稳定版**：只能在 GUI 中打开模组卡片开关（见上一节）。
 
-建议逐个启用、每启用一个观察系统表现，确认无冲突、无异常后再启用下一个。命令行的 `mod list` 可随时查看已装入的模组与启用状态，`mod disable <模组 ID>` 可关闭，`mod remove <模组 ID> --yes` 可移除。
+建议逐个启用、每启用一个观察系统表现，确认无冲突、无异常后再启用下一个。2.0 中可用 `mod list` 随时查看已装入模组与启用状态，`mod disable <模组 ID>` 关闭，`mod remove <模组 ID> --yes` 移除；1.7.3 中这些操作都在 GUI 卡片上完成。
 
-### 5. 调整设置与刷新界面
+### 6. 调整设置与刷新界面
 
 - 每个模组的设置项在 Windhawk 的模组详情页 / Settings 标签页中调整；部分模组（如灵动岛类）的设置入口在模组自身界面内，详见各模组介绍文档与源文件头部说明。
+- 2.0 中可用 `mod settings get/set <模组 ID> <键名>=<值>` 读取和修改设置（注意是 `键=值` 格式），便于备份与批量调整；1.7.3 只能在 GUI 详情页里改。
 - 关闭模组后若界面仍有样式残留，运行本目录的 `restart_explorer.bat` 重启 Windows 资源管理器即可恢复。
 - 系统大版本更新后，若某模组失效，先在 Windhawk 中重新编译；仍不生效请查看该模组介绍中的兼容性说明。
 
+### 7. 在 2.0 与 1.7.3 之间切换版本
+
+- 两个版本共用 `AppData\ModsSource\` 目录结构，**源码可以直接沿用**。从 2.0 换到 1.7.3 时，只需把 `ModsSource` 中的 `.wh.cpp` 保留，在新版本中重启识别后逐个打开开关重新编译；从 1.7.3 换回 2.0 时，用 CLI 对同一批源码重新 `mod install --file` 即可。
+- **已编译的 DLL 不通用**：不同版本的引擎与编译器可能不同，换版本后必须重新编译，不要直接复制 `Engine\Mods\64\` 下的 `.whl` / `.dll`。
+- 模组**设置值不会自动迁移**：换版本后请按各模组介绍文档核对一遍设置，尤其是分组开关与自定义数值。
+- 卸载旧版本前，建议备份整个 `AppData\ModsSource\` 和 `userprofile.json`（含模组版本记录），以便恢复。
+
 ## 模组一览
 
-以下为 `HW-修改版模组\` 中由本人修改过的模组，版本统一为 `1.0.0`。详细功能、分组设置与修改说明见该目录下的 `HW-修改版模组 模组介绍.md` 及各源文件头部说明。
+以下为 `HW-修改版模组\` 中由本人修改过的模组，首发版本为 `1.0.0`，跟进上游更新后递增。详细功能、分组设置与修改说明见该目录下的 `HW-修改版模组 模组介绍.md` 及各源文件头部说明。
 
 | 模组 | 模组 ID | 版本 | 注入进程 | 主要用途 |
 | --- | --- | --- | --- | --- |
@@ -91,17 +126,19 @@ windhawk-cli.exe mod install --file "源码文件的完整路径" --disabled
 | HW-关闭/移除一些无用设置 | `hw-close-remove-unwanted` | 1.0.0 | explorer.exe | 二合一：关闭扩展名修改警告、移除「打开方式」中的 Microsoft Store 项 |
 | HW-桌面便捷设置 | `hw-desktop-convenience` | 1.0.0 | explorer.exe | 三合一：桌面图标隐藏、悬停「显示桌面」触发 Aero Peek、桌面框选淡出 |
 | HW-更好的文件管理器 | `hw-file-explorer-plus` | 1.0.0 | explorer.exe | 五合一：文件大小列、悬停信息、信息栏、拖拽删除、双击返回上级 |
-| HW-Mac 灵动岛与 Dock（注入版） | `hw-mac-island-dock` | 1.0.0 | explorer.exe | 顶部灵动岛与 macOS 风格 Dock，改为进程内运行 |
+| HW-Mac 灵动岛与 Dock（注入版） | `hw-mac-island-dock` | 1.1.0 | explorer.exe | 顶部灵动岛与 macOS 风格 Dock，改为进程内运行 |
 | HW-快速启动 Dock（注入版） | `hw-quick-launch-dock` | 1.0.0 | explorer.exe | 屏幕边缘的纤细动画快速启动 Dock，改为进程内运行 |
 | HW-晃动找指针（注入版） | `hw-shake-find-cursor` | 1.0.0 | explorer.exe | 晃动鼠标时临时放大光标以便定位，改为进程内运行 |
-| HW-更好的任务栏 | `hw-taskbar-plus` | 1.0.0 | explorer.exe | 六合一：等比缩放、计数角标、中键关闭、图标/显示动画、托盘悬停展开 |
-| HW-任务栏系统工具（兼容22h2） | `hw-taskbar-system-utilities` | 1.0.0 | explorer.exe | 任务栏右键菜单集成系统工具，修复 Windows 11 22H2 兼容性 |
-| HW-任务栏音量控制 | `hw-taskbar-volume-control` | 1.0.0 | explorer.exe、ShellExperienceHost.exe、SndVol.exe | 三合一：全局音量、媒体设备切换、分应用音量控制 |
+| HW-更好的任务栏 | `hw-taskbar-plus` | 1.1.0 | explorer.exe | 六合一：等比缩放、计数角标、中键关闭、图标/显示动画、托盘悬停展开 |
+| HW-任务栏系统工具（兼容22h2） | `hw-taskbar-system-utilities` | 1.1.0 | explorer.exe | 任务栏右键菜单集成系统工具，修复 Windows 11 22H2 兼容性 |
+| HW-任务栏系统工具（重制版） | `hw-taskbar-system-utilities-remaster` | 1.1.0 | explorer.exe | 任务栏系统工具重制版，含快速访问分组、上游信息、启动项测试 |
+| HW-任务栏音量控制 | `hw-taskbar-volume-control` | 1.1.1 | explorer.exe、ShellExperienceHost.exe、SndVol.exe | 三合一：全局音量、媒体设备切换、分应用音量控制 |
 | HW-窗口优化 | `hw-window-optimizer` | 1.0.0 | * | 二合一：窗口任意位置拖动与滑动排列吸附 |
 
 ## 使用须知
 
 - 本项目是个人搜集整理的源码集合，请按自己的实际环境取用；模组面向 Windows 11 64 位，部分功能依赖较新的 Windhawk 与 Windows 组件，系统更新后可能失效或需要重新适配。
+- **先确认 Windhawk 版本再操作**：2.0 测试版有 `windhawk-cli.exe`，可以用命令行批量装入、启用、改设置；1.7.3 稳定版没有 CLI，只能通过 GUI 逐个操作，把源码复制进 `ModsSource` 后还需要逐个打开开关才会编译。两种版本的详细步骤见「如何使用」。
 - **同类模组不要同时开启。** 接管任务栏、开始菜单、通知中心、Alt+Tab 或右键菜单的模组，同时启用容易相互冲突，建议按需只开其一。
 - **启用前先确认编译通过。** 模组首次启用由 Windhawk 本地编译，遇到编译失败请检查网络与 Windhawk 符号服务。
 - **关闭后可能有样式残留。** 重启 Windows 资源管理器（或运行 `restart_explorer.bat`）可恢复界面。

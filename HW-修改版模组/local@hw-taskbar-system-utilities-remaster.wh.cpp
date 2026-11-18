@@ -1,9 +1,9 @@
 // ==WindhawkMod==
-// @id              hw-taskbar-system-utilities
-// @name            HW-任务栏系统工具（兼容22h2）
-// @name:zh-CN      HW-任务栏系统工具（兼容22h2）
-// @description     原生 XAML 任务栏工具：重启资源管理器、清理临时文件、释放内存、重置显卡驱动、获取 IP、重建缓存和清理 DNS 缓存。含 Windows 11 22H2 兼容性修复。
-// @version         1.0.0
+// @id              hw-taskbar-system-utilities-remaster
+// @name            HW-任务栏系统工具（重制版）
+// @name:zh-CN      HW-任务栏系统工具（重制版）
+// @description     原生 XAML 任务栏系统工具：系统维护工具集与快速访问入口，支持将各功能自由归入子菜单或作为根级独立项，支持自定义菜单项，含 Windows 11 22H2 兼容性修复。
+// @version         1.1.0
 // @author          Heptalune & Marco Petrucci
 // @github          https://github.com/marco00petrucci
 // @donateUrl       https://www.paypal.me/marco00petrucci
@@ -13,7 +13,7 @@
 // @license         MIT
 // ==/WindhawkMod==
 //
-// HW-Beautify 修改说明（1.0.0，兼容 22H2）
+// HW-Beautify 修改说明（1.1.0，兼容 22H2 + 跟进上游 1.3）
 // 本版由 Heptalune 修改并维护，属于 HW-Beautify 整合包。
 // 基于 Marco Petrucci 的 taskbar-system-utilities，修复 Windows 11 22H2 任务栏
 // 右键菜单注入，并保留对较新 Windows 11 版本的兼容：
@@ -21,6 +21,34 @@
 //   · 新增 ShowFlyoutAtPointerPosition 钩子，经 MenuFlyout::Items() 注入菜单项
 //     （22H2 菜单项由 COM 虚表直接 Append，原 Append 符号钩子不会触发）；
 //   · 保留原 Append 注入路径，两条路径复用同一构造逻辑并防重复注入。
+//
+// 1.1.0 从上游 taskbar-system-utilities 1.3（2026-11-15）挑选移植以下能力
+// （重制版自身的功能分组与交互结构保持不变）：
+//   · 「自定义菜单项」（customItems.items）：可添加程序、文件、文件夹、脚本、
+//     URL、ms-settings 设置页与 shell: 位置；支持环境变量展开、命令行参数、
+//     Segoe Fluent Icons 字形或 emoji 图标、以管理员身份运行（触发 UAC）、
+//     隐藏窗口、分隔线（-）与不可点击的分组标题（命令留空）。
+//   · 「自定义项位置」（customItems.placement）：内置项上方 / 内置项下方 /
+//     「系统工具」子菜单内。
+//   · 「自定义项分隔线」（customItems.separator）、「自定义项子菜单名称」
+//     （customItems.submenuName）、「自定义项子菜单图标」
+//     （customItems.submenuIcon）。
+//   · 「菜单位置」（menuPlacement）：本模组的「系统工具」与「快速访问」分组
+//     整体显示在任务栏右键菜单的内置项上方或下方（默认下方，与 22H2 上
+//     原有表现一致）。
+//   · 改进卸载生命周期：注入的菜单项与点击处理器改用弱引用跟踪，卸载或更新时
+//     主动摘除点击事件并隐藏元素，避免菜单关闭后残留。
+//
+// 未移植的上游 1.3 内容：上游只有一个「系统工具」分组与逐项 inSubmenu 开关，
+// 与重制版的「系统工具 / 快速访问」双分组及「独立项排序 / 菜单项排序」模型
+// 冲突，故保留重制版自己的分组与排序结构；上游的英文文案一律沿用重制版的
+// 中文文案。
+//
+// 注入模型同步上游 1.3：先统一构造菜单元素，再按位置插入——顶部项用 InsertAt
+// 插到内置项之前，底部项追加到末尾，并在资源管理器继续追加内置项时保持贴底。
+// 本地 22H2 兼容补丁（双签名 ShowTaskbarSettingsContextMenu、
+// ShowFlyoutAtPointerPosition 飞出菜单注入、两条路径防重复注入、挂钩失败可重试）
+// 全部保留。
 //
 
 // ==WindhawkModReadme==
@@ -39,173 +67,205 @@
 ## 功能
 - **重启资源管理器**：从任务栏右键菜单立即重启 `explorer.exe` shell 进程。
 - **清理临时文件**：全面的临时文件清理工具，覆盖 `%TEMP%` 以及 `%WINDIR%\Temp` 中可访问的文件。删除所有未被占用的临时文件，不论其存在时间（被活动进程锁定的文件将被跳过），并显示 XAML 摘要卡片。
-- **释放内存**：通过 `EmptyWorkingSet` 修剪你自己的、非提升权限的运行进程的工作集，以回收内存，并显示 XAML 摘要卡片，列出已优化的进程数和释放的内存量。
+- **清理运行内存**：通过 `EmptyWorkingSet` 修剪当前用户运行的、非提升权限进程的工作集（即各进程当前驻留在物理内存中的部分），将物理内存交还系统以增加可用内存，并显示 XAML 摘要卡片，列出已清理的进程数和回收的内存量。不终止进程，不影响其数据。
 - **重启显卡驱动**：触发 `Win + Ctrl + Shift + B` 显示驱动重置快捷方式。
-- **获取 IP 地址**：列出各网络适配器上活动的本地 IPv4 和 IPv6 地址。若在设置中启用，还可通过 `api.ipify.org` 查询公网 IP（出于隐私考虑默认禁用）。支持复制到剪贴板。
+- **获取本机 IP 地址**：列出各网络适配器上活动的本地 IPv4 和 IPv6 地址。支持复制到剪贴板。
+- **查询公网 IP**：通过 `api.ipify.org` 查询当前网络出口的公网 IP，独立显示为一张摘要卡片（该操作会发起外部网络请求）。
 - **重建图标和缩略图缓存**：删除 `%LOCALAPPDATA%\Microsoft\Windows\Explorer\thumbcache_*.db` 中未被占用的缩略图缓存文件，并通过 `ie4uinit.exe -show` 重建 Windows 图标缓存，无需重启资源管理器。
-- **清理 DNS 缓存**：通过 `dnsapi.dll!DnsFlushResolverCache` 刷新 Windows DNS 解析缓存。
-- **可选子菜单**：可将工具归入一个层叠子菜单，并自定义标签和 Segoe Fluent Icons 字形。每个工具都可单独放入子菜单，或置于任务栏菜单的根层级。子菜单默认开启；关闭 **子菜单 → 归入子菜单** 即可恢复之前的平铺布局。
+- **清理 DNS 解析缓存**：通过 `dnsapi.dll!DnsFlushResolverCache` 刷新 Windows DNS 解析缓存。
+- **清空回收站**：永久清空所有驱动器的回收站内容，并显示确认卡片。
+- **快速访问分组**：「系统工具」子菜单下方的层叠分组，内含**控制面板**（`shell:ControlPanelFolder`）、**注册表编辑器**（`regedit.exe`）、**回收站**（`shell:RecycleBinFolder`）、**任务管理器**、**环境变量**、**系统信息**、**设备管理器**、**卸载程序**（`appwiz.cpl`）、**系统还原**（`rstrui.exe`）、**凭据管理器**（`credman`）、**用户账户**（`netplwiz`）、**网络连接**（`ncpa.cpl`）、**磁盘管理**（`diskmgmt.msc`）、**磁盘清理**（`cleanmgr`）、**事件查看器**（`eventvwr.msc`）、**Windows 功能**（`optionalfeatures`）、**用户账户控制**（`control useraccountcontrol`）共十七个入口。注册表编辑器等按系统策略可能弹出 UAC 确认。
+- **独立项 / 菜单项排序**：系统工具与快速访问分组下均提供两个可拖拽排序的下拉列表——「独立项排序」将功能作为根级独立项直接显示，「菜单项排序」将功能归入合并子菜单，可自由组合菜单布局。
+- **菜单位置**：「系统工具」与「快速访问」分组整体显示在任务栏右键菜单的内置项上方或下方。
+- **自定义菜单项**：可自行添加程序、文件、文件夹、脚本、URL、`ms-settings:` 设置页与 `shell:` 位置；支持环境变量展开、命令行参数、Segoe Fluent Icons 字形或 emoji 图标、以管理员身份运行（UAC）、隐藏窗口、分隔线与不可点击的分组标题，并可选择放在内置项上方／下方或「系统工具」子菜单内。
 
-## 兼容性修复（1.2.1）
+## 自定义菜单项
 
-在 Windows 11 22H2（10.0.22621）上，本模组原本完全不生效且不报错。经核对本机
-`Taskbar.View.pdb` 中实际导出的修饰名，发现该版本里
-`ContextMenus::ShowTaskbarSettingsContextMenu` 是 **3 参数**签名（缺少
-`TaskbarSettings const&`），而模组只写了较新系统上的 **4 参数**符号串；
-`HookSymbols` 是「全部命中才成功」，于是整个挂钩直接失败，菜单项一个都不出现。
-同时旧版在挂钩**之前**就把 `g_taskbarViewModuleHooked` 置为 `true` 且失败后
-不复位，导致 `Wh_ModAfterInit` 与 `LoadLibraryExW` 监视器全部短路、永远不再
-重试，模组却仍返回 `TRUE` 显示为「已加载」。
+在「自定义菜单项」分组里可以添加任意多个自定义项目，每一项包含以下字段：
 
-本修复版：
+| 字段 | 说明 |
+| --- | --- |
+| 标签 | 菜单中显示的文字。填入单个短横线 `-` 表示插入一条分隔线；命令留空则作为不可点击的分组标题。 |
+| 命令 | 要打开的程序、文件、文件夹、URL、`ms-settings:` 设置页或 `shell:` 位置（不带参数）。支持展开 `%USERPROFILE%` 等环境变量。 |
+| 参数 | 命令的可选命令行参数。 |
+| 图标 | 可选的 Segoe Fluent Icons 字形十六进制代码（例如 `E756`），也可以是单个字符（如 emoji）。 |
+| 以管理员身份运行 | 以管理员权限启动该命令（会触发 UAC 提示）。 |
+| 隐藏窗口 | 启动命令时不显示窗口，适合后台脚本和控制台命令。 |
 
-- 为 3 参数与 4 参数两种签名各提供独立钩子（参数个数不同，无法共用函数），
-  以 `optional` 变体同时登记，兼容 22H2 与 24H2/25H2；
-- 只有在 `HookSymbols` 真正成功后才置位成功标志，失败时清回并允许后续
-  `LoadLibraryExW` / `Wh_ModAfterInit` 继续重试；
-- 补充关键日志（Windows 版本、命中的签名变体、挂钩失败原因），便于排查。
-
-> 说明：1.2.1 仅解决符号签名不匹配与失败锁存问题；菜单项的注入方式仍依赖
-> `IVector<MenuFlyoutItemBase>::Append` 这个 C++ 投影符号，而部分系统版本里
-> 菜单构建会被编译器内联为直接的 COM 虚表调用，导致该钩子根本不会被触发。
-
-### 兼容性修复（1.2.2）
-
-在 Windows 11 22H2（10.0.22621）上进一步排查发现：符号其实全部命中、
-`ShowTaskbarSettingsContextMenu` 也确实被调用，但 `Append` 钩子一次都没有
-触发——反汇编 `Taskbar.View.dll` 后确认，22H2 的任务栏右键菜单是通过
-**直接的 COM 虚表调用**（`IVector::Append`，`call [vtable+0x68]`）逐项构建的，
-编译器把 C++/WinRT 的 `consume_...::Append` 包装整个内联掉了，因此挂钩那个
-包装符号无法拦截任何菜单项。该函数在末尾会调用
-`ShowFlyoutAtPointerPosition(FlyoutBase const&, FrameworkElement const&,
-ContextRequestedEventArgs const&, unsigned __int64)` 来显示已构建好的菜单。
-
-1.2.2 版新增对上述 `ShowFlyoutAtPointerPosition` 的可选挂钩：拿到 `FlyoutBase`
-后转成 `MenuFlyout`，直接通过 `MenuFlyout::Items().Append(...)` 注入工具项。
-把「构造菜单项」的逻辑抽成共用函数，两条注入路径（旧版 `Append` 符号钩子、
-22H2 的 flyout 钩子）复用同一份构造代码，并用 `g_currentMenuInjected` 防止
-重复注入。较新系统继续走原来的 `Append` 路径，行为不变。
+「自定义项位置」决定这些项目的落点：**内置项下方**、**内置项上方**或**系统工具子菜单内**（默认在「系统工具」子菜单不存在时自动降级为根级项目）。「自定义项子菜单名称」填写后，自定义项会归入一个以该名称命名的专属子菜单，而不是平铺在菜单里；「自定义项分隔线」控制是否在自定义项与相邻项目之间画一条分隔线。
 
 ## 修改说明
 
-- 基于 Marco Petrucci 的 taskbar-system-utilities，修复 Windows 11 22H2 任务栏右键菜单注入，并保留对较新 Windows 11 版本的兼容。
-- `ShowTaskbarSettingsContextMenu` 同时适配 3 参数（22H2）与 4 参数签名，以 `optional` 变体同时登记：旧版只写了 4 参数符号串、且 `HookSymbols`「全部命中才成功」，导致 22H2 整个挂钩失败、菜单项一个不出现。
-- 修正失败锁存：旧版在挂钩前就把 `g_taskbarViewModuleHooked` 置为 true、失败后不复位，导致 `Wh_ModAfterInit` 与 `LoadLibraryExW` 监视器永远短路、模组却显示「已加载」；本版只有 HookSymbols 真正成功后才置位，失败清回并允许后续重试。
-- 新增 `ShowFlyoutAtPointerPosition` 可选挂钩：22H2 的菜单项由 COM 虚表直接 `IVector::Append` 构建、C++/WinRT 包装被内联，原 Append 符号钩子一次都不会触发；本版拿到 `FlyoutBase` 后转 `MenuFlyout`，经 `MenuFlyout::Items().Append(...)` 注入。
-- 两条注入路径（旧版 Append 符号钩子、22H2 flyout 钩子）复用同一份「构造菜单项」逻辑，并用 `g_currentMenuInjected` 防重复注入；较新系统继续走原 Append 路径，行为不变。
-- 补充关键日志（Windows 版本、命中的签名变体、挂钩失败原因），便于排查。
-- 模组名称加 `HW-` 前缀并在简介、详情注明属于 HW-Beautify 整合包；版本号统一为 1.0.0。
+- 修复 Windows 11 22H2 菜单项不出现：`ShowTaskbarSettingsContextMenu` 同时适配 3 参数与 4 参数签名，以 `optional` 变体登记，兼容 22H2 及较新版本。
+- 修正失败锁存：仅在 `HookSymbols` 真正成功后才置位，失败清回并允许重试，避免模组显示「已加载」却不生效。
+- 22H2 菜单项经 COM 虚表直接构建、原 `Append` 钩子不触发，新增 `ShowFlyoutAtPointerPosition` 挂钩，拿到 `FlyoutBase` 后经 `MenuFlyout::Items()` 注入；两条注入路径复用同一份构造逻辑并防重复注入。
+- 系统工具扩展为：清理临时文件、清理运行内存、重启显卡驱动、获取本机 IP、查询公网 IP、重建图标与缩略图缓存、清理 DNS 解析缓存、清空回收站。
+- 系统工具与快速访问均提供「独立项排序」「菜单项排序」两个可拖拽下拉，可自由决定各功能是根级独立显示还是归入子菜单。
+- 「启用摘要/确认卡片」作为总开关，统一控制各工具执行后的 XAML 卡片。
+- 模组更名「HW-任务栏系统工具（重制版）」，属 HW-Beautify 整合包，版本号 1.0.0。
+- 1.1.0 跟进上游 taskbar-system-utilities 1.3：新增「自定义菜单项」（含图标、参数、UAC、隐藏窗口、分隔线与分组标题）、「自定义项位置」、「自定义项子菜单名称／图标」、「自定义项分隔线」与「菜单位置」；注入模型改为上游 1.3 的「先构造、后放置」，卸载时主动摘除点击处理器并隐藏注入元素。重制版自身的双分组结构与排序模型保持不变。
 
 ## 致谢与许可
 任务栏右键菜单注入钩子改编自 **Mgrmjp** 的 `taskbar-restart-explorer`。本项目基于 MIT 许可证发布。
+
+## 修改来源与上游项目
+
+本模组为二次修改版本，完整关系链如下：
+
+- **本模组（直接修改版）**：`hw-taskbar-system-utilities-remaster`（HW-任务栏系统工具（重制版）），由 **Heptalune** 修改并维护，属于 **HW-Beautify** 整合包。在原模组基础上修复 Windows 11 22H2 兼容性，并将快速访问分组扩展至十七个常用系统入口。
+- **上游项目（本模组直接基于此修改）**：**Taskbar System Utilities**，作者 **Marco Petrucci**，项目地址 <https://windhawk.net/mods/taskbar-system-utilities>，MIT 许可。本模组的菜单注入逻辑、XAML 浮出卡片、系统工具功能均在此基础上改动。
+- **上上游项目（上游项目的上游依赖）**：**taskbar-restart-explorer**，作者 **Mgrmjp**。任务栏右键菜单注入钩子（`ContextMenus::ShowTaskbarSettingsContextMenu` 挂钩与菜单项追加）最初改编自该模组，为上游 Taskbar System Utilities 与本模组共同依赖的注入基础。
+
+即：`taskbar-restart-explorer`（Mgrmjp）→ `taskbar-system-utilities`（Marco Petrucci）→ `hw-taskbar-system-utilities-remaster`（Heptalune / HW-Beautify，本模组）。
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- submenu:
-  - enabled: true
-    $name:zh-CN: 归入子菜单
-    $description:zh-CN: 将所选工具归入一个层叠子菜单中。
-  - label: 系统工具
-    $name:zh-CN: 子菜单标签
-  - glyph: E712
-    $name:zh-CN: 子菜单图标字形（Segoe Fluent Icons）
-    $description:zh-CN: 十六进制代码（E712、0xE712、\uE712）或字形本身。
-  $name:zh-CN: 子菜单
-  $description:zh-CN: 配置层叠子菜单。
-- restartExplorer:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重启资源管理器
-    $name:zh-CN: 菜单项标签
-  $name:zh-CN: 重启资源管理器
-  $description:zh-CN: 配置重启资源管理器快捷方式。
-- cleanTemp:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 清理临时文件
-    $name:zh-CN: 菜单项标签
-  - cleanRecycleBin: false
-    $name:zh-CN: 清空回收站
-    $description:zh-CN: 永久清空所有驱动器上的回收站。
-  - showCard: true
-    $name:zh-CN: 显示摘要卡片
-    $description:zh-CN: 显示包含清理统计信息的 XAML 卡片。
-  $name:zh-CN: 清理临时文件
-  $description:zh-CN: 配置临时文件清理工具。
-- reduceMemory:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 释放内存
-    $name:zh-CN: 菜单项标签
-  - showCard: true
-    $name:zh-CN: 显示摘要卡片
-    $description:zh-CN: 显示包含已释放内存统计信息的 XAML 卡片。
-  $name:zh-CN: 释放内存
-  $description:zh-CN: 修剪正在运行进程的工作集以释放内存。
-- restartGpu:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重启显卡驱动
-    $name:zh-CN: 菜单项标签
-  $name:zh-CN: 重启显卡驱动
-  $description:zh-CN: 配置图形子系统重置快捷方式。
-- getIp:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 获取 IP 地址
-    $name:zh-CN: 菜单项标签
-  - queryPublicIp: false
-    $name:zh-CN: 查询公网 IP（外部）
-    $description:zh-CN: 通过 HTTPS 访问 api.ipify.org。默认关闭。
-  - copyToClipboard: false
-    $name:zh-CN: 自动复制到剪贴板
-    $description:zh-CN: 自动将检测到的 IP 复制到剪贴板。
-  $name:zh-CN: 获取 IP 地址
-  $description:zh-CN: 配置本地和公网 IP 检测。
-- rebuildCache:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 重建图标和缩略图缓存
-    $name:zh-CN: 菜单项标签
-  - showCard: true
-    $name:zh-CN: 显示摘要卡片
-    $description:zh-CN: 显示包含缓存重建统计信息的 XAML 卡片。
-  $name:zh-CN: 重建图标和缩略图缓存
-  $description:zh-CN: 删除缩略图缓存并重建 Windows 图标缓存。
-- flushDns:
-  - enabled: true
-    $name:zh-CN: 在任务栏菜单中启用
-  - inSubmenu: true
-    $name:zh-CN: 放入子菜单
-    $description:zh-CN: 在子菜单中显示此项（启用分组时）。
-  - label: 清理 DNS 缓存
-    $name:zh-CN: 菜单项标签
-  - showCard: true
-    $name:zh-CN: 显示确认卡片
-    $description:zh-CN: 清理 DNS 缓存时显示 XAML 卡片。
-  $name:zh-CN: 清理 DNS 缓存
-  $description:zh-CN: 配置 DNS 解析缓存清理工具。
+- quickAccessEnabled: true
+  $name:zh-CN: 启用快速访问
+  $description:zh-CN: 在任务栏右键菜单中显示「快速访问」分组。
 
+- quickAccess:
+  - standalone:
+    - items: [controlPanel]
+      $name:zh-CN: 独立项排序
+      $description:zh-CN: 从下拉中选择要作为根级独立项直接显示的跳转功能，并可拖拽调整顺序。默认将控制面板作为独立项直接显示，其余功能收进合并菜单。
+      $options:zh-CN:
+      - controlPanel: 控制面板
+      - registryEditor: 注册表编辑器
+      - recycleBin: 回收站
+      - taskManager: 任务管理器
+      - envVars: 环境变量
+      - systemInfo: 系统信息
+      - deviceManager: 设备管理器
+      - uninstallPrograms: 卸载程序
+      - systemRestore: 系统还原
+      - credentialManager: 凭据管理器
+      - userAccounts: 用户账户
+      - networkConnections: 网络连接
+      - diskManagement: 磁盘管理
+      - diskCleanup: 磁盘清理
+      - eventViewer: 事件查看器
+      - windowsFeatures: Windows 功能
+      - userAccountControl: 用户账户控制
+  - menuItems:
+    - items: [registryEditor, recycleBin, taskManager, envVars, systemInfo, deviceManager, uninstallPrograms, systemRestore, credentialManager, userAccounts, networkConnections, diskManagement, diskCleanup, eventViewer, windowsFeatures, userAccountControl]
+      $name:zh-CN: 菜单项排序
+      $description:zh-CN: 从下拉中选择要归入「快速访问」合并子菜单的跳转功能，并可拖拽调整顺序。默认包含全部功能；从此处移除的功能会变为独立项或隐藏。
+      $options:zh-CN:
+      - controlPanel: 控制面板
+      - registryEditor: 注册表编辑器
+      - recycleBin: 回收站
+      - taskManager: 任务管理器
+      - envVars: 环境变量
+      - systemInfo: 系统信息
+      - deviceManager: 设备管理器
+      - uninstallPrograms: 卸载程序
+      - systemRestore: 系统还原
+      - credentialManager: 凭据管理器
+      - userAccounts: 用户账户
+      - networkConnections: 网络连接
+      - diskManagement: 磁盘管理
+      - diskCleanup: 磁盘清理
+      - eventViewer: 事件查看器
+      - windowsFeatures: Windows 功能
+      - userAccountControl: 用户账户控制
+  $name:zh-CN: 快速访问
+  $description:zh-CN: 任务栏右键菜单中的常用系统入口跳转。
+
+- systemToolsEnabled: true
+  $name:zh-CN: 启用系统工具
+  $description:zh-CN: 在任务栏右键菜单中显示「系统工具」分组。
+
+- systemShowCards: true
+  $name:zh-CN: 启用摘要/确认卡片
+  $description:zh-CN: 总开关，统一控制各系统工具执行后弹出的 XAML 摘要或确认卡片。关闭后，所有工具的卡片都不会显示。
+
+- menuPlacement: bottom
+  $name:zh-CN: 菜单位置
+  $description:zh-CN: 「系统工具」与「快速访问」分组整体在任务栏右键菜单中的显示位置。
+  $options:
+  - top: Above built-in items
+  - bottom: Below built-in items
+  $options:zh-CN:
+  - top: 在内置项上方
+  - bottom: 在内置项下方
+
+- systemTools:
+  - standalone:
+    - items: [restartExplorer]
+      $name:zh-CN: 独立项排序
+      $description:zh-CN: 从下拉中选择要作为根级独立项直接显示的系统工具，并可拖拽调整顺序。默认将重启资源管理器作为独立项直接显示，其余工具收进子菜单。
+      $options:zh-CN:
+      - restartExplorer: 重启资源管理器
+      - cleanTemp: 清理临时文件
+      - reduceMemory: 清理运行内存
+      - restartGpu: 重启显卡驱动
+      - getIp: 获取本机 IP 地址
+      - rebuildCache: 重建图标与缩略图缓存
+      - flushDns: 清理 DNS 解析缓存
+      - queryPublicIp: 查询公网 IP
+      - cleanRecycleBin: 清空回收站
+  - menuItems:
+    - items: [cleanTemp, reduceMemory, restartGpu, getIp, rebuildCache, flushDns, queryPublicIp, cleanRecycleBin]
+      $name:zh-CN: 菜单项排序
+      $description:zh-CN: 从下拉中选择要归入「系统工具」合并子菜单的系统工具，并可拖拽调整顺序。默认包含全部工具；从此处移除且未加入「独立项排序」的工具将被隐藏。
+      $options:zh-CN:
+      - restartExplorer: 重启资源管理器
+      - cleanTemp: 清理临时文件
+      - reduceMemory: 清理运行内存
+      - restartGpu: 重启显卡驱动
+      - getIp: 获取本机 IP 地址
+      - rebuildCache: 重建图标与缩略图缓存
+      - flushDns: 清理 DNS 解析缓存
+      - queryPublicIp: 查询公网 IP
+      - cleanRecycleBin: 清空回收站
+  $name:zh-CN: 系统工具
+  $description:zh-CN: 任务栏右键菜单中的系统维护工具。
+
+- customItems:
+  - items:
+    - - name: 终端
+        $name:zh-CN: 标签
+        $description:zh-CN: 菜单中显示的文字。填入单个短横线 (-) 可添加一条分隔线；命令留空则作为不可点击的分组标题。
+      - command: wt.exe
+        $name:zh-CN: 命令
+        $description:zh-CN: 要打开的程序、文件、文件夹、URL、ms-settings 设置页或 shell 位置，不带参数。支持展开 %USERPROFILE% 等环境变量。
+      - arguments: ""
+        $name:zh-CN: 参数
+        $description:zh-CN: 命令的可选命令行参数。
+      - icon: E756
+        $name:zh-CN: 图标
+        $description:zh-CN: 可选的 Segoe Fluent Icons 字形十六进制代码（例如 E756），也可以是单个字符（如 emoji）。
+      - runAsAdmin: false
+        $name:zh-CN: 以管理员身份运行
+        $description:zh-CN: 以管理员权限启动该命令（会触发 UAC 提示）。
+      - hideWindow: false
+        $name:zh-CN: 隐藏窗口
+        $description:zh-CN: 启动命令时不显示窗口，适合后台脚本和控制台命令。
+  - placement: bottom
+    $name:zh-CN: 自定义项位置
+    $description:zh-CN: 自定义项目在任务栏右键菜单中的显示位置。
+    $options:
+    - bottom: Below built-in items
+    - top: Above built-in items
+    - submenu: Inside System Utilities submenu
+    $options:zh-CN:
+    - bottom: 在内置项下方
+    - top: 在内置项上方
+    - submenu: 在系统工具子菜单内
+  - separator: true
+    $name:zh-CN: 自定义项分隔线
+    $description:zh-CN: 在自定义项与相邻菜单项之间绘制一条分隔线。
+  - submenuName: ""
+    $name:zh-CN: 自定义项子菜单名称
+    $description:zh-CN: 填写后，自定义项会以该名称归入一个独立的子菜单，而不是直接列在菜单中。
+  - submenuIcon: E71D
+    $name:zh-CN: 自定义项子菜单图标
+    $description:zh-CN: 可选的 Segoe Fluent Icons 字形十六进制代码（例如 E71D），也可以是单个字符/emoji，用于自定义项子菜单。
+  $name:zh-CN: 自定义菜单项
+  $description:zh-CN: 在任务栏右键菜单中添加你自己的项目：程序、文件夹、脚本、URL 和设置页。
 */
 // ==/WindhawkModSettings==
 
@@ -247,6 +307,7 @@ ContextRequestedEventArgs const&, unsigned __int64)` 来显示已构建好的菜
 #include <vector>
 
 namespace wf = winrt::Windows::Foundation;
+namespace wfc = winrt::Windows::Foundation::Collections;
 namespace wu = winrt::Windows::UI;
 namespace wut = winrt::Windows::UI::Text;
 namespace wux = winrt::Windows::UI::Xaml;
@@ -259,46 +320,81 @@ namespace wuxm = winrt::Windows::UI::Xaml::Media;
 // Global State & Thread / Window Synchronization
 // ============================================================================
 
+// 本模组的「系统工具」与「快速访问」分组整体在任务栏右键菜单中的位置
+// （对应上游 1.3 的 submenu.placement）。
+enum class MenuPlacement {
+    Top,
+    Bottom,
+};
+
+// 自定义菜单项在任务栏右键菜单中的位置（上游 1.3 新增）。
+enum class CustomPlacement {
+    Bottom,
+    Top,
+    Submenu,
+};
+
+// 单条自定义菜单项的设置，对应设置分组「自定义菜单项」下的一个条目。
+struct CustomMenuItemSettings {
+    std::wstring name;
+    std::wstring command;
+    std::wstring arguments;
+    std::wstring icon;
+    bool runAsAdmin = false;
+    bool hideWindow = false;
+
+    // 菜单与日志里显示的文本；没填标签时回退为命令本身。
+    const std::wstring& DisplayName() const {
+        return name.empty() ? command : name;
+    }
+};
+
 struct ModSettings {
-    bool enableSubmenu = true;
-    std::wstring textSubmenu = L"系统工具";
-    std::wstring glyphSubmenu = L"\xE712";
+    // 顶层开关
+    bool enableQuickAccess = true;
+    bool enableSystemTools = true;
 
+    // 快速访问：独立项排序（根级直接显示，默认空）+ 菜单项排序（合并子菜单，默认全选）
+    std::vector<std::wstring> quickStandalone;
+    std::vector<std::wstring> quickMenuItems;
+
+    // 系统工具：独立项排序（根级直接显示，默认空）+ 菜单项排序（合并子菜单，默认全选）。
+    std::vector<std::wstring> systemStandalone;
+    std::vector<std::wstring> systemMenuItems;
+
+    // 系统工具各功能开关
     bool showRestartExplorer = true;
-    bool inSubmenuRestartExplorer = true;
-    std::wstring textRestartExplorer = L"重启资源管理器";
-
     bool showCleanTemp = true;
-    bool inSubmenuCleanTemp = true;
-    std::wstring textCleanTemp = L"清理临时文件";
+    bool showReduceMemory = true;
+    bool showRestartGpu = true;
+    bool showGetIp = true;
+    bool showRebuildCache = true;
+    bool showFlushDns = true;
+
+    // 各功能的行为子选项（默认值固定，不再由设置界面单独控制）
     bool cleanRecycleBin = false;
     bool notifyCleanTemp = true;
-
-    bool showReduceMemory = true;
-    bool inSubmenuReduceMemory = true;
-    std::wstring textReduceMemory = L"释放内存";
     bool notifyReduceMemory = true;
-
-    bool showRestartGpu = true;
-    bool inSubmenuRestartGpu = true;
-    std::wstring textRestartGpu = L"重启显卡驱动";
-
-    bool showGetIp = true;
-    bool inSubmenuGetIp = true;
-    std::wstring textGetIp = L"获取 IP 地址";
     bool queryPublicIp = false;
     bool copyIpToClipboard = false;
-
-    bool showRebuildCache = true;
-    bool inSubmenuRebuildCache = true;
-    std::wstring textRebuildCache = L"重建图标和缩略图缓存";
     bool notifyRebuildCache = true;
-
-    bool showFlushDns = true;
-    bool inSubmenuFlushDns = true;
-    std::wstring textFlushDns = L"清理 DNS 缓存";
     bool notifyFlushDns = true;
+    bool notifyGetIp = true;
+
+    // 摘要/确认卡片总开关：关闭后所有工具的卡片都不显示（覆盖各工具单独的 showCard）。
+    bool systemShowCards = true;
+
+    // 本模组分组的整体位置（上游 1.3 的 submenu.placement）。
+    MenuPlacement menuPlacement = MenuPlacement::Bottom;
+
+    // 自定义菜单项（上游 1.3 新增）
+    std::vector<CustomMenuItemSettings> customItems;
+    CustomPlacement customPlacement = CustomPlacement::Bottom;
+    bool customSeparator = true;
+    std::wstring customSubmenuName;
+    std::wstring customSubmenuIcon = L"E71D";
 };
+
 
 std::mutex g_settingsMutex;
 ModSettings g_settings;
@@ -311,7 +407,6 @@ std::atomic<bool> g_unloading{false};
 
 thread_local int g_taskbarSettingsMenuDepth = 0;
 thread_local bool g_currentMenuInjected = false;
-thread_local bool g_injecting = false;
 
 // Accessed only on the taskbar UI thread
 winrt::weak_ref<wux::FrameworkElement> g_lastTargetWeak;
@@ -322,6 +417,13 @@ winrt::event_token g_activeOkClickToken{};
 std::mutex g_threadsMutex;
 std::vector<HANDLE> g_threads;
 std::mutex g_dispatchMutex;
+
+// 自定义菜单项启动命令所用的后台线程（上游 1.3 新增）。
+std::mutex g_launchThreadsMutex;
+std::vector<HANDLE> g_launchThreads;
+
+// 任务栏菜单项集合的类型别名，用于统一「顶部插入 / 底部追加」的放置逻辑。
+using MenuItemsVector = wfc::IVector<wuxc::MenuFlyoutItemBase>;
 
 ModSettings GetSettingsSnapshot() {
     std::lock_guard<std::mutex> lock(g_settingsMutex);
@@ -443,6 +545,84 @@ wuxc::FontIcon CreateFluentIcon(const wchar_t* glyph, double size = 16.0) {
     icon.FontFamily(wuxm::FontFamily(L"Segoe Fluent Icons"));
     icon.Glyph(glyph);
     icon.FontSize(size);
+    return icon;
+}
+
+// ============================================================================
+// Icon & Glyph Helpers (Custom Menu Items)
+// ============================================================================
+
+bool IsHexDigit(wchar_t ch) {
+    return (ch >= L'0' && ch <= L'9') || (ch >= L'a' && ch <= L'f') ||
+           (ch >= L'A' && ch <= L'F');
+}
+
+// 把图标配置字符串转换成 UTF-16 字形。支持十六进制代码点（"E756"、"0xE756"、
+// "U+E756"、"\\uE756"），也支持直接粘贴的单个字符或 emoji。
+std::wstring GlyphFromIconSetting(const std::wstring& icon,
+                                  bool* isCodePoint) {
+    // 直接粘贴的私有使用区字符（U+E000..U+F8FF）按 Segoe Fluent Icons 字形处理。
+    if (icon.size() == 1 && icon[0] >= 0xE000 && icon[0] <= 0xF8FF) {
+        *isCodePoint = true;
+        return icon;
+    }
+
+    *isCodePoint = false;
+
+    std::wstring_view hex = icon;
+    if (hex.size() > 2 &&
+        (hex.starts_with(L"0x") || hex.starts_with(L"0X") ||
+         hex.starts_with(L"U+") || hex.starts_with(L"u+") ||
+         hex.starts_with(L"\\u") || hex.starts_with(L"\\U") ||
+         hex.starts_with(L"\\x") || hex.starts_with(L"\\X"))) {
+        hex.remove_prefix(2);
+    }
+
+    if (hex.size() < 4 || hex.size() > 6) {
+        return icon;
+    }
+
+    for (wchar_t ch : hex) {
+        if (!IsHexDigit(ch)) {
+            return icon;
+        }
+    }
+
+    unsigned long codePoint = wcstoul(std::wstring(hex).c_str(), nullptr, 16);
+    if (codePoint == 0 || codePoint > 0x10FFFF ||
+        (codePoint >= 0xD800 && codePoint <= 0xDFFF)) {
+        return icon;
+    }
+
+    *isCodePoint = true;
+
+    std::wstring glyph;
+    if (codePoint < 0x10000) {
+        glyph.push_back(static_cast<wchar_t>(codePoint));
+    } else {
+        codePoint -= 0x10000;
+        glyph.push_back(static_cast<wchar_t>(0xD800 + (codePoint >> 10)));
+        glyph.push_back(static_cast<wchar_t>(0xDC00 + (codePoint & 0x3FF)));
+    }
+
+    return glyph;
+}
+
+// 依据设置里的图标字符串创建图标：字形代码用 Segoe Fluent Icons，
+// 其它字符（emoji 等）用 Segoe UI Emoji。
+wuxc::FontIcon CreateIconFromSetting(const std::wstring& iconSetting,
+                                     double size = 16.0) {
+    bool isCodePoint = false;
+    std::wstring glyph = GlyphFromIconSetting(iconSetting, &isCodePoint);
+
+    wuxc::FontIcon icon;
+    if (isCodePoint) {
+        icon.FontFamily(wuxm::FontFamily(L"Segoe Fluent Icons"));
+    } else {
+        icon.FontFamily(wuxm::FontFamily(L"Segoe UI Emoji,Segoe UI"));
+    }
+    icon.FontSize(size);
+    icon.Glyph(glyph);
     return icon;
 }
 
@@ -870,7 +1050,7 @@ void OnCleanTempClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
                 SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
         }
 
-        if (cfg.notifyCleanTemp && !g_unloading.load()) {
+        if (cfg.systemShowCards && cfg.notifyCleanTemp && !g_unloading.load()) {
             double mbFreed =
                 static_cast<double>(stats.bytesFreed) / (1024.0 * 1024.0);
             wchar_t mbBuf[64] = {};
@@ -937,7 +1117,7 @@ void OnReduceMemoryClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             }
         }
 
-        if (cfg.notifyReduceMemory && !g_unloading.load()) {
+        if (cfg.systemShowCards && cfg.notifyReduceMemory && !g_unloading.load()) {
             MEMORYSTATUSEX memAfter = {sizeof(memAfter)};
             GlobalMemoryStatusEx(&memAfter);
 
@@ -1188,14 +1368,18 @@ void OnGetIpClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             return;
         }
 
-        std::wstring footer;
+        // 复制到剪贴板是独立行为，不受卡片开关控制；仅在需要显示卡片时决定脚注。
         if (cfg.copyIpToClipboard && !clipboardText.empty()) {
-            if (CopyTextToClipboard(clipboardText)) {
-                footer = L"已复制到剪贴板";
-            }
+            CopyTextToClipboard(clipboardText);
         }
 
-        DispatchXAMLCardSync(L"网络 IP 地址", L"\xE968", rows, footer);
+        if (cfg.systemShowCards && cfg.notifyGetIp && !g_unloading.load()) {
+            std::wstring footer;
+            if (cfg.copyIpToClipboard && !clipboardText.empty()) {
+                footer = L"已复制到剪贴板";
+            }
+            DispatchXAMLCardSync(L"网络 IP 地址", L"\xE968", rows, footer);
+        }
     });
 }
 
@@ -1275,7 +1459,7 @@ void OnRebuildCacheClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
             }
         }
 
-        if (cfg.notifyRebuildCache && !g_unloading.load()) {
+        if (cfg.systemShowCards && cfg.notifyRebuildCache && !g_unloading.load()) {
             double mbFreed =
                 static_cast<double>(bytesFreed) / (1024.0 * 1024.0);
             wchar_t mbBuf[64] = {};
@@ -1318,7 +1502,7 @@ void OnFlushDnsClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
         }
 
         auto cfg = GetSettingsSnapshot();
-        if (cfg.notifyFlushDns && !g_unloading.load()) {
+        if (cfg.systemShowCards && cfg.notifyFlushDns && !g_unloading.load()) {
             std::vector<DialogRow> rows = {
                 {L"解析缓存", flushed ? L"已刷新" : L"失败"},
                 {L"方式", L"dnsapi.dll（内存中）"},
@@ -1328,6 +1512,375 @@ void OnFlushDnsClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
                                          : L"刷新缓存时出错");
         }
     });
+}
+
+// 查询公网 IP：通过 api.ipify.org 查询当前网络出口的公网 IP，
+// 与「获取本机 IP 地址」分开展示，避免默认关闭的外部请求混入本地地址列表。
+void OnQueryPublicIpClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
+    RunAsyncTracked([]() {
+        auto cfg = GetSettingsSnapshot();
+
+        std::wstring publicIp = GetPublicIP();
+        if (publicIp.empty()) {
+            publicIp = L"未获取到";
+        }
+
+        if (cfg.systemShowCards && !g_unloading.load()) {
+            std::vector<DialogRow> rows = {
+                {L"公网 IP", publicIp},
+            };
+            DispatchXAMLCardSync(L"公网 IP 地址", L"\xE968", rows,
+                                 L"通过 api.ipify.org 查询");
+        }
+    });
+}
+
+// 清空回收站：永久清空所有驱动器的回收站内容。
+void OnCleanRecycleBinClick(wf::IInspectable const&, wux::RoutedEventArgs const&) {
+    RunAsyncTracked([]() {
+        auto cfg = GetSettingsSnapshot();
+
+        DWORD result = SHEmptyRecycleBinW(
+            nullptr, nullptr,
+            SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
+
+        bool success = (result == S_OK);
+        std::wstring message = success ? L"回收站已清空" : L"清空回收站时出错";
+
+        if (cfg.systemShowCards && !g_unloading.load()) {
+            std::vector<DialogRow> rows = {
+                {L"操作结果", success ? L"成功" : L"失败"},
+            };
+            DispatchXAMLCardSync(L"回收站", L"\xE74D", rows, message);
+        }
+    });
+}
+
+// ============================================================================
+// Quick Access Actions (系统入口跳转)
+// ============================================================================
+
+// 点击事件运行在任务栏 UI 线程（STA）。用 ShellExecuteW 打开可执行文件或
+// 有效的 shell: 命名空间，把文件与参数分开传递，启动后立即返回。打开
+// .exe/.msc 等按系统策略可能弹出 UAC 确认（regedit、devmgmt 等管理员工具）。
+//
+// 注意：lpFile 与 lpParameters 必须分开，带参数的命令（如环境变量）才能正确
+// 启动，否则会被当成找不到的「文件名」而失败。
+void OpenQuickAccessTarget(const wchar_t* file, const wchar_t* params = nullptr) {
+    if (g_unloading.load()) {
+        return;
+    }
+
+    HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd();
+    HWND hOwner = hTaskbarWnd ? hTaskbarWnd : GetShellWindow();
+
+    // 返回值 > 32 表示成功（返回进程句柄）；<= 32 为 SE_ERR_* 错误码。
+    HINSTANCE hResult =
+        ShellExecuteW(hOwner, L"open", file, params, nullptr, SW_SHOWNORMAL);
+    if ((UINT_PTR)hResult <= 32) {
+        Wh_Log(L"[TSU] Quick access open failed: %s (err=%lu)", file,
+               GetLastError());
+    }
+}
+
+// 控制面板：用 control.exe 直启，避免 shell:ControlPanelFolder 的慢速解析。
+void OnOpenControlPanelClick(wf::IInspectable const&,
+                             wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"control.exe");
+}
+
+// 注册表编辑器
+void OnOpenRegistryEditorClick(wf::IInspectable const&,
+                               wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"regedit.exe");
+}
+
+// 回收站
+void OnOpenRecycleBinClick(wf::IInspectable const&,
+                           wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"shell:RecycleBinFolder");
+}
+
+// 任务管理器
+void OnOpenTaskManagerClick(wf::IInspectable const&,
+                            wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"taskmgr.exe");
+}
+
+// 环境变量：rundll32 调用 sysdm.cpl 的 EditEnvironmentVariables 入口，
+// 直接弹出「环境变量」对话框，无需先打开系统属性。
+void OnOpenEnvVarsClick(wf::IInspectable const&,
+                        wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"rundll32.exe", L"sysdm.cpl,EditEnvironmentVariables");
+}
+
+// 系统信息
+void OnOpenSystemInfoClick(wf::IInspectable const&,
+                           wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"msinfo32.exe");
+}
+
+// 设备管理器
+void OnOpenDeviceManagerClick(wf::IInspectable const&,
+                              wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"devmgmt.msc");
+}
+
+// 卸载程序：.cpl 不能直接用 ShellExecute 打开（会弹出「打开方式」），
+// 需交给 control.exe 作为控制面板小部件启动。
+void OnOpenUninstallProgramsClick(wf::IInspectable const&,
+                                  wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"control.exe", L"appwiz.cpl");
+}
+
+// 系统还原
+void OnOpenSystemRestoreClick(wf::IInspectable const&,
+                               wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"rstrui.exe");
+}
+
+// 凭据管理器：用控制面板的规范名打开（/name Microsoft.CredentialManager），
+// 避免 credman 或错误的 /f 参数导致无响应。
+void OnOpenCredentialManagerClick(wf::IInspectable const&,
+                                  wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"control.exe", L"/name Microsoft.CredentialManager");
+}
+
+// 用户账户
+void OnOpenUserAccountsClick(wf::IInspectable const&,
+                             wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"netplwiz");
+}
+
+// 网络连接：.cpl 交给 control.exe 启动，避免弹出「打开方式」。
+void OnOpenNetworkConnectionsClick(wf::IInspectable const&,
+                                   wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"control.exe", L"ncpa.cpl");
+}
+
+// 磁盘管理
+void OnOpenDiskManagementClick(wf::IInspectable const&,
+                               wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"diskmgmt.msc");
+}
+
+// 磁盘清理
+void OnOpenDiskCleanupClick(wf::IInspectable const&,
+                             wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"cleanmgr");
+}
+
+// 事件查看器
+void OnOpenEventViewerClick(wf::IInspectable const&,
+                            wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"eventvwr.msc");
+}
+
+// Windows 功能
+void OnOpenWindowsFeaturesClick(wf::IInspectable const&,
+                                wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"optionalfeatures");
+}
+
+// 用户账户控制（UAC）：直接启动专用的 UserAccountControlSettings.exe，
+// 避免 control.exe 后跟非法参数导致无响应。
+void OnOpenUserAccountControlClick(wf::IInspectable const&,
+                                   wux::RoutedEventArgs const&) {
+    OpenQuickAccessTarget(L"UserAccountControlSettings.exe");
+}
+
+// ============================================================================
+// Custom Menu Items Launcher (上游 1.3 新增)
+// ============================================================================
+
+// 启动一条自定义菜单项所需的参数。
+struct LaunchRequest {
+    std::wstring name;
+    std::wstring command;
+    std::wstring arguments;
+    bool runAsAdmin = false;
+    bool hideWindow = false;
+};
+
+// 展开 %USERPROFILE%、%WINDIR% 等环境变量。
+std::wstring ExpandEnvironment(const std::wstring& value) {
+    if (value.empty()) {
+        return value;
+    }
+
+    DWORD size = ExpandEnvironmentStringsW(value.c_str(), nullptr, 0);
+    if (!size) {
+        return value;
+    }
+
+    std::wstring expanded(size, L'\0');
+    DWORD written =
+        ExpandEnvironmentStringsW(value.c_str(), expanded.data(), size);
+    if (!written || written > size) {
+        return value;
+    }
+
+    expanded.resize(written - 1);
+    return expanded;
+}
+
+// 去掉从资源管理器「复制为路径」得到的首尾引号。
+std::wstring StripSurroundingQuotes(const std::wstring& value) {
+    if (value.size() >= 2 && value.front() == L'"' && value.back() == L'"' &&
+        value.find(L'"', 1) == value.size() - 1) {
+        return value.substr(1, value.size() - 2);
+    }
+
+    return value;
+}
+
+DWORD WINAPI LaunchThread(LPVOID param) {
+    std::unique_ptr<LaunchRequest> request(static_cast<LaunchRequest*>(param));
+
+    HRESULT hrCoInit = CoInitializeEx(
+        nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+    std::wstring command =
+        StripSurroundingQuotes(ExpandEnvironment(request->command));
+    std::wstring arguments = ExpandEnvironment(request->arguments);
+
+    // 以用户目录作为工作目录，避免落到 System32。
+    std::wstring directory = ExpandEnvironment(L"%USERPROFILE%");
+
+    SHELLEXECUTEINFOW sei = {};
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_NOASYNC;
+    sei.lpVerb = request->runAsAdmin ? L"runas" : nullptr;
+    sei.lpFile = command.c_str();
+    sei.lpParameters = arguments.empty() ? nullptr : arguments.c_str();
+    sei.lpDirectory = directory.empty() ? nullptr : directory.c_str();
+    sei.nShow = request->hideWindow ? SW_HIDE : SW_SHOWNORMAL;
+
+    if (ShellExecuteExW(&sei)) {
+        Wh_Log(L"[TSU] Started \"%s\"", request->name.c_str());
+    } else {
+        DWORD error = GetLastError();
+        if (error == ERROR_CANCELLED) {
+            Wh_Log(L"[TSU] Starting \"%s\" was cancelled by the user",
+                   request->name.c_str());
+        } else {
+            Wh_Log(L"[TSU] Failed to start \"%s\" (%s), error %lu",
+                   request->name.c_str(), command.c_str(), error);
+        }
+    }
+
+    if (SUCCEEDED(hrCoInit)) {
+        CoUninitialize();
+    }
+
+    return 0;
+}
+
+// 在独立线程里启动自定义项，避免慢启动或 UAC 弹窗卡住任务栏 UI 线程。
+void LaunchCustomItem(const CustomMenuItemSettings& item) {
+    auto request = std::make_unique<LaunchRequest>();
+    request->name = item.DisplayName();
+    request->command = item.command;
+    request->arguments = item.arguments;
+    request->runAsAdmin = item.runAsAdmin;
+    request->hideWindow = item.hideWindow;
+
+    std::lock_guard<std::mutex> lock(g_launchThreadsMutex);
+    if (g_unloading.load()) {
+        return;
+    }
+
+    for (auto it = g_launchThreads.begin(); it != g_launchThreads.end();) {
+        if (WaitForSingleObject(*it, 0) == WAIT_OBJECT_0) {
+            CloseHandle(*it);
+            it = g_launchThreads.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    auto* rawRequest = request.release();
+    HANDLE thread =
+        CreateThread(nullptr, 0, LaunchThread, rawRequest, 0, nullptr);
+    if (!thread) {
+        delete rawRequest;
+        Wh_Log(L"[TSU] CreateThread failed, error %lu", GetLastError());
+        return;
+    }
+
+    g_launchThreads.push_back(thread);
+}
+
+// 卸载前等待所有自定义项的启动线程结束，避免 DLL 卸载后仍被调用。
+void WaitForLaunchThreads() {
+    std::vector<HANDLE> threads;
+    {
+        std::lock_guard<std::mutex> lock(g_launchThreadsMutex);
+        threads.swap(g_launchThreads);
+    }
+
+    for (HANDLE thread : threads) {
+        WaitForSingleObject(thread, INFINITE);
+        CloseHandle(thread);
+    }
+}
+
+// ============================================================================
+// Injected Menu Elements Lifetime & Unload Detachment (上游 1.3 新增)
+// ============================================================================
+
+// 用弱引用跟踪注入的菜单元素：菜单关闭后可以被正常回收，
+// 同时在模组卸载时仍能摘除点击事件并隐藏元素。
+struct InjectedElement {
+    winrt::weak_ref<wuxc::MenuFlyoutItemBase> element;
+    winrt::event_token clickToken{};
+    bool hasClickHandler = false;
+};
+
+std::mutex g_injectedElementsMutex;
+std::vector<InjectedElement> g_injectedElements;
+
+void TrackInjectedElement(InjectedElement&& element) {
+    std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+    g_injectedElements.push_back(std::move(element));
+}
+
+void PruneInjectedElements() {
+    std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+    std::erase_if(g_injectedElements, [](const InjectedElement& entry) {
+        return !entry.element.get();
+    });
+}
+
+// 卸载时在任务栏 UI 线程上摘除点击处理器并隐藏注入的元素。
+void ReleaseInjectedElements() {
+    std::vector<InjectedElement> elements;
+    {
+        std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+        elements.swap(g_injectedElements);
+    }
+
+    int released = 0;
+    for (const auto& entry : elements) {
+        try {
+            auto element = entry.element.get();
+            if (!element) {
+                continue;
+            }
+
+            if (entry.hasClickHandler) {
+                if (auto item = element.try_as<wuxc::MenuFlyoutItem>()) {
+                    item.Click(entry.clickToken);
+                }
+            }
+
+            element.Visibility(wux::Visibility::Collapsed);
+            released++;
+        } catch (...) {
+        }
+    }
+
+    Wh_Log(L"[TSU] Released %d menu element(s)", released);
 }
 
 // ============================================================================
@@ -1362,119 +1915,502 @@ using MenuFlyoutItemBaseVector_Append_t =
 MenuFlyoutItemBaseVector_Append_t MenuFlyoutItemBaseVector_Append_Original;
 
 struct MenuItemSpec {
-    bool enabled;
-    bool inSubmenu;
-    std::wstring text;
-    const wchar_t* glyph;
+    const wchar_t* keyword;   // 设置项关键字，用于匹配合并菜单数组
+    std::wstring text;        // 菜单项显示文本（固定，不可自定义）
+    const wchar_t* glyph;     // Segoe Fluent Icons 字形
+    bool enabled;             // 对应开关是否启用
     void (*handler)(wf::IInspectable const&, wux::RoutedEventArgs const&);
 };
 
-// 构造要注入的菜单项，并通过传入的 appender 追加。抽成共用函数，让两条注入
-// 路径（旧版 Append 符号钩子 / 22H2 的 flyout 钩子）复用同一份构造代码。
-bool InjectSystemUtilities(
-    const std::function<void(wuxc::MenuFlyoutItemBase const&)>& append) {
-    if (g_injecting) {
-        return false;
+// ---- 系统工具 ----
+// enabled 固定为 true：显示与否完全由「独立项/菜单项排序」下拉决定。
+const MenuItemSpec kSystemToolSpecs[] = {
+    {L"restartExplorer", L"重启资源管理器", L"\xE72C", true,
+     &OnRestartExplorerClick},
+    {L"cleanTemp", L"清理临时文件", L"\xE74D", true,
+     &OnCleanTempClick},
+    {L"reduceMemory", L"清理运行内存", L"\xE950", true,
+     &OnReduceMemoryClick},
+    {L"restartGpu", L"重启显卡驱动", L"\xE7F4", true,
+     &OnRestartGpuClick},
+    {L"getIp", L"获取本机 IP 地址", L"\xE968", true,
+     &OnGetIpClick},
+    {L"rebuildCache", L"重建图标与缩略图缓存", L"\xE8B9",
+     true, &OnRebuildCacheClick},
+    {L"flushDns", L"清理 DNS 解析缓存", L"\xE774", true,
+     &OnFlushDnsClick},
+    {L"queryPublicIp", L"查询公网 IP", L"\xE968", true,
+     &OnQueryPublicIpClick},
+    {L"cleanRecycleBin", L"清空回收站", L"\xE74D", true,
+     &OnCleanRecycleBinClick},
+};
+
+// ---- 快速访问 ----
+// enabled 固定为 true：显示与否完全由「功能与排序」数组决定。
+const MenuItemSpec kQuickAccessSpecs[] = {
+    {L"controlPanel", L"控制面板", L"\xE771", true,
+     &OnOpenControlPanelClick},
+    {L"registryEditor", L"注册表编辑器", L"\xE8B7", true,
+     &OnOpenRegistryEditorClick},
+    {L"recycleBin", L"回收站", L"\xE74D", true,
+     &OnOpenRecycleBinClick},
+    {L"taskManager", L"任务管理器", L"\xE8B3", true,
+     &OnOpenTaskManagerClick},
+    {L"envVars", L"环境变量", L"\xE851", true,
+     &OnOpenEnvVarsClick},
+    {L"systemInfo", L"系统信息", L"\xE756", true,
+     &OnOpenSystemInfoClick},
+    {L"deviceManager", L"设备管理器", L"\xE7A7", true,
+     &OnOpenDeviceManagerClick},
+    {L"uninstallPrograms", L"卸载程序", L"\xE752", true,
+     &OnOpenUninstallProgramsClick},
+    {L"systemRestore", L"系统还原", L"\xE715", true,
+     &OnOpenSystemRestoreClick},
+    {L"credentialManager", L"凭据管理器", L"\xE78B", true,
+     &OnOpenCredentialManagerClick},
+    {L"userAccounts", L"用户账户", L"\xE787", true,
+     &OnOpenUserAccountsClick},
+    {L"networkConnections", L"网络连接", L"\xE753", true,
+     &OnOpenNetworkConnectionsClick},
+    {L"diskManagement", L"磁盘管理", L"\xE73E", true,
+     &OnOpenDiskManagementClick},
+    {L"diskCleanup", L"磁盘清理", L"\xE74D", true,
+     &OnOpenDiskCleanupClick},
+    {L"eventViewer", L"事件查看器", L"\xE9C6", true,
+     &OnOpenEventViewerClick},
+    {L"windowsFeatures", L"Windows 功能", L"\xE8A9", true,
+     &OnOpenWindowsFeaturesClick},
+    {L"userAccountControl", L"用户账户控制", L"\xE7C4", true,
+     &OnOpenUserAccountControlClick},
+};
+
+// 按关键字在 spec 数组中查找对应项。
+const MenuItemSpec* FindSpec(const MenuItemSpec* specs, size_t count,
+                              const std::wstring& key) {
+    for (size_t i = 0; i < count; ++i) {
+        if (_wcsicmp(specs[i].keyword, key.c_str()) == 0) {
+            return &specs[i];
+        }
     }
-    g_injecting = true;
-    struct Reset {
-        ~Reset() { g_injecting = false; }
-    } reset;
+    return nullptr;
+}
 
-    auto cfg = GetSettingsSnapshot();
+// 按 spec 构造一个菜单项，填充文本／图标／点击处理，并登记到弱引用表，
+// 以便模组卸载时能摘除点击处理器并隐藏该元素。
+wuxc::MenuFlyoutItem BuildMenuItem(const MenuItemSpec& spec) {
+    wuxc::MenuFlyoutItem item;
+    item.Text(spec.text);
+    item.Icon(CreateFluentIcon(spec.glyph));
 
-    const MenuItemSpec specs[] = {
-        {cfg.showRestartExplorer, cfg.inSubmenuRestartExplorer,
-         cfg.textRestartExplorer, L"\xE72C", &OnRestartExplorerClick},
-        {cfg.showCleanTemp, cfg.inSubmenuCleanTemp, cfg.textCleanTemp,
-         L"\xE74D", &OnCleanTempClick},
-        {cfg.showReduceMemory, cfg.inSubmenuReduceMemory, cfg.textReduceMemory,
-         L"\xE950", &OnReduceMemoryClick},
-        {cfg.showRestartGpu, cfg.inSubmenuRestartGpu, cfg.textRestartGpu,
-         L"\xE7F4", &OnRestartGpuClick},
-        {cfg.showGetIp, cfg.inSubmenuGetIp, cfg.textGetIp, L"\xE968",
-         &OnGetIpClick},
-        {cfg.showRebuildCache, cfg.inSubmenuRebuildCache, cfg.textRebuildCache,
-         L"\xE8B9", &OnRebuildCacheClick},
-        {cfg.showFlushDns, cfg.inSubmenuFlushDns, cfg.textFlushDns, L"\xE774",
-         &OnFlushDnsClick},
-    };
+    InjectedElement tracked;
+    tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(item);
+    tracked.clickToken = item.Click(wux::RoutedEventHandler{spec.handler});
+    tracked.hasClickHandler = true;
+    TrackInjectedElement(std::move(tracked));
 
+    return item;
+}
+
+// 判断某个关键字是否出现在合并菜单数组中（决定它是否归入子菜单）。
+bool IsInMergeList(const std::vector<std::wstring>& list,
+                   const wchar_t* keyword) {
+    for (const auto& k : list) {
+        if (_wcsicmp(k.c_str(), keyword) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// ============================================================================
+// Taskbar Context Menu Injection Engine (上游 1.3 的「先构造、后放置」模型)
+// ============================================================================
+
+// 一次菜单构建过程中的共享状态：两条注入路径（旧版 Append 符号钩子、
+// 22H2 的 flyout 钩子）共用同一份设置与放置结果，保证只注入一次。
+struct MenuBuildState {
+    ModSettings settings;
+    // 任务栏菜单 IVector 的 ABI 标识，用于确认是不是同一个菜单。
+    void* itemsIdentity = nullptr;
+    // 追加到菜单末尾的元素，保持显示顺序。
+    std::vector<wuxc::MenuFlyoutItemBase> bottomInjected;
+    // 修改菜单项集合时的重入保护。
+    bool modifying = false;
+    // 本轮菜单是否已经注入过。
+    bool injected = false;
+};
+
+thread_local MenuBuildState* g_menuBuildState = nullptr;
+
+void* GetIdentity(MenuItemsVector const& items) {
+    return winrt::get_abi(items.as<wf::IUnknown>());
+}
+
+// 构造一条分隔线。
+wuxc::MenuFlyoutSeparator CreateInjectedSeparator() {
+    wuxc::MenuFlyoutSeparator separator;
+
+    InjectedElement tracked;
+    tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(separator);
+    TrackInjectedElement(std::move(tracked));
+
+    return separator;
+}
+
+// 构造一条自定义菜单项：标签填 "-" 表示分隔线，命令留空表示不可点击的分组标题。
+wuxc::MenuFlyoutItemBase CreateCustomMenuItem(
+    const CustomMenuItemSettings& settings) {
+    if (settings.name == L"-") {
+        return CreateInjectedSeparator();
+    }
+
+    wuxc::MenuFlyoutItem item;
+    item.Text(settings.DisplayName());
+
+    if (!settings.icon.empty()) {
+        item.Icon(CreateIconFromSetting(settings.icon, 16.0));
+    }
+
+    InjectedElement tracked;
+    tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(item);
+
+    if (settings.command.empty()) {
+        // 只有标签、命令留空的条目作为不可点击的分组标题。
+        item.IsEnabled(false);
+    } else {
+        tracked.clickToken = item.Click(
+            [settings](wf::IInspectable const&, wux::RoutedEventArgs const&) {
+                Wh_Log(L"[TSU] Clicked \"%s\"", settings.DisplayName().c_str());
+                LaunchCustomItem(settings);
+            });
+        tracked.hasClickHandler = true;
+    }
+
+    TrackInjectedElement(std::move(tracked));
+    return item;
+}
+
+// 构造自定义菜单元素：填写了子菜单名称时归入专属子菜单，否则直接平铺。
+std::vector<wuxc::MenuFlyoutItemBase> CreateCustomElements(
+    const std::vector<CustomMenuItemSettings>& items,
+    const std::wstring& submenuName,
+    const std::wstring& submenuIcon) {
+    std::vector<wuxc::MenuFlyoutItemBase> elements;
+    if (items.empty()) {
+        return elements;
+    }
+
+    if (!submenuName.empty()) {
+        wuxc::MenuFlyoutSubItem subItem;
+        subItem.Text(submenuName);
+
+        if (!submenuIcon.empty()) {
+            subItem.Icon(CreateIconFromSetting(submenuIcon, 16.0));
+        }
+
+        InjectedElement tracked;
+        tracked.element = winrt::make_weak<wuxc::MenuFlyoutItemBase>(subItem);
+        TrackInjectedElement(std::move(tracked));
+
+        auto subItems = subItem.Items();
+        for (const auto& item : items) {
+            subItems.Append(CreateCustomMenuItem(item));
+        }
+
+        elements.push_back(subItem);
+    } else {
+        for (const auto& item : items) {
+            elements.push_back(CreateCustomMenuItem(item));
+        }
+    }
+
+    return elements;
+}
+
+// 一个分组的构造结果：根级独立项 + 可选的合并子菜单。
+struct GroupElements {
+    std::vector<wuxc::MenuFlyoutItemBase> standaloneItems;
     wuxc::MenuFlyoutSubItem subItem{nullptr};
-    bool anyRootInjected = false;
+};
 
-    for (const auto& spec : specs) {
-        if (!spec.enabled) {
+// 构造一个分组：
+//   · 开关启用、且出现在合并菜单数组中的功能 → 归入该分组的子菜单（按数组顺序）；
+//   · 开关启用、但未出现在数组中的功能 → 作为根级独立项显示；
+//   · 开关关闭的功能 → 不显示。
+GroupElements BuildGroupElements(const MenuItemSpec* specs, size_t count,
+                                 bool groupEnabled,
+                                 const std::vector<std::wstring>& standaloneList,
+                                 const std::vector<std::wstring>& menuList,
+                                 const wchar_t* groupLabel,
+                                 const wchar_t* groupGlyph) {
+    GroupElements result;
+    if (!groupEnabled) {
+        return result;
+    }
+
+    // 1) 独立项 → 根级直接显示。
+    //    若某功能同时出现在菜单项列表中，则菜单项优先，只在子菜单显示，
+    //    不再作为独立项（避免同一功能重复出现）。
+    for (const auto& key : standaloneList) {
+        if (IsInMergeList(menuList, key.c_str())) {
+            continue;
+        }
+        if (const MenuItemSpec* m = FindSpec(specs, count, key)) {
+            if (m->enabled) {
+                result.standaloneItems.push_back(BuildMenuItem(*m));
+            }
+        }
+    }
+
+    // 2) 菜单项 → 归入子菜单（按数组顺序）。
+    for (const auto& key : menuList) {
+        const MenuItemSpec* m = FindSpec(specs, count, key);
+        if (!m || !m->enabled) {
             continue;
         }
 
-        wuxc::MenuFlyoutItem menuItem;
-        menuItem.Text(spec.text);
-        menuItem.Icon(CreateFluentIcon(spec.glyph));
-        menuItem.Click(wux::RoutedEventHandler{spec.handler});
+        if (!result.subItem) {
+            result.subItem = wuxc::MenuFlyoutSubItem();
+            result.subItem.Text(groupLabel);
+            result.subItem.Icon(CreateFluentIcon(groupGlyph));
 
-        if (cfg.enableSubmenu && spec.inSubmenu) {
-            if (!subItem) {
-                subItem = wuxc::MenuFlyoutSubItem();
-                subItem.Text(cfg.textSubmenu);
-                subItem.Icon(CreateFluentIcon(cfg.glyphSubmenu.c_str()));
-            }
-            subItem.Items().Append(menuItem);
-        } else {
-            if (!anyRootInjected) {
-                menuItem.Name(kGuardItemName);
-            }
-            append(menuItem);
-            anyRootInjected = true;
+            InjectedElement tracked;
+            tracked.element =
+                winrt::make_weak<wuxc::MenuFlyoutItemBase>(result.subItem);
+            TrackInjectedElement(std::move(tracked));
         }
+
+        result.subItem.Items().Append(BuildMenuItem(*m));
     }
 
-    if (subItem) {
-        if (!anyRootInjected) {
-            subItem.Name(kGuardItemName);
-        }
-        append(subItem);
-        anyRootInjected = true;
-    }
-
-    if (anyRootInjected) {
-        wuxc::MenuFlyoutSeparator separator;
-        append(separator);
-        g_currentMenuInjected = true;
-    }
-    return anyRootInjected;
+    return result;
 }
 
-void AppendInjectedItems(void* vectorThis) {
-    InjectSystemUtilities([&](wuxc::MenuFlyoutItemBase const& item) {
-        MenuFlyoutItemBaseVector_Append_Original(vectorThis, item);
-    });
+// 构造本模组的根级菜单元素：「系统工具」与「快速访问」两个分组，
+// 以及选择放进「系统工具」子菜单的自定义项。
+std::vector<wuxc::MenuFlyoutItemBase> CreateRemasterElements(
+    const ModSettings& cfg,
+    const std::vector<wuxc::MenuFlyoutItemBase>& customElements) {
+    std::vector<wuxc::MenuFlyoutItemBase> rootElements;
+
+    // 先系统工具，再快速访问，保证菜单顺序稳定（沿用重制版原有顺序）。
+    GroupElements sysGroup = BuildGroupElements(
+        kSystemToolSpecs, ARRAYSIZE(kSystemToolSpecs), cfg.enableSystemTools,
+        cfg.systemStandalone, cfg.systemMenuItems, L"系统工具", L"\xE712");
+    GroupElements quickGroup = BuildGroupElements(
+        kQuickAccessSpecs, ARRAYSIZE(kQuickAccessSpecs), cfg.enableQuickAccess,
+        cfg.quickStandalone, cfg.quickMenuItems, L"快速访问", L"\xE8A7");
+
+    // 自定义项选择放进「系统工具」子菜单时，归入该子菜单末尾。
+    bool customInSubmenu = !customElements.empty() &&
+                           cfg.customPlacement == CustomPlacement::Submenu;
+    bool customPlacedInSubmenu = false;
+    if (customInSubmenu && sysGroup.subItem) {
+        if (sysGroup.subItem.Items().Size() > 0 && cfg.customSeparator) {
+            sysGroup.subItem.Items().Append(CreateInjectedSeparator());
+        }
+        for (const auto& el : customElements) {
+            sysGroup.subItem.Items().Append(el);
+        }
+        customPlacedInSubmenu = true;
+    }
+
+    // 根级顺序：系统工具独立项 → 系统工具子菜单 → 快速访问独立项 → 快速访问子菜单
+    for (const auto& el : sysGroup.standaloneItems) {
+        rootElements.push_back(el);
+    }
+    if (sysGroup.subItem) {
+        rootElements.push_back(sysGroup.subItem);
+    }
+    for (const auto& el : quickGroup.standaloneItems) {
+        rootElements.push_back(el);
+    }
+    if (quickGroup.subItem) {
+        rootElements.push_back(quickGroup.subItem);
+    }
+
+    // 「系统工具」子菜单不存在时（例如系统工具被整体关闭或没有菜单项），
+    // 自定义项降级为根级元素，避免无处安放。
+    if (customInSubmenu && !customPlacedInSubmenu) {
+        if (cfg.customSeparator && !rootElements.empty()) {
+            rootElements.push_back(CreateInjectedSeparator());
+        }
+        for (const auto& el : customElements) {
+            rootElements.push_back(el);
+        }
+    }
+
+    return rootElements;
+}
+
+// 把构造好的菜单元素按设置放进任务栏菜单：顶部元素用 InsertAt 插到内置项
+// 之前，底部元素追加到末尾（资源管理器继续追加内置项时保持贴底）。
+void InjectElements(MenuItemsVector const& items, MenuBuildState& state) {
+    PruneInjectedElements();
+
+    const auto& cfg = state.settings;
+
+    std::vector<wuxc::MenuFlyoutItemBase> topElements;
+    std::vector<wuxc::MenuFlyoutItemBase> bottomElements;
+
+    // 自定义菜单元素（选择放进「系统工具」子菜单的由 CreateRemasterElements 处理）。
+    std::vector<wuxc::MenuFlyoutItemBase> customElements;
+    if (!cfg.customItems.empty()) {
+        customElements = CreateCustomElements(
+            cfg.customItems, cfg.customSubmenuName, cfg.customSubmenuIcon);
+    }
+
+    // 1. 本模组的「系统工具」与「快速访问」分组（整体放在顶部或底部）
+    auto groupElements = CreateRemasterElements(cfg, customElements);
+    if (!groupElements.empty()) {
+        if (cfg.menuPlacement == MenuPlacement::Top) {
+            for (const auto& el : groupElements) {
+                topElements.push_back(el);
+            }
+            topElements.push_back(CreateInjectedSeparator());
+        } else {
+            bottomElements.push_back(CreateInjectedSeparator());
+            for (const auto& el : groupElements) {
+                bottomElements.push_back(el);
+            }
+        }
+    }
+
+    // 2. 自定义菜单项（放进子菜单的已在上一步处理）
+    if (!customElements.empty() &&
+        cfg.customPlacement != CustomPlacement::Submenu) {
+        if (cfg.customPlacement == CustomPlacement::Top) {
+            for (const auto& el : customElements) {
+                topElements.push_back(el);
+            }
+            if (cfg.customSeparator) {
+                topElements.push_back(CreateInjectedSeparator());
+            }
+        } else {
+            if (cfg.customSeparator) {
+                bottomElements.push_back(CreateInjectedSeparator());
+            }
+            for (const auto& el : customElements) {
+                bottomElements.push_back(el);
+            }
+        }
+    }
+
+    // 给首个注入元素打上标记，便于识别（沿用本地原有的防重复机制）。
+    if (!topElements.empty()) {
+        topElements.front().Name(kGuardItemName);
+    }
+    if (!bottomElements.empty()) {
+        bottomElements.front().Name(kGuardItemName);
+    }
+
+    // 顶部元素插到内置项之前
+    if (!topElements.empty()) {
+        uint32_t index = 0;
+        for (const auto& element : topElements) {
+            items.InsertAt(index++, element);
+        }
+    }
+
+    // 底部元素追加到末尾
+    if (!bottomElements.empty()) {
+        for (const auto& element : bottomElements) {
+            items.Append(element);
+        }
+        state.bottomInjected = std::move(bottomElements);
+    }
+}
+
+// 资源管理器继续追加内置项时，把底部的注入元素重新移到菜单末尾。
+void MoveBottomElementsToEnd(MenuItemsVector const& items,
+                             MenuBuildState& state) {
+    for (const auto& element : state.bottomInjected) {
+        uint32_t index;
+        if (items.IndexOf(element, index)) {
+            items.RemoveAt(index);
+        }
+    }
+
+    for (const auto& element : state.bottomInjected) {
+        items.Append(element);
+    }
 }
 
 // Windows 11 22H2：菜单项由 ShowTaskbarSettingsContextMenu 经 COM 虚表直接
 // Append（编译器内联），不经过被挂钩的 consume_...::Append 符号，因此改用
 // 菜单显示函数拿到已构建好的 FlyoutBase，直接往 MenuFlyout::Items() 追加。
 void InjectIntoFlyout(wuxc::MenuFlyout const& menuFlyout) {
+    MenuBuildState* state = g_menuBuildState;
+    if (!state || state->modifying || state->injected) {
+        return;
+    }
+
     auto items = menuFlyout.Items();
-    InjectSystemUtilities([&](wuxc::MenuFlyoutItemBase const& item) {
-        items.Append(item);
-    });
+
+    state->modifying = true;
+    try {
+        state->itemsIdentity = GetIdentity(items);
+        InjectElements(items, *state);
+        state->injected = true;
+        g_currentMenuInjected = true;
+        Wh_Log(L"[TSU] Flyout path injection triggered");
+    } catch (winrt::hresult_error const& e) {
+        Wh_Log(L"[TSU] Flyout injection failed: %08X %s",
+               static_cast<unsigned>(e.code()), e.message().c_str());
+    } catch (...) {
+        Wh_Log(L"[TSU] Flyout injection failed");
+    }
+    state->modifying = false;
 }
 
 void __cdecl MenuFlyoutItemBaseVector_Append_Hook(
     void* pThis,
     wuxc::MenuFlyoutItemBase const& item) {
-    if (g_taskbarSettingsMenuDepth > 0 && !g_currentMenuInjected) {
-        try {
-            if (!IsSeparator(item) && !IsNamedItem(item, kGuardItemName)) {
-                AppendInjectedItems(pThis);
-            }
-        } catch (...) {
-            Wh_Log(L"Taskbar menu append inspection failed");
-        }
+    // 先让原本的菜单项进入集合，再按位置插入本模组的元素：插在前面的元素
+    // 才能稳定地留在内置项之前，追加到末尾的元素则需要保持贴底。
+    MenuFlyoutItemBaseVector_Append_Original(pThis, item);
+
+    MenuBuildState* state = g_menuBuildState;
+    if (!state || state->modifying || g_unloading.load()) {
+        return;
     }
 
-    MenuFlyoutItemBaseVector_Append_Original(pThis, item);
+    try {
+        if (IsSeparator(item) || IsNamedItem(item, kGuardItemName)) {
+            return;
+        }
+    } catch (...) {
+        Wh_Log(L"Taskbar menu append inspection failed");
+    }
+
+    state->modifying = true;
+    try {
+        auto const& items = *reinterpret_cast<MenuItemsVector const*>(pThis);
+        if (!items.try_as<MenuItemsVector>()) {
+            state->modifying = false;
+            return;
+        }
+
+        void* identity = GetIdentity(items);
+        if (!state->injected) {
+            state->itemsIdentity = identity;
+            InjectElements(items, *state);
+            state->injected = true;
+            g_currentMenuInjected = true;
+            Wh_Log(L"[TSU] Append path injection triggered");
+        } else if (state->itemsIdentity == identity &&
+                   !state->bottomInjected.empty()) {
+            // 资源管理器继续追加内置项时，把底部元素保持贴底。
+            MoveBottomElementsToEnd(items, *state);
+        }
+    } catch (winrt::hresult_error const& e) {
+        Wh_Log(L"[TSU] Failed to update taskbar menu: %08X %s",
+               static_cast<unsigned>(e.code()), e.message().c_str());
+    } catch (...) {
+        Wh_Log(L"[TSU] Failed to update taskbar menu");
+    }
+
+    state->modifying = false;
 }
 
 // 22H2 上 ShowTaskbarSettingsContextMenu 在末尾调用本函数来显示菜单，
@@ -1507,17 +2443,26 @@ void __cdecl ShowFlyoutAtPointerPosition_Hook(
     ShowFlyoutAtPointerPosition_Original(flyout, target, args, options);
 }
 
+// 一次任务栏右键菜单构建的上下文：两条注入路径共用同一份状态，
+// 保证构造逻辑一致、且只注入一次。
 struct ScopedTaskbarSettingsMenuBuild {
     bool outer = false;
+    MenuBuildState state;
 
     ScopedTaskbarSettingsMenuBuild() {
         outer = g_taskbarSettingsMenuDepth++ == 0;
         if (outer) {
             g_currentMenuInjected = false;
         }
+        state.settings = GetSettingsSnapshot();
+        state.injected = false;
+        g_menuBuildState = &state;
     }
 
-    ~ScopedTaskbarSettingsMenuBuild() { g_taskbarSettingsMenuDepth--; }
+    ~ScopedTaskbarSettingsMenuBuild() {
+        g_menuBuildState = nullptr;
+        g_taskbarSettingsMenuDepth--;
+    }
 };
 
 using ContextMenus_ShowTaskbarSettingsContextMenu_t =
@@ -1773,6 +2718,21 @@ std::wstring LoadStringSetting(const wchar_t* name,
     return val.get()[0] != L'\0' ? val.get() : defaultValue;
 }
 
+// \u8BFB\u53D6\u5E26\u7D22\u5F15\u7684\u5B57\u7B26\u4E32\u8BBE\u7F6E\uFF08\u5982 customItems.items[0].name\uFF09\u3002
+std::wstring GetIndexedStringSetting(const wchar_t* nameFormat, int index) {
+    wchar_t key[128];
+    swprintf_s(key, L"%s[%d]", nameFormat, index);
+    auto val = WindhawkUtils::StringSetting::make(key);
+    return val.get() ? val.get() : L"";
+}
+
+// \u8BFB\u53D6\u5E26\u7D22\u5F15\u7684\u6574\u578B\u8BBE\u7F6E\uFF08\u5982 customItems.items[0].runAsAdmin\uFF09\u3002
+int GetIndexedIntSetting(const wchar_t* nameFormat, int index) {
+    wchar_t key[128];
+    swprintf_s(key, L"%s[%d]", nameFormat, index);
+    return Wh_GetIntSetting(key);
+}
+
 // Accepts "E712", "0xE712", "\xE712", "\uE712", "U+E712" or a literal glyph.
 std::wstring ParseGlyphString(const std::wstring& raw,
                               const wchar_t* fallback) {
@@ -1816,55 +2776,97 @@ std::wstring ParseGlyphString(const std::wstring& raw,
     return hadPrefix ? std::wstring(fallback) : s;
 }
 
+// 读取一个字符串数组设置（如 mergeMenu.items），按索引顺序返回。
+// 设置界面里这种数组渲染为可拖拽排序的多选下拉列表，此处按序读回。
+std::vector<std::wstring> ReadStringArray(const wchar_t* prefix,
+                                          int maxItems = 32) {
+    std::vector<std::wstring> out;
+    for (int i = 0; i < maxItems; ++i) {
+        wchar_t key[256];
+        swprintf_s(key, L"%s[%d]", prefix, i);
+        PCWSTR raw = Wh_GetStringSetting(key);
+        if (!raw || !*raw) {
+            if (raw) Wh_FreeStringSetting(raw);
+            break;
+        }
+        out.emplace_back(raw);
+        Wh_FreeStringSetting(raw);
+    }
+    return out;
+}
+
 void LoadSettings() {
     ModSettings fresh;
-    fresh.enableSubmenu = Wh_GetIntSetting(L"submenu.enabled");
-    fresh.textSubmenu =
-        LoadStringSetting(L"submenu.label", L"系统工具");
-    fresh.glyphSubmenu = ParseGlyphString(
-        LoadStringSetting(L"submenu.glyph", L"E712"), L"\xE712");
 
-    fresh.inSubmenuRestartExplorer =
-        Wh_GetIntSetting(L"restartExplorer.inSubmenu");
-    fresh.inSubmenuCleanTemp = Wh_GetIntSetting(L"cleanTemp.inSubmenu");
-    fresh.inSubmenuReduceMemory = Wh_GetIntSetting(L"reduceMemory.inSubmenu");
-    fresh.inSubmenuRestartGpu = Wh_GetIntSetting(L"restartGpu.inSubmenu");
-    fresh.inSubmenuGetIp = Wh_GetIntSetting(L"getIp.inSubmenu");
-    fresh.inSubmenuRebuildCache = Wh_GetIntSetting(L"rebuildCache.inSubmenu");
-    fresh.inSubmenuFlushDns = Wh_GetIntSetting(L"flushDns.inSubmenu");
+    fresh.enableQuickAccess = Wh_GetIntSetting(L"quickAccessEnabled");
+    fresh.enableSystemTools = Wh_GetIntSetting(L"systemToolsEnabled");
 
-    fresh.showRestartExplorer = Wh_GetIntSetting(L"restartExplorer.enabled");
-    fresh.textRestartExplorer =
-        LoadStringSetting(L"restartExplorer.label", L"重启资源管理器");
+    // 快速访问：独立项排序（默认空）+ 菜单项排序（默认全选）。
+    fresh.quickStandalone = ReadStringArray(L"quickAccess.standalone.items");
+    fresh.quickMenuItems = ReadStringArray(L"quickAccess.menuItems.items");
+    // 系统工具：独立项排序（默认空）+ 菜单项排序（默认全选）。
+    fresh.systemStandalone = ReadStringArray(L"systemTools.standalone.items");
+    fresh.systemMenuItems = ReadStringArray(L"systemTools.menuItems.items");
+    // 迁移：旧版本使用 systemTools.mergeMenu.items，若新键未设置则回退读取旧键，
+    // 避免老用户自定义的合并菜单选择丢失。
+    if (fresh.systemMenuItems.empty()) {
+        fresh.systemMenuItems = ReadStringArray(L"systemTools.mergeMenu.items");
+    }
 
-    fresh.showCleanTemp = Wh_GetIntSetting(L"cleanTemp.enabled");
-    fresh.textCleanTemp = LoadStringSetting(L"cleanTemp.label", L"清理临时文件");
-    fresh.cleanRecycleBin = Wh_GetIntSetting(L"cleanTemp.cleanRecycleBin");
-    fresh.notifyCleanTemp = Wh_GetIntSetting(L"cleanTemp.showCard");
+    // 摘要/确认卡片总开关：关闭后所有工具卡片都不显示。
+    fresh.systemShowCards = Wh_GetIntSetting(L"systemShowCards");
 
-    fresh.showReduceMemory = Wh_GetIntSetting(L"reduceMemory.enabled");
-    fresh.textReduceMemory =
-        LoadStringSetting(L"reduceMemory.label", L"释放内存");
-    fresh.notifyReduceMemory = Wh_GetIntSetting(L"reduceMemory.showCard");
+    // 本模组分组的整体位置（上游 1.3 的 submenu.placement）：
+    // 系统工具与快速访问分组整体显示在内置项上方或下方。
+    std::wstring placementStr = LoadStringSetting(L"menuPlacement", L"bottom");
+    fresh.menuPlacement = (_wcsicmp(placementStr.c_str(), L"top") == 0)
+                              ? MenuPlacement::Top
+                              : MenuPlacement::Bottom;
 
-    fresh.showRestartGpu = Wh_GetIntSetting(L"restartGpu.enabled");
-    fresh.textRestartGpu =
-        LoadStringSetting(L"restartGpu.label", L"重启显卡驱动");
+    // 自定义菜单项（上游 1.3 新增）：按索引顺序读取，遇到第一个既没有标签
+    // 也没有命令的条目就停止。
+    for (int i = 0;; i++) {
+        CustomMenuItemSettings item;
+        item.name = GetIndexedStringSetting(L"customItems.items.name", i);
+        item.command = GetIndexedStringSetting(L"customItems.items.command", i);
 
-    fresh.showGetIp = Wh_GetIntSetting(L"getIp.enabled");
-    fresh.textGetIp = LoadStringSetting(L"getIp.label", L"获取 IP 地址");
-    fresh.queryPublicIp = Wh_GetIntSetting(L"getIp.queryPublicIp");
-    fresh.copyIpToClipboard = Wh_GetIntSetting(L"getIp.copyToClipboard");
+        if (item.name.empty() && item.command.empty()) {
+            break;
+        }
 
-    fresh.showRebuildCache = Wh_GetIntSetting(L"rebuildCache.enabled");
-    fresh.textRebuildCache = LoadStringSetting(
-        L"rebuildCache.label", L"重建图标和缩略图缓存");
-    fresh.notifyRebuildCache = Wh_GetIntSetting(L"rebuildCache.showCard");
+        item.arguments =
+            GetIndexedStringSetting(L"customItems.items.arguments", i);
+        item.icon = GetIndexedStringSetting(L"customItems.items.icon", i);
+        item.runAsAdmin =
+            GetIndexedIntSetting(L"customItems.items.runAsAdmin", i) != 0;
+        item.hideWindow =
+            GetIndexedIntSetting(L"customItems.items.hideWindow", i) != 0;
 
-    fresh.showFlushDns = Wh_GetIntSetting(L"flushDns.enabled");
-    fresh.textFlushDns =
-        LoadStringSetting(L"flushDns.label", L"清理 DNS 缓存");
-    fresh.notifyFlushDns = Wh_GetIntSetting(L"flushDns.showCard");
+        fresh.customItems.push_back(std::move(item));
+    }
+
+    // 自定义项位置、分隔线与专属子菜单（上游 1.3 新增）。
+    std::wstring customPlacementStr =
+        LoadStringSetting(L"customItems.placement", L"bottom");
+    if (_wcsicmp(customPlacementStr.c_str(), L"top") == 0) {
+        fresh.customPlacement = CustomPlacement::Top;
+    } else if (_wcsicmp(customPlacementStr.c_str(), L"submenu") == 0) {
+        fresh.customPlacement = CustomPlacement::Submenu;
+    } else {
+        fresh.customPlacement = CustomPlacement::Bottom;
+    }
+
+    fresh.customSeparator = Wh_GetIntSetting(L"customItems.separator") != 0;
+    fresh.customSubmenuName = LoadStringSetting(L"customItems.submenuName", L"");
+    fresh.customSubmenuIcon =
+        LoadStringSetting(L"customItems.submenuIcon", L"E71D");
+
+    // 系统工具各功能开关：设置界面已移除逐项开关，统一由「独立项/菜单项排序」
+    // 下拉控制显示与位置，故这里保持默认显示（enabled=true），卡片开关由总开关统一控制。
+    // 行为子选项（清空回收站、查询公网 IP、复制到剪贴板）保留固定默认值。
+    fresh.cleanRecycleBin = false;
+    fresh.queryPublicIp = false;
+    fresh.copyIpToClipboard = false;
 
     std::lock_guard<std::mutex> lock(g_settingsMutex);
     g_settings = std::move(fresh);
@@ -1929,13 +2931,28 @@ void Wh_ModUninit() {
 
     CancelActivePublicIpRequest();
 
+    // 卸载时在任务栏 UI 线程上摘除注入元素的点击处理器并隐藏它们，
+    // 避免菜单关闭后残留（上游 1.3 的改进卸载生命周期）。
+    bool hasInjectedElements;
+    {
+        std::lock_guard<std::mutex> lock(g_injectedElementsMutex);
+        hasInjectedElements = !g_injectedElements.empty();
+    }
+
+    if (HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd()) {
+        RunFromWindowThread(hTaskbarWnd, [hasInjectedElements]() {
+            CloseActiveFlyoutOnUIThread();
+            if (hasInjectedElements) {
+                ReleaseInjectedElements();
+            }
+        });
+    }
+
     for (HANDLE thread : threads) {
         WaitForSingleObject(thread, INFINITE);
         CloseHandle(thread);
     }
 
-    if (HWND hTaskbarWnd = FindCurrentProcessTaskbarWnd()) {
-        RunFromWindowThread(hTaskbarWnd,
-                            []() { CloseActiveFlyoutOnUIThread(); });
-    }
+    // 等待自定义菜单项的启动线程结束，避免 DLL 卸载后仍被调用。
+    WaitForLaunchThreads();
 }
